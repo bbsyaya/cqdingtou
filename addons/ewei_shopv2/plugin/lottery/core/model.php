@@ -102,7 +102,7 @@ class LotteryModel extends PluginModel
 				foreach ($lotterylist as $key => $value ) 
 				{
 					$value['task_data'] = unserialize($value['task_data']);
-					if ($data['day'] == $value['task_data']['sign_day']) 
+					if (($value['task_data']['sign_day'] == 1) || (($value['task_data']['sign_day'] <= $data['day']) && (($data['day'] % $value['task_data']['sign_day']) == 0))) 
 					{
 						if (0 < $value['task_data']['sign_num']) 
 						{
@@ -178,7 +178,6 @@ class LotteryModel extends PluginModel
 		if (!(empty($lottery_list))) 
 		{
 			$datas = array( array('name' => '活动名称', 'value' => $lottery_list['title']) );
-			logg('CUNX.txt', $_W['siteroot']);
 			$url = $_W['siteroot'] . 'app/index.php?i=' . $_W['uniacid'] . '&c=entry&m=ewei_shopv2&do=mobile&r=lottery.index.lottery_info&id=' . $param['lottery_id'];
 			$url = str_replace('addons/ewei_shopv2/', '', $url);
 			$remark = "\n" . '<a href=\'' . $url . '\'>点击去抽奖</a>';
@@ -224,7 +223,6 @@ class LotteryModel extends PluginModel
 			$params = array('openid' => $openid, 'tid' => $tid, 'send_name' => '推荐奖励', 'money' => $poster['bribery']['num'], 'wishing' => '推荐奖励', 'act_name' => $title, 'remark' => '推荐奖励');
 			$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
 			$err = m('common')->sendredpack($params, $wechat);
-			dump($err);
 			if (!(is_error($err))) 
 			{
 				$reward = $poster;
@@ -236,7 +234,6 @@ class LotteryModel extends PluginModel
 			}
 			else 
 			{
-				dump($err);
 				show_json(0, 'WechatRedError');
 			}
 		}

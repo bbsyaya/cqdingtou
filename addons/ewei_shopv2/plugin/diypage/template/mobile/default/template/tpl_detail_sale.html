@@ -124,7 +124,6 @@
             {/if}
 
         {elseif $saledata['type']=='coupon'}
-
             {if com('coupon')&&$coupons}
                 <div class="fui-cell-group fui-cell-click">
                     <div class="fui-cell">
@@ -132,6 +131,28 @@
                         <div class="fui-cell-remark"></div>
                     </div>
                 </div>
+            {/if}
+
+        {elseif $saledata['type']=='zengpin'}
+
+            {if $gifts && $goods['total'] > 0}
+            <div class='fui-cell-group fui-sale-group' style='margin-top:0'>
+                <div class='fui-cell'>
+                    {if count($gifts)>1}
+                    <div class='fui-cell-text fui-cell-giftclick'>
+                        赠品: <label id="gifttitle">请选择赠品</label>
+                        <input type="hidden" name="giftid" id="giftid" value="">
+                    </div>
+                    {else}
+                    {loop $gifts $item}
+                    <div class='fui-cell-text' onclick="javascript:window.location.href='{php echo mobileUrl('goods/gift',array('id'=>$item['id']))}'">
+                        赠品:{$gifttitle}<input type="hidden" name="giftid" id="giftid" value="{$item['id']}">
+                    </div>
+                    {/loop}
+                    {/if}
+                    <div class='fui-cell-remark'></div>
+                </div>
+            </div>
             {/if}
 
         {/if}

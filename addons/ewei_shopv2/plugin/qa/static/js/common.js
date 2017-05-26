@@ -4,6 +4,8 @@ define(['core', 'tpl'], function (core, tpl) {
     modal.init = function (params) {
         modal.cate = params.cate;
         modal.keyword = params.keyword;
+        modal.isrecommand = params.isrecommand;
+        modal.page = 1;
 
         $('.fui-content').infinite({
             onLoading: function () {
@@ -18,7 +20,8 @@ define(['core', 'tpl'], function (core, tpl) {
         core.json('qa/getlist', {
             page: modal.page,
             cate: modal.cate,
-            keyword: modal.keyword
+            keyword: modal.keyword,
+            isrecommand: modal.isrecommand
         }, function (ret) {
             var result = ret.result;
             if (result.total <= 0) {

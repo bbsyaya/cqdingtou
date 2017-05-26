@@ -166,7 +166,7 @@
                              {ifp 'creditshop.goods.delete' && $_GPC['tab']!='warehouse' && $_GPC['tab']!='recycle'}
                              	<a class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('creditshop/goods/delete',array('id' => $row['id']));}" data-confirm="确定要删除该商品吗？" title="删除"><i class='fa fa-trash'></i></a>
                              {/if}
-                             {ifp 'creditshop.goods.delete' && $_GPC['tab']!='recycle'}
+                             {ifp 'creditshop.goods.delete' && $_GPC['tab']=='recycle'}
                              <a class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('creditshop/goods/deleted',array('id' => $row['id']));}" data-confirm="确定要彻底删除该商品吗？" title="彻底删除"><i class='fa fa-remove'></i></a>
                              {/if}
                              {ifp 'creditshop.goods.delete' && $_GPC['tab']=='recycle'}

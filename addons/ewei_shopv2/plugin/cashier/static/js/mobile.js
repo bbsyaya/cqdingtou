@@ -216,10 +216,9 @@ define(['core', 'tpl'], function (core, tpl) {
                                 modal.couponmerchid = 0;
                                 coupondiv.find('.fui-cell-label').html('优惠券');
                                 coupondiv.find('.fui-cell-info').html('');
-                                modal.calcCouponPrice()
                             },
                             onSelected: function (data) {
-                                modal.couponid = data.id;
+                                modal.couponid = data.id || data.couponid;
                                 modal.couponmerchid = data.merchid;
                                 coupondiv.find('.fui-cell-label').html('已选择');
                                 coupondiv.find('.fui-cell-info').html(data.couponname);

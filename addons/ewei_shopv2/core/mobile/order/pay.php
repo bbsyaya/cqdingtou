@@ -66,6 +66,12 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		{
 			$credit = array('success' => true, 'current' => $member['credit2']);
 		}
+		$order['price'] = floatval($order['price']);
+		if (empty($order['price'])) 
+		{
+			header('location: ' . mobileUrl('order/pay/complete', array('id' => $order['id'], 'type' => 'credit')));
+			exit();
+		}
 		load()->model('payment');
 		$setting = uni_setting($_W['uniacid'], array('payment'));
 		$sec = m('common')->getSec();
@@ -240,6 +246,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			$pay_result = true;
 			if ($_W['ispost']) 
 			{
+				$_SESSION[EWEI_SHOPV2_PREFIX . '_order_pay_complete'] = 1;
 				show_json(1, array('result' => $pay_result));
 			}
 			else 

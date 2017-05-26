@@ -313,11 +313,11 @@ if (!(class_exists('AbonusModel')))
 				return false;
 			}
 			$member = m('member')->getMember($openid);
-			if (empty($member['agentlevel'])) 
+			if (empty($member['aagentlevel'])) 
 			{
 				return false;
 			}
-			$level = pdo_fetch('select * from ' . tablename('ewei_shop_abonus_level') . ' where uniacid=:uniacid and id=:id limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $member['partnerlevel']));
+			$level = pdo_fetch('select * from ' . tablename('ewei_shop_abonus_level') . ' where uniacid=:uniacid and id=:id limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $member['aagentlevel']));
 			return $level;
 		}
 		public function getInfo($openid, $options = NULL) 

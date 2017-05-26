@@ -24,6 +24,14 @@ class Detail_EweiShopV2Page extends MobilePage
 		{
 			$_SESSION[$id . '_log_id'] = $log_id;
 		}
+		if (p('threen')) 
+		{
+			$threenvip = p('threen')->getMember($_W['openid']);
+			if (!(empty($threenvip))) 
+			{
+				$threen = true;
+			}
+		}
 		$err = false;
 		$merch_plugin = p('merch');
 		$merch_data = m('common')->getPluginset('merch');
@@ -58,6 +66,7 @@ class Detail_EweiShopV2Page extends MobilePage
 			}
 		}
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		$threenprice = json_decode($goods['threen'], 1);
 		if ((0 < $goods['ispresell']) && (((0 < $goods['presellend']) && (time() < $goods['preselltimeend'])) || ($goods['preselltimeend'] == 0))) 
 		{
 			$goods['minprice'] = $goods['presellprice'];
@@ -155,7 +164,7 @@ class Detail_EweiShopV2Page extends MobilePage
 		}
 		$goods['unit'] = ((empty($goods['unit']) ? '件' : $goods['unit']));
 		$dispatch_areas = m('dispatch')->getNoDispatchAreas($goods);
-		$citys = $dispatch_areas['citys'];
+		$citys = ((empty($dispatch_areas) ? '' : $dispatch_areas['citys']));
 		if (!(empty($citys))) 
 		{
 			$onlysent = $dispatch_areas['onlysent'];

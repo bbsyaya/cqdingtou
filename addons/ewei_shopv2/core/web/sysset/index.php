@@ -97,6 +97,8 @@ class Index_EweiShopV2Page extends WebPage
 			$data['img'] = save_media($data['img']);
 			$data['logo'] = save_media($data['logo']);
 			$data['signimg'] = save_media($data['signimg']);
+			$data['saleout'] = save_media($data['saleout']);
+			$data['loading'] = save_media($data['loading']);
 			$data['diycode'] = $_POST['data']['diycode'];
 			m('common')->updateSysset(array('shop' => $data));
 			plog('sysset.shop.edit', '修改系统设置-商城设置');
@@ -216,11 +218,11 @@ class Index_EweiShopV2Page extends WebPage
 				$defaulttemp = pdo_fetch('select 1  from ' . tablename('ewei_shop_member_message_template_default') . ' where typecode=:typecode and uniacid=:uniacid  limit 1', array(':typecode' => $tag, ':uniacid' => $_W['uniacid']));
 				if (empty($defaulttemp)) 
 				{
-					pdo_insert('ewei_shop_member_message_template_default', array('typecode' => $tag, 'uniacid' => $_W['uniacid'], 'templateid' => $result['template_id']));
+					pdo_insert('ewei_shop_member_message_template_default', array('typecode' => $tag, 'uniacid' => $_W['uniacid'], 'templateid' => $value['template_id']));
 				}
 				else 
 				{
-					pdo_update('ewei_shop_member_message_template_default', array('templateid' => $result['template_id']), array('typecode' => $tag, 'uniacid' => $_W['uniacid']));
+					pdo_update('ewei_shop_member_message_template_default', array('templateid' => $value['template_id']), array('typecode' => $tag, 'uniacid' => $_W['uniacid']));
 				}
 			}
 		}
@@ -515,6 +517,16 @@ class Index_EweiShopV2Page extends WebPage
 			$sec['mchid_jie_sub'] = trim($_GPC['data']['mchid_jie_sub']);
 			$sec['sub_mchid_jie_sub'] = trim($_GPC['data']['sub_mchid_jie_sub']);
 			$sec['apikey_jie_sub'] = trim($_GPC['data']['apikey_jie_sub']);
+			$sec['weixin_wft_mchid'] = trim($_GPC['data']['weixin_wft_mchid']);
+			$sec['weixin_wft_key'] = trim($_GPC['data']['weixin_wft_key']);
+			$sec['weixin_wft_native'] = intval($_GPC['data']['weixin_wft_native']);
+			$sec['weixin_zxyh_mchid'] = trim($_GPC['data']['weixin_zxyh_mchid']);
+			$sec['weixin_zxyh_key'] = trim($_GPC['data']['weixin_zxyh_key']);
+			$sec['weixin_zxyh_key2'] = trim($_GPC['data']['weixin_zxyh_key2']);
+			$sec['weixin_zxyh_sub_mchid'] = trim($_GPC['data']['weixin_zxyh_sub_mchid']);
+			$sec['weixin_zxyhapp_mchid'] = trim($_GPC['data']['weixin_zxyhapp_mchid']);
+			$sec['weixin_zxyhapp_key'] = trim($_GPC['data']['weixin_zxyhapp_key']);
+			$sec['weixin_zxyhapp_key2'] = trim($_GPC['data']['weixin_zxyhapp_key2']);
 			pdo_update('ewei_shop_sysset', array('sec' => iserializer($sec)), array('uniacid' => $_W['uniacid']));
 			$inputdata = ((is_array($_GPC['data']) ? $_GPC['data'] : array()));
 			$data['weixin'] = intval($inputdata['weixin']);
@@ -526,6 +538,9 @@ class Index_EweiShopV2Page extends WebPage
 			$data['cash'] = intval($inputdata['cash']);
 			$data['app_wechat'] = intval($inputdata['app_wechat']);
 			$data['app_alipay'] = intval($inputdata['app_alipay']);
+			$data['weixin_wft'] = intval($inputdata['weixin_wft']);
+			$data['weixin_zxyh'] = intval($inputdata['weixin_zxyh']);
+			$data['weixin_zxyhapp'] = intval($inputdata['weixin_zxyhapp']);
 			$data['paytype'] = ((isset($inputdata['paytype']) ? $inputdata['paytype'] : array()));
 			m('common')->updateSysset(array('pay' => $data));
 			plog('sysset.payset.edit', '修改系统设置-支付设置');
@@ -630,9 +645,6 @@ class Index_EweiShopV2Page extends WebPage
 			$data['address'] = $shop['address'];
 			$data['phone'] = $shop['phone'];
 		}
-		$area_set = m('util')->get_area_config_set();
-		$new_area = intval($area_set['new_area']);
-		$address_street = intval($area_set['address_street']);
 		include $this->template();
 	}
 	public function close() 
@@ -794,8 +806,6 @@ class Index_EweiShopV2Page extends WebPage
 					$change_data['province'] = '';
 					$change_data['city'] = '';
 					$change_data['area'] = '';
-					pdo_update('ewei_shop_member', $change_data, array('uniacid' => $uniacid));
-					pdo_update('ewei_shop_member_address', $change_data, array('uniacid' => $uniacid));
 				}
 				else 
 				{
@@ -822,6 +832,21 @@ class Index_EweiShopV2Page extends WebPage
 			show_json(1);
 		}
 		include $this->template();
+	}
+	public function express() 
+	{
+		global $_W;
+		global $_GPC;
+		$data = m('common')->getSysset('express');
+		if ($_W['ispost']) 
+		{
+			ca('sysset.express.edit');
+			$data = array('apikey' => trim($_GPC['apikey']), 'customer' => trim($_GPC['customer']), 'isopen' => intval($_GPC['isopen']), 'cache' => intval($_GPC['cache']));
+			m('common')->updateSysset(array('express' => $data));
+			plog('sysset.express.edit', '修改系统设置-物流信息接口');
+			show_json(1);
+		}
+		include $this->template('sysset/express');
 	}
 }
 ?>

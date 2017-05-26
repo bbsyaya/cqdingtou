@@ -18,12 +18,20 @@ class TaskProcessor extends PluginProcessor
 		$msgtype = strtolower($message['msgtype']);
 		$event = strtolower($message['event']);
 		$obj->member = $this->model->checkMember($message['from']);
-		if (($msgtype == 'text') || ($event == 'click')) 
+		if (($msgtype == 'text') || ($event == 'click') || !(empty($_SESSION['autoposter']))) 
 		{
+			unset($_SESSION['autoposter']);
+			if (!(empty($_SESSION['postercontent']))) 
+			{
+				$obj->message['content'] = $_SESSION['postercontent'];
+				unset($_SESSION['postercontent']);
+			}
 			return $this->responseText($obj);
 		}
 		if ($msgtype == 'event') 
 		{
+			@session_start();
+			$_SESSION['autoposter'] = $obj;
 			if ($event == 'scan') 
 			{
 				return $this->responseScan($obj);
@@ -114,6 +122,10 @@ class TaskProcessor extends PluginProcessor
 					$this->model->rankreward($member_info, $poster, $join_info, $qr, $openid, $qrmember);
 				}
 				$this->commission($poster, $member_info, $qrmember);
+				if (!(empty($_SESSION['postercontent']))) 
+				{
+					$this->respond($_SESSION['autoposter']);
+				}
 			}
 		}
 		else 
@@ -270,6 +282,10 @@ class TaskProcessor extends PluginProcessor
 					$this->model->rankreward($member_info, $poster, $join_info, $qr, $openid, $qrmember);
 				}
 				$this->commission($poster, $member_info, $qrmember);
+				if (!(empty($_SESSION['postercontent']))) 
+				{
+					$this->respond($_SESSION['autoposter']);
+				}
 			}
 		}
 		else 

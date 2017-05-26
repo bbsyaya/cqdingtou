@@ -10,10 +10,11 @@ class Banner_EweiShopV2Page extends MerchWebPage
 	{
 		global $_W;
 		global $_GPC;
+		$merchid = $_W['merchid'];
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 20;
 		$condition = ' and uniacid=:uniacid and merchid=:merchid';
-		$params = array(':uniacid' => $_W['uniacid'], ':merchid' => $_W['merchid']);
+		$params = array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid);
 		if ($_GPC['enabled'] != '') 
 		{
 			$condition .= ' and enabled=' . intval($_GPC['enabled']);
@@ -27,7 +28,8 @@ class Banner_EweiShopV2Page extends MerchWebPage
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_merch_banner') . ' WHERE 1 ' . $condition . '  ORDER BY displayorder DESC limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_merch_banner') . ' WHERE 1 ' . $condition, $params);
 		$pager = pagination($total, $pindex, $psize);
-		$bannerswipe = $_W['shopset']['shop']['bannerswipe'];
+		$shop = $this->model->getSet('shop', $merchid);
+		$bannerswipe = $shop['bannerswipe'];
 		include $this->template();
 	}
 	public function add() 
@@ -114,9 +116,10 @@ class Banner_EweiShopV2Page extends MerchWebPage
 	{
 		global $_W;
 		global $_GPC;
-		$shop = $_W['shopset']['shop'];
+		$merchid = $_W['merchid'];
+		$shop = $this->model->getSet('shop', $merchid);
 		$shop['bannerswipe'] = intval($_GPC['bannerswipe']);
-		m('common')->updateSysset(array('shop' => $shop));
+		$this->model->updateSet(array('shop' => $shop), $merchid);
 		mplog('shop.banner.edit', '修改手机端广告轮播');
 		show_json(1);
 	}

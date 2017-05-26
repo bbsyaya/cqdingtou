@@ -24,51 +24,51 @@ class Detail_EweiShopV2Page extends MobilePage
 		{
 			if (0 < $coupon['enough']) 
 			{
-				$title2 = '满' . (double) $coupon['enough'] . '元';
+				$title2 = '满' . (double) $coupon['enough'] . '元可用';
 			}
 			else 
 			{
-				$title2 = '购物任意金额';
+				$title2 = '无金额门槛';
 			}
 		}
 		else if ($coupon['coupontype'] == '1') 
 		{
 			if (0 < $coupon['enough']) 
 			{
-				$title2 = '充值满' . (double) $coupon['enough'] . '元';
+				$title2 = '充值满' . (double) $coupon['enough'] . '元可用';
 			}
 			else 
 			{
-				$title2 = '充值任意金额';
+				$title2 = '无金额门槛';
 			}
 		}
 		if ($coupon['coupontype'] == '2') 
 		{
 			if (0 < $coupon['enough']) 
 			{
-				$title2 = '满' . (double) $coupon['enough'] . '元';
+				$title2 = '满' . (double) $coupon['enough'] . '元可用';
 			}
 			else 
 			{
-				$title2 = '购物任意金额';
+				$title2 = '无金额门槛';
 			}
 		}
 		if ($coupon['backtype'] == 0) 
 		{
 			if ($coupon['enough'] == '0') 
 			{
-				$coupon['color'] = 'org ';
+				$coupon['color'] = 'orange';
 			}
 			else 
 			{
 				$coupon['color'] = 'blue';
 			}
-			$title3 = '减' . (double) $coupon['deduct'] . '元';
+			$title3 = '<span class="subtitle nopadding">￥</span>' . (double) $coupon['deduct'];
 		}
 		if ($coupon['backtype'] == 1) 
 		{
 			$coupon['color'] = 'red ';
-			$title3 = '打' . (double) $coupon['discount'] . '折 ';
+			$title3 = (double) $coupon['discount'] . '折 ';
 		}
 		if ($coupon['backtype'] == 2) 
 		{
@@ -82,15 +82,15 @@ class Detail_EweiShopV2Page extends MobilePage
 			}
 			if (!(empty($coupon['backmoney'])) && (0 < $coupon['backmoney'])) 
 			{
-				$title3 = $title3 . '送' . $coupon['backmoney'] . '元余额 ';
+				$backmoneytext = $coupon['backmoney'] . '元余额 ';
 			}
 			if (!(empty($coupon['backcredit'])) && (0 < $coupon['backcredit'])) 
 			{
-				$title3 = $title3 . '送' . $coupon['backcredit'] . '积分 ';
+				$backcredittext = $coupon['backcredit'] . '积分 ';
 			}
 			if (!(empty($coupon['backredpack'])) && (0 < $coupon['backredpack'])) 
 			{
-				$title3 = $title3 . '送' . $coupon['backredpack'] . '元红包';
+				$backredpacktext = $coupon['backredpack'] . '元红包';
 			}
 		}
 		$coupon['title2'] = $title2;

@@ -158,7 +158,7 @@
         </td>
 
         <td  style="overflow:visible;">
-            {if $row['status']<1}
+            {if $row['status']<1 && $row['status']!=-1 }
             <div class="btn-group btn-group-sm" >
                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">操作 <span class="caret"></span></a>
                 <ul class="dropdown-menu dropdown-menu-left" role="menu" style='z-index: 9999'>

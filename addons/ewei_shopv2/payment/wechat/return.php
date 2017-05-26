@@ -36,6 +36,10 @@ if (!(empty($ordersn)))
 	{
 		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=groups.pay.complete&ordersn=' . $ordersn . '&type=wechat';
 	}
+	else if ($paytype == 6) 
+	{
+		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=threen.register.complete&logno=' . $ordersn . '&type=wechat';
+	}
 }
 header('location: ' . $url);
 exit();

@@ -41,12 +41,17 @@ class Index_EweiShopV2Page extends PluginMobilePage
 		global $_GPC;
 		$cate = intval($_GPC['cate']);
 		$keyword = trim($_GPC['keyword']);
+		$isrecommand = intval($_GPC['isrecommand']);
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 20;
 		$condition = ' q.uniacid=:uniacid and q.status=1 and c.enabled=1 ';
 		if (!(empty($cate))) 
 		{
 			$condition .= ' and q.cate=' . $cate . ' ';
+		}
+		if (!(empty($isrecommand))) 
+		{
+			$condition .= ' and q.isrecommand=1 ';
 		}
 		if (!(empty($keyword))) 
 		{

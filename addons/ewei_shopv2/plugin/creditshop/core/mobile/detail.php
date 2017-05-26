@@ -298,7 +298,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		}
 		if ($addressid) 
 		{
-			$dispatch = $this->model->dispatch($addressid, $goods);
+			$dispatch = $this->model->dispatchPrice($id, $addressid, $optionid);
 		}
 		$goods['dispatch'] = $dispatch;
 		if (empty($goods['canbuy'])) 
@@ -351,7 +351,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			$set = m('common')->getSysset();
 			if ($paytype == 'balance') 
 			{
-				if ($goods['money'] < $money) 
+				if (($goods['money'] + $goods['dispatch']) < $money) 
 				{
 					$paystatus = 0;
 				}
@@ -587,10 +587,11 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			}
 		}
 		$id = intval($_GPC['id']);
+		$logid = intval($_GPC['logid']);
 		$shop = m('common')->getSysset('shop');
 		$member = m('member')->getMember($openid);
 		$goodsid = intval($_GPC['goodsid']);
-		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $uniacid));
+		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $logid, ':uniacid' => $uniacid));
 		$optionid = $log['optionid'];
 		$goods = $this->model->getGoods($log['goodsid'], $member, $log['optionid']);
 		$goods['dispatch'] = $this->model->dispatchPrice($log['goodsid'], $log['addressid'], $log['optionid']);
@@ -624,7 +625,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			if ($log['paytype'] == 0) 
 			{
-				m('member')->setCredit($openid, 'credit2', -$goods['money'], '积分商城抽奖扣除余额度 ' . $goods['money']);
+				m('member')->setCredit($openid, 'credit2', -($goods['money'] + $goods['dispatch']), '积分商城抽奖扣除余额度 ' . $goods['money']);
 				$update['paystatus'] = 1;
 			}
 			if ($log['paytype'] == 1) 
@@ -646,7 +647,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			m('member')->setCredit($openid, 'credit1', -$goods['credit'], '积分商城抽奖扣除积分 ' . $goods['credit']);
 			$update['creditpay'] = 1;
-			pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set joins=joins+1 where id=' . $id);
+			pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set joins=joins+1 where id=' . $log['goodsid']);
 		}
 		$status = 1;
 		if ($goods['type'] == 1) 
@@ -699,14 +700,14 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			$update['dispatchstatus'] = '1';
 		}
-		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
+		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $logid));
 		if ($status == 2) 
 		{
 			if ($goods['goodstype'] == 1) 
 			{
 				if (com('coupon')) 
 				{
-					com('coupon')->creditshop($id);
+					com('coupon')->creditshop($logid);
 					$status = 3;
 				}
 				$update['time_finish'] = time();
@@ -733,19 +734,19 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			{
 			}
 			$update['status'] = $status;
-			pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
-			$this->model->sendMessage($id);
+			pdo_update('ewei_shop_creditshop_log', $update, array('id' => $logid));
+			$this->model->sendMessage($logid);
 			if ($status == 3) 
 			{
-				pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set total=total-1 where id=' . $id);
+				pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set total=total-1 where id=' . $log['goodsid']);
 			}
 			if (($goods['goodstype'] == 0) && ($status == 2)) 
 			{
-				pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set total=total-1 where id=' . $id);
+				pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set total=total-1 where id=' . $log['goodsid']);
 			}
 			if (($goods['goodstype'] == 3) && ($status == 2)) 
 			{
-				pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set packetsurplus=packetsurplus-1 where id=' . $id);
+				pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set packetsurplus=packetsurplus-1 where id=' . $log['goodsid']);
 			}
 			if ($goods['hasoption'] && $log['optionid']) 
 			{

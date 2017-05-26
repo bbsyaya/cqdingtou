@@ -37,7 +37,7 @@
 			</div>
 		</div>
 
-	{if !$member['mobileverify'] && !empty($wapset['open'])}
+	{if !$member['mobileverify'] && (!empty($wapset['open']) || $hasThreen)}
 		<div class="fui-cell-group fui-cell-click external">
 			<a class="fui-cell"  href="{php echo mobileUrl('member/bind')}">
 				<div class="fui-cell-icon"><i class="icon icon-mobile"></i></div>
@@ -142,7 +142,7 @@
 				<a class="fui-cell"  href="{php echo mobileUrl('sale/coupon/my')}">
 					<div class="fui-cell-icon"><i class="icon icon-card"></i></div>
 					<div class="fui-cell-text"><p>我的优惠券</p></div>
-					<div class="fui-cell-remark">{if $statics['coupon']>0}<span  {if $statics['newcoupon']>0}style="background: #fe5455;color:#fff"{/if} class='badge'>  {if $statics['newcoupon']>0}new{else}{$statics['coupon']}{/if}</span>{/if}</div>
+					<div class="fui-cell-remark"><!--{if $statics['coupon']>0}<span  {if $statics['newcoupon']>0}style="background: #fe5455;color:#fff"{/if} class='badge'>  {if $statics['newcoupon']>0}new{else}{$statics['coupon']}{/if}</span>{/if}--></div>
 				</a>
 			</div>
 		{/if}

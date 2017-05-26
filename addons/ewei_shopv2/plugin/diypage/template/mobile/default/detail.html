@@ -120,6 +120,50 @@
 {/if}
 </div>
 
+{if $isgift && $goods['total'] > 0}
+<div id='gift-picker-modal' style="margin:-100%;">
+    <div class='gift-picker'>
+        <div class="fui-cell-group fui-sale-group" style='margin-top:0;'>
+            <div class="fui-cell">
+                <div class="fui-cell-text dispatching">
+                    请选择赠品:
+                    <div class="dispatching-info" style="max-height:12rem;overflow-y: auto ">
+                        {loop $gifts $item}
+                        <div class="fui-list goods-item align-start" data-giftid="{$item['id']}">
+                            <div class="fui-list-media">
+                                <input type="radio" name="checkbox" class="fui-radio fui-radio-danger gift-item" value="{$item['id']}" style="display: list-item;">
+                            </div>
+                            <div class="fui-list-inner">
+                                {loop $item['gift'] $gift}
+                                <div class="fui-list">
+                                    <div class="fui-list-media image-media" style="position: initial;">
+                                        <a href="javascript:void(0);">
+                                            <img class="round" src="{php echo tomedia($gift['thumb'])}" data-lazyloaded="true">
+                                        </a>
+                                    </div>
+                                    <div class="fui-list-inner">
+                                        <a href="javascript:void(0);">
+                                            <div class="text">
+                                                {$gift['title']}
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class='fui-list-angle'>
+                                        <span class="price">&yen;<del class='marketprice'>{$gift['marketprice']}</del></span>
+                                    </div>
+                                </div>
+                                {/loop}
+                            </div>
+                        </div>
+                        {/loop}
+                    </div>
+                </div>
+            </div>
+            <div class='btn btn-danger block'>确定</div>
+        </div>
+    </div>
+</div>
+{/if}
 
 {if $goods['canbuy']}
     <div class="fui-navbar bottom-buttons" style="background: {$diypage['navbar']['style']['background']};">

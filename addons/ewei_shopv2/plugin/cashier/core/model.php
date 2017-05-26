@@ -374,22 +374,23 @@ class CashierModel extends PluginModel
 		}
 		$array['operatorid'] = ((isset($array['operatorid']) ? $array['operatorid'] : 0));
 		$array['deduction'] = ((isset($array['deduction']) ? $array['deduction'] : 0));
-		$realmoney = $array['money'] - $array['deduction'];
-		if ($array['money'] < $array['deduction']) 
-		{
-			return array('res' => error(-1, '抵扣金额出错!'));
-		}
+		$realmoney = $array['money'];
 		$sale = array();
 		if ((0 < $realmoney) && $can_sale) 
 		{
 			if (!(empty($array['usecoupon']))) 
 			{
 				$usecoupon = $this->caculatecoupon($array['usecoupon'], $realmoney);
-				$realmoney = $realmoney = $usecoupon['new_price'];
+				$realmoney = $usecoupon['new_price'];
 			}
 			$sale = $this->saleCalculate($realmoney);
 			$realmoney = $sale['money'];
 		}
+		if ($realmoney < $array['deduction']) 
+		{
+			$array['deduction'] = $realmoney;
+		}
+		$realmoney = $realmoney - $array['deduction'];
 		$title = $_W['cashieruser']['title'] . '消费';
 		if (!(empty($array['title']))) 
 		{

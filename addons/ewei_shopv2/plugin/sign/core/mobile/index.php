@@ -146,7 +146,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$this->model->updateSign($signinfo);
 		if (p('lottery')) 
 		{
-			$res = p('lottery')->getLottery($member['openid'], 2, array('day' => $signinfo['order']));
+			$res = p('lottery')->getLottery($member['openid'], 2, array('day' => $signinfo['orderday']));
 			if ($res) 
 			{
 				p('lottery')->getLotteryList($member['openid'], array('lottery_id' => $res));

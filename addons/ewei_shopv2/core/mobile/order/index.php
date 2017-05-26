@@ -50,6 +50,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		$merchdata = $this->merchData();
 		extract($merchdata);
 		$condition .= ' and merchshow=0 ';
+		$show_status = intval($show_status);
 		if($show_status == ""){
 			$show_status = 6;
 		}else{
@@ -59,7 +60,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		{
 			case 0: $condition .= ' and status=0 and paytype!=3';
 			break;
-			case 2: $condition .= ' and (status=2 or status=0 and paytype=3)';
+			case 2: $condition .= ' and (status=2 or status=0 and paytype=3 or status = 1 and sendtype>0)';
 			break;
 			case 4: $condition .= ' and refundstate>0';
 			break;
@@ -68,15 +69,13 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			case 6: $condition .= ' and userdeleted=0 ';
 			break;
 			default: $condition .= ' and status=' . intval($show_status);
-			
 		}
-			
 			if ($show_status != 5) 
 			{
-				
 				$condition .= ' and userdeleted=0 ';
+				
+				
 			}
-			
 			$com_verify = com('verify');
 			$s_string = '';
 			if (p('ccard')) 
@@ -344,6 +343,9 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		{
 			$this->message('订单已经被删除!', '', 'error');
 		}
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
 		$merchdata = $this->merchData();
 		extract($merchdata);
 		$merchid = $order['merchid'];
@@ -666,6 +668,14 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			$order['expresscom'] = $goods[0]['expresscom'];
 		}
 		$expresslist = m('util')->getExpressList($order['express'], $order['expresssn']);
+		include $this->template();
+	}
+	public function dispatch() 
+	{
+		global $_W;
+		global $_GPC;
+		$merchid = intval($_GPC['merchid']);
+		$list = m('dispatch')->getDispatchList($merchid);
 		include $this->template();
 	}
 }

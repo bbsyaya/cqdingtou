@@ -35,6 +35,8 @@ class Register_EweiShopV2Page extends PluginMobileLoginPage
 		$fields = array();
 		if ($diyform_plugin) 
 		{
+			$area_set = m('util')->get_area_config_set();
+			$new_area = intval($area_set['new_area']);
 			if (!(empty($set['apply_diyform'])) && !(empty($set['apply_diyformid']))) 
 			{
 				$template_flag = 1;

@@ -83,13 +83,14 @@ class Qiniu_EweiShopV2ComModel extends ComModel
 					$url = IA_ROOT . '/' . $url;
 				}
 			}
-			else if (strexists($url, 'addons/ewei_shopv2')) 
-			{
-				$url = IA_ROOT . '/' . $url;
-			}
 			else 
 			{
 				$outlinkEnforce = true;
+				if (strexists($url, 'addons/ewei_shopv2')) 
+				{
+					$url = IA_ROOT . '/' . $url;
+					$outlinkEnforce = false;
+				}
 			}
 		}
 		$key = (($outlinkEnforce ? md5($url) : md5_file($url))) . $ext;

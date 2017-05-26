@@ -39,9 +39,13 @@ class Member_EweiShopV2Model
 		{
 			$info['birthday'] = $info['birthyear'] . '-' . ((strlen($info['birthmonth']) <= 1 ? '0' . $info['birthmonth'] : $info['birthmonth'])) . '-' . ((strlen($info['birthday']) <= 1 ? '0' . $info['birthday'] : $info['birthday']));
 		}
-		if (empty($info['birthday'])) 
+		if (!(empty($info)) && empty($info['birthday'])) 
 		{
 			$info['birthday'] = '';
+		}
+		if (!(empty($info)) && $_W['ishttps']) 
+		{
+			$info['avatar'] = str_replace('http://', 'https://', $info['avatar']);
 		}
 		return $info;
 	}
@@ -85,6 +89,10 @@ class Member_EweiShopV2Model
 		else 
 		{
 			$info = pdo_fetch('select * from ' . tablename('ewei_shop_member') . ' where id=:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $openid));
+		}
+		if (!(empty($info)) && $_W['ishttps']) 
+		{
+			$info['avatar'] = str_replace('http://', 'https://', $info['avatar']);
 		}
 		if (!(empty($info))) 
 		{
@@ -250,7 +258,7 @@ class Member_EweiShopV2Model
 		$member = array();
 		$shopset = m('common')->getSysset(array('shop', 'wap'));
 		$openid = $_W['openid'];
-		if (($_W['routes'] == 'order.pay_alipay') || ($_W['routes'] == 'creditshop.log.dispatch_complete') || ($_W['routes'] == 'creditshop.detail.creditshop_complete') || ($_W['routes'] == 'order.pay_alipay.recharge_complete') || ($_W['routes'] == 'order.pay_alipay.complete') || ($_W['routes'] == 'newmr.alipay') || ($_W['routes'] == 'newmr.callback.gprs') || ($_W['routes'] == 'newmr.callback.bill') || ($_W['routes'] == 'account.sns')) 
+		if (($_W['routes'] == 'order.pay_alipay') || ($_W['routes'] == 'creditshop.log.dispatch_complete') || ($_W['routes'] == 'threen.register.threen_complete') || ($_W['routes'] == 'creditshop.detail.creditshop_complete') || ($_W['routes'] == 'order.pay_alipay.recharge_complete') || ($_W['routes'] == 'order.pay_alipay.complete') || ($_W['routes'] == 'newmr.alipay') || ($_W['routes'] == 'newmr.callback.gprs') || ($_W['routes'] == 'newmr.callback.bill') || ($_W['routes'] == 'account.sns')) 
 		{
 			return;
 		}
@@ -261,12 +269,21 @@ class Member_EweiShopV2Model
 				return;
 			}
 		}
+		$redis = redis();
+		if (!(is_error($redis))) 
+		{
+			$member = $redis->get($_W['openid']);
+			if (!(empty($member))) 
+			{
+				return array('openid' => $_W['openid']);
+			}
+		}
 		if (empty($openid) && !(EWEI_SHOPV2_DEBUG)) 
 		{
 			$diemsg = ((is_h5app() ? 'APP正在维护, 请到公众号中访问' : '请在微信客户端打开链接'));
 			exit('<!DOCTYPE html>' . "\r\n" . '                <html>' . "\r\n" . '                    <head>' . "\r\n" . '                        <meta name=\'viewport\' content=\'width=device-width, initial-scale=1, user-scalable=0\'>' . "\r\n" . '                        <title>抱歉，出错了</title><meta charset=\'utf-8\'><meta name=\'viewport\' content=\'width=device-width, initial-scale=1, user-scalable=0\'><link rel=\'stylesheet\' type=\'text/css\' href=\'https://res.wx.qq.com/connect/zh_CN/htmledition/style/wap_err1a9853.css\'>' . "\r\n" . '                    </head>' . "\r\n" . '                    <body>' . "\r\n" . '                    <div class=\'page_msg\'><div class=\'inner\'><span class=\'msg_icon_wrp\'><i class=\'icon80_smile\'></i></span><div class=\'msg_content\'><h4>' . $diemsg . '</h4></div></div></div>' . "\r\n" . '                    </body>' . "\r\n" . '                </html>');
 		}
-		$member = m('member')->getMember($openid);
+		$member = $this->getMember($openid);
 		$followed = m('user')->followed($openid);
 		$uid = 0;
 		$mc = array();
@@ -288,6 +305,10 @@ class Member_EweiShopV2Model
 			$mc['gender'] = $userinfo['sex'];
 			$mc['resideprovince'] = $userinfo['province'];
 			$mc['residecity'] = $userinfo['city'];
+		}
+		if (!(is_error($redis))) 
+		{
+			$redis->set($_W['openid'], 1, 10);
 		}
 		if (empty($member) && !(empty($openid))) 
 		{
@@ -351,7 +372,7 @@ class Member_EweiShopV2Model
 		{
 			return false;
 		}
-		$member = m('member')->getMember($openid);
+		$member = $this->getMember($openid);
 		if (!(empty($member)) && !(empty($member['level']))) 
 		{
 			$level = pdo_fetch('select * from ' . tablename('ewei_shop_member_level') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $member['level'], ':uniacid' => $_W['uniacid']));
@@ -371,7 +392,7 @@ class Member_EweiShopV2Model
 		}
 		$shopset = m('common')->getSysset('shop');
 		$leveltype = intval($shopset['leveltype']);
-		$member = m('member')->getMember($openid);
+		$member = $this->getMember($openid);
 		if (empty($member)) 
 		{
 			return;
@@ -422,7 +443,7 @@ class Member_EweiShopV2Model
 		{
 			return false;
 		}
-		$member = m('member')->getMember($openid);
+		$member = $this->getMember($openid);
 		return $member['groupid'];
 	}
 	public function setRechargeCredit($openid = '', $money = 0) 

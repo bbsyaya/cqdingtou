@@ -96,7 +96,7 @@ class My_EweiShopV2Page extends MobileLoginPage
 		{
 			if ($coupon['enough'] == '0') 
 			{
-				$coupon['color'] = 'org ';
+				$coupon['color'] = 'orange ';
 			}
 			else 
 			{
@@ -180,20 +180,17 @@ class My_EweiShopV2Page extends MobileLoginPage
 		global $_GPC;
 		$openid = $_W['openid'];
 		$cate = trim($_GPC['cate']);
-		$imgname = 'ling';
 		$check = 0;
 		if (!(empty($cate))) 
 		{
 			if ($cate == 'used') 
 			{
 				$used = 1;
-				$imgname = 'used';
 				$check = 1;
 			}
 			else 
 			{
 				$past = 1;
-				$imgname = 'past';
 				$check = 2;
 			}
 		}
@@ -231,41 +228,48 @@ class My_EweiShopV2Page extends MobileLoginPage
 			{
 				if (0 < $row['enough']) 
 				{
-					$title2 = '消费满' . (double) $row['enough'] . '元';
+					$title2 = '满' . (double) $row['enough'] . '元可用';
+					$title5 = '消费满' . (double) $row['enough'];
 				}
 				else 
 				{
-					$title2 = '消费';
+					$title2 = '无金额门槛';
+					$title5 = '消费任意金额';
 				}
 			}
 			else if ($row['coupontype'] == '1') 
 			{
 				if (0 < $row['enough']) 
 				{
-					$title2 = '充值满' . (double) $row['enough'] . '元';
+					$title2 = '充值满' . (double) $row['enough'] . '元可用';
+					$title5 = '充值满' . (double) $row['enough'];
 				}
 				else 
 				{
-					$title2 = '充值';
+					$title2 = '无金额门槛';
+					$title5 = '充值任意金额';
 				}
 			}
 			else if ($row['coupontype'] == '2') 
 			{
 				if (0 < $row['enough']) 
 				{
-					$title2 = '消费满' . (double) $row['enough'] . '元';
+					$title2 = '满' . (double) $row['enough'] . '元可用';
+					$title5 = '消费满' . (double) $row['enough'];
 				}
 				else 
 				{
-					$title2 = '消费';
+					$title2 = '无金额门槛';
+					$title5 = '消费任意金额';
 				}
 			}
 			if ($row['backtype'] == 0) 
 			{
-				$title2 = $title2 . '立减' . (double) $row['deduct'] . '元';
+				$title3 = '<span class="subtitle">￥</span>' . (double) $row['deduct'];
+				$title5 = $title5 . '立减' . (double) $row['deduct'];
 				if ($row['enough'] == '0') 
 				{
-					$row['color'] = 'org ';
+					$row['color'] = 'orange ';
 					$tagtitle = '代金券';
 				}
 				else 
@@ -277,7 +281,8 @@ class My_EweiShopV2Page extends MobileLoginPage
 			if ($row['backtype'] == 1) 
 			{
 				$row['color'] = 'red ';
-				$title2 = $title2 . '打' . (double) $row['discount'] . '折';
+				$title3 = (double) $row['discount'] . '折 ';
+				$title5 = $title5 . '打' . (double) $row['discount'] . '折 ';
 				$tagtitle = '打折券';
 			}
 			if ($row['backtype'] == 2) 
@@ -299,15 +304,18 @@ class My_EweiShopV2Page extends MobileLoginPage
 				}
 				if (!(empty($row['backmoney'])) && (0 < $row['backmoney'])) 
 				{
-					$title2 = $title2 . '送' . $row['backmoney'] . '元余额';
+					$title3 = '立返';
+					$title5 = '立返余额';
 				}
 				if (!(empty($row['backcredit'])) && (0 < $row['backcredit'])) 
 				{
-					$title2 = $title2 . '送' . $row['backcredit'] . '积分';
+					$title3 = '立返';
+					$title5 = '立返积分';
 				}
 				if (!(empty($row['backredpack'])) && (0 < $row['backredpack'])) 
 				{
-					$title2 = $title2 . '送' . $row['backredpack'] . '元红包';
+					$title3 = '立返';
+					$title5 = '立返红包';
 				}
 			}
 			if ($row['tagtitle'] == '') 
@@ -318,9 +326,10 @@ class My_EweiShopV2Page extends MobileLoginPage
 			{
 				$row['color'] = 'disa';
 			}
-			$row['imgname'] = $imgname;
 			$row['check'] = $check;
 			$row['title2'] = $title2;
+			$row['title3'] = $title3;
+			$row['title5'] = $title5;
 		}
 		unset($row);
 		show_json(1, array('list' => $coupons, 'pagesize' => $psize, 'total' => $total));
@@ -385,7 +394,7 @@ class My_EweiShopV2Page extends MobileLoginPage
 				$title2 = $title2 . '立减' . (double) $row['deduct'] . '元';
 				if ($row['enough'] == '0') 
 				{
-					$row['color'] = 'org ';
+					$row['color'] = 'orange ';
 					$tagtitle = '代金券';
 				}
 				else 

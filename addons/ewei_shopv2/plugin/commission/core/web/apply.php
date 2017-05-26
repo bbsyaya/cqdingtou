@@ -979,7 +979,7 @@ class Apply_EweiShopV2Page extends PluginWebPage
 				$commissions['level3'] = ((isset($cm3[$og['id']]) ? round($cm3[$og['id']], 2) : $commissions['level2']));
 				pdo_update('ewei_shop_order_goods', array('commissions' => iserializer($commissions)), array('id' => $og['id']));
 			}
-			plog('commission.changecommission', '修改佣金 订单号: ' . $order['ordersn']);
+			plog('commission.apply.changecommission', '修改佣金 订单号: ' . $order['ordersn']);
 			show_json(1, array('url' => referer()));
 		}
 		$cm1 = m('member')->getMember($agentid);

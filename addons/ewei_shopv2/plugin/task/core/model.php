@@ -756,6 +756,14 @@ class TaskModel extends PluginModel
 			return false;
 		}
 		global $_W;
+		if (empty($poster['autoposter'])) 
+		{
+			$_SESSION['postercontent'] = NULL;
+		}
+		else 
+		{
+			$_SESSION['postercontent'] = $poster['keyword'];
+		}
 		load()->func('logging');
 		$reward_data = unserialize($poster['reward_data']);
 		$count = $join_info['completecount'] + 1;
@@ -1149,6 +1157,14 @@ class TaskModel extends PluginModel
 			return false;
 		}
 		global $_W;
+		if (empty($poster['autoposter'])) 
+		{
+			$_SESSION['postercontent'] = NULL;
+		}
+		else 
+		{
+			$_SESSION['postercontent'] = $poster['keyword'];
+		}
 		$reward_data = unserialize($poster['reward_data']);
 		$rec_data = unserialize($join_info['reward_data']);
 		$count = $join_info['completecount'] + 1;

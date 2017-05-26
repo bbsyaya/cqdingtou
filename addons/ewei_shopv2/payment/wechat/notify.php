@@ -89,6 +89,10 @@ class EweiShopWechatPay
 		{
 			$this->groups();
 		}
+		else if ($this->type == '6') 
+		{
+			$this->threen();
+		}
 		else if ($this->type == '10') 
 		{
 			$this->mr();
@@ -112,6 +116,10 @@ class EweiShopWechatPay
 		else if ($this->type == '15') 
 		{
 			$this->wxapp_recharge();
+		}
+		else if ($this->type == '16') 
+		{
+			$this->wxapp_coupon();
 		}
 		$this->success();
 	}
@@ -281,6 +289,17 @@ class EweiShopWechatPay
 			com_run('coupon::payResult', $logno);
 		}
 	}
+	public function wxapp_coupon() 
+	{
+		global $_W;
+		$logno = str_replace('_borrow', '', $this->get['out_trade_no']);
+		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_coupon_log') . ' WHERE `logno`=:logno and `uniacid`=:uniacid  limit 1', array(':uniacid' => $_W['uniacid'], ':logno' => $logno));
+		$coupon = pdo_fetchcolumn('select money from ' . tablename('ewei_shop_coupon') . ' where id=:id limit 1', array(':id' => $log['couponid']));
+		if ($coupon == $this->total_fee) 
+		{
+			com_run('coupon::payResult', $logno);
+		}
+	}
 	public function groups() 
 	{
 		global $_W;
@@ -301,6 +320,28 @@ class EweiShopWechatPay
 		if (p('groups')) 
 		{
 			p('groups')->payResult($orderno, 'wechat', ($this->isapp ? true : false));
+		}
+	}
+	public function threen() 
+	{
+		global $_W;
+		if (!($this->publicMethod())) 
+		{
+			exit('threen');
+		}
+		$orderno = trim($this->get['out_trade_no']);
+		$orderno = str_replace('_borrow', '', $orderno);
+		if (empty($orderno)) 
+		{
+			exit();
+		}
+		if ($this->is_jie) 
+		{
+			pdo_update('ewei_shop_threen_log', array('isborrow' => '1', 'borrowopenid' => $this->get['openid']), array('logno' => $orderno, 'uniacid' => $_W['uniacid']));
+		}
+		if (p('threen')) 
+		{
+			p('threen')->payResult($orderno, 'wechat', ($this->isapp ? true : false));
 		}
 	}
 	public function mr() 

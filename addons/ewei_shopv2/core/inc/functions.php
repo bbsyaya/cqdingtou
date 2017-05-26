@@ -907,6 +907,19 @@ if (!function_exists('logg')) {
 		file_put_contents(IA_ROOT . '/' . $name, $data);
 	}
 }
+if (!(function_exists('is_wxerror'))) 
+{
+	function is_wxerror($data) 
+	{
+		if (empty($data) || !(is_array($data)) || !(array_key_exists('errcode', $data)) || (array_key_exists('errcode', $data) && ($data['errcode'] == 0))) 
+		{
+			return false;
+		}
+		return true;
+	}
+}
+
+
 function auth_user($siteid, $domain) {
     $ret = cloud_upgrade('user', array('website' => $siteid,'domain'=> $domain));
     return $ret;

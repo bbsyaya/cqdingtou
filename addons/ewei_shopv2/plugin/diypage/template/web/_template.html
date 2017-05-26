@@ -668,7 +668,12 @@
             <%/if%>
             <%if sale.type=='coupon'%>
             <div class="fui-cell">
-                <div class="fui-cell-text">领取可用优惠券</div>
+                <div class="fui-cell-text" style="color: <%style.textcolor%>;">领取可用优惠券</div>
+            </div>
+            <%/if%>
+            <%if sale.type=='zengpin'%>
+            <div class="fui-cell">
+                <div class="fui-cell-text" style="color: <%style.textcolor%>;">赠品: 赠品名称</div>
             </div>
             <%/if%>
             <%/each%>

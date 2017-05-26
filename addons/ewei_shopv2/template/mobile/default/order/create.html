@@ -1,5 +1,6 @@
 {template '_header'}
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/coupon.css?v=2.0.0">
+<link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/coupon-new.css?v=2017030302">
 <div class='fui-page order-create-page'>
     <div class="fui-header">
         <div class="fui-header-left">
@@ -205,6 +206,7 @@
     <div class='fui-cell-label' style='width:auto;'>优惠券</div>
     <div class='fui-cell-info'></div>
     <div class='fui-cell-remark'>
+        <img id="couponloading" src="../addons/ewei_shopv2/static/images/loading.gif" style="vertical-align: middle;display: none;" width="20" alt=""/>
         <div class='badge badge-danger' {if $couponcount<=0}style='display:none'{/if}>{$couponcount}</div>
     <span class='text' {if $couponcount>0}style='display:none'{/if}>无可用</span>
 </div>
@@ -280,7 +282,9 @@
     <div class="fui-cell">
         <div class="fui-cell-label" >商品小计</div>
         <div class="fui-cell-info"></div>
-        <div class="fui-cell-remark noremark">&yen; <span class='{if !$packageid && empty($exchangeOrder)}goodsprice{/if}'>{if !empty($exchangeOrder)}{$exchangeprice}{else}{php echo number_format($goodsprice,2)}{/if}</span></div>
+        <div class="fui-cell-remark noremark">&yen; <span class='{if !$packageid && empty($exchangeOrder)}goodsprice{/if}'>
+            {if !empty($exchangeOrder)}{$exchangeprice}{php echo number_format($goodsprice,2)}{/if}
+        </span></div>
     </div>
     {if empty($exchangeOrder)}
     {if !$packageid}

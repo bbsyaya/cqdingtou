@@ -1506,7 +1506,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_dispatch` (
   `firstweight` int(11) DEFAULT '0',
   `secondweight` int(11) DEFAULT '0',
   `express` varchar(250) DEFAULT '',
-  `areas` text,
+  `areas` longtext,
   `carriers` text,
   `enabled` int(11) DEFAULT '0',
   `calculatetype` tinyint(1) DEFAULT '0',
@@ -1518,7 +1518,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_dispatch` (
   `shopid` int(11) DEFAULT '0',
   `merchid` int(11) DEFAULT '0',
   `nodispatchareas` text,
-  `nodispatchareas_code` text NOT NULL,
+  `nodispatchareas_code` longtext,
   `isdispatcharea` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
@@ -1844,6 +1844,18 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_express` (
   `displayorder` tinyint(3) unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=92 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_express_cache`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_express_cache` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `expresssn` varchar(50) DEFAULT NULL,
+  `express` varchar(50) DEFAULT NULL,
+  `lasttime` int(11) NOT NULL,
+  `datas` text,
+  PRIMARY KEY (`id`),
+  KEY `idx_expresssn` (`expresssn`) USING BTREE,
+  KEY `idx_express` (`express`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_feedback`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_feedback` (
@@ -2180,6 +2192,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `presellsendtime` int(11) NOT NULL DEFAULT '0',
   `edareas_code` text NOT NULL,
   `unite_total` tinyint(3) NOT NULL DEFAULT '0',
+  `buyagain_price` decimal(10,2) DEFAULT '0.00',
+  `threen` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_pcate` (`pcate`),
@@ -3502,6 +3516,11 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order` (
   `willcancelmessage` tinyint(1) DEFAULT '0',
   `sendtype` tinyint(3) NOT NULL DEFAULT '0',
   `lotterydiscountprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `contype` tinyint(1) DEFAULT '0',
+  `wxid` int(11) DEFAULT '0',
+  `wxcardid` varchar(50) DEFAULT '',
+  `wxcode` varchar(50) DEFAULT '',
+  `dispatchkey` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_openid` (`openid`),
@@ -3821,7 +3840,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_plugin` (
   PRIMARY KEY (`id`),
   KEY `idx_displayorder` (`displayorder`),
   KEY `idx_identity` (`identity`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=39 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_poster`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_poster` (
@@ -4895,6 +4914,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_poster` (
   `titleicon` text,
   `poster_banner` text,
   `is_goods` tinyint(1) DEFAULT '0',
+  `autoposter` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -5028,6 +5048,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxcard` (
   `settitlecolor` tinyint(1) DEFAULT '0',
   `titlecolor` varchar(10) DEFAULT '',
   `tagtitle` varchar(20) DEFAULT '',
+  `use_condition` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -5213,6 +5234,7 @@ INSERT INTO `ims_ewei_shop_plugin` (`id`, `displayorder`, `identity`, `name`, `v
 (34, 37, 'messages', '消息群发', '1.0','官方', 1, 'tool',1,'../addons/ewei_shopv2/static/images/messages.jpg','',0,0),
 (35, 38, 'seckill','整点秒杀','1.0','官方',1,'sale',1,'../addons/ewei_shopv2/static/images/seckill.jpg','',0,0),
 (36, 39, 'exchange','兑换中心','1.0','官方',1,'biz',1,'../addons/ewei_shopv2/static/images/exchange.jpg','',0,0),
-(37, 40, 'lottery', '游戏营销', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/lottery.jpg', '', 0, 0);
+(37, 40, 'lottery', '游戏营销', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/lottery.jpg', '', 0, 0),
+(38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', 1,'', '', 1, 0);
 
 ");

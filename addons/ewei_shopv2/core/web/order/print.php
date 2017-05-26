@@ -735,7 +735,7 @@ class Print_EweiShopV2Page extends WebPage
 		include $this->template('order/print'); 
 	}
 	
-	public function main() 
+	public function main()
 	{
 		global $_W;
 		global $_GPC;
@@ -743,6 +743,31 @@ class Print_EweiShopV2Page extends WebPage
 	}
 	
 	public function shengchan(){
+		global $_W;
+		global $_GPC;
+		$uniacid = $_W['uniacid'];
+		$orderId = $_GPC['id'];
+		if($orderId){
+		$itemOrderId[0] = $_GPC['id'];
+		}else{
+		$itemOrderId = explode(',',$_GPC['item']);	
+		}
+		
+		$a=array('11'=>'A类产品','12'=>'B类产品');
+		$b=array('00'=>'通用系列','01'=>'儿童系列','02'=>'婚纱系列','03'=>'写真系列','04'=>'旅游系列','05'=>'同学情系列','06'=>'家庭情系列','07'=>'战友情系列','08'=>'同事情系列','09'=>'师生情系列');
+		$c=array('11'=>'照片书','12'=>'台历','13'=>'摆台','14'=>'组合相框','15'=>'DIY影集','16'=>'LOMO卡','17'=>'照片书旋转摆台','18'=>'宝宝成长册旋转摆台','19'=>'宝宝成长册','20'=>'嘉宾签名册','21'=>'婚礼纪念册','22'=>'设计师作品集');
+		$d=array('01'=>'2.5D相纸','02'=>'珠光相纸','03'=>'触感相纸','04'=>'木质','05'=>'塑料','06'=>'麻绳+木夹','07'=>'亚克力','08'=>'自粘相册');
+		
+		foreach($itemOrderId as $key=>$orderId){
+		$stores[$key] = pdo_fetchall('select * from ' . tablename('ewei_shop_order') . ' where uniacid=:uniacid and id=:orderid', array(':uniacid' => $uniacid,':orderid' => $orderId));		
+		$order_goods[$key] = pdo_fetchall('select g.id,og.is_make,g.title,g.thumb,g.goodssn,og.goodssn as option_goodssn, g.productsn,og.productsn as option_productsn, og.total,og.price,og.optionname as optiontitle, og.realprice,og.changeprice,og.oldprice,og.commission1,og.commission2,og.commission3,og.commissions,og.diyformdata,og.diyformfields,op.specs,g.merchid,og.seckill,og.seckill_taskid,og.seckill_roomid from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' left join ' . tablename('ewei_shop_goods_option') . ' op on og.optionid = op.id ' . ' where og.uniacid=:uniacid and og.orderid=:orderid ', array(':uniacid' => $uniacid, ':orderid' => $orderId));
+		foreach($order_goods[$key] as $goodkey=>$goodval){
+			$goodssn=str_split($goodval['option_goodssn'],2);
+			$order_goods[$key][$goodkey]['option_goodssn']=$a[$goodssn[0]].$b[$goodssn[1]].$c[$goodssn[2]].$d[$goodssn[3]];
+		}
+		$user[$key]=unserialize($stores[$key][0]['address']);
+		
+		}		
 		include $this->template('order/shengchan'); 
 	}
 	

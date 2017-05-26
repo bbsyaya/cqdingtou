@@ -303,7 +303,7 @@ class List_EweiShopV2Page extends WebPage
 				}
 			}
 			pdo_update('ewei_shop_member', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
-			$member = m('member')->getMember($id);
+			$member = array_merge($member, $data);
 			plog('member.list.edit', '修改会员资料  ID: ' . $member['id'] . ' <br/> 会员信息:  ' . $member['openid'] . '/' . $member['nickname'] . '/' . $member['realname'] . '/' . $member['mobile']);
 			if ($hascommission) 
 			{

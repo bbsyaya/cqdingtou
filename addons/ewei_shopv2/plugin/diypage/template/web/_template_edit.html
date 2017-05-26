@@ -2293,7 +2293,10 @@
                     </span>
                     <%/if%>
                     <%if child.type=='coupon'%>
-                        <span>领取可用优惠券</span>
+                        <span style="color: <%style.salecolor%>;">领取可用优惠券</span>
+                    <%/if%>
+                    <%if child.type=='zengpin'%>
+                        <span style="color: <%style.salecolor%>;">赠品: 赠品名称</span>
                     <%/if%>
                 </div>
             </div>

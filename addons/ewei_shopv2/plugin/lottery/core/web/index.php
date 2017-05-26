@@ -66,14 +66,17 @@ class Index_EweiShopV2Page extends PluginWebPage
 		}
 		if ($_W['ispost']) 
 		{
+			
 			$itemCount = count(json_decode(htmlspecialchars_decode(trim($_GPC['reward_data']))));
 			if ((intval($_GPC['lottery_type']) == 3) && ($itemCount != 8) && !(empty($itemCount))) 
 			{
-				show_json(0, '¾Å¹¬¸ñ½±Ïî±ØĞëÎª8¸ö');
+				//show_json(0, 'ä¹å®«æ ¼å¥–é¡¹å¿…é¡»ä¸º8ä¸ª');
+				show_json(0, array('message' => 'ä¹å®«æ ¼å¥–é¡¹å¿…é¡»ä¸º8ä¸ª'));
 			}
 			else if ((intval($_GPC['lottery_type']) == 1) && ($itemCount < 5) && !(empty($itemCount))) 
 			{
-				show_json(0, '´ó×ªÅÌ½±Ïî²»µÃÉÙÓÚ5¸ö');
+				//show_json(0, 'å¤§è½¬ç›˜å¥–é¡¹ä¸å¾—å°‘äº5ä¸ª');
+				show_json(0, array('message' => 'å¤§è½¬ç›˜å¥–é¡¹ä¸å¾—å°‘äº5ä¸ª'));
 			}
 			$data = array();
 			$data['uniacid'] = $_W['uniacid'];
@@ -88,9 +91,15 @@ class Index_EweiShopV2Page extends PluginWebPage
 			$data['lottery_type'] = intval($_GPC['lottery_type']);
 			$data['addtime'] = time();
 			$taskTypeIsExist = intval($this->taskTypeIsExist(intval($_GPC['task_type']), $id));
+			
+			
 			if (!(empty($taskTypeIsExist))) 
 			{
-				show_json(0, '¸Ã³¡¾°ÒÑ¾­´æÔÚ£¬²»ÄÜ¸øÒ»¸ö³¡¾°Ìí¼ÓÁ½¸öÓÎÏ·');
+				
+				//show_json(0, 'è¯¥åœºæ™¯å·²ç»å­˜åœ¨ï¼Œä¸èƒ½ç»™ä¸€ä¸ªåœºæ™¯æ·»åŠ ä¸¤ä¸ªæ¸¸æˆ');
+				show_json(0, array('message' => 'è¯¥åœºæ™¯å·²ç»å­˜åœ¨ï¼Œä¸èƒ½ç»™ä¸€ä¸ªåœºæ™¯æ·»åŠ ä¸¤ä¸ªæ¸¸æˆï¼'));
+				
+				
 			}
 			if ($_GPC['task_type'] == 1) 
 			{
@@ -211,11 +220,13 @@ class Index_EweiShopV2Page extends PluginWebPage
 				$res = pdo_update('ewei_shop_lottery', $data, array('lottery_id' => $id, 'uniacid' => $_W['uniacid']));
 				if ($res) 
 				{
-					plog('lottery.edit', 'ĞŞ¸Ä³é½±»î¶¯ ID: ' . $id . '<br>');
+					plog('lottery.edit', 'ä¿®æ”¹æŠ½å¥–æ´»åŠ¨ ID: ' . $id . '<br>');
 				}
 				else 
 				{
-					show_json(0, '¸üĞÂ²Ù×÷Ê§°Ü');
+					//show_json(0, 'æ›´æ–°æ“ä½œå¤±è´¥');
+					show_json(0, array('message' => 'æ›´æ–°æ“ä½œå¤±è´¥ï¼'));
+					
 				}
 				show_json(1, array('url' => webUrl('lottery')));
 			}
@@ -225,11 +236,13 @@ class Index_EweiShopV2Page extends PluginWebPage
 				$id = pdo_insertid();
 				if ($res) 
 				{
-					plog('lottery.edit', 'Ìí¼Ó³é½±»î¶¯ ID: ' . $id . '<br>');
+					plog('lottery.edit', 'æ·»åŠ æŠ½å¥–æ´»åŠ¨ ID: ' . $id . '<br>');
 				}
 				else 
 				{
-					show_json(0, 'Ìí¼Ó²Ù×÷Ê§°Ü');
+					//show_json(0, 'æ·»åŠ æ“ä½œå¤±è´¥');
+					show_json(0, array('message' => 'æ·»åŠ æ“ä½œå¤±è´¥ï¼'));
+					
 				}
 				show_json(1, array('url' => webUrl('lottery/edit', array('id' => $id, 'lottery_type' => $data['lottery_type']))));
 			}
@@ -249,7 +262,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 		foreach ($posters as $poster ) 
 		{
 			pdo_update('ewei_shop_lottery', array('is_delete' => 1), array('lottery_id' => $poster['lottery_id'], 'uniacid' => $_W['uniacid']));
-			plog('lottery.delete', 'É¾³ı³é½± ID: ' . $id . ' º£±¨Ãû³Æ: ' . $poster['lottery_title']);
+			plog('lottery.delete', 'åˆ é™¤æŠ½å¥– ID: ' . $id . ' æµ·æŠ¥åç§°: ' . $poster['lottery_title']);
 		}
 		show_json(1, array('url' => webUrl('lottery')));
 	}

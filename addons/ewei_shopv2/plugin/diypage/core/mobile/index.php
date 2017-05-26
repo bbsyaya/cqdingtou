@@ -26,11 +26,22 @@ class Index_EweiShopV2Page extends PluginMobilePage
 		$member = m('member')->getMember($_W['openid']);
 		if ($page['type'] == 4) 
 		{
+			$comset = $_W['shopset']['commission'];
+			if (empty($comset['level'])) 
+			{
+				$this->message('未开启分销', mobileUrl());
+			}
 			if (($member['isagent'] != 1) || ($member['status'] != 1)) 
 			{
-				header('location:' . mobileUrl('commission/register'));
+				$jumpurl = ((!(empty($comset['no_commission_url'])) ? trim($comset['no_commission_url']) : mobileUrl('commission/register')));
+				header('location:' . $jumpurl);
 				exit();
 			}
+		}
+		else if ($page['type'] == 5) 
+		{
+			header('location:' . mobileUrl('goods'));
+			exit();
 		}
 		if (!(empty($page['data']['page']['visit'])) && ($page['data']['page']['type'] == 1)) 
 		{
