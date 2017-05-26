@@ -216,11 +216,11 @@ class Index_EweiShopV2Page extends WebPage
 				$defaulttemp = pdo_fetch('select 1  from ' . tablename('ewei_shop_member_message_template_default') . ' where typecode=:typecode and uniacid=:uniacid  limit 1', array(':typecode' => $tag, ':uniacid' => $_W['uniacid']));
 				if (empty($defaulttemp)) 
 				{
-					pdo_insert('ewei_shop_member_message_template_default', array('typecode' => $tag, 'uniacid' => $_W['uniacid'], 'templateid' => $value['template_id']));
+					pdo_insert('ewei_shop_member_message_template_default', array('typecode' => $tag, 'uniacid' => $_W['uniacid'], 'templateid' => $result['template_id']));
 				}
 				else 
 				{
-					pdo_update('ewei_shop_member_message_template_default', array('templateid' => $value['template_id']), array('typecode' => $tag, 'uniacid' => $_W['uniacid']));
+					pdo_update('ewei_shop_member_message_template_default', array('templateid' => $result['template_id']), array('typecode' => $tag, 'uniacid' => $_W['uniacid']));
 				}
 			}
 		}
@@ -363,6 +363,7 @@ class Index_EweiShopV2Page extends WebPage
 			$data['withdrawbegin'] = floatval(trim($data['withdrawbegin']));
 			$data['withdrawend'] = floatval(trim($data['withdrawend']));
 			$data['nodispatchareas'] = iserializer($data['nodispatchareas']);
+			$data['nodispatchareas_code'] = iserializer($data['nodispatchareas_code']);
 			$data['withdrawcashweixin'] = intval($data['withdrawcashweixin']);
 			$data['withdrawcashalipay'] = intval($data['withdrawcashalipay']);
 			$data['withdrawcashcard'] = intval($data['withdrawcashcard']);
@@ -380,7 +381,10 @@ class Index_EweiShopV2Page extends WebPage
 		}
 		$areas = m('common')->getAreas();
 		$data = m('common')->getSysset('trade');
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
 		$data['nodispatchareas'] = iunserializer($data['nodispatchareas']);
+		$data['nodispatchareas_code'] = iunserializer($data['nodispatchareas_code']);
 		include $this->template();
 	}
 	protected function upload_cert($fileinput) 
@@ -626,6 +630,9 @@ class Index_EweiShopV2Page extends WebPage
 			$data['address'] = $shop['address'];
 			$data['phone'] = $shop['phone'];
 		}
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
 		include $this->template();
 	}
 	public function close() 
@@ -787,6 +794,8 @@ class Index_EweiShopV2Page extends WebPage
 					$change_data['province'] = '';
 					$change_data['city'] = '';
 					$change_data['area'] = '';
+					pdo_update('ewei_shop_member', $change_data, array('uniacid' => $uniacid));
+					pdo_update('ewei_shop_member_address', $change_data, array('uniacid' => $uniacid));
 				}
 				else 
 				{

@@ -118,6 +118,9 @@ class Index_EweiShopV2Page extends ComWebPage
 		{
 			$goods = pdo_fetchall('SELECT id,uniacid,title,thumb FROM ' . tablename('ewei_shop_goods') . ' WHERE uniacid=:uniacid AND id IN (' . implode(',', $data['goodsids']) . ')', array(':uniacid' => $_W['uniacid']));
 		}
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
 		$areas = m('common')->getAreas();
 		include $this->template();
 	}

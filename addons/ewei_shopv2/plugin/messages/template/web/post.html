@@ -24,7 +24,7 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">发送消息类型</label>
     <div class="col-sm-9 col-xs-12" >
-        {ife 'sale.coupon' $item}
+        {ife 'messages.template' $item}
         <label class="radio-inline coupon-radio">
             <input type="radio" name="messagetype" value="0" {if $item['messagetype'] == 0}checked="true"{/if} onclick="$('.customermessage').hide();$('.selecttemplate').show();" /> 发送模板消息
         </label>
@@ -79,7 +79,7 @@
 
     <label class="col-sm-2 control-label"> 客户消息类型</label>
     <div class="col-sm-9 col-xs-12" >
-        {ife 'sale.coupon' $item}
+        {ife 'messages.template' $item}
             <label class="radio-inline coupon-radio">
                 <input type="radio" name="customertype" value="0" {if $item['customertype'] == 0}checked="true"{/if} onclick="$('.custm').hide();$('.news').show();" /> 发送图文消息
             </label>

@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -68,18 +68,38 @@ class Dispatch_EweiShopV2Model
 		}
 		return $price;
 	}
-	public function getCityDispatchPrice($areas, $city, $param, $d) 
+	public function getCityDispatchPrice($areas, $address, $param, $d) 
 	{
-		if (is_array($areas) && (0 < count($areas))) 
+		$city = $address['city'];
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		if (empty($new_area)) 
 		{
-			foreach ($areas as $area ) 
+			if (is_array($areas) && (0 < count($areas))) 
 			{
-				$citys = explode(';', $area['citys']);
-				//return $this->getDispatchPrice($param, $area, $d['calculatetype']);
-				if(in_array($city, $citys)){
-   return $this->getDispatchPrice($param, $area, $d['calculatetype']);
-}
-
+				foreach ($areas as $area ) 
+				{
+					$citys = explode(';', $area['citys']);
+					if (in_array($city, $citys) && !(empty($citys))) 
+					{
+						return $this->getDispatchPrice($param, $area, $d['calculatetype']);
+					}
+				}
+			}
+		}
+		else 
+		{
+			$address_datavalue = trim($address['datavalue']);
+			if (is_array($areas) && (0 < count($areas))) 
+			{
+				foreach ($areas as $area ) 
+				{
+					$citys_code = explode(';', $area['citys_code']);
+					if (in_array($address_datavalue, $citys_code) && !(empty($citys_code))) 
+					{
+						return $this->getDispatchPrice($param, $area, $d['calculatetype']);
+					}
+				}
 			}
 		}
 		return $this->getDispatchPrice($param, $d);
@@ -116,36 +136,68 @@ class Dispatch_EweiShopV2Model
 		$data = pdo_fetch($sql, $params);
 		return $data;
 	}
-	public function getAllNoDispatchAreas($areas = array()) 
+	public function getAllNoDispatchAreas($areas = array(), $type = 0) 
 	{
 		global $_W;
 		$tradeset = m('common')->getSysset('trade');
-		$tradeset['nodispatchareas'] = iunserializer($tradeset['nodispatchareas']);
+		if (empty($type)) 
+		{
+			$dispatchareas = iunserializer($tradeset['nodispatchareas']);
+		}
+		else 
+		{
+			$dispatchareas = iunserializer($tradeset['nodispatchareas_code']);
+		}
 		$set_citys = array();
 		$dispatch_citys = array();
-		if (!empty($tradeset['nodispatchareas'])) 
+		if (!(empty($dispatchareas))) 
 		{
-			$set_citys = explode(';', trim($tradeset['nodispatchareas'], ';'));
+			$set_citys = explode(';', trim($dispatchareas, ';'));
 		}
-		if (!empty($areas)) 
+		if (!(empty($areas))) 
 		{
 			$areas = iunserializer($areas);
-			if (!empty($areas)) 
+			if (!(empty($areas))) 
 			{
 				$dispatch_citys = explode(';', trim($areas, ';'));
 			}
 		}
 		$citys = array();
-		if (!empty($set_citys)) 
+		if (!(empty($set_citys))) 
 		{
 			$citys = $set_citys;
 		}
-		if (!empty($dispatch_citys)) 
+		if (!(empty($dispatch_citys))) 
 		{
 			$citys = array_merge($citys, $dispatch_citys);
 			$citys = array_unique($citys);
 		}
 		return $citys;
+	}
+	public function checkOnlyDispatchAreas($user_city_code, $dispatch_data) 
+	{
+		global $_W;
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		if (empty($new_area)) 
+		{
+			$areas = $dispatch_data['nodispatchareas'];
+		}
+		else 
+		{
+			$areas = $dispatch_data['nodispatchareas_code'];
+		}
+		$isnoarea = 1;
+		if (!(empty($user_city_code)) && !(empty($areas))) 
+		{
+			$areas = iunserializer($areas);
+			$citys = explode(';', trim($areas, ';'));
+			if (in_array($user_city_code, $citys)) 
+			{
+				$isnoarea = 0;
+			}
+		}
+		return $isnoarea;
 	}
 	public function getNoDispatchAreas($goods) 
 	{
@@ -156,7 +208,7 @@ class Dispatch_EweiShopV2Model
 		}
 		if ($goods['dispatchtype'] == 1) 
 		{
-			$nodispatchareas = $this->getAllNoDispatchAreas();
+			$dispatchareas = $this->getAllNoDispatchAreas();
 		}
 		else 
 		{
@@ -172,9 +224,19 @@ class Dispatch_EweiShopV2Model
 			{
 				$dispatch = m('dispatch')->getNewDispatch($goods['merchid']);
 			}
-			$nodispatchareas = $this->getAllNoDispatchAreas($dispatch['nodispatchareas']);
+			if (empty($dispatch['isdispatcharea'])) 
+			{
+				$onlysent = 0;
+				$citys = $this->getAllNoDispatchAreas($dispatch['nodispatchareas']);
+			}
+			else 
+			{
+				$onlysent = 1;
+				$dispatchareas = iunserializer($dispatch['nodispatchareas']);
+				$citys = explode(';', trim($dispatchareas, ';'));
+			}
 		}
-		return $nodispatchareas;
+		return array('onlysent' => $onlysent, 'citys' => $citys);
 	}
 }
 ?>

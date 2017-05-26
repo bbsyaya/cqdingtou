@@ -103,7 +103,7 @@
 							{/loop}
 						</p>
 						{/if}
-						{if $coupon['limitgoodtype']=='1'}
+						{if $coupon['limitgoodcatetype']=='1'}
 							<p>允许以下商品分类使用:</p>
 							<p>
 								{loop $category $c}
@@ -111,7 +111,7 @@
 								{/loop}
 							</p>
 						{/if}
-						{if $coupon['limitgoodtype']=='0'&& $coupon['limitgoodtype']=='0'&&$coupon['limitdiscounttype']=='0'&&$coupon['coupontype']!='2'}
+						{if $coupon['limitgoodtype']=='0'&& $coupon['limitgoodcatetype']=='0'&&$coupon['limitdiscounttype']=='0'&&$coupon['coupontype']!='2'}
 						<p>无</p>
 						{/if}
 					</div>

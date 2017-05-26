@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -25,7 +25,7 @@ class Info_EweiShopV2Page extends MobileLoginPage
 			{
 				$template_flag = 1;
 				$diyform_id = $set_config['user_diyform'];
-				if (!empty($diyform_id)) 
+				if (!(empty($diyform_id))) 
 				{
 					$formInfo = $diyform_plugin->getDiyformInfo($diyform_id);
 					$fields = $formInfo['fields'];
@@ -45,6 +45,13 @@ class Info_EweiShopV2Page extends MobileLoginPage
 		$returnurl = urldecode(trim($_GPC['returnurl']));
 		$member = $this->member;
 		$wapset = m('common')->getSysset('wap');
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$show_data = 1;
+		if ((!(empty($new_area)) && empty($member['datavalue'])) || (empty($new_area) && !(empty($member['datavalue'])))) 
+		{
+			$show_data = 0;
+		}
 		include $this->template();
 	}
 	public function submit() 
@@ -67,9 +74,9 @@ class Info_EweiShopV2Page extends MobileLoginPage
 			$m_data['diymemberfields'] = iserializer($fields);
 			$m_data['diymemberdata'] = $data;
 			pdo_update('ewei_shop_member', $m_data, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
-			if (!empty($this->member['uid'])) 
+			if (!(empty($this->member['uid']))) 
 			{
-				if (!empty($mc_data)) 
+				if (!(empty($mc_data))) 
 				{
 					m('member')->mc_update($this->member['uid'], $mc_data);
 				}
@@ -78,7 +85,7 @@ class Info_EweiShopV2Page extends MobileLoginPage
 		else 
 		{
 			pdo_update('ewei_shop_member', $memberdata, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
-			if (!empty($this->member['uid'])) 
+			if (!(empty($this->member['uid']))) 
 			{
 				$mcdata = $_GPC['mcdata'];
 				m('member')->mc_update($this->member['uid'], $mcdata);

@@ -190,10 +190,9 @@ class TaobaoModel extends PluginModel
 		$dom->loadHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $content);
 		$xml = simplexml_import_dom($dom);
 		$prodectNameContent = $xml->xpath('//*[@id="goodName"]');
-		$prodectName = strval( $prodectNameContent[0]->attributes()->value);
+		$prodectName = strval($prodectNameContent[0]->attributes()->value);
 		if ($prodectName == NULL) 
 		{
-			echo '宝贝不存在';
 			return array('result' => '0', 'error' => '宝贝不存在!');
 		}
 		$item = array();
@@ -237,7 +236,7 @@ class TaobaoModel extends PluginModel
 		$item['total'] = 10;
 		$item['sales'] = 0;
 		$prodectPriceContent = $xml->xpath('//*[@id="jdPrice"]');
-		$prodectPrices = strval( $prodectPriceContent[0]->attributes()->value);
+		$prodectPrices = strval($prodectPriceContent[0]->attributes()->value);
 		$item['marketprice'] = $prodectPrices;
 		$url = $this->get_jingdong_detail_url($itemid);
 		$responseDetail = ihttp_get($url);
@@ -273,8 +272,7 @@ class TaobaoModel extends PluginModel
 		$g = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where uniacid=:uniacid and merchid=:merchid and catch_id=:catch_id and catch_source=\'1688\' limit 1', array(':uniacid' => $_W['uniacid'], ':catch_id' => $itemid, ':merchid' => $merchid));
 		$url = $this->get_1688_info_url($itemid);
 		load()->func('communication');
-		$url = $this->getRealURL($url);
-		$response = ihttp_get($url);
+		$response = ihttp_request($url, '', array('CURLOPT_FOLLOWLOCATION' => 1));
 		$length = strval($response['headers']['Content-Length']);
 		if ($length != NULL) 
 		{
@@ -288,7 +286,6 @@ class TaobaoModel extends PluginModel
 		$prodectName = strval($prodectNameContent[0]);
 		if ($prodectName == NULL) 
 		{
-			echo '宝贝不存在';
 			return array('result' => '0', 'error' => '宝贝不存在!');
 		}
 		$item = array();
@@ -326,7 +323,7 @@ class TaobaoModel extends PluginModel
 		$item['total'] = 10;
 		$item['sales'] = 0;
 		$prodectPriceContent = $xml->xpath('//*[@property="og:product:price"]');
-		$prodectPrices = strval( $prodectPriceContent[0]->attributes()->content);
+		$prodectPrices = strval($prodectPriceContent[0]->attributes()->content);
 		$item['marketprice'] = $prodectPrices;
 		$prodectContent = $xml->xpath('//*[@id="desc-lazyload-container"]');
 		$Contents = $prodectContent[0]->attributes();

@@ -33,7 +33,7 @@ class Batchsend_EweiShopV2Page extends MerchWebPage
 					$err_array[] = $ordersn;
 					continue;
 				}
-				$sql = 'select id,status,refundid from ' . tablename('ewei_shop_order') . ' where ordersn=:ordersn and uniacid=:uniacid and merchid = :merchid';
+				$sql = 'select id,status,refundid from ' . tablename('ewei_shop_order') . ' where ordersn=:ordersn and uniacid=:uniacid and isparent=0 and merchid = :merchid';
 				$sql .= ' and status in (1,2) and isverify=0 and isvirtual=0 and virtual=0 and addressid >0 limit 1';
 				$order = pdo_fetch($sql, array(':ordersn' => $ordersn, ':uniacid' => $_W['uniacid'], ':merchid' => $_W['merchid']));
 				if (!(empty($order))) 

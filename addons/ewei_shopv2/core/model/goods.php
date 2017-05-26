@@ -107,8 +107,7 @@ class Goods_EweiShopV2Model
 		if (!(empty($args['cate']))) 
 		{
 			$category = m('shop')->getAllCategory();
-			//begin
-			/* $catearr = array($args['cate']);
+			$catearr = array($args['cate']);
 			foreach ($category as $index => $row ) 
 			{
 				if ($row['parentid'] == $args['cate']) 
@@ -122,26 +121,7 @@ class Goods_EweiShopV2Model
 						}
 					}
 				}
-			} */
-			//center
-			$catearr = explode(',', $args['cate']);
-			foreach ($catearr as $k=>$v){
-				foreach ($category as $index => $row )
-				{
-					if ($row['parentid'] == $v)
-					{
-						$catearr[] = $row['id'];
-						foreach ($category as $ind => $ro )
-						{
-							if ($ro['parentid'] == $row['id'])
-							{
-								$catearr[] = $ro['id'];
-							}
-						}
-					}
-				}
 			}
-			//end
 			$catearr = array_unique($catearr);
 			$condition .= ' AND ( ';
 			foreach ($catearr as $key => $value ) 

@@ -1084,6 +1084,18 @@ class Common_EweiShopV2Model
 						unset($row['city']['county']);
 					}
 				}
+				else 
+				{
+					unset($areas['province'][0]);
+				}
+				foreach ($row['city'] as $k1 => $v1 ) 
+				{
+					if (empty($v1['county'][0])) 
+					{
+						$row['city'][$k1]['county'][0]['@attributes'] = $v1['county']['@attributes'];
+						unset($row['city'][$k1]['county']['@attributes']);
+					}
+				}
 			}
 			unset($row);
 		}

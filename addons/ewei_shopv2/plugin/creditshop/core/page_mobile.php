@@ -1,6 +1,5 @@
 <?php
-
-class CreditshopMobilePage extends PluginMobilePage
-{}
-
+class CreditshopMobilePage extends PluginMobilePage 
+{
+}
 ?>

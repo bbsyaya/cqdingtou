@@ -92,6 +92,10 @@ class Qiniu_EweiShopV2ComModel extends ComModel
 				$outlinkEnforce = true;
 			}
 		}
+		if (!(is_file($url))) 
+		{
+			return '';
+		}
 		$key = md5_file($url) . $ext;
 		if ($outlinkEnforce) 
 		{
@@ -124,6 +128,7 @@ class Qiniu_EweiShopV2ComModel extends ComModel
 			$uploadtoken = $auth->uploadToken($config['bucket'], $key, 3600);
 		}
 		list($ret, $err) = $uploadmgr->putFile($uploadtoken, $key, $url);
+		print_r($err);
 		if ($err !== NULL) 
 		{
 			return '';

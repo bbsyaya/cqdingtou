@@ -194,10 +194,10 @@
 					<i class='fa fa-exchange'></i> 物流信息
 				</a>
 				{/if}
-				{ifp 'creditshop.log.exchange'} 
+				{ifp 'creditshop.log.exchange'}
 					{if $row['canexchange']}
 						<a class='btn btn-default btn-sm' data-toggle='ajaxModal' href="{php echo webUrl('creditshop/log/doexchange',array('id' => $row['id'],'type'=>$row['goodstype']));}"><i class='fa fa-exchange'></i> 兑换</a>
-				{/if} 
+				{/if}
 				{/if}
 			</td>
 		</tr>

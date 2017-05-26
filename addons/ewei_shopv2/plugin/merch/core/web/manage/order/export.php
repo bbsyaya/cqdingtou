@@ -185,6 +185,8 @@ class Export_EweiShopV2Page extends MerchWebPage
 				$agentid = $value['agentid'];
 				$s = $value['status'];
 				$pt = $value['paytype'];
+				$value['realname'] = str_replace('=', '', $value['realname']);
+				$value['nickname'] = str_replace('=', '', $value['nickname']);
 				$value['statusvalue'] = $s;
 				$value['statuscss'] = $orderstatus[$value['status']]['css'];
 				$value['status'] = $orderstatus[$value['status']]['name'];

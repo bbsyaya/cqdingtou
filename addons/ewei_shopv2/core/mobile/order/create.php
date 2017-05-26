@@ -73,6 +73,9 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$giftGood = array();
 		$sysset = m('common')->getSysset('trade');
 		$allow_sale = true;
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
 		$packageid = intval($_GPC['packageid']);
 		if (!($packageid)) 
 		{
@@ -623,7 +626,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			}
 			else 
 			{
-				$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . ' where openid=:openid and deleted=0 and isdefault=1  and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid));
+				$address = pdo_fetch('select * from ' . tablename('ewei_shop_member_address') . ' where openid=:openid and deleted=0 and isdefault=1  and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid));
 				if (!(empty($carrier_list))) 
 				{
 					$carrier = $carrier_list[0];
@@ -769,6 +772,10 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					$gifts = array();
 					$giftgoods = array();
 					$gifts = pdo_fetchall('select id,goodsid,giftgoodsid,thumb,title from ' . tablename('ewei_shop_gift') . "\n" . '                    where uniacid = ' . $uniacid . ' and status = 1 and starttime <= ' . time() . ' and endtime >= ' . time() . ' and orderprice <= ' . $goodsprice . ' and activity = 1 ');
+					if (!(empty($gifts)) && (count($gifts) == 1)) 
+					{
+						$giftid = $gifts[0]['id'];
+					}
 					foreach ($gifts as $key => $value ) 
 					{
 						$isgift = 1;
@@ -843,7 +850,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			else 
 			{
 			}
-			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, $createInfo =   'addressid' => (!empty($address) && !$isverify && !$isvirtual ? $address['id'] : 0), 'storeid' => 0, 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind);
+			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!empty($address) && !$isverify && !$isvirtual ? $address['id'] : 0), 'storeid' => 0, 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind);
 			$buyagain = $buyagainprice;
 		}
 		else 
@@ -893,7 +900,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				$goodsprice += $goods[$key]['packageprice'];
 				$marketprice += $goods[$key]['marketprice'];
 			}
-			$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . ' where openid=:openid and deleted=0 and isdefault=1  and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid));
+			$address = pdo_fetch('select * from ' . tablename('ewei_shop_member_address') . ' where openid=:openid and deleted=0 and isdefault=1  and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid));
 			$total = count($goods);
 			$dispatch_price = $package['freight'];
 			$realprice = $goodsprice + $package['freight'];
@@ -1055,6 +1062,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					}
 				}
 				break;
+				default:
 				if ($g['discounttype'] == 1) 
 				{
 					$coupongoodprice += $gprice - ((double) $g['isdiscountunitprice'] * (double) $g['total']);
@@ -1163,7 +1171,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$totalprice = floatval($_GPC['totalprice']);
 		$dflag = $_GPC['dflag'];
 		$addressid = intval($_GPC['addressid']);
-		$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . ' where  id=:id and openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid, ':id' => $addressid));
+		$address = pdo_fetch('select * from ' . tablename('ewei_shop_member_address') . ' where  id=:id and openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid, ':id' => $addressid));
 		$member = m('member')->getMember($openid, true);
 		$level = m('member')->getLevel($openid);
 		$weight = floatval($_GPC['weight']);
@@ -1597,10 +1605,17 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$address = false;
 		if (!(empty($addressid)) && ($dispatchtype == 0)) 
 		{
-			$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . ' where id=:id and openid=:openid and uniacid=:uniacid   limit 1', array(':uniacid' => $uniacid, ':openid' => $openid, ':id' => $addressid));
+			$address = pdo_fetch('select * from ' . tablename('ewei_shop_member_address') . ' where id=:id and openid=:openid and uniacid=:uniacid   limit 1', array(':uniacid' => $uniacid, ':openid' => $openid, ':id' => $addressid));
 			if (empty($address)) 
 			{
 				show_json(0, '未找到地址');
+			}
+			else 
+			{
+				if (empty($address['province']) || empty($address['city'])) 
+				{
+					show_json(0, '地址请选择省市信息');
+				}
 			}
 		}
 		$carrierid = intval($_GPC['carrierid']);
@@ -1649,7 +1664,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$verifytype = 0;
 		$isvirtualsend = false;
 		$couponmerchid = 0;
-		$giftid = $_GPC['giftid'];
+		$giftid = intval($_GPC['giftid']);
 		if ($giftid) 
 		{
 			$gift = array();

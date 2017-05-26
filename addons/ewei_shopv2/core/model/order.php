@@ -84,7 +84,7 @@ class Order_EweiShopV2Model
 					$res = p('lottery')->getLottery($_W['openid'], 1, array('money' => $order['price'], 'paytype' => 1));
 					if ($res) 
 					{
-						p('lottery')->getLotteryList($_W['openid']);
+						p('lottery')->getLotteryList($_W['openid'], array('lottery_id' => $res));
 					}
 				}
 			}
@@ -140,7 +140,7 @@ class Order_EweiShopV2Model
 		pdo_update('ewei_shop_order', array('virtualsend_info' => $order_goods['virtualsendcontent'], 'status' => '3', 'paytime' => $time, 'sendtime' => $time, 'finishtime' => $time), array('id' => $orderid));
 		$this->setStocksAndCredits($orderid, 1);
 		m('member')->upgradeLevel($order['openid']);
-		m('order')->setGiveBalance($orderid, 1);
+		$this->setGiveBalance($orderid, 1);
 		if (com('coupon')) 
 		{
 			com('coupon')->sendcouponsbytask($order['id']);
@@ -365,9 +365,9 @@ class Order_EweiShopV2Model
 				}
 			}
 		}
-		if ($type == 1) 
+		else if ($type == 1) 
 		{
-			$money = com_run('sale::getCredit1', $order['openid'], $order['price'], $order['paytype'], 0);
+			$money = com_run('sale::getCredit1', $order['openid'], (double) $order['price'], $order['paytype'], 1);
 			if (0 < $money) 
 			{
 				m('notice')->sendMemberPointChange($order['openid'], $money, 0);
@@ -377,7 +377,7 @@ class Order_EweiShopV2Model
 		{
 			if (1 <= $order['status']) 
 			{
-				$money = com_run('sale::getCredit1', $order['openid'], $order['price'], $order['paytype'], 1, 1);
+				$money = com_run('sale::getCredit1', $order['openid'], (double) $order['price'], $order['paytype'], 1, 1);
 				if (0 < $money) 
 				{
 					m('notice')->sendMemberPointChange($order['openid'], $money, 1);
@@ -604,7 +604,7 @@ class Order_EweiShopV2Model
 						{
 							$price2 = round($dd, 2);
 						}
-						else if (0 < $md) 
+						else if (0 < $md)
 						{
 							$price2 = round(($md / 10) * $gprice, 2);
 						}
@@ -815,6 +815,8 @@ class Order_EweiShopV2Model
 	public function getOrderDispatchPrice($goods, $member, $address, $saleset = false, $merch_array, $t, $loop = 0) 
 	{
 		global $_W;
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
 		$realprice = 0;
 		$dispatch_price = 0;
 		$dispatch_array = array();
@@ -826,13 +828,22 @@ class Order_EweiShopV2Model
 		$seckill_payprice = 0;
 		$seckill_dispatchprice = 0;
 		$user_city = '';
-		if (!(empty($address))) 
+		$user_city_code = '';
+		if (empty($new_area)) 
 		{
-			$user_city = $address['city'];
+			if (!(empty($address))) 
+			{
+				$user_city = $user_city_code = $address['city'];
+			}
+			else if (!(empty($member['city']))) 
+			{
+				$user_city = $user_city_code = $member['city'];
+			}
 		}
-		else if (!(empty($member['city']))) 
+		else if (!(empty($address))) 
 		{
-			$user_city = $member['city'];
+			$user_city = $address['city'] . $address['area'];
+			$user_city_code = $address['datavalue'];
 		}
 		foreach ($goods as $g ) 
 		{
@@ -920,10 +931,17 @@ class Order_EweiShopV2Model
 			{
 				if (!(empty($user_city))) 
 				{
-					$citys = m('dispatch')->getAllNoDispatchAreas();
+					if (empty($new_area)) 
+					{
+						$citys = m('dispatch')->getAllNoDispatchAreas();
+					}
+					else 
+					{
+						$citys = m('dispatch')->getAllNoDispatchAreas('', 1);
+					}
 					if (!(empty($citys))) 
 					{
-						if (in_array($user_city, $citys) && !(empty($citys))) 
+						if (in_array($user_city_code, $citys) && !(empty($citys))) 
 						{
 							$isnodispatch = 1;
 							$has_goodsid = 0;
@@ -972,33 +990,71 @@ class Order_EweiShopV2Model
 				}
 				if (!(empty($dispatch_data))) 
 				{
+					$isnoarea = 0;
 					$dkey = $dispatch_data['id'];
+					$isdispatcharea = intval($dispatch_data['isdispatcharea']);
 					if (!(empty($user_city))) 
 					{
-						$citys = m('dispatch')->getAllNoDispatchAreas($dispatch_data['nodispatchareas']);
-						if (!(empty($citys))) 
+						if (empty($isdispatcharea)) 
 						{
-							if (in_array($user_city, $citys) && !(empty($citys))) 
+							if (empty($new_area)) 
 							{
-								$isnodispatch = 1;
-								$has_goodsid = 0;
-								if (!(empty($nodispatch_array['goodid']))) 
+								$citys = m('dispatch')->getAllNoDispatchAreas($dispatch_data['nodispatchareas']);
+							}
+							else 
+							{
+								$citys = m('dispatch')->getAllNoDispatchAreas($dispatch_data['nodispatchareas_code'], 1);
+							}
+							if (!(empty($citys))) 
+							{
+								if (in_array($user_city_code, $citys)) 
 								{
-									if (in_array($g['goodsid'], $nodispatch_array['goodid'])) 
-									{
-										$has_goodsid = 1;
-									}
-								}
-								if ($has_goodsid == 0) 
-								{
-									$nodispatch_array['goodid'][] = $g['goodsid'];
-									$nodispatch_array['title'][] = $g['title'];
-									$nodispatch_array['city'] = $user_city;
+									$isnoarea = 1;
 								}
 							}
 						}
+						else 
+						{
+							if (empty($new_area)) 
+							{
+								$citys = m('dispatch')->getAllNoDispatchAreas();
+							}
+							else 
+							{
+								$citys = m('dispatch')->getAllNoDispatchAreas('', 1);
+							}
+							if (!(empty($citys))) 
+							{
+								if (in_array($user_city_code, $citys)) 
+								{
+									$isnoarea = 1;
+								}
+							}
+							if (empty($isnoarea)) 
+							{
+								$isnoarea = m('dispatch')->checkOnlyDispatchAreas($user_city_code, $dispatch_data);
+							}
+						}
+						if (!(empty($isnoarea))) 
+						{
+							$isnodispatch = 1;
+							$has_goodsid = 0;
+							if (!(empty($nodispatch_array['goodid']))) 
+							{
+								if (in_array($g['goodsid'], $nodispatch_array['goodid'])) 
+								{
+									$has_goodsid = 1;
+								}
+							}
+							if ($has_goodsid == 0) 
+							{
+								$nodispatch_array['goodid'][] = $g['goodsid'];
+								$nodispatch_array['title'][] = $g['title'];
+								$nodispatch_array['city'] = $user_city;
+							}
+						}
 					}
-					if (!$sendfree  && !$sendfree && ($isnodispatch == 0))  
+					if (!$sendfree  && !$sendfree && ($isnodispatch == 0)) 
 					{
 						$areas = unserialize($dispatch_data['areas']);
 						if ($dispatch_data['calculatetype'] == 1) 
@@ -1042,11 +1098,11 @@ class Order_EweiShopV2Model
 				$areas = unserialize($dispatch_data['areas']);
 				if (!(empty($address))) 
 				{
-					$dprice = m('dispatch')->getCityDispatchPrice($areas, $address['city'], $param, $dispatch_data);
+					$dprice = m('dispatch')->getCityDispatchPrice($areas, $address, $param, $dispatch_data);
 				}
 				else if (!(empty($member['city']))) 
 				{
-					$dprice = m('dispatch')->getCityDispatchPrice($areas, $member['city'], $param, $dispatch_data);
+					$dprice = m('dispatch')->getCityDispatchPrice($areas, $member, $param, $dispatch_data);
 				}
 				else 
 				{

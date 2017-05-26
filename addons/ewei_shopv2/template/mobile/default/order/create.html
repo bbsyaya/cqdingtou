@@ -32,7 +32,7 @@
             </div>
             <div class="fui-list-inner" >
                 <div class="title has-address" {if empty($address)}style='display:none'{/if}><span class='realname'>{$address['realname']}</span> <span class='mobile'>{$address['mobile']}</span></div>
-            <div class="text has-address" {if empty($address)}style='display:none'{/if}><span class='address'>{$address['province']}{$address['city']}{$address['area']} {$address['address']}</span></div>
+            <div class="text has-address" {if empty($address)}style='display:none'{/if}><span class='address'>{$address['province']}{$address['city']}{$address['area']}{if !empty($new_area) && !empty($address_street)} {$address['street']}{/if} {$address['address']}</span></div>
         <div class="text no-address" {if !empty($address)}style='display:none'{/if}><i class="icon icon-add"></i> 添加收货地址</div>
 </div>
 <div class="fui-list-angle">

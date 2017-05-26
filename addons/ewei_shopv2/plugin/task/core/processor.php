@@ -100,7 +100,6 @@ class TaskProcessor extends PluginProcessor
 			return m('message')->sendCustomNotice($openid, '扫描自己的海报是不会增加人气值的,快快把你的海报发送给你的小伙伴吧~');
 		}
 		load()->func('logging');
-		logging_run($join_info['task_type']);
 		if ($member_info['isnew']) 
 		{
 			if (!(empty($join_info))) 
@@ -238,7 +237,7 @@ class TaskProcessor extends PluginProcessor
 			return $this->responseDefault($obj);
 		}
 		$qrmember = m('member')->getMember($qr['openid']);
-		$join_info = pdo_fetch('select `join_id`,`needcount`,`completecount`,`failtime`,`reward_data`,`is_reward` from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_id=:task_id and task_type=:task_type and failtime>' . time() . '  order by addtime DESC limit 1', array(':uniacid' => $_W['uniacid'], ':join_user' => $qrmember['openid'], ':task_id' => $poster['id'], ':task_type' => $poster['poster_type']));
+		$join_info = pdo_fetch('select `join_id`,`needcount`,`completecount`,`failtime`,`task_type`,`reward_data`,`is_reward` from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_id=:task_id and task_type=:task_type and failtime>' . time() . ' order by addtime DESC limit 1', array(':uniacid' => $_W['uniacid'], ':join_user' => $qrmember['openid'], ':task_id' => $poster['id'], ':task_type' => $poster['poster_type']));
 		if ($openid == $qr['openid']) 
 		{
 			$default_text = pdo_fetchcolumn('SELECT `data` FROM ' . tablename('ewei_shop_task_default') . ' WHERE uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));

@@ -10,8 +10,11 @@ class Picker_EweiShopV2Page extends MobilePage
 		global $_W;
 		global $_GPC;
 		$id = intval($_GPC['id']);
+		$action = trim($_GPC['action']);
 		$rank = intval($_SESSION[$id . '_rank']);
+		$log_id = intval($_SESSION[$id . '_log_id']);
 		$join_id = intval($_SESSION[$id . '_join_id']);
+		$cremind = false;
 		$seckillinfo = false;
 		$seckill = p('seckill');
 		if ($seckill) 
@@ -187,54 +190,73 @@ class Picker_EweiShopV2Page extends MobilePage
 		$goods['minprice'] = number_format($minprice, 2);
 		$goods['maxprice'] = number_format($maxprice, 2);
 		$diyformhtml = '';
-		$diyform_plugin = p('diyform');
-		if ($diyform_plugin) 
+		if ($action == 'cremind') 
 		{
-			$fields = false;
-			if ($goods['diyformtype'] == 1) 
+			$cremind_plugin = p('cremind');
+			$cremind_data = m('common')->getPluginset('cremind');
+			if ($cremind_plugin && $cremind_data['remindopen']) 
 			{
-				if (!(empty($goods['diyformid']))) 
-				{
-					$diyformid = $goods['diyformid'];
-					$formInfo = $diyform_plugin->getDiyformInfo($diyformid);
-					$fields = $formInfo['fields'];
-				}
+				$cremind = true;
 			}
-			else if ($goods['diyformtype'] == 2) 
+			ob_start();
+			include $this->template('cremind/formfields');
+			$cremindformhtml = ob_get_contents();
+			ob_clean();
+		}
+		else 
+		{
+			$diyform_plugin = p('diyform');
+			if ($diyform_plugin) 
 			{
-				$diyformid = 0;
-				$fields = iunserializer($goods['diyfields']);
-				if (empty($fields)) 
+				$fields = false;
+				if ($goods['diyformtype'] == 1) 
 				{
-					$fields = false;
-				}
-			}
-			if (!(empty($fields))) 
-			{
-				ob_start();
-				$inPicker = true;
-				$openid = $_W['openid'];
-				$member = m('member')->getMember($openid, true);
-				$f_data = $diyform_plugin->getLastData(3, 0, $diyformid, $id, $fields, $member);
-				$flag = 0;
-				if (!(empty($f_data))) 
-				{
-					foreach ($f_data as $k => $v ) 
+					if (!(empty($goods['diyformid']))) 
 					{
-						if (!(empty($v))) 
-						{
-							$flag = 1;
-							break;
-						}
+						$diyformid = $goods['diyformid'];
+						$formInfo = $diyform_plugin->getDiyformInfo($diyformid);
+						$fields = $formInfo['fields'];
 					}
 				}
-				if (empty($flag)) 
+				else if ($goods['diyformtype'] == 2) 
 				{
-					$f_data = $diyform_plugin->getLastCartData($id);
+					$diyformid = 0;
+					$fields = iunserializer($goods['diyfields']);
+					if (empty($fields)) 
+					{
+						$fields = false;
+					}
 				}
-				include $this->template('diyform/formfields');
-				$diyformhtml = ob_get_contents();
-				ob_clean();
+				if (!(empty($fields))) 
+				{
+					ob_start();
+					$inPicker = true;
+					$openid = $_W['openid'];
+					$member = m('member')->getMember($openid, true);
+					$f_data = $diyform_plugin->getLastData(3, 0, $diyformid, $id, $fields, $member);
+					$flag = 0;
+					if (!(empty($f_data))) 
+					{
+						foreach ($f_data as $k => $v ) 
+						{
+							if (!(empty($v))) 
+							{
+								$flag = 1;
+								break;
+							}
+						}
+					}
+					if (empty($flag)) 
+					{
+						$f_data = $diyform_plugin->getLastCartData($id);
+					}
+					$area_set = m('util')->get_area_config_set();
+					$new_area = intval($area_set['new_area']);
+					$address_street = intval($area_set['address_street']);
+					include $this->template('diyform/formfields');
+					$diyformhtml = ob_get_contents();
+					ob_clean();
+				}
 			}
 		}
 		if (!(empty($specs))) 
@@ -252,7 +274,7 @@ class Picker_EweiShopV2Page extends MobilePage
 		{
 			$goods['canAddCart'] = false;
 		}
-		show_json(1, array('goods' => $goods, 'seckillinfo' => $seckillinfo, 'specs' => $specs, 'options' => $options, 'diyformhtml' => $diyformhtml));
+		show_json(1, array('goods' => $goods, 'seckillinfo' => $seckillinfo, 'specs' => $specs, 'options' => $options, 'diyformhtml' => $diyformhtml, 'cremind' => $cremind, 'cremindformhtml' => $cremindformhtml));
 	}
 }
 ?>

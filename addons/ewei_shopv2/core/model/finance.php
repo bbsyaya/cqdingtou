@@ -155,7 +155,7 @@ class Finance_EweiShopV2Model
 			$redpack = 388;
 		}
 		$shopset = m('common')->getSysset('shop');
-		$params = array('openid' => $openid, 'tid' => '', 'send_name' => $shopset['name'], 'money' => '', 'wishing' => '恭喜发财,大吉大利!', 'act_name' => $_W['shopset']['shop']['name'] . '活动', 'remark' => $desc);
+		$params = array('openid' => $openid, 'tid' => '', 'send_name' => mb_substr($shopset['name'], 0, 10, 'UTF-8'), 'money' => '', 'wishing' => '恭喜发财,大吉大利!', 'act_name' => $_W['shopset']['shop']['name'] . '活动', 'remark' => $desc);
 		$setting = uni_setting($_W['uniacid'], array('payment'));
 		$wechats = $setting['payment']['wechat'];
 		$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';

@@ -41,7 +41,9 @@
     flex: 1;
     background: #fff;
     padding-left: .5rem;
-
+    background: url("../images/get.png") no-repeat;
+    background-position: right;
+    background-size: 4.3rem;
 }
 
 .fui-goods-item .detail .name {
@@ -65,7 +67,7 @@
 
 }
 
-.fui-goods-item .detail .price .text {
+.fui-list-inner .text {
     -webkit-box-flex: 1;
     -webkit-flex: 1;
     -ms-flex: 1;
@@ -138,4 +140,16 @@
     height: auto;
     width: auto;
     z-index: 10;
+}
+
+.oldprice{
+    font-size: 0.1rem;
+    color: gray;
+    padding-left: 0.1rem;
+    text-decoration: line-through;
+}
+.nosale{
+    background: url("../images/get.png") no-repeat;
+    background-position: right;
+    background-size: 3rem;
 }

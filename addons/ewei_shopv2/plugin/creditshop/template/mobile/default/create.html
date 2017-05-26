@@ -54,7 +54,7 @@
                 {/if}
                 <div class="fui-cell">
                     <div class="fui-cell-text store">请选择兑换门店</div>
-                    <a class="fui-cell-info" href="{php echo mobileUrl('store/selector', array('ids'=>$goods['storeids']))}">
+                    <a class="fui-cell-info" href="{php echo mobileUrl('store/selector', array('ids'=>$goods['storeids'],'merchid'=>$goods['merchid']))}">
                         <div class="fui-cell-remark" id="storename"></div>
                     </a>
                 </div>

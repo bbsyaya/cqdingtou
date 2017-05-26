@@ -38,8 +38,13 @@ class Op_EweiShopV2Page extends MerchWebPage
 		global $_GPC;
 		$opdata = $this->opData();
 		extract($opdata);
+		$merch_user = $_W['merch_user'];
 		if ($_W['ispost']) 
 		{
+			if (empty($merch_user['changepricechecked'])) 
+			{
+				show_json(0, '您没有改价的权限!');
+			}
 			if (0 < $item['parentid']) 
 			{
 				$parent_order = array();
@@ -169,15 +174,19 @@ class Op_EweiShopV2Page extends MerchWebPage
 		{
 			show_json(0, '订单已付款，不需重复付款！');
 		}
-		if (!(empty($item['virtual'])) && c('virtual')) 
+		if (!(empty($item['virtual'])) && com('virtual')) 
 		{
-			c('virtual')->pay($item);
+			com('virtual')->pay($item);
 		}
 		else 
 		{
 			pdo_update('ewei_shop_order', array('status' => 1, 'paytype' => 11, 'paytime' => time()), array('id' => $item['id'], 'uniacid' => $_W['uniacid'], 'merchid' => $_W['merchid']));
 			m('order')->setStocksAndCredits($item['id'], 1);
 			m('notice')->sendOrderMessage($item['id']);
+			if (com('coupon')) 
+			{
+				com('coupon')->sendcouponsbytask($item['id']);
+			}
 			if (com('coupon') && !(empty($item['couponid']))) 
 			{
 				com('coupon')->backConsumeCoupon($item['id']);
@@ -186,7 +195,6 @@ class Op_EweiShopV2Page extends MerchWebPage
 			{
 				p('commission')->checkOrderPay($item['id']);
 			}
-			
 		}
 		plog('order.op.pay', '订单确认付款 ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn']);
 		show_json(1);
@@ -262,13 +270,26 @@ class Op_EweiShopV2Page extends MerchWebPage
 		global $_GPC;
 		$opdata = $this->opData();
 		extract($opdata);
+		$merch_user = $_W['merch_user'];
+		if (empty($merch_user['finishchecked'])) 
+		{
+			show_json(0, '您没有确认收货的权限!');
+		}
 		pdo_update('ewei_shop_order', array('status' => 3, 'finishtime' => time()), array('id' => $item['id'], 'uniacid' => $_W['uniacid'], 'merchid' => $_W['merchid']));
 		m('member')->upgradeLevel($item['openid']);
 		m('order')->setGiveBalance($item['id'], 1);
 		m('notice')->sendOrderMessage($item['id']);
+		if (com('coupon')) 
+		{
+			com('coupon')->sendcouponsbytask($item['id']);
+		}
 		if (!(empty($item['couponid']))) 
 		{
-			m('coupon')->backConsumeCoupon($item['id']);
+			com('coupon')->backConsumeCoupon($item['id']);
+		}
+		if (p('lineup')) 
+		{
+			p('lineup')->checkOrder($item);
 		}
 		if (p('commission')) 
 		{
@@ -312,6 +333,10 @@ class Op_EweiShopV2Page extends MerchWebPage
 				$remark = $item['remarksend'] . "\r\n" . $remark;
 			}
 			pdo_update('ewei_shop_order', array('status' => 1, 'sendtime' => 0, 'remarksend' => $remark), array('id' => $item['id'], 'uniacid' => $_W['uniacid'], 'merchid' => $_W['merchid']));
+			if ($item['paytype'] == 3) 
+			{
+				m('order')->setStocksAndCredits($item['id'], 2);
+			}
 			plog('order.op.sendcancel', '订单取消发货 ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn'] . ' 原因: ' . $remark);
 			show_json(1);
 		}
@@ -392,6 +417,10 @@ class Op_EweiShopV2Page extends MerchWebPage
 					pdo_update('ewei_shop_order', array('refundstate' => 0), array('id' => $item['id']));
 				}
 			}
+			if ($item['paytype'] == 3) 
+			{
+				m('order')->setStocksAndCredits($item['id'], 1);
+			}
 			m('notice')->sendOrderMessage($item['id']);
 			plog('order.op.send', '订单发货 ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn'] . ' <br/>快递公司: ' . $_GPC['expresscom'] . ' 快递单号: ' . $_GPC['expresssn']);
 			show_json(1);
@@ -464,6 +493,9 @@ class Op_EweiShopV2Page extends MerchWebPage
 		global $_GPC;
 		$opdata = $this->opData();
 		extract($opdata);
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
 		if (empty($item['addressid'])) 
 		{
 			$user = unserialize($item['carrier']);
@@ -476,7 +508,8 @@ class Op_EweiShopV2Page extends MerchWebPage
 				$user = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_address') . ' WHERE id = :id and uniacid=:uniacid', array(':id' => $item['addressid'], ':uniacid' => $_W['uniacid']));
 			}
 			$address_info = $user['address'];
-			$user['address'] = $user['province'] . ' ' . $user['city'] . ' ' . $user['area'] . ' ' . $user['address'];
+			$user_address = $user['address'];
+			$user['address'] = $user['province'] . ' ' . $user['city'] . ' ' . $user['area'] . ' ' . $user['street'] . ' ' . $user['address'];
 			$item['addressdata'] = $oldaddress = array('realname' => $user['realname'], 'mobile' => $user['mobile'], 'address' => $user['address']);
 		}
 		if ($_W['ispost']) 
@@ -486,6 +519,8 @@ class Op_EweiShopV2Page extends MerchWebPage
 			$province = $_GPC['province'];
 			$city = $_GPC['city'];
 			$area = $_GPC['area'];
+			$street = $_GPC['street'];
+			$changead = intval($_GPC['changead']);
 			$address = trim($_GPC['address']);
 			if (!(empty($id))) 
 			{
@@ -499,24 +534,39 @@ class Op_EweiShopV2Page extends MerchWebPage
 					$ret = '请填写收件人手机！';
 					show_json(0, $ret);
 				}
-				if ($province == '请选择省份') 
+				if ($changead) 
 				{
-					$ret = '请选择省份！';
-					show_json(0, $ret);
-				}
-				if (empty($address)) 
-				{
-					$ret = '请填写详细地址！';
-					show_json(0, $ret);
+					if ($province == '请选择省份') 
+					{
+						$ret = '请选择省份！';
+						show_json(0, $ret);
+					}
+					if (empty($address)) 
+					{
+						$ret = '请填写详细地址！';
+						show_json(0, $ret);
+					}
 				}
 				$item = pdo_fetch('SELECT id, ordersn, address FROM ' . tablename('ewei_shop_order') . ' WHERE id = :id and uniacid=:uniacid and merchid = :merchid', array(':id' => $id, ':uniacid' => $_W['uniacid'], ':merchid' => $_W['merchid']));
 				$address_array = iunserializer($item['address']);
 				$address_array['realname'] = $realname;
 				$address_array['mobile'] = $mobile;
-				$address_array['province'] = $province;
-				$address_array['city'] = $city;
-				$address_array['area'] = $area;
-				$address_array['address'] = $address;
+				if ($changead) 
+				{
+					$address_array['province'] = $province;
+					$address_array['city'] = $city;
+					$address_array['area'] = $area;
+					$address_array['street'] = $street;
+					$address_array['address'] = $address;
+				}
+				else 
+				{
+					$address_array['province'] = $user['province'];
+					$address_array['city'] = $user['city'];
+					$address_array['area'] = $user['area'];
+					$address_array['street'] = $user['street'];
+					$address_array['address'] = $user_address;
+				}
 				$address_array = iserializer($address_array);
 				pdo_update('ewei_shop_order', array('address' => $address_array), array('id' => $id, 'uniacid' => $_W['uniacid'], 'merchid' => $_W['merchid']));
 				plog('order.op.changeaddress', '修改收货地址 ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn'] . ' <br>原地址: 收件人: ' . $oldaddress['realname'] . ' 手机号: ' . $oldaddress['mobile'] . ' 收件地址: ' . $oldaddress['address'] . '<br>新地址: 收件人: ' . $realname . ' 手机号: ' . $mobile . ' 收件地址: ' . $province . ' ' . $city . ' ' . $area . ' ' . $address);

@@ -327,7 +327,7 @@
 {if $has_city}
 <div class='fui-cell-group fui-cell-click  fui-sale-group' style='margin-top:0' id="city-picker">
     <div class='fui-cell'>
-        <div class='fui-cell-text'>不配送区域:
+        <div class='fui-cell-text'>{if empty($onlysent)}不{else}只{/if}配送区域:
             {loop $citys $item}
             {$item}
             {/loop}
@@ -697,7 +697,7 @@
 
             <div class="fui-cell">
                 <div class="fui-cell-text dispatching">
-                    不配送区域:
+                    {if empty($onlysent)}不{else}只{/if}配送区域:
                     <div class="dispatching-info">
                         {loop $citys $item}
                         <i>{$item}</i>

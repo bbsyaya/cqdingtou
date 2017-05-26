@@ -60,6 +60,7 @@
                 <option value='ordersn' {if $_GPC['searchfield']=='ordersn'}selected{/if}>订单号</option>
                 <option value='member' {if $_GPC['searchfield']=='member'}selected{/if}>会员信息</option>
                 <option value='address' {if $_GPC['searchfield']=='address'}selected{/if}>收件人信息</option>
+                <option value='location' {if $_GPC['searchfield']=='location'}selected{/if}>地址信息</option>
                 <option value='expresssn' {if $_GPC['searchfield']=='expresssn'}selected{/if}>快递单号</option>
                 <option value='goodstitle' {if $_GPC['searchfield']=='goodstitle'}selected{/if}>商品名称</option>
                 <option value='goodssn' {if $_GPC['searchfield']=='goodssn'}selected{/if}>商品编码</option>
@@ -109,13 +110,15 @@
 
             {if empty($item['statusvalue'])}
                 {if $item['parentid'] == 0}
-                {ifp 'order.op.close'}
-                <a class='op'  data-toggle='ajaxModal' href="{php echo merchUrl('order/op/close',array('id'=>$item['id']))}" >关闭订单</a>
+                    {ifp 'order.op.close'}
+                    <a class='op'  data-toggle='ajaxModal' href="{php echo merchUrl('order/op/close',array('id'=>$item['id']))}" >关闭订单</a>
+                    {/if}
                 {/if}
-            {/if}
-            {ifp 'order.op.changeprice'}
-            <a class='op'  data-toggle='ajaxModal' href="{php echo merchUrl('order/op/changeprice',array('id'=>$item['id']))}">订单改价</a>
-            {/if}
+                {if $merch_user['changepricechecked'] == 1}
+                    {ifp 'order.op.changeprice'}
+                    <a class='op'  data-toggle='ajaxModal' href="{php echo merchUrl('order/op/changeprice',array('id'=>$item['id']))}">订单改价</a>
+                    {/if}
+                {/if}
             {/if}
             {if !empty($item['refundid'])}
             <a class='op'  href="{php echo merchUrl('order/op/refund', array('id' => $item['id']))}" >维权{if $item['refundstate']>0}处理{else}详情{/if}</a>
@@ -203,7 +206,7 @@
                 {/if}
                 {if $item['deductenough']>0}
                 <tr>
-                    <td  style='border:none;text-align:right;'>平台满额立减：</td>
+                    <td  style='border:none;text-align:right;'>商城满额立减：</td>
                     <td  style='border:none;text-align:right;;'>-￥{php echo number_format( $item['deductenough'],2)}</td>
                 </tr>
                 {/if}
@@ -264,15 +267,31 @@
     {/loop}
     {if !empty($item['remark'])}
     <tr ><td colspan='8' style='background:#fdeeee;color:red;'>买家备注: {$item['remark']}</td></tr>
-
-
     {/if}
 
-    <tr style=";border-bottom:none;background:#f9f9f9;">
-        <td colspan='8' style='text-align:left'>
-        </td>
+    {if !empty($level) && $merch_user['commissionchecked'] == 1}
+        <tr style=";border-bottom:none;background:#f9f9f9;">
+            <td colspan='4' style='text-align:left'>
+                {if !empty($agentid)}
+                <b>分销订单级别:</b> {$item['level']}级 <b>分销佣金:</b> {$item['commission']} 元
 
-    </tr>
+                {/if}
+            </td>
+            <td colspan='4' style='text-align:right'>
+                {if empty($agentid)}
+                {if $item['commission1']!=-1}<b>1级佣金:</b> {$item['commission1']} 元 {/if}
+                {if $item['commission2']!=-1}<b>2级佣金:</b> {$item['commission2']} 元 {/if}
+                {if $item['commission3']!=-1}<b>3级佣金:</b> {$item['commission3']} 元 {/if}
+                {/if}
+            </td>
+        </tr>
+    {else}
+        <tr style=";border-bottom:none;background:#f9f9f9;">
+            <td colspan='8' style='text-align:left'>
+            </td>
+        </tr>
+    {/if}
+
     {/loop}
 </table>
 <div style="text-align:right;width:100%;">

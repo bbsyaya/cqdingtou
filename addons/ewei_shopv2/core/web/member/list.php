@@ -151,6 +151,8 @@ class List_EweiShopV2Page extends WebPage
 	{
 		global $_W;
 		global $_GPC;
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
 		$shop = $_W['shopset']['shop'];
 		$hascommission = false;
 		$plugin_com = p('commission');

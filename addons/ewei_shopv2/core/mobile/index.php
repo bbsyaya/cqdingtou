@@ -73,7 +73,7 @@ class Index_EweiShopV2Page extends MobilePage
 			$goodids = implode(',', $_W['shopset']['shop']['indexrecommands']);
 			if (!(empty($goodids))) 
 			{
-				$indexrecommands = pdo_fetchall('select id, title, thumb, marketprice,ispresell,presellprice productprice, minprice, total from ' . tablename('ewei_shop_goods') . ' where id in( ' . $goodids . ' ) and uniacid=:uniacid and status=1 order by instr(\'' . $goodids . '\',id),displayorder desc', array(':uniacid' => $uniacid));
+				$indexrecommands = pdo_fetchall('select id, title, thumb, marketprice,ispresell,presellprice, productprice, minprice, total from ' . tablename('ewei_shop_goods') . ' where id in( ' . $goodids . ' ) and uniacid=:uniacid and status=1 order by instr(\'' . $goodids . '\',id),displayorder desc', array(':uniacid' => $uniacid));
 				foreach ($indexrecommands as $key => $value ) 
 				{
 					if (0 < $value['ispresell']) 

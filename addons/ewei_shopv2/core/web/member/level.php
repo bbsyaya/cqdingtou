@@ -11,11 +11,6 @@ class Level_EweiShopV2Page extends WebPage
 		global $_GPC;
 		$set = m('common')->getSysset();
 		$shopset = $set['shop'];
-		if(isset($shopset['leveldiscount'])){
-			$leveldiscount = $shopset['leveldiscount'];
-		}else{
-			$leveldiscount = 0;
-		}
 		$default = array('id' => 'default', 'levelname' => (empty($set['shop']['levelname']) ? '普通等级' : $set['shop']['levelname']), 'discount' => $set['shop']['leveldiscount'], 'ordermoney' => 0, 'ordercount' => 0);
 		$condition = ' and uniacid=:uniacid';
 		$params = array(':uniacid' => $_W['uniacid']);

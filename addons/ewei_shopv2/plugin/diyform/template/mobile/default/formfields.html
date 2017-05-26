@@ -80,7 +80,7 @@
     <input type="text" class='fui-input datepicker'  id="field_data{php echo $i}_1" name='field_data{php echo $i}' placeholder="结束日期" readonly value='{if !empty($f_data[$k1][1])}{php echo $f_data[$k1][1]}{/if}' style='width:40%;float:left;margin-left:5px;' readonly/>
 
     {else if $v1['data_type'] == 9}
-    <input type="text" class='fui-input citypicker' id="field_data{php echo $i}" name='field_data{php echo $i}' placeholder="请选择{$v1['tp_name']}"  readonly value="{php echo !empty($f_data[$k1]['province']) && !empty($f_data[$k1]['city']) ?($f_data[$k1]['province'].' '.$f_data[$k1]['city']):''}"/>
+    <input type="text" class='fui-input citypicker' id="field_data{php echo $i}" name='field_data{php echo $i}' placeholder="请选择{$v1['tp_name']}"  readonly value="" data-value="" data-area="{php echo intval($v1['tp_area'])}"/>
 
     {else if $v1['data_type'] == 10}
     <input type="text" class='fui-input' id='field_data{php echo $i}' name='field_data{php echo $i}' placeholder="请输入{$v1['tp_name']}"  value="{php echo $f_data[$k1]['name1']}" />
@@ -96,7 +96,20 @@
 {php $i++;}
 {/loop}
 <script language='javascript'>
-    require(['foxui','foxui.picker'],function(){
+    var new_area = {php echo intval($new_area)};
+    var address_street = {php echo intval($address_street)};
+    var showArea = false;
+
+    var reqParams = ['foxui','foxui.picker'];
+    if(new_area){
+        reqParams = ['foxui','foxui.picker','foxui.citydatanew'];
+    }
+
+    if ($('.citypicker').attr('data-area') == 1) {
+        showArea = true;
+    }
+
+    require(reqParams,function(){
         $('.diyform-container .datepicker').datePicker({
             onShow:function(){
                 {if $inPicker}
@@ -117,7 +130,9 @@
                         }
                     });
                     $('.diyform-container .citypicker').cityPicker({
-                        showArea:false,
+                        new_area: new_area,
+                        address_street: address_street,
+                        showArea:showArea,
                         onShow:function(){
 
                             {if $inPicker}

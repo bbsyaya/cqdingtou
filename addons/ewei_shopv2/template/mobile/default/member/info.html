@@ -46,7 +46,7 @@
 			</div>
 			<div class="fui-cell">
 				<div class="fui-cell-label ">所在城市</div>
-				<div class="fui-cell-info"><input type="text"  class='fui-input'  id='city' name='city' placeholder="请选择城市"  value="{if !empty($member) && !empty($member['city'])}{$member['province']} {$member['city']}{/if}" readonly/></div>
+				<div class="fui-cell-info"><input type="text"  class='fui-input'  id='city' name='city' placeholder="请选择城市"  value="{if !empty($show_data) && !empty($member) && !empty($member['city'])}{$member['province']} {$member['city']}{/if}" data-value="{if !empty($show_data)}{$member['datavalue']}{/if}" readonly/></div>
 			</div>
 		 
 		</div>
@@ -58,7 +58,8 @@
 	<script language='javascript'>
 		require(['biz/member/info'], function (modal) {
 		  	modal.init({
-			    returnurl:"{$returnurl}",
+			    new_area:{php echo $new_area},
+			    returnurl:"{php echo $returnurl}",
 			    template_flag: {php echo intval($template_flag)},
 				wapopen: {php echo intval($wapset['open'])}
 			});

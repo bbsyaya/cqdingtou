@@ -5,6 +5,9 @@ $shopset_level = intval($_W['shopset']['commission']['level']);
 $merch_user = $_W['merch_user'];
 $id = intval($_GPC['id']);
 $item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods') . ' WHERE id = :id and uniacid=:uniacid and merchid=:merchid', array(':id' => $id, ':uniacid' => $_W['uniacid'], ':merchid' => $_W['merchid']));
+$area_set = m('util')->get_area_config_set();
+$new_area = intval($area_set['new_area']);
+$address_street = intval($area_set['address_street']);
 if (p('diyform')) 
 {
 	$diyform = p('diyform');

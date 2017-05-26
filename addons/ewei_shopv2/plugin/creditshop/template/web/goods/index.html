@@ -70,6 +70,7 @@
                 </thead>
                 <tbody>
                     {loop $list $row}
+                    <tr>
                        	<td>
                             <input type='checkbox'   value="{$row['id']}"/>
                         </td>
@@ -148,6 +149,12 @@
                              {/if}
                          </td>
             </tr>
+                    {if !empty($row['merchname']) && $row['merchid'] > 0}
+                    <tr>
+                        <td colspan='10' style='text-align: left;border-top:none;padding:5px 0;' class='aops'>
+                            <span class="text-default" style="margin-left: 95px;">商户名称:</span><span class="text-info">{$row['merchname']}</span>
+                        </td>
+                    {/if}
            {/loop}
         </tbody>
     </table>

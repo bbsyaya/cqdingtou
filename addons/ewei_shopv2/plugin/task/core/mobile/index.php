@@ -113,19 +113,19 @@ class index_EweiShopV2Page extends PluginMobilePage
 					}
 					if (isset($v['money']['num']) && (0 < $v['money']['num'])) 
 					{
-						$task_running[$key]['is_credit'] = 1;
+						$task_running[$key]['is_money'] = 1;
 					}
 					if (isset($v['bribery']) && (0 < $v['bribery'])) 
 					{
-						$task_running[$key]['is_credit'] = 1;
+						$task_running[$key]['is_bribery'] = 1;
 					}
 					if (isset($v['goods']) && count($v['goods'])) 
 					{
-						$task_running[$key]['is_credit'] = 1;
+						$task_running[$key]['is_goods'] = 1;
 					}
 					if (isset($v['coupon']['total']) && (0 < $v['coupon']['total'])) 
 					{
-						$task_running[$key]['is_credit'] = 1;
+						$task_running[$key]['is_coupon'] = 1;
 					}
 				}
 			}
@@ -172,19 +172,19 @@ class index_EweiShopV2Page extends PluginMobilePage
 					}
 					if (isset($v['money']['num']) && (0 < $v['money']['num'])) 
 					{
-						$task_complete[$key]['is_credit'] = 1;
+						$task_complete[$key]['is_money'] = 1;
 					}
 					if (isset($v['bribery']) && (0 < $v['bribery'])) 
 					{
-						$task_complete[$key]['is_credit'] = 1;
+						$task_complete[$key]['is_bribery'] = 1;
 					}
 					if (isset($v['goods']) && count($v['goods'])) 
 					{
-						$task_complete[$key]['is_credit'] = 1;
+						$task_complete[$key]['is_goods'] = 1;
 					}
 					if (isset($v['coupon']['total']) && (0 < $v['coupon']['total'])) 
 					{
-						$task_complete[$key]['is_credit'] = 1;
+						$task_complete[$key]['is_coupon'] = 1;
 					}
 				}
 			}
@@ -234,15 +234,15 @@ class index_EweiShopV2Page extends PluginMobilePage
 					}
 					if (isset($v['bribery']) && (0 < $v['bribery'])) 
 					{
-						$faile_complete[$key]['is_credit'] = 1;
+						$faile_complete[$key]['is_money'] = 1;
 					}
 					if (isset($v['goods']) && count($v['goods'])) 
 					{
-						$faile_complete[$key]['is_credit'] = 1;
+						$faile_complete[$key]['is_goods'] = 1;
 					}
 					if (isset($v['coupon']['total']) && (0 < $v['coupon']['total'])) 
 					{
-						$faile_complete[$key]['is_credit'] = 1;
+						$faile_complete[$key]['is_coupon'] = 1;
 					}
 				}
 			}
@@ -282,10 +282,10 @@ class index_EweiShopV2Page extends PluginMobilePage
 			$is_get = 0;
 			if ($res['is_posterall'] == 1) 
 			{
-				$task_count = pdo_fetchcolumn('select COUNT(*) from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_type=' . $taskinfo['poster_type'] . ' and failtime>' . time(), array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
+				$task_count = pdo_fetchcolumn('select COUNT(*) from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_type=' . $taskinfo['poster_type'] . ' and is_reward=0 and failtime>' . time(), array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
 				if (empty($task_count)) 
 				{
-					$end_task_count = pdo_fetchcolumn('select COUNT(*) from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_id=' . $taskinfo['id'] . ' and failtime<' . time(), array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
+					$end_task_count = pdo_fetchcolumn('select COUNT(*) from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_id=' . $taskinfo['id'] . ' and (is_reward=1 or failtime<' . time() . ')', array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
 					if ($end_task_count) 
 					{
 						if ($taskinfo['is_repeat']) 
@@ -307,8 +307,12 @@ class index_EweiShopV2Page extends PluginMobilePage
 					$poster_type = 2;
 				}
 				$other_task_count = pdo_fetchcolumn('select COUNT(*) from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_type=' . $poster_type . ' and failtime>' . time(), array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
-				$task_count = pdo_fetchcolumn('select COUNT(*) from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_type=' . $taskinfo['poster_type'] . ' and failtime>' . time(), array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
+				$task_count = pdo_fetchcolumn('select task_id from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_type=' . $taskinfo['poster_type'] . ' and failtime>' . time(), array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
 				if (empty($other_task_count) && empty($task_count)) 
+				{
+					$is_get = 1;
+				}
+				else if (empty($other_task_count) && !(empty($task_count)) && ($task_count == intval($_GPC['id']))) 
 				{
 					$is_get = 1;
 				}
@@ -351,7 +355,7 @@ class index_EweiShopV2Page extends PluginMobilePage
 		if (intval($_GPC['id'])) 
 		{
 			$param = array(':join_user' => $_W['openid'], ':join_id' => intval($_GPC['id']));
-			$task_sql = 'SELECT `join`.*,`task`.title,`task`.titleicon FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.join_user=:join_user AND `join`.`is_reward`=1 AND `join`.`join_id`=:join_id ';
+			$task_sql = 'SELECT `join`.*,`task`.title,`task`.titleicon,`task`.poster_banner FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.join_user=:join_user AND `join`.`is_reward`=1 AND `join`.`join_id`=:join_id ';
 			$taskinfo = pdo_fetch($task_sql, $param);
 			if (!(empty($taskinfo['reward_data']))) 
 			{
@@ -412,18 +416,21 @@ class index_EweiShopV2Page extends PluginMobilePage
 			$goodslist = $taskinfo['reward_data']['goods'];
 			foreach ($taskinfo['reward_data']['goods'] as $k => $v ) 
 			{
-				$searchsql = 'SELECT thumb FROM ' . tablename('ewei_shop_goods') . ' WHERE uniacid= ' . $_W['uniacid'] . ' and id=' . $k . ' and status=1 and deleted=0';
-				$thumb = pdo_fetchcolumn($searchsql);
-				$thumb = tomedia($thumb);
+				$searchsql = 'SELECT thumb,marketprice FROM ' . tablename('ewei_shop_goods') . ' WHERE uniacid= ' . $_W['uniacid'] . ' and id=' . $k . ' and status=1 and deleted=0';
+				$goodsinfo = pdo_fetch($searchsql);
+				$thumb = tomedia($goodsinfo['thumb']);
 				$goodslist[$k]['thumb'] = $thumb;
+				$goodslist[$k]['oldprice'] = $goodsinfo['marketprice'];
 				if (!(empty($goodslist[$k]['spec']))) 
 				{
+					$goodslist[$k]['total'] = 0;
 					foreach ($goodslist[$k]['spec'] as $key => $val ) 
 					{
 						if ($val['marketprice'] < $goodslist[$k]['marketprice']) 
 						{
 							$goodslist[$k]['marketprice'] = $val['marketprice'];
 						}
+						$goodslist[$k]['total'] += $val['total'];
 					}
 				}
 			}
@@ -439,18 +446,21 @@ class index_EweiShopV2Page extends PluginMobilePage
 					$goodslist[$key] = $value['goods'];
 					foreach ($value['goods'] as $k => $val ) 
 					{
-						$searchsql = 'SELECT thumb FROM ' . tablename('ewei_shop_goods') . ' WHERE uniacid= ' . $_W['uniacid'] . ' and id=' . $k . ' and status=1 and deleted=0';
-						$thumb = pdo_fetchcolumn($searchsql);
-						$thumb = tomedia($thumb);
+						$searchsql = 'SELECT thumb,marketprice FROM ' . tablename('ewei_shop_goods') . ' WHERE uniacid= ' . $_W['uniacid'] . ' and id=' . $k . ' and status=1 and deleted=0';
+						$goodsinfo = pdo_fetch($searchsql);
+						$thumb = tomedia($goodsinfo['thumb']);
 						$goodslist[$key][$k]['thumb'] = $thumb;
+						$goodslist[$key][$k]['oldprice'] = $goodsinfo['marketprice'];
 						if (!(empty($goodslist[$key][$k]['spec']))) 
 						{
+							$goodslist[$key][$k]['total'] = 0;
 							foreach ($goodslist[$k]['spec'] as $ke => $va ) 
 							{
 								if ($va['marketprice'] < $goodslist[$key][$k]['marketprice']) 
 								{
 									$goodslist[$key][$k]['marketprice'] = $va['marketprice'];
 								}
+								$goodslist[$key][$k]['total'] += $va['total'];
 							}
 						}
 					}

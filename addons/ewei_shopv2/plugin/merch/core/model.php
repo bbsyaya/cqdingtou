@@ -381,12 +381,16 @@ class MerchModel extends PluginModel
 	}
 	public function allPerms() 
 	{
-		if (empty($allPerms)) 
+		if (empty(self::$allPerms)) 
 		{
-			$perms = array('shop' => $this->perm_shop(), 'goods' => $this->perm_goods(), 'order' => $this->perm_order(), 'statistics' => $this->perm_statistics(), 'sale' => $this->perm_sale(), 'perm' => $this->perm_perm(), 'apply' => $this->perm_apply(), 'exhelper' => $this->perm_exhelper());
+			$perms = array('shop' => $this->perm_shop(), 'goods' => $this->perm_goods(), 'order' => $this->perm_order(), 'statistics' => $this->perm_statistics(), 'sale' => $this->perm_sale(), 'creditshop' => $this->perm_creditshop(), 'perm' => $this->perm_perm(), 'apply' => $this->perm_apply(), 'exhelper' => $this->perm_exhelper());
 			self::$allPerms = $perms;
 		}
 		return self::$allPerms;
+	}
+	protected function perm_creditshop() 
+	{
+		return array( 'goods' => array( 'text' => '商品', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('property' => 'edit') ), 'log' => array('text' => '订单/记录', 'exchange' => '兑换记录', 'draw' => '抽奖记录', 'order' => '待发货', 'convey' => '待收货', 'finish' => '已完成', 'verifying' => '待核销', 'verifyover' => '已核销', 'verify' => '全部核销', 'detail' => '详情', 'doexchange' => '确认兑换-log', 'export' => '导出明细-log'), 'comment' => array('text' => '评价管理', 'edit' => '回复评价', 'check' => '审核评价') );
 	}
 	protected function perm_shop() 
 	{
@@ -577,7 +581,7 @@ class MerchModel extends PluginModel
 	}
 	public function getLogTypes($all = false) 
 	{
-		if (empty($getLogTypes)) 
+		if (empty(self::$getLogTypes)) 
 		{
 			$perms = $this->allPerms();
 			$array = array();
@@ -703,7 +707,7 @@ class MerchModel extends PluginModel
 	}
 	public function formatPerms() 
 	{
-		if (empty($formatPerms)) 
+		if (empty(self::$formatPerms)) 
 		{
 			$perms = $this->allPerms();
 			$array = array();
@@ -1207,9 +1211,8 @@ class MerchModel extends PluginModel
 			if ($type == 1) 
 			{
 				plog('merch.exhelper.temp.express.setdefault', '设置默认快递单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
-				return;
 			}
-			if ($type == 2) 
+			else if ($type == 2) 
 			{
 				plog('merch.exhelper.temp.invoice.setdefault', '设置默认发货单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
 			}

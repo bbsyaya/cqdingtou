@@ -147,9 +147,11 @@ class Detail_EweiShopV2Page extends MobilePage
 			}
 		}
 		$goods['unit'] = ((empty($goods['unit']) ? '件' : $goods['unit']));
-		$citys = m('dispatch')->getNoDispatchAreas($goods);
-		if (!(empty($citys)) && is_array($citys)) 
+		$dispatch_areas = m('dispatch')->getNoDispatchAreas($goods);
+		$citys = $dispatch_areas['citys'];
+		if (!(empty($citys))) 
 		{
+			$onlysent = $dispatch_areas['onlysent'];
 			$has_city = 1;
 		}
 		else 

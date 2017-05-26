@@ -87,7 +87,7 @@
 
         var messagetype = $('.messagetype:checked').val();
 
-        if(messagetype==0||messagetype==1)
+        if(messagetype==0||messagetype==2)
         {
             if($('#send_desc').val()=='')
             {
@@ -98,7 +98,7 @@
             }
         }
 
-        if(messagetype==0||messagetype==2)
+        if(messagetype==0||messagetype==1)
         {
             if($('.key_item').length<=0){
                 tip.msgbox.err('请添加一条键!');

@@ -159,23 +159,24 @@
 {/if}
 
 {if $has_city}
-    <div id='city-picker-modal' style="margin: -100%;">
-        <div class='city-picker'>
-            <div class="fui-cell-group fui-sale-group" style='margin-top:0;'>
-                <div class="fui-cell">
-                    <div class="fui-cell-text dispatching">
-                        不配送区域:
-                        <div class="dispatching-info">
-                            {loop $citys $item}
-                            <i>{$item}</i>
-                            {/loop}
-                        </div>
+<div id='city-picker-modal' style="margin: -100%;">
+    <div class='city-picker'>
+        <div class='fui-cell-title'>促销活动</div>
+        <div class="fui-cell-group fui-sale-group" style='margin-top:0;'>
+            <div class="fui-cell">
+                <div class="fui-cell-text dispatching">
+                    {if empty($onlysent)}不{else}只{/if}配送区域:
+                    <div class="dispatching-info">
+                        {loop $citys $item}
+                        <i>{$item}</i>
+                        {/loop}
                     </div>
                 </div>
-                <div class='btn btn-danger block'>确定</div>
             </div>
+            <div class='btn btn-danger block'>确定</div>
         </div>
     </div>
+</div>
 {/if}
 
 <div id='sale-picker-modal' style="margin: -100%;">

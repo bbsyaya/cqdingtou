@@ -428,7 +428,7 @@
 		
 	<span class='help-block'>商品所在地，显示在详情页面，如果不选择，则显示商城所在地
 	    <script language='javascript'>
-            cascdeInit("{$item['province']}","{$item['city']}","");
+            cascdeInit("{php echo $new_area}","0","{$item['province']}","{$item['city']}","");
         </script>
            {else}
            <div class='form-control-static'>{$item['province']} {$item['province']}</div>
@@ -573,6 +573,10 @@
 
 <script language="javascript">
     require(['jquery.ui'],function(){
-        $('.multi-img-details').sortable();
+        $('.multi-img-details').sortable({scroll:'false'});
+        $('.multi-img-details').sortable('option', 'scroll', false);
+        /*$('.multi-img-details').sortable({zIndex: 50 });
+
+        $('.multi-img-details').sortable('option','zIndex', 50);*/
     })
 </script>

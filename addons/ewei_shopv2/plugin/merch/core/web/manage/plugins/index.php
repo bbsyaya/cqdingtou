@@ -24,6 +24,10 @@ class Index_EweiShopV2Page extends MerchWebPage
 		{
 			$has_plugins[] = 'diypage';
 		}
+		if (p('creditshop')) 
+		{
+			$has_plugins[] = 'creditshop';
+		}
 		$plugins_list = array();
 		$plugins_all = array();
 		foreach ($category as $key => $value ) 

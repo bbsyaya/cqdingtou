@@ -30,9 +30,8 @@ if (!(class_exists('SnsModel')))
 				{
 					$member = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'createtime' => time());
 					pdo_insert('ewei_shop_sns_member', $member);
-					return;
 				}
-				if (!(empty($member['isblack']))) 
+				else if (!(empty($member['isblack']))) 
 				{
 					show_message('禁止访问，请联系客服!');
 				}
@@ -309,9 +308,11 @@ if (!(class_exists('SnsModel')))
 			if (!(empty($tm['templateid']))) 
 			{
 				m('message')->sendTplNotice($openid, $tm['templateid'], $msg);
-				return;
 			}
-			m('message')->sendCustomNotice($openid, $msg);
+			else 
+			{
+				m('message')->sendCustomNotice($openid, $msg);
+			}
 		}
 		public function sendReplyMessage($openid, $data) 
 		{
@@ -332,9 +333,11 @@ if (!(class_exists('SnsModel')))
 			if (!(empty($tm['templateid']))) 
 			{
 				m('message')->sendTplNotice($openid, $tm['templateid'], $msg, $url);
-				return;
 			}
-			m('message')->sendCustomNotice($openid, $msg, $url);
+			else 
+			{
+				m('message')->sendCustomNotice($openid, $msg, $url);
+			}
 		}
 		public function timeBefore($the_time) 
 		{

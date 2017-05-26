@@ -121,7 +121,7 @@
                 <div class='fui-list-media'><i class='icon icon-location'></i></div>
                 <div class='fui-list-inner'>
                     <div class='title'>{$address['realname']} {$address['mobile']}</div>
-                    <div class='text'>{$address['province']}{$address['city']}{$address['area']} {$address['address']}</div>
+                    <div class='text'>{$address['province']}{$address['city']}{$address['area']}{if !empty($new_area) && !empty($address_street)} {$address['street']}{/if} {$address['address']}</div>
                 </div>
             </div>
         </div>

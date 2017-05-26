@@ -1,5 +1,5 @@
 <?php
-if (!(defined('IN_IA'))) 
+if (!defined('IN_IA')) 
 {
 	exit('Access Denied');
 }
@@ -38,7 +38,7 @@ class Route_EweiShopV2Model
 		}
 		else 
 		{
-			$isplugin = !(empty($r)) && is_dir(EWEI_SHOPV2_PLUGIN . $routes[0]);
+			$isplugin = !empty($r) && is_dir(EWEI_SHOPV2_PLUGIN . $routes[0]);
 		}
 		if ($isplugin) 
 		{
@@ -156,30 +156,31 @@ class Route_EweiShopV2Model
 			$class = ucfirst($routes[2]);
 			$file = $root . $routes[0] . '/' . $routes[1] . '/' . $routes[2] . '.php';
 			break;
+			//default:
 			}
-			 if (!(is_file($file))) 
+			if (!is_file($file)) 
 			{
 				show_message('未找到控制器 ' . $r);
 			}
 			$_W['routes'] = $r;
 			$_W['isplugin'] = $isplugin;
 			$_W['controller'] = $routes[0];
-			$global_set = m('cache')->getArray('globalset');
+			$global_set = m('cache')->getArray('globalset', 'global');
 			if (empty($global_set)) 
 			{
 				$global_set = m('common')->setGlobalSet();
 			}
-			if (!(is_array($global_set))) 
+			if (!is_array($global_set)) 
 			{
 				$global_set = array();
 			}
-			empty($global_set['trade']['credittext']) && ($global_set['trade']['credittext'] = '积分');
-			empty($global_set['trade']['moneytext']) && ($global_set['trade']['moneytext'] = '余额');
+			empty($global_set['trade']['credittext']) && $global_set['trade']['credittext'] = '积分';
+			empty($global_set['trade']['moneytext']) && $global_set['trade']['moneytext'] = '余额';
 			$GLOBALS['_S'] = $_W['shopset'] = $global_set;
 			include $file;
 			$class = ucfirst($class) . '_EweiShopV2Page';
 			$instance = new $class();
-			if (!(method_exists($instance, $method))) 
+			if (!method_exists($instance, $method)) 
 			{
 				show_message('控制器 ' . $_W['controller'] . ' 方法 ' . $method . ' 未找到!');
 			}

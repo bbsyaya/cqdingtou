@@ -802,7 +802,7 @@ class Apply_EweiShopV2Page extends PluginWebPage
 				$pay *= 100;
 			}
 			$data = m('common')->getSysset('pay');
-			if (!(empty($data['paytype']['commission']))) 
+			if (!(empty($data['paytype']['commission'])) && ($apply['type'] == 1)) 
 			{
 				$result = m('finance')->payRedPack($member['openid'], $pay, $apply['applyno'], $apply, $set['texts']['commission'] . '打款', $data['paytype']);
 				pdo_update('ewei_shop_commission_apply', array('sendmoney' => $result['sendmoney'], 'senddata' => json_encode($result['senddata'])), array('id' => $apply['id']));

@@ -78,6 +78,9 @@ class Refundaddress_EweiShopV2Page extends MerchWebPage
 		{
 			$item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_refund_address') . ' WHERE id = \'' . $id . '\' and uniacid = \'' . $_W['uniacid'] . '\' and merchid=' . $_W['merchid']);
 		}
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
 		include $this->template();
 	}
 	public function delete() 

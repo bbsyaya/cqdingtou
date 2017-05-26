@@ -61,7 +61,7 @@
                                     {if $goods['goodstype']==1}优惠券{elseif $goods['goodstype']==2}余额{elseif $goods['goodstype']==3}红包{/if}已发放
                                 {/if}
                             {else}
-                                {if $log['status'] ==3}优惠券已发放{/if}
+                                {if $log['status'] ==3}{if $goods['goodstype']==1}优惠券{elseif $goods['goodstype']==2}余额{elseif $goods['goodstype']==3}红包{/if}已发放{/if}
                             {/if}
                         {/if}
                     </div>

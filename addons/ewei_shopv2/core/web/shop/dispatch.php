@@ -62,7 +62,7 @@ class Dispatch_EweiShopV2Page extends WebPage
 					{
 						$_GPC['secondnum'][$random] = 1;
 					}
-					$areas[] = array('citys' => $_GPC['citys'][$random], 'firstprice' => $_GPC['firstprice'][$random], 'firstweight' => $_GPC['firstweight'][$random], 'secondprice' => $_GPC['secondprice'][$random], 'secondweight' => $_GPC['secondweight'][$random], 'firstnumprice' => $_GPC['firstnumprice'][$random], 'firstnum' => $_GPC['firstnum'][$random], 'secondnumprice' => $_GPC['secondnumprice'][$random], 'secondnum' => $_GPC['secondnum'][$random]);
+					$areas[] = array('citys' => $_GPC['citys'][$random], 'citys_code' => $_GPC['citys_code'][$random], 'firstprice' => $_GPC['firstprice'][$random], 'firstweight' => $_GPC['firstweight'][$random], 'secondprice' => $_GPC['secondprice'][$random], 'secondweight' => $_GPC['secondweight'][$random], 'firstnumprice' => $_GPC['firstnumprice'][$random], 'firstnum' => $_GPC['firstnum'][$random], 'secondnumprice' => $_GPC['secondnumprice'][$random], 'secondnum' => $_GPC['secondnum'][$random]);
 				}
 			}
 			$_GPC['default_firstnum'] = trim($_GPC['default_firstnum']);
@@ -75,7 +75,7 @@ class Dispatch_EweiShopV2Page extends WebPage
 			{
 				$_GPC['default_secondnum'] = 1;
 			}
-			$data = array('uniacid' => $_W['uniacid'], 'merchid' => 0, 'displayorder' => intval($_GPC['displayorder']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'isdefault' => intval($_GPC['isdefault']), 'dispatchname' => trim($_GPC['dispatchname']), 'express' => trim($_GPC['express']), 'calculatetype' => trim($_GPC['calculatetype']), 'firstprice' => trim($_GPC['default_firstprice']), 'firstweight' => trim($_GPC['default_firstweight']), 'secondprice' => trim($_GPC['default_secondprice']), 'secondweight' => trim($_GPC['default_secondweight']), 'firstnumprice' => trim($_GPC['default_firstnumprice']), 'firstnum' => $_GPC['default_firstnum'], 'secondnumprice' => trim($_GPC['default_secondnumprice']), 'secondnum' => $_GPC['default_secondnum'], 'areas' => iserializer($areas), 'nodispatchareas' => iserializer($_GPC['nodispatchareas']), 'enabled' => intval($_GPC['enabled']));
+			$data = array('uniacid' => $_W['uniacid'], 'merchid' => 0, 'displayorder' => intval($_GPC['displayorder']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'isdefault' => intval($_GPC['isdefault']), 'dispatchname' => trim($_GPC['dispatchname']), 'express' => trim($_GPC['express']), 'calculatetype' => trim($_GPC['calculatetype']), 'firstprice' => trim($_GPC['default_firstprice']), 'firstweight' => trim($_GPC['default_firstweight']), 'secondprice' => trim($_GPC['default_secondprice']), 'secondweight' => trim($_GPC['default_secondweight']), 'firstnumprice' => trim($_GPC['default_firstnumprice']), 'firstnum' => $_GPC['default_firstnum'], 'secondnumprice' => trim($_GPC['default_secondnumprice']), 'secondnum' => $_GPC['default_secondnum'], 'areas' => iserializer($areas), 'nodispatchareas' => iserializer($_GPC['nodispatchareas']), 'nodispatchareas_code' => iserializer($_GPC['nodispatchareas_code']), 'isdispatcharea' => intval($_GPC['isdispatcharea']), 'enabled' => intval($_GPC['enabled']));
 			if ($data['isdefault']) 
 			{
 				pdo_update('ewei_shop_dispatch', array('isdefault' => 0), array('uniacid' => $_W['uniacid'], 'merchid' => 0));
@@ -99,7 +99,10 @@ class Dispatch_EweiShopV2Page extends WebPage
 			$dispatch_areas = unserialize($dispatch['areas']);
 			$dispatch_carriers = unserialize($dispatch['carriers']);
 			$dispatch_nodispatchareas = unserialize($dispatch['nodispatchareas']);
+			$dispatch_nodispatchareas_code = unserialize($dispatch['nodispatchareas_code']);
 		}
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
 		$areas = m('common')->getAreas();
 		$express_list = m('express')->getExpressList();
 		include $this->template();

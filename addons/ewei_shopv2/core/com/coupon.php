@@ -1156,7 +1156,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		if ($pdata['isopensendtask'] == 1) 
 		{
 			$price = $order['price'];
-			$sendtasks = pdo_fetch('select id,couponid,sendnum,num,sendpoint  from ' . tablename('ewei_shop_coupon_sendtasks') . "\n" . '             where  status =1  and uniacid=:uniacid and starttime< :now and endtime>:now and enough<:enough   and num>=sendnum' . "\n" . '             order by  enough desc,id  limit 1', array(':now' => time(), ':enough' => $price, ':uniacid' => $_W['uniacid']));
+			$sendtasks = pdo_fetch('select id,couponid,sendnum,num,sendpoint  from ' . tablename('ewei_shop_coupon_sendtasks') . "\n" . '             where  status =1  and uniacid=:uniacid and starttime< :now and endtime>:now and enough<=:enough   and num>=sendnum' . "\n" . '             order by  enough desc,id  limit 1', array(':now' => time(), ':enough' => $price, ':uniacid' => $_W['uniacid']));
 			if (!(empty($sendtasks))) 
 			{
 				$data = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'taskid' => intval($sendtasks['id']), 'couponid' => intval($sendtasks['couponid']), 'parentorderid' => 0, 'sendnum' => intval($sendtasks['sendnum']), 'tasktype' => 1, 'orderid' => $orderid, 'createtime' => time(), 'status' => 0, 'sendpoint' => intval($sendtasks['sendpoint']));

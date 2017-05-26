@@ -269,11 +269,11 @@ class Check_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 		$bpid = $_GPC['bpid'];
 		$type = intval($_GPC['type']);
-		if (empty($bpid) && is_array($bpid)) 
+		if (empty($bpid)) 
 		{
 			show_json(0, '参数错误!');
 		}
-		if (!(empty($item))) 
+		else 
 		{
 			$bpid = array_unique($bpid);
 		}

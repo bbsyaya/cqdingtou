@@ -379,5 +379,24 @@ class Verify_EweiShopV2ComModel extends ComModel
 		$data = pdo_fetch($sql, $params);
 		return $data;
 	}
+	public function getStoreInfo($storeid, $merchid = 0) 
+	{
+		global $_W;
+		$condition = ' uniacid = :uniacid and id = :storeid';
+		$params = array(':uniacid' => $_W['uniacid'], ':storeid' => $storeid);
+		if (empty($merchid)) 
+		{
+			$table_name = tablename('ewei_shop_store');
+		}
+		else 
+		{
+			$table_name = tablename('ewei_shop_merch_store');
+			$condition .= ' and merchid = :merchid';
+			$params['merchid'] = $merchid;
+		}
+		$sql = 'SELECT * FROM ' . $table_name . ' WHERE ' . $condition . ' Limit 1';
+		$data = pdo_fetch($sql, $params);
+		return $data;
+	}
 }
 ?>

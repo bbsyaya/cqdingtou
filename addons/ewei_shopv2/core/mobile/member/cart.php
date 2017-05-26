@@ -222,7 +222,13 @@ class Cart_EweiShopV2Page extends MobileLoginPage
 		$total = intval($_GPC['total']);
 		($total <= 0) && ($total = 1);
 		$optionid = intval($_GPC['optionid']);
-		$optionidarr = pdo_fetchall("SELECT id FROM ".tablename('ewei_shop_goods_option')." WHERE goodsid = ".$id);
+		$goods = pdo_fetch('select id,marketprice,diyformid,diyformtype,diyfields, isverify, `type`,merchid, cannotrefund from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		if (empty($goods)) 
+		{
+			show_json(0, '商品未找到');
+		}
+		
+$optionidarr = pdo_fetchall("SELECT id FROM ".tablename('ewei_shop_goods_option')." WHERE goodsid = ".$id);
 		
 		$ver = 0;
 		if(is_array($optionidarr)){
@@ -239,11 +245,6 @@ class Cart_EweiShopV2Page extends MobileLoginPage
 			$optionid = intval($_GPC['optionid']);
 		}else{
 			$optionid = 0;
-		}
-		$goods = pdo_fetch('select id,marketprice,diyformid,diyformtype,diyfields, isverify, `type`,merchid, cannotrefund from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
-		if (empty($goods)) 
-		{
-			show_json(0, '商品未找到');
 		}
 		$member = m('member')->getMember($_W['openid']);
 		if (!(empty($_W['shopset']['wap']['open'])) && !(empty($_W['shopset']['wap']['mustbind'])) && empty($member['mobileverify'])) 

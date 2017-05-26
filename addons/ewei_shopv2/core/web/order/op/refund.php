@@ -241,7 +241,6 @@ class Refund_EweiShopV2Page extends WebPage
 				$credits = m('order')->getGoodsCredit($goods);
 				if (0 < $credits) 
 				{
-					m('member')->setCredit($item['openid'], 'credit1', -$credits, array(0, $shopset['name'] . '退款扣除购物赠送积分: ' . $credits . ' 订单号: ' . $item['ordersn']));
 				}
 				if (0 < $item['deductcredit']) 
 				{
@@ -309,6 +308,7 @@ class Refund_EweiShopV2Page extends WebPage
 				}
 				pdo_update('ewei_shop_order_refund', $change_refund, array('id' => $item['refundid']));
 				m('order')->setGiveBalance($item['id'], 2);
+				m('order')->setStocksAndCredits($item['id'], 2);
 				if ($refund['orderprice'] == $refund['applyprice']) 
 				{
 					if (com('coupon') && !(empty($item['couponid']))) 
@@ -321,7 +321,6 @@ class Refund_EweiShopV2Page extends WebPage
 				$credits = m('order')->getGoodsCredit($goods);
 				if (0 < $credits) 
 				{
-					m('member')->setCredit($item['openid'], 'credit1', -$credits, array(0, $shopset['name'] . '退款扣除购物赠送积分: ' . $credits . ' 订单号: ' . $item['ordersn']));
 				}
 				foreach ($goods as $g ) 
 				{

@@ -83,6 +83,8 @@ class User_EweiShopV2Page extends PluginWebPage
 		global $_W;
 		global $_GPC;
 		$id = intval($_GPC['id']);
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
 		if (empty($id)) 
 		{
 			$max_flag = $this->model->checkMaxMerchUser(1);

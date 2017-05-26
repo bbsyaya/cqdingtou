@@ -55,14 +55,14 @@
         <select id="sel-provance{$i}" name='{$field_data_name}_province{$i}' onchange="selectCity('{$i}');" class="form-control" style='width:200px;display: inline-block' >
             <option value="" selected="true">请选择省份</option>
         </select>
-        <select id="sel-city{$i}" name='{$field_data_name}_city{$i}'  onchange="selectcounty('{$i}')" class="form-control" style='width:200px;display: inline-block' >
+        <select id="sel-city{$i}" name='{$field_data_name}_city{$i}'  onchange="selectcounty(0,0,'{$i}')" class="form-control" style='width:200px;display: inline-block' >
             <option value="" selected="true">请选择城市</option>
         </select>
         <select id="sel-area{$i}" name='{$field_data_name}_area{$i}'  class="form-control" style='width:200px;display: inline-block;display:none;' >
             <option value="" selected="true">请选择</option>
         </select>
         <script language='javascript'>
-            cascdeInit("{php echo isset($f_data[$k1]['province'])?$f_data[$k1]['province']:''}","{php echo  isset($f_data[$k1]['city'])?$f_data[$k1]['city']:''}","",'{$i}');
+            cascdeInit("{php echo $new_area}","0","{php echo isset($f_data[$k1]['province'])?$f_data[$k1]['province']:''}","{php echo  isset($f_data[$k1]['city'])?$f_data[$k1]['city']:''}","","",'{$i}');
         </script>
         {/if}
     </div>

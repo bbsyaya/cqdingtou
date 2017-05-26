@@ -565,16 +565,17 @@ class TaskModel extends PluginModel
 	}
 	public function getGoods($param = '') 
 	{
+		load()->func('logging');
 		if (empty($param)) 
 		{
 			return false;
 		}
-		if (isset($param['join_id']) || empty($param['join_id'])) 
+		if (!(isset($param['join_id'])) || empty($param['join_id'])) 
 		{
 			return false;
 		}
 		global $_W;
-		$search_sql = 'SELECT * FROM ' . tablename('ewei_shop_task_join') . ' WHERE openid= :openid AND uniacid = :uniacid AND `join_id`=:join_id  AND is_reward=1';
+		$search_sql = 'SELECT * FROM ' . tablename('ewei_shop_task_join') . ' WHERE join_user= :openid AND uniacid = :uniacid AND `join_id`=:join_id  AND is_reward=1';
 		$data = array(':uniacid' => $_W['uniacid'], ':openid' => $param['openid'], ':join_id' => $param['join_id']);
 		$join_info = pdo_fetch($search_sql, $data);
 		if (empty($join_info)) 
@@ -689,7 +690,25 @@ class TaskModel extends PluginModel
 				$goods_id = intval($param['goods_id']);
 				if (isset($rec_reward['goods'][$goods_id]) && !(empty($rec_reward['goods'][$goods_id]))) 
 				{
-					return $rec_reward['goods'][$goods_id];
+					$createtime_sql = 'SELECT `createtime` FROM ' . tablename('ewei_shop_task_log') . ' WHERE openid= :openid AND uniacid = :uniacid AND `join_id`=:join_id  AND (recdata IS NOT NULL AND recdata !="") ';
+					$createtime_data = array(':uniacid' => $_W['uniacid'], ':openid' => $param['openid'], ':join_id' => $param['join_id']);
+					$createtime = pdo_fetchcolumn($createtime_sql, $createtime_data);
+					$rewardday_sql = 'SELECT `reward_days`,`is_goods` FROM ' . tablename('ewei_shop_task_poster') . ' WHERE  uniacid = :uniacid AND `id`=:id  AND poster_type=:poster_type ';
+					$rewardday_data = array(':uniacid' => $_W['uniacid'], ':id' => $join_info['task_id'], ':poster_type' => $join_info['task_type']);
+					$reward_days = pdo_fetch($rewardday_sql, $rewardday_data);
+					if (0 < $reward_days['reward_days']) 
+					{
+						$reward_day = $createtime + $reward_days['reward_days'];
+					}
+					else 
+					{
+						return $rec_reward['goods'][$goods_id];
+					}
+					if (time() < $reward_day) 
+					{
+						return $rec_reward['goods'][$goods_id];
+					}
+					return false;
 				}
 				return false;
 			}
@@ -708,7 +727,22 @@ class TaskModel extends PluginModel
 				$goods_id = intval($param['goods_id']);
 				if (isset($rec_reward[$rank]['goods'][$goods_id]) && !(empty($rec_reward[$rank]['goods'][$goods_id]))) 
 				{
-					return $rec_reward[$rank]['goods'][$goods_id];
+					$rewardday_sql = 'SELECT `reward_days`,`is_goods` FROM ' . tablename('ewei_shop_task_poster') . ' WHERE  uniacid = :uniacid AND `id`=:id  AND poster_type=:poster_type ';
+					$rewardday_data = array(':uniacid' => $_W['uniacid'], ':id' => $join_info['task_id'], ':poster_type' => $join_info['task_type']);
+					$reward_days = pdo_fetch($rewardday_sql, $rewardday_data);
+					if (0 < $reward_days['reward_days']) 
+					{
+						$reward_day = $rec_reward[$rank]['reward_time'] + $reward_days['reward_days'];
+					}
+					else 
+					{
+						return $rec_reward[$rank]['goods'][$goods_id];
+					}
+					if (time() < $reward_day) 
+					{
+						return $rec_reward[$rank]['goods'][$goods_id];
+					}
+					return false;
 				}
 				return false;
 			}
@@ -809,6 +843,36 @@ class TaskModel extends PluginModel
 					{
 						m('member')->setCredit($openid, 'credit1', $val['credit'], array(0, '扫码关注积分+' . $val['credit']));
 					}
+					if (0 < $val['bribery']) 
+					{
+						$setting = uni_setting($_W['uniacid'], array('payment'));
+						if (!(is_array($setting['payment']))) 
+						{
+							return error(1, '没有设定支付参数');
+						}
+						$sec = m('common')->getSec();
+						$sec = iunserializer($sec['sec']);
+						$certs = $sec;
+						$wechat = $setting['payment']['wechat'];
+						$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
+						$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+						$tid = rand(1, 1000) . time() . rand(1, 10000);
+						$params = array('openid' => $openid, 'tid' => $tid, 'send_name' => '推荐奖励', 'money' => $val['bribery'], 'wishing' => '推荐奖励', 'act_name' => $poster['title'], 'remark' => '推荐奖励');
+						$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
+						$err = m('common')->sendredpack($params, $wechat);
+						if (!(is_error($err))) 
+						{
+							$sub_reward = unserialize($sub_reward);
+							$sub_reward['briberyOrder'] = $tid;
+							$sub_reward = serialize($sub_reward);
+							$upgrade = array('subdata' => $sub_reward);
+							pdo_update('ewei_shop_task_log', $upgrade, array('id' => $log_id));
+						}
+						else 
+						{
+							logging_run('bribery' . $err['message']);
+						}
+					}
 					if (0 < $val['money']['num']) 
 					{
 						$pay = $val['money']['num'];
@@ -898,7 +962,15 @@ class TaskModel extends PluginModel
 			else 
 			{
 				m('message')->sendCustomNotice($openid, '感谢您的关注，恭喜您获得关注奖励');
-				m('message')->sendCustomNotice($openid, '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task', array('tabpage' => 'complete'), true));
+				m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task', array('tabpage' => 'complete'), true));
+			}
+			if (p('lottery')) 
+			{
+				$res = p('lottery')->getLottery($qrmember['openid'], 3, array('taskid' => $poster['id']));
+				if ($res) 
+				{
+					p('lottery')->getLotteryList($qrmember['openid']);
+				}
 			}
 		}
 		else 
@@ -1081,8 +1153,10 @@ class TaskModel extends PluginModel
 		$rec_data = unserialize($join_info['reward_data']);
 		$count = $join_info['completecount'] + 1;
 		$is_reward = 0;
+		$needcount = 0;
 		foreach ($rec_data as $k => $val ) 
 		{
+			$needcount = $val['needcount'];
 			if ($val['needcount'] == $count) 
 			{
 				if ($is_reward == 0) 
@@ -1103,15 +1177,17 @@ class TaskModel extends PluginModel
 					}
 					else 
 					{
+						$poster['needcount'] = $needcount;
 						$this->reward_scan($count, $reward_data, $qr, $join_info, $openid, $qrmember, $member_info, $poster);
 					}
 				}
 			}
-			else if ($is_reward == 0) 
-			{
-				$is_reward = 1;
-				$this->reward_scan($count, $reward_data, $qr, $join_info, $openid, $qrmember, $member_info, $poster);
-			}
+		}
+		if ($is_reward == 0) 
+		{
+			$is_reward = 1;
+			$poster['needcount'] = $needcount;
+			$this->reward_scan($count, $reward_data, $qr, $join_info, $openid, $qrmember, $member_info, $poster);
 		}
 	}
 	protected function reward_both($count, $reward_data, $qr, $join_info, $openid, $qrmember, $member_info, $poster) 
@@ -1264,32 +1340,41 @@ class TaskModel extends PluginModel
 			{
 				m('message')->sendCustomNotice($openid, '感谢您的关注，恭喜您获得关注奖励');
 			}
-			if (!(empty($default_text['completed']))) 
+			if (!(empty($default_text['rankcomplete']))) 
 			{
 				$poster['okdays'] = $join_info['failtime'];
 				$poster['completecount'] = $count;
-				foreach ($default_text['completed'] as $key => $val ) 
+				$poster['needcount'] = $count;
+				foreach ($default_text['rankcomplete'] as $key => $val ) 
 				{
-					$default_text['completed'][$key]['value'] = $this->notice_complain($val['value'], $qrmember, $poster, $member_info, 2);
+					$default_text['rankcomplete'][$key]['value'] = $this->notice_complain($val['value'], $qrmember, $poster, $member_info, 2);
 				}
 				if ($default_text['templateid']) 
 				{
-					m('message')->sendTplNotice($qrmember['openid'], $default_text['templateid'], $default_text['completed'], mobileUrl('task', array('tabpage' => 'complete'), true));
+					m('message')->sendTplNotice($qrmember['openid'], $default_text['templateid'], $default_text['rankcomplete'], mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
 				}
 				else 
 				{
-					m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task', array('tabpage' => 'complete'), true));
+					m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
 				}
 			}
 			else 
 			{
-				m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task', array('tabpage' => 'complete'), true));
+				m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
 			}
 		}
 		else 
 		{
 			m('message')->sendCustomNotice($openid, '感谢您的关注，恭喜您获得关注奖励');
-			m('message')->sendCustomNotice($openid, '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task', array('tabpage' => 'complete'), true));
+			m('message')->sendCustomNotice($openid, '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
+		}
+		if (p('lottery')) 
+		{
+			$res = p('lottery')->getLottery(3, array('taskid' => $poster['id']));
+			if ($res) 
+			{
+				p('lottery')->getLotteryList($qrmember['openid']);
+			}
 		}
 	}
 	protected function reward_scan($count, $reward_data, $qr, $join_info, $openid, $qrmember, $member_info, $poster) 

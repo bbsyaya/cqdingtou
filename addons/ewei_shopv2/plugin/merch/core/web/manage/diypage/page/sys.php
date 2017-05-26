@@ -76,7 +76,7 @@ class Sys_EweiShopV2Page extends MerchWebPage
 	{
 		global $_W;
 		global $_GPC;
-		$temp = array('type' => intval($_GPC['type']), 'cate' => intval($_GPC['cate']), 'name' => trim($_GPC['name']), 'preview' => trim($_GPC['preview']), 'data' => $_GPC['data']);
+		$temp = array('type' => intval($_GPC['type']), 'cate' => intval($_GPC['cate']), 'name' => trim($_GPC['name']), 'preview' => trim($_GPC['preview']), 'data' => $_GPC['data'], 'merch' => intval($_W['merchid']));
 		$diypage_plugin = p('diypage');
 		$diypage_plugin->saveTemp($temp);
 	}
