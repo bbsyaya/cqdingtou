@@ -12,6 +12,7 @@ class Taobaocsv_EweiShopV2Page extends MerchWebPage
 	{
 		global $_W;
 		global $_GPC;
+		$this->model->CheckPlugin('taobao');
 		$merchid = $_W['merchid'];
 		$uploadStart = '0';
 		$uploadnum = '0';

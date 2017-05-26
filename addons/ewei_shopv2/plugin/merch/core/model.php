@@ -1295,6 +1295,93 @@ class MerchModel extends PluginModel
 		}
 		return $allset;
 	}
+	public function getPluginList($merchid = 0) 
+	{
+		$category = m('plugin')->getList(1);
+		$has_plugins = array();
+		if (p('exhelper')) 
+		{
+			$has_plugins[] = 'exhelper';
+		}
+		if (p('taobao')) 
+		{
+			$has_plugins[] = 'taobao';
+		}
+		if (p('diypage')) 
+		{
+			$has_plugins[] = 'diypage';
+		}
+		if (p('creditshop')) 
+		{
+			$has_plugins[] = 'creditshop';
+		}
+		if (!(empty($merchid))) 
+		{
+			$item = $this->getListUserOne($merchid);
+			if (!(empty($item['pluginset']))) 
+			{
+				$pluginset = iunserializer($item['pluginset']);
+			}
+		}
+		$plugins_list = array();
+		$plugins_all = array();
+		foreach ($category as $key => $value ) 
+		{
+			foreach ($value['plugins'] as $k => $v ) 
+			{
+				$plugins_all[$v['identity']] = $v;
+				if (in_array($v['identity'], $has_plugins)) 
+				{
+					$is_has = 1;
+					if (!(empty($pluginset))) 
+					{
+						if ($pluginset[$v['identity']]['close'] == 1) 
+						{
+							$is_has = 0;
+						}
+					}
+					if ($is_has) 
+					{
+						$plugins_list[] = $v;
+					}
+				}
+			}
+		}
+		$data = array();
+		$data['plugins_list'] = $plugins_list;
+		$data['plugins_all'] = $plugins_all;
+		return $data;
+	}
+	public function CheckPlugin($plugin, $merchid = 0, $flag = 0) 
+	{
+		global $_W;
+		if (empty($merchid)) 
+		{
+			$merchid = $_W['merchid'];
+		}
+		$plugins_data = $this->getPluginList($merchid);
+		$plugins_list = $plugins_data['plugins_list'];
+		$check = 0;
+		foreach ($plugins_list as $k => $v ) 
+		{
+			if ($v['identity'] == $plugin) 
+			{
+				$check = 1;
+				break;
+			}
+		}
+		if (empty($flag)) 
+		{
+			if ($check == 0) 
+			{
+				show_message('您没有该应用的权限!');
+			}
+		}
+		else 
+		{
+			return $check;
+		}
+	}
 }
 function merch_sort_enoughs($a, $b) 
 {

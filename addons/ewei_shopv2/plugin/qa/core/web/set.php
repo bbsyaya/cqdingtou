@@ -48,7 +48,6 @@ class Set_EweiShopV2Page extends PluginWebPage
 				pdo_update('rule_keyword', $keyword_data, array('id' => $keyword['id']));
 			}
 			$cover_data = array('uniacid' => $_W['uniacid'], 'rid' => $rid, 'module' => $this->modulename, 'title' => $data['enter_title'], 'description' => $data['enter_desc'], 'thumb' => $data['enter_img'], 'url' => mobileUrl('qa'));
-			$cover_data = array('uniacid' => $_W['uniacid'], 'rid' => $rid, 'module' => $this->modulename, 'title' => $data['enter_title'], 'description' => $data['enter_desc'], 'thumb' => $data['enter_img'], 'url' => mobileUrl('qa'));
 			if (empty($cover)) 
 			{
 				pdo_insert('cover_reply', $cover_data);

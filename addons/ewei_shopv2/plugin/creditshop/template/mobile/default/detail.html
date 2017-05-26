@@ -110,7 +110,7 @@
             <div class="fui-cell">
                 <div class="fui-cell-text flex">
                     <span class="price" style="text-align: left;">
-                        <span class="big">{$goods['credit']}</span>{$_W['shopset']['trade']['credittext']}
+                        <span class="big">{if $goods['mincredit']>0}{$goods['mincredit']}{else}{$goods['credit']}{/if}</span>{$_W['shopset']['trade']['credittext']}
                         {if $goods['money'] > 0}
                             + <span style="font-size: 0.8rem;font-weight: bold;padding-right: 0.1rem;">&yen;{$goods['money']}</span>
                         {/if}

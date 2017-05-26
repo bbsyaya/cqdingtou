@@ -437,7 +437,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 				$wechat['jie'] = $jie;
 				if (!($wechat['success'])) 
 				{
-					show_json(0, '微信支付参数错误!');
+					show_json(0, $wechat);
 				}
 				show_json(1, array('logid' => $logid, 'wechat' => $wechat));
 			}
@@ -589,10 +589,11 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		$id = intval($_GPC['id']);
 		$shop = m('common')->getSysset('shop');
 		$member = m('member')->getMember($openid);
-		$logid = intval($_GPC['logid']);
-		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $logid, ':uniacid' => $uniacid));
+		$goodsid = intval($_GPC['goodsid']);
+		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $uniacid));
 		$optionid = $log['optionid'];
-		$goods = $this->model->getGoods($id, $member, $optionid);
+		$goods = $this->model->getGoods($log['goodsid'], $member, $log['optionid']);
+		$goods['dispatch'] = $this->model->dispatchPrice($log['goodsid'], $log['addressid'], $log['optionid']);
 		$credit = $member['credit1'];
 		$money = $member['credit2'];
 		if (empty($log)) 
@@ -698,14 +699,14 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			$update['dispatchstatus'] = '1';
 		}
-		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $logid));
+		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
 		if ($status == 2) 
 		{
 			if ($goods['goodstype'] == 1) 
 			{
 				if (com('coupon')) 
 				{
-					com('coupon')->creditshop($logid);
+					com('coupon')->creditshop($id);
 					$status = 3;
 				}
 				$update['time_finish'] = time();
@@ -732,8 +733,8 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			{
 			}
 			$update['status'] = $status;
-			pdo_update('ewei_shop_creditshop_log', $update, array('id' => $logid));
-			$this->model->sendMessage($logid);
+			pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
+			$this->model->sendMessage($id);
 			if ($status == 3) 
 			{
 				pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set total=total-1 where id=' . $id);

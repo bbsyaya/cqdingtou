@@ -14,7 +14,7 @@
 		</div>
 	    <div class="info info-total">
 			<%if seckillinfo==false || ( seckillinfo && seckillinfo.status==1) %>
-	    		<%if goods.showtotal != 0%>库存 <span class='total text-danger'><%goods.total%></span> 件<%/if%>
+	    		<%if goods.showtotal != 0%><%if goods.unite_total != 0%>总<%/if%>库存 <span class='total text-danger'><%goods.total%></span> 件<%/if%>
 			<%/if%>
 	    </div>
 	    <div class="info info-titles"><%if specs.length>0%>请选择规格<%/if%></div>

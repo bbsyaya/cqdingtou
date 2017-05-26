@@ -79,7 +79,15 @@
 				</a>
 			</div>
 		</div>
-
+	{if $hasThreen}
+	<div class="fui-cell-group fui-cell-click">
+		<a class="fui-cell"  href="{php echo mobileUrl('threen')}">
+			<div class="fui-cell-icon"><i class="icon icon-profile"></i></div>
+			<div class="fui-cell-text"><p>{$plugin_threen_set['texts']['threen']}</p></div>
+			<div class="fui-cell-remark"></div>
+		</a>
+	</div>
+	{/if}
 	{if $hassign}
 	<div class="fui-cell-group fui-cell-click">
 		<a class="fui-cell" href="{php echo mobileUrl('sign')}">

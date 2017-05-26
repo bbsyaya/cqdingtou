@@ -32,6 +32,9 @@ class Create_EweiShopV2Page extends PluginMobileLoginPage
 			$this->message('商品已下架或被删除!', mobileUrl('creditshop'), 'error');
 		}
 		$pay = m('common')->getSysset('pay');
+		$pay['weixin'] = ((!(empty($pay['weixin_sub'])) ? 1 : $pay['weixin']));
+		$pay['weixin_jie'] = ((!(empty($pay['weixin_jie_sub'])) ? 1 : $pay['weixin_jie']));
+		$goods['jie'] = intval($pay['weixin_jie']);
 		$set = m('common')->getPluginset('creditshop');
 		$goods['followed'] = m('user')->followed($openid);
 		if ($goods['goodstype'] == 0) 
@@ -160,11 +163,11 @@ class Create_EweiShopV2Page extends PluginMobileLoginPage
 					$areas = unserialize($dispatch_data['areas']);
 					if (!(empty($address))) 
 					{
-						$dprice = m('dispatch')->getCityDispatchPrice($areas, $address['city'], $param, $dispatch_data);
+						$dprice = m('dispatch')->getCityDispatchPrice($areas, $address, $param, $dispatch_data);
 					}
 					else if (!(empty($member['city']))) 
 					{
-						$dprice = m('dispatch')->getCityDispatchPrice($areas, $member['city'], $param, $dispatch_data);
+						$dprice = m('dispatch')->getCityDispatchPrice($areas, $member, $param, $dispatch_data);
 					}
 					else 
 					{

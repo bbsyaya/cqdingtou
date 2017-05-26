@@ -245,6 +245,11 @@ class Data_EweiShopV2Page extends ComWebPage
 		}
 		$rows = m('excel')->import('excelfile');
 		$item['fields'] = iunserializer($item['fields']);
+		$rows = $this->filterEmpty($rows);
+		if (empty($rows)) 
+		{
+			$this->message('导入数据为空', referer(), 'error');
+		}
 		foreach ($rows as $rownum => $col ) 
 		{
 			$data = array( 'typeid' => $id, 'pvalue' => $col[0], 'fields' => array(), 'uniacid' => $_W['uniacid'] );
@@ -295,6 +300,31 @@ class Data_EweiShopV2Page extends ComWebPage
 		$item['fields'] = iunserializer($item['fields']);
 		$num = $_GPC['numlist'];
 		include $this->template('goods/virtual/data/tpl');
+	}
+	protected function filterEmpty($arr) 
+	{
+		if (empty($arr)) 
+		{
+			return array();
+		}
+		$newArr = array();
+		foreach ($arr as $i => $val ) 
+		{
+			$isEmpty = false;
+			foreach ($val as $k => $v ) 
+			{
+				if (empty($v)) 
+				{
+					$isEmpty = true;
+					break;
+				}
+			}
+			if (!($isEmpty)) 
+			{
+				$newArr[] = $val;
+			}
+		}
+		return $newArr;
 	}
 }
 ?>

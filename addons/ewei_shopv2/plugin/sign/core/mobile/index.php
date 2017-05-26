@@ -144,6 +144,19 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$member = m('member')->getMember($_W['openid']);
 		$result = array('message' => $set['textsign'] . '成功!' . $message, 'signorder' => $signinfo['orderday'], 'signsum' => $signinfo['sum'], 'addcredit' => $credit, 'credit' => intval($member['credit1']));
 		$this->model->updateSign($signinfo);
+		if (p('lottery')) 
+		{
+			$res = p('lottery')->getLottery($member['openid'], 2, array('day' => $signinfo['order']));
+			if ($res) 
+			{
+				p('lottery')->getLotteryList($member['openid'], array('lottery_id' => $res));
+			}
+			$result['lottery'] = p('lottery')->check_isreward();
+		}
+		else 
+		{
+			$result['lottery']['is_changes'] = 0;
+		}
 		show_json(1, $result);
 	}
 	public function doreward() 

@@ -10,6 +10,7 @@ class Index_EweiShopV2Page extends MerchWebPage
 	{
 		global $_W;
 		global $_GPC;
+		$this->model->CheckPlugin('taobao');
 		include $this->template();
 	}
 }

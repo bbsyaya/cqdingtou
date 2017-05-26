@@ -105,6 +105,14 @@ class EweiShopWechatPay
 		{
 			$this->cashier();
 		}
+		else if ($this->type == '14') 
+		{
+			$this->wxapp_order();
+		}
+		else if ($this->type == '15') 
+		{
+			$this->wxapp_recharge();
+		}
 		$this->success();
 	}
 	public function order() 
@@ -140,6 +148,7 @@ class EweiShopWechatPay
 		$log = pdo_fetch($sql, $params);
 		if (!(empty($log)) && ($log['status'] == '0') && ($log['fee'] == $this->total_fee)) 
 		{
+			pdo_update('ewei_shop_order', array('paytype' => 21, 'isborrow' => $isborrow, 'borrowopenid' => $borrowopenid, 'apppay' => ($this->isapp ? 1 : 0)), array('ordersn' => $log['tid'], 'uniacid' => $log['uniacid']));
 			$site = WeUtility::createModuleSite($log['module']);
 			if (!(is_error($site))) 
 			{
@@ -156,7 +165,6 @@ class EweiShopWechatPay
 					$ret['user'] = $log['openid'];
 					$ret['fee'] = $log['fee'];
 					$ret['tag'] = $log['tag'];
-					pdo_update('ewei_shop_order', array('paytype' => 21, 'isborrow' => $isborrow, 'borrowopenid' => $borrowopenid, 'apppay' => ($this->isapp ? 1 : 0)), array('ordersn' => $log['tid'], 'uniacid' => $log['uniacid']));
 					$result = $site->$method($ret);
 					if ($result) 
 					{
@@ -375,6 +383,81 @@ class EweiShopWechatPay
 		if (p('cashier')) 
 		{
 			p('cashier')->payResult($ordersn);
+		}
+	}
+	public function wxapp_order() 
+	{
+		$tid = $this->get['out_trade_no'];
+		if (strexists($tid, 'GJ')) 
+		{
+			$tids = explode('GJ', $tid);
+			$tid = $tids[0];
+		}
+		$sql = 'SELECT * FROM ' . tablename('core_paylog') . ' WHERE `module`=:module AND `tid`=:tid  limit 1';
+		$params = array();
+		$params[':tid'] = $tid;
+		$params[':module'] = 'ewei_shopv2';
+		$log = pdo_fetch($sql, $params);
+		if (!(empty($log)) && ($log['status'] == '0') && ($log['fee'] == $this->total_fee)) 
+		{
+			$site = WeUtility::createModuleSite($log['module']);
+			if (!(is_error($site))) 
+			{
+				$method = 'payResult';
+				if (method_exists($site, $method)) 
+				{
+					$ret = array();
+					$ret['weid'] = $log['weid'];
+					$ret['uniacid'] = $log['uniacid'];
+					$ret['result'] = 'success';
+					$ret['type'] = $log['type'];
+					$ret['from'] = 'return';
+					$ret['tid'] = $log['tid'];
+					$ret['user'] = $log['openid'];
+					$ret['fee'] = $log['fee'];
+					$ret['tag'] = $log['tag'];
+					pdo_update('ewei_shop_order', array('paytype' => 21, 'apppay' => 2), array('ordersn' => $log['tid'], 'uniacid' => $log['uniacid']));
+					$result = $site->$method($ret);
+					if ($result) 
+					{
+						$log['tag'] = iunserializer($log['tag']);
+						$log['tag']['transaction_id'] = $this->get['transaction_id'];
+						$record = array();
+						$record['status'] = '1';
+						$record['tag'] = iserializer($log['tag']);
+						pdo_update('core_paylog', $record, array('plid' => $log['plid']));
+					}
+				}
+			}
+		}
+		else 
+		{
+			$this->fail();
+		}
+	}
+	public function wxapp_recharge() 
+	{
+		global $_W;
+		$logno = trim($this->get['out_trade_no']);
+		if (empty($logno)) 
+		{
+			$this->fail();
+		}
+		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_log') . ' WHERE `uniacid`=:uniacid and `logno`=:logno limit 1', array(':uniacid' => $_W['uniacid'], ':logno' => $logno));
+		$OK = !(empty($log)) && empty($log['status']) && ($log['money'] == $this->total_fee);
+		if ($OK) 
+		{
+			pdo_update('ewei_shop_member_log', array('status' => 1, 'rechargetype' => 'wechat', 'apppay' => 2), array('id' => $log['id']));
+			$shopset = m('common')->getSysset('shop');
+			m('member')->setCredit($log['openid'], 'credit2', $log['money'], array(0, $shopset['name'] . '会员充值:wechatnotify:credit2:' . $log['money']));
+			m('member')->setRechargeCredit($log['openid'], $log['money']);
+			com_run('sale::setRechargeActivity', $log);
+			com_run('coupon::useRechargeCoupon', $log);
+			m('notice')->sendMemberLogMessage($log['id']);
+		}
+		else if ($log['money'] == $this->total_fee) 
+		{
+			pdo_update('ewei_shop_member_log', array('rechargetype' => 'wechat', 'apppay' => 2), array('id' => $log['id']));
 		}
 	}
 	public function publicMethod() 

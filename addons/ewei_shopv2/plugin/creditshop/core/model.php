@@ -109,6 +109,112 @@ if (!(class_exists('CreditshopModel')))
 			}
 			return $dispatch;
 		}
+		public function dispatchPrice($goodsid, $addressid, $optionid = 0) 
+		{
+			global $_W;
+			global $_GPC;
+			$openid = $_W['openid'];
+			$uniacid = $_W['uniacid'];
+			$member = m('member')->getMember($openid);
+			$goods = $this->getGoods($goodsid, $member, $optionid);
+			$dispatch = 0;
+			$dispatch_array = array();
+			$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . "\n" . '        where id=:id and uniacid=:uniacid limit 1', array(':id' => $addressid, ':uniacid' => $_W['uniacid']));
+			if ($goods['dispatchtype'] == 0) 
+			{
+				$dispatch = $goods['dispatch'];
+			}
+			else 
+			{
+				$merchid = $goods['merchid'];
+				if (empty($goods['dispatchid'])) 
+				{
+					$dispatch_data = m('dispatch')->getDefaultDispatch($merchid);
+				}
+				else 
+				{
+					$dispatch_data = m('dispatch')->getOneDispatch($goods['dispatchid']);
+				}
+				if (empty($dispatch_data)) 
+				{
+					$dispatch_data = m('dispatch')->getNewDispatch($merchid);
+				}
+				if (!(empty($dispatch_data))) 
+				{
+					$dkey = $dispatch_data['id'];
+					if (!(empty($user_city))) 
+					{
+						$citys = m('dispatch')->getAllNoDispatchAreas($dispatch_data['nodispatchareas']);
+						if (!(empty($citys))) 
+						{
+							if (in_array($user_city, $citys) && !(empty($citys))) 
+							{
+								$isnodispatch = 1;
+								$has_goodsid = 0;
+								if (!(empty($nodispatch_array['goodid']))) 
+								{
+									if (in_array($goods['goodsid'], $nodispatch_array['goodid'])) 
+									{
+										$has_goodsid = 1;
+									}
+								}
+								if ($has_goodsid == 0) 
+								{
+									$nodispatch_array['goodid'][] = $goods['id'];
+									$nodispatch_array['title'][] = $goods['title'];
+									$nodispatch_array['city'] = $user_city;
+								}
+							}
+						}
+					}
+					if (($goods['isverify'] == 0) && ($goods['goodstype'] == 0)) 
+					{
+						$areas = unserialize($dispatch_data['areas']);
+						if ($dispatch_data['calculatetype'] == 1) 
+						{
+							$param = 1;
+						}
+						else 
+						{
+							$param = $goods['weight'] * 1;
+						}
+						if (array_key_exists($dkey, $dispatch_array)) 
+						{
+							$dispatch_array[$dkey]['param'] += $param;
+						}
+						else 
+						{
+							$dispatch_array[$dkey]['data'] = $dispatch_data;
+							$dispatch_array[$dkey]['param'] = $param;
+						}
+					}
+				}
+				$dispatch_merch = array();
+				if (!(empty($dispatch_array))) 
+				{
+					foreach ($dispatch_array as $k => $v ) 
+					{
+						$dispatch_data = $dispatch_array[$k]['data'];
+						$param = $dispatch_array[$k]['param'];
+						$areas = unserialize($dispatch_data['areas']);
+						if (!(empty($address))) 
+						{
+							$dprice = m('dispatch')->getCityDispatchPrice($areas, $address, $param, $dispatch_data);
+						}
+						else if (!(empty($member['city']))) 
+						{
+							$dprice = m('dispatch')->getCityDispatchPrice($areas, $member, $param, $dispatch_data);
+						}
+						else 
+						{
+							$dprice = m('dispatch')->getDispatchPrice($param, $dispatch_data);
+						}
+						$dispatch = $dprice;
+					}
+				}
+			}
+			return $dispatch;
+		}
 		public function packetmoney($goodsid) 
 		{
 			global $_W;
@@ -266,6 +372,7 @@ if (!(class_exists('CreditshopModel')))
 							}
 							array_push($firstprice, m('dispatch')->getDispatchPrice(1, $dispatch));
 							$ret = array('min' => round(min($firstprice), 2), 'max' => round(max($firstprice), 2));
+							$goods['areas'] = $ret;
 						}
 						else 
 						{
@@ -278,7 +385,6 @@ if (!(class_exists('CreditshopModel')))
 				{
 					$goods['dispatch'] = 0;
 				}
-				$goods['dispatch'] = floatval($goods['dispatch']);
 				if ($goods['canbuy']) 
 				{
 					if (0 < $goods['totalday']) 
@@ -532,7 +638,7 @@ if (!(class_exists('CreditshopModel')))
 							$remark = "\r\n" . ' 请您点击选择邮寄地址后, 我们会尽快发货，【' . $shop['name'] . '】期待您再次光顾！';
 						}
 					}
-					$msg = array( 'first' => array('value' => '恭喜您，商品兑换成功~', 'color' => '#4a5077'), 'keyword1' => array('title' => '奖品名称', 'value' => $goods['title'], 'color' => '#4a5077'), 'keyword2' => array('title' => '消耗积分', 'value' => $credits, 'color' => '#4a5077'), 'keyword3' => array('title' => '兑换时间', 'value' => date('Y-m-d', time()), 'color' => '#4a5077'), 'keyword4' => array('title' => '剩余积分', 'value' => $credit, 'color' => '#4a5077'), 'remark' => array('value' => $remark, 'color' => '#4a5077') );
+					$msg = array( 'first' => array('value' => '恭喜您，商品兑换成功~', 'color' => '#4a5077'), 'keyword1' => array('title' => '奖品名称', 'value' => $goods['title'], 'color' => '#4a5077'), 'keyword2' => array('title' => '消耗积分', 'value' => $credits, 'color' => '#4a5077'), 'keyword3' => array('title' => '剩余积分', 'value' => $credit, 'color' => '#4a5077'), 'keyword4' => array('title' => '兑换时间', 'value' => date('Y-m-d', time()), 'color' => '#4a5077'), 'remark' => array('value' => $remark, 'color' => '#4a5077') );
 					if (!(empty($tm['exchange']))) 
 					{
 						m('message')->sendTplNotice($log['openid'], $tm['exchange'], $msg, $detailurl);

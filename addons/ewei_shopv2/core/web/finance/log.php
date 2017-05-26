@@ -260,6 +260,11 @@ class Log_EweiShopV2Page extends WebPage
 		pdo_update('ewei_shop_member_log', array('status' => 3), array('id' => $id, 'uniacid' => $_W['uniacid']));
 		$refundmoney = $log['money'] + $log['gives'];
 		m('member')->setCredit($log['openid'], 'credit2', -$refundmoney, array(0, $set['name'] . '充值退款'));
+		$money = com_run('sale::getCredit1', $log['openid'], (double) $log['money'], 21, 2, 1);
+		if (0 < $money) 
+		{
+			m('notice')->sendMemberPointChange($log['openid'], $money, 1);
+		}
 		m('notice')->sendMemberLogMessage($log['id']);
 		$member = m('member')->getMember($log['openid']);
 		plog('finance.log.refund', '充值退款 ID: ' . $log['id'] . ' 金额: ' . $log['money'] . ' <br/>会员信息:  ID: ' . $member['id'] . ' / ' . $member['openid'] . '/' . $member['nickname'] . '/' . $member['realname'] . '/' . $member['mobile']);

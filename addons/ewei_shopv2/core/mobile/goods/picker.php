@@ -37,7 +37,7 @@ class Picker_EweiShopV2Page extends MobilePage
 				}
 			}
 		}
-		$goods = pdo_fetch('select id,thumb,title,marketprice,total,maxbuy,minbuy,unit,hasoption,showtotal,diyformid,diyformtype,diyfields,isdiscount,presellprice,' . "\n" . '                isdiscount_time,isdiscount_discounts, needfollow, followtip, followurl, `type`, isverify, maxprice, minprice, merchsale,ispresell,preselltimeend' . "\n" . '                from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		$goods = pdo_fetch('select id,thumb,title,marketprice,total,maxbuy,minbuy,unit,hasoption,showtotal,diyformid,diyformtype,diyfields,isdiscount,presellprice,' . "\n" . '                isdiscount_time,isdiscount_discounts, needfollow, followtip, followurl, `type`, isverify, maxprice, minprice, merchsale,ispresell,preselltimeend,unite_total' . "\n" . '                from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		if (empty($goods)) 
 		{
 			show_json(0);
@@ -77,7 +77,7 @@ class Picker_EweiShopV2Page extends MobilePage
 		{
 			$isdiscount = false;
 		}
-		$task_goods_data = m('goods')->getTaskGoods($openid, $id, $rank, $join_id);
+		$task_goods_data = m('goods')->getTaskGoods($openid, $id, $rank, $log_id, $join_id);
 		if (empty($task_goods_data['is_task_goods'])) 
 		{
 			$is_task_goods = 0;
@@ -99,6 +99,13 @@ class Picker_EweiShopV2Page extends MobilePage
 			}
 			unset($spec);
 			$options = pdo_fetchall('select * from ' . tablename('ewei_shop_goods_option') . ' where goodsid=:goodsid and uniacid=:uniacid order by displayorder asc', array(':goodsid' => $id, ':uniacid' => $_W['uniacid']));
+		}
+		if (!(empty($options)) && !(empty($goods['unite_total']))) 
+		{
+			foreach ($options as &$option ) 
+			{
+				$option['stock'] = $goods['total'];
+			}
 		}
 		if ($seckillinfo && ($seckillinfo['status'] == 0)) 
 		{
@@ -253,6 +260,11 @@ class Picker_EweiShopV2Page extends MobilePage
 					$area_set = m('util')->get_area_config_set();
 					$new_area = intval($area_set['new_area']);
 					$address_street = intval($area_set['address_street']);
+					$corder_plugin = p('corder');
+					if ($corder_plugin) 
+					{
+						$diy_data0 = $corder_plugin->get_list(0);
+					}
 					include $this->template('diyform/formfields');
 					$diyformhtml = ob_get_contents();
 					ob_clean();

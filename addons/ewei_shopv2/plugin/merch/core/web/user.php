@@ -114,6 +114,10 @@ class User_EweiShopV2Page extends PluginWebPage
 		{
 			$account = pdo_fetch('select * from ' . tablename('ewei_shop_merch_account') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $item['accountid'], ':uniacid' => $_W['uniacid']));
 		}
+		if (!(empty($item['pluginset']))) 
+		{
+			$item['pluginset'] = iunserializer($item['pluginset']);
+		}
 		$diyform_flag = 0;
 		$diyform_plugin = p('diyform');
 		$f_data = array();
@@ -216,7 +220,7 @@ class User_EweiShopV2Page extends PluginWebPage
 				$salt = $account['salt'];
 				$pwd = $account['pwd'];
 			}
-			$data = array('uniacid' => $_W['uniacid'], 'merchname' => trim($_GPC['merchname']), 'salecate' => trim($_GPC['salecate']), 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'address' => trim($_GPC['address']), 'tel' => trim($_GPC['tel']), 'lng' => $_GPC['map']['lng'], 'lat' => $_GPC['map']['lat'], 'accounttime' => strtotime($_GPC['accounttime']), 'accounttotal' => intval($_GPC['accounttotal']), 'groupid' => intval($_GPC['groupid']), 'cateid' => intval($_GPC['cateid']), 'isrecommand' => intval($_GPC['isrecommand']), 'remark' => trim($_GPC['remark']), 'status' => $status, 'desc' => trim($_GPC['desc1']), 'logo' => save_media($_GPC['logo']), 'payopenid' => trim($_GPC['payopenid']), 'payrate' => trim($_GPC['payrate'], '%'));
+			$data = array('uniacid' => $_W['uniacid'], 'merchname' => trim($_GPC['merchname']), 'salecate' => trim($_GPC['salecate']), 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'address' => trim($_GPC['address']), 'tel' => trim($_GPC['tel']), 'lng' => $_GPC['map']['lng'], 'lat' => $_GPC['map']['lat'], 'accounttime' => strtotime($_GPC['accounttime']), 'accounttotal' => intval($_GPC['accounttotal']), 'groupid' => intval($_GPC['groupid']), 'cateid' => intval($_GPC['cateid']), 'isrecommand' => intval($_GPC['isrecommand']), 'remark' => trim($_GPC['remark']), 'status' => $status, 'desc' => trim($_GPC['desc1']), 'logo' => save_media($_GPC['logo']), 'payopenid' => trim($_GPC['payopenid']), 'payrate' => trim($_GPC['payrate'], '%'), 'pluginset' => iserializer($_GPC['pluginset']));
 			if ($diyform_flag) 
 			{
 				$data['diyformdata'] = iserializer($fdata);
@@ -255,6 +259,8 @@ class User_EweiShopV2Page extends PluginWebPage
 			}
 			show_json(1, array('url' => webUrl('merch/user', array('status' => $item['status']))));
 		}
+		$plugins_data = $this->model->getPluginList();
+		$plugins_list = $plugins_data['plugins_list'];
 		$groups = $this->model->getGroups();
 		$category = $this->model->getCategory();
 		include $this->template();

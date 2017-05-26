@@ -969,7 +969,7 @@ class TaskModel extends PluginModel
 				$res = p('lottery')->getLottery($qrmember['openid'], 3, array('taskid' => $poster['id']));
 				if ($res) 
 				{
-					p('lottery')->getLotteryList($qrmember['openid']);
+					p('lottery')->getLotteryList($qrmember['openid'], array('lottery_id' => $res));
 				}
 			}
 		}
@@ -1366,14 +1366,14 @@ class TaskModel extends PluginModel
 		else 
 		{
 			m('message')->sendCustomNotice($openid, '感谢您的关注，恭喜您获得关注奖励');
-			m('message')->sendCustomNotice($openid, '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
+			m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
 		}
 		if (p('lottery')) 
 		{
-			$res = p('lottery')->getLottery(3, array('taskid' => $poster['id']));
+			$res = p('lottery')->getLottery($qrmember['openid'], 3, array('taskid' => $poster['id']));
 			if ($res) 
 			{
-				p('lottery')->getLotteryList($qrmember['openid']);
+				p('lottery')->getLotteryList($qrmember['openid'], array('lottery_id' => $res));
 			}
 		}
 	}

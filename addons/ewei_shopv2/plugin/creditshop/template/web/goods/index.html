@@ -9,6 +9,13 @@
         {/if}
     </span>
     <h2>商品管理 <small>数量: <span class='text-danger'>{$total}</span> 条</small></h2> </div>
+
+<ul class="nav nav-tabs" id="myTab">
+    <li {if empty($_GPC['tab']) || $_GPC['tab']=='sell'}class="active"{/if}><a href="{php echo webUrl('creditshop/goods',array('tab'=>'sell'))}">出售中</a></li>
+    <li {if $_GPC['tab']=='sellout'}class="active"{/if}><a href="{php echo webUrl('creditshop/goods',array('tab'=>'sellout'))}">已售罄</a></li>
+    <li {if $_GPC['tab']=='warehouse'}class="active"{/if}><a href="{php echo webUrl('creditshop/goods',array('tab'=>'warehouse'))}">仓库中</a></li>
+    <li {if $_GPC['tab']=='recycle'}class="active"{/if}><a href="{php echo webUrl('creditshop/goods',array('tab'=>'recycle'))}">回收站</a></li>
+</ul>
     <form action="./index.php" method="get" class="form-horizontal" plugins="form">
         <input type="hidden" name="c" value="site" />
         <input type="hidden" name="a" value="entry" />
@@ -16,19 +23,31 @@
         <input type="hidden" name="do" value="web" />
         <input type="hidden" name="r"  value="creditshop.goods" />
 	<div class="page-toolbar row m-b-sm m-t-sm">
-		<div class="col-sm-4">
+		<div class="col-sm-5">
 			<div class="input-group-btn">
 				<button class="btn btn-default btn-sm"  type="button" data-toggle='refresh'><i class='fa fa-refresh'></i></button>
 				{ifp 'creditshop.goods.edit'}
 					<button class="btn btn-default btn-sm" type="button" data-toggle='batch'  data-href="{php echo webUrl('creditshop/goods/status',array('status'=>0))}"><i class='fa fa-circle-o'></i> 下架</button>
 					<button class="btn btn-default btn-sm" type="button" data-toggle='batch' data-href="{php echo webUrl('creditshop/goods/status',array('status'=>1))}"><i class='fa fa-circle'></i> 上架</button>
 				{/if}
-				{ifp 'creditshop.goods.delete'}	
-				     <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{php echo webUrl('creditshop/goods/delete')}"><i class='fa fa-trash'></i> 删除</button>
+				{ifp 'creditshop.goods.delete' && $_GPC['tab']!='recycle' && $_GPC['tab']!='warehouse'}
+				     <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确认要删除吗?" data-href="{php echo webUrl('creditshop/goods/delete')}">
+                         <i class='fa fa-trash'></i> 删除
+                     </button>
 				{/if}
+                {ifp 'creditshop.goods.delete' && $_GPC['tab']!='recycle'}
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确定要彻底删除该商品吗?" data-href="{php echo webUrl('creditshop/goods/deleted')}">
+                    <i class='fa fa-remove'></i> 彻底删除
+                </button>
+                {/if}
+                {ifp 'creditshop.goods.delete' && $_GPC['tab']=='recycle'}
+                <button class="btn btn-default btn-sm" type="button" data-toggle='batch-remove' data-confirm="确定要恢复商品到仓库吗?" data-href="{php echo webUrl('creditshop/goods/recycle')}">
+                    <i class='fa fa-reply'></i> 恢复商品到仓库
+                </button>
+                {/if}
 			</div> 
 		</div>
-		<div class="col-sm-8 pull-right">
+		<div class="col-sm-7 pull-right">
 			<select name="cate" class='form-control input-sm select-sm' style="width:120px;">
                 <option value="" {if empty($_GPC['cate'])}selected{/if} >商品分类</option>
                 {loop $category $cate}
@@ -40,11 +59,11 @@
                 <option value='0' {if $_GPC['type']=='0'}selected{/if}>兑换</option>
                 <option value='1' {if $_GPC['type']=='1'}selected{/if} >抽奖</option>
             </select>
-            <select name='status' class='form-control  input-sm' style='width:100px;'  >
+            <!--<select name='status' class='form-control  input-sm' style='width:100px;'  >
                 <option value='' {if $_GPC['status']==''}selected{/if}>状态</option>
                 <option value='0' {if $_GPC['status']=='0'}selected{/if}>暂停</option>
                 <option value='1' {if $_GPC['status']=='1'}selected{/if} >开启</option>
-            </select>
+            </select>-->
 			<div class="input-group">				 
 				<input type="text" class="input-sm form-control" name='keyword' value="{$_GPC['keyword']}" placeholder="请输入关键词"> <span class="input-group-btn">
                 <button class="btn btn-sm btn-primary" type="submit"> 搜索</button> </span>
@@ -65,7 +84,7 @@
                     <th style="width:90px;">消耗</th>
                     <th style="width: 90px;">参与/浏览</th>
                     <th style="width: 100px;text-align: center;">状态</th>
-                    <th style="width: 100px;text-align: center;">操作</th>
+                    <th style="width: 120px;text-align: center;">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -144,8 +163,14 @@
                              {ifp 'creditshop.goods.view|creditshop.goods.edit'}
                                  <a class='btn btn-default btn-sm' href="{php echo webUrl('creditshop/goods/edit',array('id' => $row['id']));}" title="{ifp 'creditshop.goods.edit'}编辑{else}查看{/if}"><i class='fa fa-edit'></i></a>
                              {/if}
-                             {ifp 'creditshop.goods.delete'}
-                             	<a class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('creditshop/goods/delete',array('id' => $row['id']));}" data-confirm="确定要删除该商品吗？" title="删除"><i class='fa fa-remove'></i></a>
+                             {ifp 'creditshop.goods.delete' && $_GPC['tab']!='warehouse' && $_GPC['tab']!='recycle'}
+                             	<a class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('creditshop/goods/delete',array('id' => $row['id']));}" data-confirm="确定要删除该商品吗？" title="删除"><i class='fa fa-trash'></i></a>
+                             {/if}
+                             {ifp 'creditshop.goods.delete' && $_GPC['tab']!='recycle'}
+                             <a class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('creditshop/goods/deleted',array('id' => $row['id']));}" data-confirm="确定要彻底删除该商品吗？" title="彻底删除"><i class='fa fa-remove'></i></a>
+                             {/if}
+                             {ifp 'creditshop.goods.delete' && $_GPC['tab']=='recycle'}
+                             <a class='btn btn-default btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('creditshop/goods/recycle',array('id' => $row['id']));}" data-confirm="确定要恢复商品到仓库吗？" title="恢复商品到仓库"><i class='fa fa-reply'></i></a>
                              {/if}
                          </td>
             </tr>

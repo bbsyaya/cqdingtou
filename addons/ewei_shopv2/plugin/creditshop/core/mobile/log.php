@@ -55,7 +55,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		$uniacid = $_W['uniacid'];
 		$status = intval($_GPC['status']);
 		$set = m('common')->getPluginset('creditshop');
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 10;
 		$condition = ' and log.openid=:openid and  log.uniacid = :uniacid and log.status>0';
@@ -128,7 +128,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		$uniacid = $_W['uniacid'];
 		$set = m('common')->getPluginset('creditshop');
 		$pay = m('common')->getSysset('pay');
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$condition = ' and uniacid=:uniacid ';
 		$id = intval($_GPC['id']);
 		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and openid=:openid ' . $condition . ' limit 1', array(':id' => $id, ':openid' => $openid, ':uniacid' => $uniacid));
@@ -145,7 +145,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		if (!(empty($log['addressid']))) 
 		{
 			$address = pdo_fetch('select * from ' . tablename('ewei_shop_member_address') . ' where id=:id and openid=:openid and uniacid=:uniacid limit 1', array(':id' => $log['addressid'], ':uniacid' => $uniacid, ':openid' => $openid));
-			$goods['dispatch'] = $this->model->dispatch($log['addressid'], $goods);
+			$goods['dispatch'] = $this->model->dispatchPrice($log['goodsid'], $log['addressid'], $log['optionid']);
 		}
 		$goods['currenttime'] = time();
 		$stores = array();
@@ -224,7 +224,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		$openid = $_W['openid'];
 		$uniacid = $_W['uniacid'];
 		$set = m('common')->getPluginset('creditshop');
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$condition = ' and uniacid = ' . $uniacid . ' ';
 		if (0 < $merchid) 
 		{
@@ -300,7 +300,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			$is_openmerch = 0;
 		}
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$condition = ' and uniacid=:uniacid ';
 		if (0 < $merchid) 
 		{
@@ -334,7 +334,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		global $_W;
 		global $_GPC;
 		$logid = intval($_GPC['id']);
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$condition = ' and uniacid=:uniacid ';
 		if (0 < $merchid) 
 		{
@@ -361,7 +361,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		$shop = m('common')->getSysset('shop');
 		$uniacid = $_W['uniacid'];
 		$paytype = trim($_GPC['paytype']);
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$condition = ' and uniacid=:uniacid ';
 		if (0 < $merchid) 
 		{
@@ -624,7 +624,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		$member = m('member')->getMember($openid);
 		$shop = m('common')->getSysset('shop');
 		$uniacid = $_W['uniacid'];
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$condition = ' and uniacid=:uniacid ';
 		if (0 < $merchid) 
 		{
@@ -656,7 +656,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		$member = m('member')->getMember($openid);
 		$shop = m('common')->getSysset('shop');
 		$uniacid = $_W['uniacid'];
-		$merchid = intval($_GPC['merchid']);
+		$merchid = intval($_W['merchid']);
 		$condition = ' and uniacid=:uniacid ';
 		if (0 < $merchid) 
 		{

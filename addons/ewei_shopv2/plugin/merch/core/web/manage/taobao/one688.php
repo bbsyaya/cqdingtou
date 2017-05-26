@@ -10,6 +10,7 @@ class One688_EweiShopV2Page extends MerchWebPage
 	{
 		global $_W;
 		global $_GPC;
+		$this->model->CheckPlugin('taobao');
 		$sql = 'SELECT * FROM ' . tablename('ewei_shop_category') . ' WHERE `uniacid` = :uniacid ORDER BY `parentid`, `displayorder` DESC';
 		$category = pdo_fetchall($sql, array(':uniacid' => $_W['uniacid']), 'id');
 		$parent = $children = array();

@@ -13,11 +13,16 @@ class Detail_EweiShopV2Page extends MobilePage
 		$uniacid = $_W['uniacid'];
 		$id = intval($_GPC['id']);
 		$rank = intval($_GPC['rank']);
+		$log_id = intval($_GPC['log_id']);
 		$join_id = intval($_GPC['join_id']);
 		if (!(empty($join_id))) 
 		{
 			$_SESSION[$id . '_rank'] = $rank;
 			$_SESSION[$id . '_join_id'] = $join_id;
+		}
+		else if (!(empty($log_id))) 
+		{
+			$_SESSION[$id . '_log_id'] = $log_id;
 		}
 		$err = false;
 		$merch_plugin = p('merch');
@@ -98,6 +103,8 @@ class Detail_EweiShopV2Page extends MobilePage
 				if (($seckillinfo['starttime'] <= $time) && ($time < $seckillinfo['endtime'])) 
 				{
 					$seckillinfo['status'] = 0;
+					unset($_SESSION[$id . '_log_id']);
+					unset($log_id);
 				}
 				else if ($time < $seckillinfo['starttime']) 
 				{
@@ -109,7 +116,7 @@ class Detail_EweiShopV2Page extends MobilePage
 				}
 			}
 		}
-		$task_goods_data = m('goods')->getTaskGoods($openid, $id, $rank, $join_id);
+		$task_goods_data = m('goods')->getTaskGoods($openid, $id, $rank, $log_id, $join_id);
 		if (empty($task_goods_data['is_task_goods'])) 
 		{
 			$is_task_goods = 0;

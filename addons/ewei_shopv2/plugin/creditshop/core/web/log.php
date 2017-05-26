@@ -482,26 +482,33 @@ class Log_EweiShopV2Page extends PluginWebPage
 				{
 					show_json(0, '此记录已兑换过了!');
 				}
-				pdo_update('ewei_shop_creditshop_log', array('status' => 2, 'usetime' => time(), 'time_send' => time(), 'expresscom' => $_GPC['expresscom'], 'expresssn' => $_GPC['expresssn'], 'express' => $_GPC['express']), array('id' => $id));
-				if ($goods['verifytype'] == 0) 
+				if (0 < $goods['isverify']) 
 				{
-					pdo_update('ewei_shop_creditshop_log', array('status' => 3, 'usetime' => time(), 'verifyopenid' => 'system', 'time_finish' => time()), array('id' => $id));
-					$data = array('uniacid' => $_W['uniacid'], 'openid' => $log['openid'], 'logid' => $id, 'verifycode' => $log['eno'], 'storeid' => $log['storeid'], 'verifier' => 'system', 'isverify' => 1, 'verifytime' => time());
-					pdo_insert('ewei_shop_creditshop_verify', $data);
-				}
-				else if ($goods['verifytype'] == 1) 
-				{
-					if ($log['status'] != 3) 
+					if ($goods['verifytype'] == 0) 
 					{
 						pdo_update('ewei_shop_creditshop_log', array('status' => 3, 'usetime' => time(), 'verifyopenid' => 'system', 'time_finish' => time()), array('id' => $id));
-					}
-					$i = 1;
-					while ($i <= $verifynum) 
-					{
 						$data = array('uniacid' => $_W['uniacid'], 'openid' => $log['openid'], 'logid' => $id, 'verifycode' => $log['eno'], 'storeid' => $log['storeid'], 'verifier' => 'system', 'isverify' => 1, 'verifytime' => time());
 						pdo_insert('ewei_shop_creditshop_verify', $data);
-						++$i;
 					}
+					else if ($goods['verifytype'] == 1) 
+					{
+						if ($log['status'] != 3) 
+						{
+							pdo_update('ewei_shop_creditshop_log', array('status' => 3, 'usetime' => time(), 'verifyopenid' => 'system', 'time_finish' => time()), array('id' => $id));
+						}
+						$i = 1;
+						if ($i <= $verifynum) 
+						{
+							$data = array('uniacid' => $_W['uniacid'], 'openid' => $log['openid'], 'logid' => $id, 'verifycode' => $log['eno'], 'storeid' => $log['storeid'], 'verifier' => 'system', 'isverify' => 1, 'verifytime' => time());
+							pdo_insert('ewei_shop_creditshop_verify', $data);
+							++$i;
+							pdo_update('ewei_shop_creditshop_log', array('status' => 3, 'usetime' => time(), 'time_send' => time(), 'expresscom' => $_GPC['expresscom'], 'expresssn' => $_GPC['expresssn'], 'express' => $_GPC['express']), array('id' => $id));
+						}
+					}
+				}
+				else 
+				{
+					pdo_update('ewei_shop_creditshop_log', array('status' => 3, 'usetime' => time(), 'time_send' => time(), 'expresscom' => $_GPC['expresscom'], 'expresssn' => $_GPC['expresssn'], 'express' => $_GPC['express']), array('id' => $id));
 				}
 			}
 			$this->model->sendMessage($id);

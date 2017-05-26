@@ -102,6 +102,7 @@ class TaskProcessor extends PluginProcessor
 		load()->func('logging');
 		if ($member_info['isnew']) 
 		{
+			load()->func('logging');
 			if (!(empty($join_info))) 
 			{
 				if ($join_info['task_type'] == 1) 
@@ -110,7 +111,6 @@ class TaskProcessor extends PluginProcessor
 				}
 				else if ($join_info['task_type'] == 2) 
 				{
-					logging_run('saomiao 2leixing');
 					$this->model->rankreward($member_info, $poster, $join_info, $qr, $openid, $qrmember);
 				}
 				$this->commission($poster, $member_info, $qrmember);

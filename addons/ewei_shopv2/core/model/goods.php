@@ -153,12 +153,12 @@ class Goods_EweiShopV2Model
 		$total = '';
 		if (!($random)) 
 		{
-			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell' . "\r\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY ' . $order . ' ' . $orderby . ' LIMIT ' . (($page - 1) * $pagesize) . ',' . $pagesize;
+			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell' . "\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY ' . $order . ' ' . $orderby . ' LIMIT ' . (($page - 1) * $pagesize) . ',' . $pagesize;
 			$total = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ', $params);
 		}
 		else 
 		{
-			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell' . "\r\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY rand() LIMIT ' . $pagesize;
+			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell' . "\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY rand() LIMIT ' . $pagesize;
 			$total = $pagesize;
 		}
 		$list = pdo_fetchall($sql, $params);
@@ -613,24 +613,34 @@ class Goods_EweiShopV2Model
 		}
 		pdo_query('UPDATE ' . tablename('ewei_shop_order_goods') . ' SET `canbuyagain`=\'0\' WHERE uniacid=:uniacid AND goodsid IN (' . implode(',', array_keys($order_goods)) . ')', array(':uniacid' => $_W['uniacid']));
 	}
-	public function getTaskGoods($openid, $goodsid, $rank, $join_id, $optionid = 0, $total = 0) 
+	public function getTaskGoods($openid, $goodsid, $rank, $log_id = 0, $join_id = 0, $optionid = 0, $total = 0) 
 	{
 		global $_W;
 		$is_task_goods = 0;
 		$is_task_goods_option = 0;
-		$task_plugin = p('task');
+		if (!(empty($join_id))) 
+		{
+			$task_plugin = p('task');
+			$flag = 1;
+		}
+		else if (!(empty($log_id))) 
+		{
+			$task_plugin = p('lottery');
+			$flag = 2;
+		}
 		$param = array();
 		$param['openid'] = $openid;
 		$param['goods_id'] = $goodsid;
 		$param['rank'] = $rank;
 		$param['join_id'] = $join_id;
+		$param['log_id'] = $log_id;
 		$param['goods_spec'] = $optionid;
 		$param['goods_num'] = $total;
-		if ($task_plugin && !(empty($join_id))) 
+		if ($task_plugin && (!(empty($join_id)) || !(empty($log_id)))) 
 		{
 			$task_goods = $task_plugin->getGoods($param);
 		}
-		if (!(empty($task_goods)) && empty($total) && !(empty($join_id))) 
+		if (!(empty($task_goods)) && empty($total) && (!(empty($join_id)) || !(empty($log_id)))) 
 		{
 			if (!(empty($task_goods['spec']))) 
 			{
@@ -665,13 +675,13 @@ class Goods_EweiShopV2Model
 				}
 				if (!(empty($task_goods['spec']))) 
 				{
-					$is_task_goods = 1;
+					$is_task_goods = $flag;
 					$is_task_goods_option = 1;
 				}
 			}
 			else if (!(empty($task_goods['total']))) 
 			{
-				$is_task_goods = 1;
+				$is_task_goods = $flag;
 			}
 		}
 		$data = array();

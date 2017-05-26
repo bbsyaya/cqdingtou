@@ -10,6 +10,7 @@ class Index_EweiShopV2Page extends MerchWebPage
 	{
 		global $_W;
 		global $_GPC;
+		$this->model->CheckPlugin('taobao');
 		if (mcv('taobao.main')) 
 		{
 			$sql = 'SELECT * FROM ' . tablename('ewei_shop_category') . ' WHERE `uniacid` = :uniacid ORDER BY `parentid`, `displayorder` DESC';

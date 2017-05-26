@@ -752,11 +752,10 @@ if (!(class_exists('GlobonusModel')))
 					}
 					$price = ($o['price'] * $set['bonusrate']) / 100;
 					!(isset($p['bonusmoney'])) && ($p['bonusmoney'] = 0);
-					$p['bonusmoney'] += round(($price * $p['bonus']) / 100, 2);
+					$p['bonusmoney'] += floatval(($price * $p['bonus']) / 100);
 				}
 				unset($p);
 			}
-			$bonusmoney = 0;
 			foreach ($partners as &$p ) 
 			{
 				$bonusmoney_send = 0;
@@ -776,6 +775,18 @@ if (!(class_exists('GlobonusModel')))
 				$bonusmoney += $bonusmoney_send;
 			}
 			unset($p);
+			if ($bonusordermoney < $bonusmoney) 
+			{
+				$rat = $bonusordermoney / $bonusmoney;
+				$bonusmoney = 0;
+				foreach ($partners as &$p ) 
+				{
+					$p['chargemoney'] = round($p['chargemoney'] * $rat, 2);
+					$p['bonusmoney_send'] = round($p['bonusmoney_send'] * $rat, 2);
+					$bonusmoney += $p['bonusmoney_send'];
+				}
+				unset($p);
+			}
 			return array('orders' => $orders, 'partners' => $partners, 'ordermoney' => round($ordermoney, 2), 'bonusordermoney' => round($bonusordermoney, 2), 'bonusrate' => round($set['bonusrate'], 2), 'ordercount' => count($orders), 'bonusmoney' => round($bonusmoney, 2), 'partnercount' => count($partners), 'starttime' => $starttime, 'endtime' => $endtime, 'old' => false);
 		}
 		public function getTotals() 

@@ -473,7 +473,8 @@
 }
 
 .diy-richtext img {
-    display: block;
+    display: inline-block;
+    vertical-align: middle;
     max-width: 100%;
 }
 
