@@ -442,12 +442,12 @@
                             <p>
                                 Copyright 2016
                                 <a href="#" >
-                                    广州微上宝移动互联营销有限公司 版权所有 All Rights Reserved
+                                    重庆顶头农产品经营部 版权所有 All Rights Reserved
                                 </a>
                             </p>
                             <a href="#" >
                                 <p>
-                                    联系电话：400-8888-8888 招商热线：400-8888-8888
+                                    联系电话：023-68526144 招商热线：023-68526144
                                 </p>
                             </a>
                            
@@ -455,7 +455,7 @@
                         </div>
                         <div class="InnerRight">
                             <div class="tel">
-                                24小时咨询热线：400-8888-8888
+                                24小时咨询热线：023-68526144
                             </div>
                             <div class="SearchTop">
                                 
