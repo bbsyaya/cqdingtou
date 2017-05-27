@@ -72,19 +72,6 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				$threenprice = true;
 			}
 		}
-		if (p('quick')) 
-		{
-			$quickid = intval($_GPC['fromquick']);
-			if (!(empty($quickid))) 
-			{
-				$quickinfo = p('quick')->getQuick($quickid);
-				if (empty($quickinfo)) 
-				{
-					$this->message('快速购买页面不存在');
-					exit();
-				}
-			}
-		}
 		$open_redis = function_exists('redis') && !(is_error(redis()));
 		$seckillinfo = false;
 		$uniacid = $_W['uniacid'];
@@ -154,14 +141,9 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			$goods = array();
 			if (empty($id)) 
 			{
-				if (!(empty($quickid))) 
+				if (empty($exchangeOrder)) 
 				{
-					$sql = 'SELECT c.goodsid,c.total,g.maxbuy,g.type,g.issendfree,g.isnodiscount,g.ispresell,g.presellprice as gpprice,o.presellprice,g.preselltimeend' . ',g.weight,o.weight as optionweight,g.title,g.thumb,ifnull(o.marketprice, g.marketprice) as marketprice,o.title as optiontitle,c.optionid,' . ' g.storeids,g.isverify,g.deduct,g.manydeduct,g.virtual,o.virtual as optionvirtual,discounts,' . ' g.deduct2,g.ednum,g.edmoney,g.edareas,g.edareas_code,g.diyformtype,g.diyformid,diymode,g.dispatchtype,g.dispatchid,g.dispatchprice,g.minbuy ' . ' ,g.isdiscount,g.isdiscount_time,g.isdiscount_discounts,g.cates,g.isfullback, ' . ' g.virtualsend,invoice,o.specs,g.merchid,g.checked,g.merchsale,g.unite_total,' . ' g.buyagain,g.buyagain_islong,g.buyagain_condition, g.buyagain_sale, g.hasoption, g.threen' . ' FROM ' . tablename('ewei_shop_quick_cart') . ' c ' . ' left join ' . tablename('ewei_shop_goods') . ' g on c.goodsid = g.id ' . ' left join ' . tablename('ewei_shop_goods_option') . ' o on c.optionid = o.id ' . ' where c.openid=:openid and c.selected=1 and  c.deleted=0 and c.uniacid=:uniacid and c.quickid=' . $quickid . '  order by c.id desc';
-					$goods = pdo_fetchall($sql, array(':uniacid' => $uniacid, ':openid' => $openid));
-				}
-				else if (empty($exchangeOrder)) 
-				{
-					$sql = 'SELECT c.goodsid,c.total,g.maxbuy,g.type,g.issendfree,g.isnodiscount,g.ispresell,g.presellprice as gpprice,o.presellprice,g.preselltimeend' . ',g.weight,o.weight as optionweight,g.title,g.thumb,ifnull(o.marketprice, g.marketprice) as marketprice,o.title as optiontitle,c.optionid,' . ' g.storeids,g.isverify,g.deduct,g.manydeduct,g.virtual,o.virtual as optionvirtual,discounts,' . ' g.deduct2,g.ednum,g.edmoney,g.edareas,g.diyformtype,g.diyformid,diymode,g.dispatchtype,g.dispatchid,g.dispatchprice,g.minbuy ' . ' ,g.isdiscount,g.isdiscount_time,g.isdiscount_discounts,g.cates, ' . ' g.virtualsend,invoice,o.specs,g.merchid,g.checked,g.merchsale,' . ' g.buyagain,g.buyagain_islong,g.buyagain_condition, g.buyagain_sale, g.hasoption' . ' FROM ' . tablename('ewei_shop_member_cart') . ' c ' . ' left join ' . tablename('ewei_shop_goods') . ' g on c.goodsid = g.id ' . ' left join ' . tablename('ewei_shop_goods_option') . ' o on c.optionid = o.id ' . ' where c.openid=:openid and c.selected=1 and  c.deleted=0 and c.uniacid=:uniacid  order by c.id desc';
+					$sql = 'SELECT c.goodsid,c.total,g.maxbuy,g.type,g.issendfree,g.isnodiscount,g.ispresell,g.presellprice as gpprice,o.presellprice,g.preselltimeend' . ',g.weight,o.weight as optionweight,g.title,g.thumb,ifnull(o.marketprice, g.marketprice) as marketprice,o.title as optiontitle,c.optionid,' . ' g.storeids,g.isverify,g.deduct,g.manydeduct,g.virtual,o.virtual as optionvirtual,discounts,' . ' g.deduct2,g.ednum,g.edmoney,g.edareas,g.edareas_code,g.diyformtype,g.diyformid,diymode,g.dispatchtype,g.dispatchid,g.dispatchprice,g.minbuy ' . ' ,g.isdiscount,g.isdiscount_time,g.isdiscount_discounts,g.cates,g.isfullback, ' . ' g.virtualsend,invoice,o.specs,g.merchid,g.checked,g.merchsale,g.unite_total,' . ' g.buyagain,g.buyagain_islong,g.buyagain_condition, g.buyagain_sale, g.hasoption, g.threen' . ' FROM ' . tablename('ewei_shop_member_cart') . ' c ' . ' left join ' . tablename('ewei_shop_goods') . ' g on c.goodsid = g.id ' . ' left join ' . tablename('ewei_shop_goods_option') . ' o on c.optionid = o.id ' . ' where c.openid=:openid and c.selected=1 and  c.deleted=0 and c.uniacid=:uniacid  order by c.id desc';
 					$goods = pdo_fetchall($sql, array(':uniacid' => $uniacid, ':openid' => $openid));
 				}
 				else if (p('exchange')) 
@@ -265,7 +247,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				}
 				else if ($giftid) 
 				{
-					$gift = pdo_fetch('select id,title,thumb,activity,giftgoodsid,goodsid from ' . tablename('ewei_shop_gift') . "\r\n" . '                where uniacid = ' . $uniacid . ' and id = ' . $giftid . ' and status = 1 and starttime <= ' . time() . ' and endtime >= ' . time() . ' ');
+					$gift = pdo_fetch('select id,title,thumb,activity,giftgoodsid,goodsid from ' . tablename('ewei_shop_gift') . "\n" . '                where uniacid = ' . $uniacid . ' and id = ' . $giftid . ' and status = 1 and starttime <= ' . time() . ' and endtime >= ' . time() . ' ');
 					if (!(strstr($gift['goodsid'], (string) $goodsid))) 
 					{
 						$this->message('赠品与商品不匹配或者商品没有赠品!', '', 'error');
@@ -314,7 +296,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				$data['optionid'] = $optionid;
 				if (!(empty($optionid))) 
 				{
-					$option = pdo_fetch('select id,title,marketprice,presellprice,goodssn,productsn,`virtual`,stock,weight,specs,' . "\r\n" . '                    `day`,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback' . "\r\n" . '                    from ' . tablename('ewei_shop_goods_option') . ' where id=:id and goodsid=:goodsid and uniacid=:uniacid  limit 1', array(':uniacid' => $uniacid, ':goodsid' => $id, ':id' => $optionid));
+					$option = pdo_fetch('select id,title,marketprice,presellprice,goodssn,productsn,`virtual`,stock,weight,specs,' . "\n" . '                    `day`,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback' . "\n" . '                    from ' . tablename('ewei_shop_goods_option') . ' where id=:id and goodsid=:goodsid and uniacid=:uniacid  limit 1', array(':uniacid' => $uniacid, ':goodsid' => $id, ':id' => $optionid));
 					if (!(empty($option))) 
 					{
 						$data['optionid'] = $optionid;
@@ -848,7 +830,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					$isgift = 0;
 					$gifts = array();
 					$giftgoods = array();
-					$gifts = pdo_fetchall('select id,goodsid,giftgoodsid,thumb,title from ' . tablename('ewei_shop_gift') . "\r\n" . '                    where uniacid = ' . $uniacid . ' and status = 1 and starttime <= ' . time() . ' and endtime >= ' . time() . ' and orderprice <= ' . $goodsprice . ' and activity = 1 ');
+					$gifts = pdo_fetchall('select id,goodsid,giftgoodsid,thumb,title from ' . tablename('ewei_shop_gift') . "\n" . '                    where uniacid = ' . $uniacid . ' and status = 1 and starttime <= ' . time() . ' and endtime >= ' . time() . ' and orderprice <= ' . $goodsprice . ' and activity = 1 ');
 					if (!(empty($gifts)) && (count($gifts) == 1)) 
 					{
 						$giftid = $gifts[0]['id'];
@@ -928,7 +910,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			else 
 			{
 			}
-			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!empty($address) && !$isverify && !$isvirtual ? $address['id'] : 0), 'storeid' => 0, 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind, 'fromquick' => intval($quickid));
+			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!empty($address) && !$isverify && !$isvirtual ? $address['id'] : 0), 'storeid' => 0, 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind);
 			$buyagain = $buyagainprice;
 		}
 		else 
@@ -950,17 +932,17 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			$marketprice = 0;
 			foreach ($g as $key => $value ) 
 			{
-				$goods[$key] = pdo_fetch('select id,title,thumb,marketprice from ' . tablename('ewei_shop_goods') . "\r\n" . '                            where id = ' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
+				$goods[$key] = pdo_fetch('select id,title,thumb,marketprice from ' . tablename('ewei_shop_goods') . "\n" . '                            where id = ' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
 				$option = array();
 				$packagegoods = array();
 				if (0 < $value['optionid']) 
 				{
-					$option = pdo_fetch('select title,packageprice from ' . tablename('ewei_shop_package_goods_option') . "\r\n" . '                            where optionid = ' . $value['optionid'] . ' and goodsid=' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' and pid = ' . $packageid . ' ');
+					$option = pdo_fetch('select title,packageprice from ' . tablename('ewei_shop_package_goods_option') . "\n" . '                            where optionid = ' . $value['optionid'] . ' and goodsid=' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' and pid = ' . $packageid . ' ');
 					$goods[$key]['packageprice'] = $option['packageprice'];
 				}
 				else 
 				{
-					$packagegoods = pdo_fetch('select title,packageprice from ' . tablename('ewei_shop_package_goods') . "\r\n" . '                            where goodsid=' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' and pid = ' . $packageid . ' ');
+					$packagegoods = pdo_fetch('select title,packageprice from ' . tablename('ewei_shop_package_goods') . "\n" . '                            where goodsid=' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' and pid = ' . $packageid . ' ');
 					$goods[$key]['packageprice'] = $packagegoods['packageprice'];
 				}
 				$goods[$key]['optiontitle'] = ((!(empty($option['title'])) ? $option['title'] : ''));
@@ -982,7 +964,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			$total = count($goods);
 			$dispatch_price = $package['freight'];
 			$realprice = $goodsprice + $package['freight'];
-			$createInfo = array('id' => 0, 'gdid' => intval($_GPC['gdid']), 'fromcart' => 0, 'packageid' => $packageid, 'addressid' => $address['id'], 'storeid' => 0, 'couponcount' => 0, 'isvirtual' => 0, 'isverify' => 0, 'goods' => $goods, 'merchs' => 0, 'orderdiyformid' => 0, 'mustbind' => 0, 'fromquick' => intval($quickid));
+			$createInfo = array('id' => 0, 'gdid' => intval($_GPC['gdid']), 'fromcart' => 0, 'packageid' => $packageid, 'addressid' => $address['id'], 'storeid' => 0, 'couponcount' => 0, 'isvirtual' => 0, 'isverify' => 0, 'goods' => $goods, 'merchs' => 0, 'orderdiyformid' => 0, 'mustbind' => 0);
 		}
 		$_W['shopshare']['hideMenus'] = array('menuItem:share:qq', 'menuItem:share:QZone', 'menuItem:share:email', 'menuItem:copyUrl', 'menuItem:openWithSafari', 'menuItem:openWithQQBrowser', 'menuItem:share:timeline', 'menuItem:share:appMessage');
 		if (p('exchange')) 
@@ -1684,10 +1666,6 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		{
 			show_json(0);
 		}
-		if (p('quick')) 
-		{
-			$_GPC['fromcart'] = 0;
-		}
 		if (!(empty($_W['shopset']['wap']['open'])) && !(empty($_W['shopset']['wap']['mustbind'])) && empty($member['mobileverify'])) 
 		{
 			show_json(0, array('message' => '请先绑定手机', 'url' => mobileUrl('member/bind', NULL, true)));
@@ -1699,7 +1677,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$packageprice = 0;
 		if (!(empty($packageid))) 
 		{
-			$package = pdo_fetch('SELECT id,title,price,freight,cash,starttime,endtime FROM ' . tablename('ewei_shop_package') . "\r\n" . '                    WHERE uniacid = ' . $uniacid . ' and id = ' . $packageid . ' and deleted = 0 and status = 1  ORDER BY id DESC');
+			$package = pdo_fetch('SELECT id,title,price,freight,cash,starttime,endtime FROM ' . tablename('ewei_shop_package') . "\n" . '                    WHERE uniacid = ' . $uniacid . ' and id = ' . $packageid . ' and deleted = 0 and status = 1  ORDER BY id DESC');
 			if (empty($package)) 
 			{
 				show_json(0, '未找到套餐！');
@@ -1712,7 +1690,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			{
 				show_json(0, '套餐活动已结束，谢谢您的关注，请您浏览其他套餐或商品！');
 			}
-			$packgoods = pdo_fetchall('SELECT id,title,thumb,packageprice,`option`,goodsid FROM ' . tablename('ewei_shop_package_goods') . "\r\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $packageid . '  ORDER BY id DESC');
+			$packgoods = pdo_fetchall('SELECT id,title,thumb,packageprice,`option`,goodsid FROM ' . tablename('ewei_shop_package_goods') . "\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $packageid . '  ORDER BY id DESC');
 			if (empty($packgoods)) 
 			{
 				show_json(0, '未找到套餐商品！');
@@ -2065,7 +2043,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					$packageoption = array();
 					if ($packageid) 
 					{
-						$packageoption = pdo_fetch('select packageprice from ' . tablename('ewei_shop_package_goods_option') . "\r\n" . '                                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and optionid = ' . $optionid . ' and pid = ' . $packageid . ' ');
+						$packageoption = pdo_fetch('select packageprice from ' . tablename('ewei_shop_package_goods_option') . "\n" . '                                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and optionid = ' . $optionid . ' and pid = ' . $packageid . ' ');
 						$data['marketprice'] = $packageoption['packageprice'];
 						$packageprice += $packageoption['packageprice'];
 					}
@@ -2086,7 +2064,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			}
 			if ($packageid) 
 			{
-				$pg = pdo_fetch('select packageprice from ' . tablename('ewei_shop_package_goods') . "\r\n" . '                                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and pid = ' . $packageid . ' ');
+				$pg = pdo_fetch('select packageprice from ' . tablename('ewei_shop_package_goods') . "\n" . '                                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and pid = ' . $packageid . ' ');
 				$data['marketprice'] = $pg['packageprice'];
 				$packageprice += $pg['packageprice'];
 			}
@@ -2628,7 +2606,6 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$order['ispackage'] = $is_package;
 		$order['packageid'] = $packageid;
 		$order['seckilldiscountprice'] = $seckill_price;
-		$order['quickid'] = intval($_GPC['fromquick']);
 		if (!(empty($ccard))) 
 		{
 			$order['ccard'] = 1;
@@ -2957,10 +2934,6 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		if ($_GPC['fromcart'] == 1) 
 		{
 			pdo_query('update ' . tablename('ewei_shop_member_cart') . ' set deleted=1 where  openid=:openid and uniacid=:uniacid and selected=1 ', array(':uniacid' => $uniacid, ':openid' => $openid));
-		}
-		if (p('quick') && !(empty($_GPC['fromquick']))) 
-		{
-			pdo_update('ewei_shop_quick_cart', array('deleted' => 1), array('quickid' => intval($_GPC['fromquick']), 'uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
 		}
 		if (0 < $deductcredit) 
 		{

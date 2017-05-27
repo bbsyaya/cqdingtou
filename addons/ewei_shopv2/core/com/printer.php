@@ -136,7 +136,6 @@ class Printer_EweiShopV2ComModel extends ComModel
 		}
 		return $res;
 	}
-	
 	public function printer($params, $templateid, $printerid, $type = 0) 
 	{
 		global $_W;

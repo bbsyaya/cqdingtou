@@ -153,12 +153,12 @@ class Goods_EweiShopV2Model
 		$total = '';
 		if (!($random)) 
 		{
-			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell,hasoption' . "\r\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY ' . $order . ' ' . $orderby . ' LIMIT ' . (($page - 1) * $pagesize) . ',' . $pagesize;
+			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell,hasoption' . "\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY ' . $order . ' ' . $orderby . ' LIMIT ' . (($page - 1) * $pagesize) . ',' . $pagesize;
 			$total = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ', $params);
 		}
 		else 
 		{
-			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell,hasoption' . "\r\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY rand() LIMIT ' . $pagesize;
+			$sql = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,salesreal,total,description,bargain,`type`,ispresell,hasoption' . "\n" . '            FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY rand() LIMIT ' . $pagesize;
 			$total = $pagesize;
 		}
 		$list = pdo_fetchall($sql, $params);
@@ -689,6 +689,59 @@ class Goods_EweiShopV2Model
 		$data['is_task_goods_option'] = $is_task_goods_option;
 		$data['task_goods'] = $task_goods;
 		return $data;
+	}
+	public function wholesaleprice($goods) 
+	{
+		$goods2 = array();
+		foreach ($goods as $good ) 
+		{
+			if ($good['type'] == 4) 
+			{
+				if (empty($goods2[$good['goodsid']])) 
+				{
+					$intervalprices = array();
+					if (0 < $good['intervalfloor']) 
+					{
+						$intervalprices[] = array('intervalnum' => intval($good['intervalnum1']), 'intervalprice' => floatval($good['intervalprice1']));
+					}
+					if (1 < $good['intervalfloor']) 
+					{
+						$intervalprices[] = array('intervalnum' => intval($good['intervalnum2']), 'intervalprice' => floatval($good['intervalprice2']));
+					}
+					if (2 < $good['intervalfloor']) 
+					{
+						$intervalprices[] = array('intervalnum' => intval($good['intervalnum3']), 'intervalprice' => floatval($good['intervalprice3']));
+					}
+					$goods2[$good['goodsid']] = array('goodsid' => $good['goodsid'], 'total' => $good['total'], 'intervalfloor' => $good['intervalfloor'], 'intervalprice' => $intervalprices);
+				}
+				else 
+				{
+					$goods2[$good['goodsid']]['total'] += $good['total'];
+				}
+			}
+		}
+		foreach ($goods2 as $good2 ) 
+		{
+			$intervalprices2 = iunserializer($good2['intervalprice']);
+			$price = 0;
+			foreach ($intervalprices2 as $intervalprice ) 
+			{
+				if ($intervalprice['intervalnum'] <= $good2['total']) 
+				{
+					$price = $intervalprice['intervalprice'];
+				}
+			}
+			foreach ($goods as &$good ) 
+			{
+				if ($good['goodsid'] == $good2['goodsid']) 
+				{
+					$good['wholesaleprice'] = $price;
+					$good['goodsalltotal'] = $good2['total'];
+				}
+			}
+			unset($good);
+		}
+		return $goods;
 	}
 }
 ?>

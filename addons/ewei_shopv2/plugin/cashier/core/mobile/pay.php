@@ -78,6 +78,10 @@ class Pay_EweiShopV2Page extends CashierMobilePage
 		{
 			show_json(1, array('success' => true, 'logid' => $this->log['id'], 'log' => $this->log));
 		}
+		if ($this->log['money'] == 0) 
+		{
+			show_json(1, array('success' => true, 'logid' => $this->log['id'], 'log' => $this->log));
+		}
 		if ($paytype == '0') 
 		{
 			$this->paytype0($jie);
@@ -174,8 +178,15 @@ class Pay_EweiShopV2Page extends CashierMobilePage
 			$wechat = m('common')->wechat_build($params, $options, 13);
 			if (!(is_error($wechat))) 
 			{
-				$wechat['weixin'] = true;
 				$wechat['success'] = true;
+				if (!(empty($wechat['code_url']))) 
+				{
+					$wechat['weixin_jie'] = true;
+				}
+				else 
+				{
+					$wechat['weixin'] = true;
+				}
 			}
 		}
 		if ((isset($set['pay']) && ($set['pay']['weixin_jie'] == 1) && !($wechat['success'])) || ($jie === 1)) 
@@ -217,6 +228,45 @@ class Pay_EweiShopV2Page extends CashierMobilePage
 		}
 		show_json(1, array('wechat' => $wechat, 'logid' => $this->log['id'], 'log' => $this->log));
 	}
+	public function get_discount() 
+	{
+		global $_W;
+		global $_GPC;
+		$money = floatval($_GPC['money']);
+		$no_money = floatval($_GPC['no_money']);
+		$type = intval($_GPC['type']);
+		$return_money = $this->discountMoney($money, $no_money, $type);
+		show_json(1, array('discountmoney' => $return_money));
+	}
+	protected function discountMoney($money, $no_money) 
+	{
+		global $_W;
+		$yes_money = $money - $no_money;
+		$couponpay = $this->model->getUserSet('couponpay', $_W['cashierid']);
+		$can = $this->discount($couponpay);
+		if ($can) 
+		{
+			$return_money = ($yes_money * (10 - $can)) / 10;
+			return max(0, round($return_money, 2));
+		}
+		return 0;
+	}
+	protected function discount($couponpay) 
+	{
+		if (empty($couponpay)) 
+		{
+			return false;
+		}
+		if (($couponpay['time']['start'] < time()) && (time() < $couponpay['time']['end'])) 
+		{
+			if (10 <= $couponpay['discount']) 
+			{
+				return false;
+			}
+			return (double) $couponpay['discount'];
+		}
+		return false;
+	}
 	public function orderquery() 
 	{
 		global $_W;
@@ -240,7 +290,7 @@ class Pay_EweiShopV2Page extends CashierMobilePage
 		$log = $this->model->payResult($orderid, true);
 		if ($log && ($log['status'] == 1)) 
 		{
-			$item = array('title' => $log['title'], 'goodstitle' => $log['title'] . '消费', 'money' => $log['money'], 'paytype' => $log['paytype'], 'time' => date('Y-m-d H:i:s', $log['paytime']), 'out_trade_no' => $log['logno'], 'randommoney' => (double) $log['randommoney'], 'enough' => (double) $log['enough'], 'deduction' => (double) $log['deduction'], 'discountmoney' => (double) $log['discountmoney'], 'orderprice' => (double) $log['orderprice'], 'goodsprice' => (double) $log['goodsprice'], 'couponpay' => (double) $log['couponpay'], 'present_credit1' => (int) $log['present_credit1']);
+			$item = array('title' => $log['title'], 'goodstitle' => $log['title'] . '消费', 'money' => $log['money'] + $log['deduction'], 'paytype' => $log['paytype'], 'time' => date('Y-m-d H:i:s', $log['paytime']), 'out_trade_no' => $log['logno'], 'randommoney' => (double) $log['randommoney'], 'enough' => (double) $log['enough'], 'deduction' => (double) $log['deduction'], 'discountmoney' => (double) $log['discountmoney'], 'orderprice' => (double) $log['orderprice'], 'goodsprice' => (double) $log['goodsprice'], 'couponpay' => (double) $log['usecouponprice'], 'present_credit1' => (int) $log['present_credit1']);
 			if (empty($log['paytype']) || ($log['paytype'] == '101')) 
 			{
 				$item['paytype'] = '微信支付';
@@ -322,7 +372,6 @@ class Pay_EweiShopV2Page extends CashierMobilePage
 						{
 							$coupon['backstr'] = '返利';
 							$coupon['css'] = 'money';
-							$coupon['backmoney'] = $coupon['backmoney'];
 							$coupon['backpre'] = true;
 						}
 						else if (!(empty($coupon['backcredit']))) 

@@ -113,7 +113,7 @@ class Check_EweiShopV2Page extends PluginWebPage
 			}
 			m('excel')->export($list, array('title' => '提现申请数据', 'columns' => $columns));
 		}
-		$total = pdo_fetchcolumn('select COUNT(1) from ' . tablename('ewei_shop_merch_bill') . ' b ' . ' left join ' . tablename('ewei_shop_merch_user') . ' u on b.merchid = u.id' . ' where 1 ' . $condition . ' GROUP BY u.id', $params);
+		$total = pdo_fetchcolumn('select COUNT(1) from ' . tablename('ewei_shop_merch_bill') . ' b ' . ' left join ' . tablename('ewei_shop_merch_user') . ' u on b.merchid = u.id' . ' where 1 ' . $condition, $params);
 		$pager = pagination($total, $pindex, $psize);
 		$groups = $this->model->getGroups();
 		include $this->template('merch/check/index');

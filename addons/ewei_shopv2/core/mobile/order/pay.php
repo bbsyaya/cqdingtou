@@ -215,10 +215,15 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		{
 			$cash = array('success' => false);
 		}
-		$payinfo = array('orderid' => $orderid, 'credit' => $credit, 'alipay' => $alipay, 'wechat' => $wechat, 'cash' => $cash, 'money' => $order['price']);
+		$bestpay = array('success' => false);
+		if (isset($set['pay']) && ($set['pay']['bestpay'] == 1)) 
+		{
+			$bestpay = array('success' => true, 'merchantid' => $sec['bestpay']['merchantid'], 'submerchantid' => $sec['bestpay']['submerchantid'], 'merchantPwd' => $sec['bestpay']['merchantPwd']);
+		}
+		$payinfo = array('orderid' => $orderid, 'credit' => $credit, 'alipay' => $alipay, 'wechat' => $wechat, 'cash' => $cash, 'bestpay' => $bestpay, 'money' => $order['price']);
 		if (is_h5app()) 
 		{
-			$payinfo = array('wechat' => (!(empty($sec['app_wechat']['merchname'])) && !(empty($set['pay']['app_wechat'])) && !(empty($sec['app_wechat']['appid'])) && !(empty($sec['app_wechat']['appsecret'])) && !(empty($sec['app_wechat']['merchid'])) && !(empty($sec['app_wechat']['apikey'])) && (0 < $order['price']) ? true : false), 'alipay' => (!(empty($set['pay']['app_alipay'])) && !(empty($sec['app_alipay']['public_key'])) ? true : false), 'mcname' => $sec['app_wechat']['merchname'], 'aliname' => (empty($_W['shopset']['shop']['name']) ? $sec['app_wechat']['merchname'] : $_W['shopset']['shop']['name']), 'ordersn' => $log['tid'], 'money' => $order['price'], 'attach' => $_W['uniacid'] . ':0', 'type' => 0, 'orderid' => $orderid, 'credit' => $credit, 'cash' => $cash);
+			$payinfo = array('wechat' => (!(empty($sec['app_wechat']['merchname'])) && !(empty($set['pay']['app_wechat'])) && !(empty($sec['app_wechat']['appid'])) && !(empty($sec['app_wechat']['appsecret'])) && !(empty($sec['app_wechat']['merchid'])) && !(empty($sec['app_wechat']['apikey'])) && (0 < $order['price']) ? true : false), 'alipay' => (!(empty($set['pay']['app_alipay'])) && !(empty($sec['app_alipay']['public_key'])) ? true : false), 'mcname' => $sec['app_wechat']['merchname'], 'aliname' => (empty($_W['shopset']['shop']['name']) ? $sec['app_wechat']['merchname'] : $_W['shopset']['shop']['name']), 'ordersn' => $log['tid'], 'money' => $order['price'], 'attach' => $_W['uniacid'] . ':0', 'type' => 0, 'orderid' => $orderid, 'credit' => $credit, 'cash' => $cash, 'bestpay' => $bestpay);
 			if (!(empty($order['ordersn2']))) 
 			{
 				$var = sprintf('%02d', $order['ordersn2']);
@@ -305,6 +310,11 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		if (is_h5app() && empty($orderid)) 
 		{
 			$ordersn = $_GPC['ordersn'];
+			if (strexists($ordersn, 'GJ')) 
+			{
+				$ordersns = explode('GJ', $ordersn);
+				$ordersn = $ordersns[0];
+			}
 			$orderid = pdo_fetchcolumn('select id from ' . tablename('ewei_shop_order') . ' where ordersn=:ordersn and uniacid=:uniacid and openid=:openid limit 1', array(':ordersn' => $ordersn, ':uniacid' => $uniacid, ':openid' => $openid));
 		}
 		if (empty($orderid)) 

@@ -21,7 +21,8 @@ class Batch_EweiShopV2Page extends MerchWebPage
 		$printset = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_exhelper_sys') . ' WHERE uniacid=:uniacid and merchid=:merchid limit 1', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
 		$lodopUrl_ip = 'localhost';
 		$lodopUrl_port = ((empty($printset['port']) ? 8000 : $printset['port']));
-		$lodopUrl = 'http://' . $lodopUrl_ip . ':' . $lodopUrl_port . '/CLodopfuncs.js';
+		$https = (($_W['ishttps'] ? 'https://' : 'http://'));
+		$lodopUrl = $https . $lodopUrl_ip . ':' . $lodopUrl_port . '/CLodopfuncs.js';
 		load()->func('tpl');
 		include $this->template();
 	}
@@ -103,7 +104,6 @@ class Batch_EweiShopV2Page extends MerchWebPage
 			$sqlcondition = '';
 			if (!(empty($_GPC['searchfield'])) && !(empty($_GPC['keyword']))) 
 			{
-				$paras[':keyword'] = trim($_GPC['keyword']);
 				$searchfield = trim(strtolower($_GPC['searchfield']));
 				$keyword = trim($_GPC['keyword']);
 				if ($searchfield == 'ordersn') 
@@ -125,10 +125,12 @@ class Batch_EweiShopV2Page extends MerchWebPage
 				else if ($searchfield == 'goodstitle') 
 				{
 					$sqlcondition = ' inner join ( select distinct og.orderid from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and og.merchid = \'' . $merchid . '\' and (locate(:keyword,g.title)>0)) gs on gs.orderid=o.id';
+					$paras[':keyword'] = trim($_GPC['keyword']);
 				}
 				else if ($searchfield == 'goodssn') 
 				{
 					$sqlcondition = ' inner join ( select distinct og.orderid from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and og.merchid = \'' . $merchid . '\' and (locate(:keyword,g.goodssn)>0)) gs on gs.orderid=o.id';
+					$paras[':keyword'] = trim($_GPC['keyword']);
 				}
 			}
 			$sql = 'select o.* ,a.realname ,m.nickname, d.dispatchname,m.nickname,r.status as refundstatus from ' . tablename('ewei_shop_order') . ' o' . ' left join ' . tablename('ewei_shop_order_refund') . ' r on r.orderid=o.id and ifnull(r.status,-1)<>-1' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid = o.uniacid ' . ' left join ' . tablename('ewei_shop_member_address') . ' a on o.addressid = a.id ' . ' left join ' . tablename('ewei_shop_dispatch') . ' d on d.id = o.dispatchid ' . $sqlcondition . ' where ' . $condition . ' ' . $statuscondition . '  ORDER BY o.createtime DESC,o.status DESC  ';

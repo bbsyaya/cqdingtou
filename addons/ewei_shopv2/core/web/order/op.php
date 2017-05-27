@@ -259,11 +259,12 @@ class Op_EweiShopV2Page extends WebPage
 		$opdata = $this->opData();
 		extract($opdata);
 		pdo_update('ewei_shop_order', array('status' => 3, 'finishtime' => time()), array('id' => $item['id'], 'uniacid' => $_W['uniacid']));
+		m('order')->fullback($item['id']);
 		if (p('ccard') && !(empty($item['ccardid']))) 
 		{
 			p('ccard')->setBegin($item['id'], $item['ccardid']);
 		}
-		m('member')->upgradeLevel($item['openid']);
+		m('member')->upgradeLevel($item['openid'], $item['id']);
 		m('order')->setGiveBalance($item['id'], 1);
 		m('notice')->sendOrderMessage($item['id']);
 		com_run('printer::sendOrderMessage', $item['id']);
@@ -398,6 +399,7 @@ class Op_EweiShopV2Page extends WebPage
 			$d['verifyopenid'] = '';
 		}
 		pdo_update('ewei_shop_order', $d, array('id' => $item['id'], 'uniacid' => $_W['uniacid']));
+		m('order')->fullback($item['id']);
 		if (com('coupon')) 
 		{
 			com('coupon')->sendcouponsbytask($item['id']);
@@ -423,7 +425,7 @@ class Op_EweiShopV2Page extends WebPage
 		}
 		$log .= ' ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn'];
 		m('order')->setGiveBalance($item['id'], 1);
-		m('member')->upgradeLevel($item['openid']);
+		m('member')->upgradeLevel($item['openid'], $item['id']);
 		m('notice')->sendOrderMessage($item['id']);
 		if (p('commission')) 
 		{

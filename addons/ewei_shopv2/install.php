@@ -1941,6 +1941,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_fullback_goods` (
   `displayorder` int(11) NOT NULL DEFAULT '0',
   `hasoption` tinyint(3) NOT NULL DEFAULT '0',
   `optionid` text NOT NULL,
+  `startday` int(11) NOT NULL DEFAULT '0',
+  `refund` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -1957,6 +1959,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_fullback_log` (
   `createtime` int(10) NOT NULL,
   `fullbacktime` int(10) NOT NULL,
   `isfullback` tinyint(3) NOT NULL DEFAULT '0',
+  `goodsid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -2258,6 +2261,9 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `intervalfloor` tinyint(1) DEFAULT '0',
   `intervalprice` varchar(512) DEFAULT '',
   `isfullback` tinyint(3) NOT NULL DEFAULT '0',
+  `isstatustime` tinyint(3) NOT NULL DEFAULT '0',
+  `statustimestart` int(10) NOT NULL DEFAULT '0',
+  `statustimeend` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_pcate` (`pcate`),

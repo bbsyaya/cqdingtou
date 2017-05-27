@@ -1299,19 +1299,20 @@ class MerchModel extends PluginModel
 	{
 		$category = m('plugin')->getList(1);
 		$has_plugins = array();
-		if (p('exhelper')) 
+		$perm = com('perm');
+		if (p('exhelper') && $perm->is_perm_plugin('exhelper')) 
 		{
 			$has_plugins[] = 'exhelper';
 		}
-		if (p('taobao')) 
+		if (p('taobao') && $perm->is_perm_plugin('taobao')) 
 		{
 			$has_plugins[] = 'taobao';
 		}
-		if (p('diypage')) 
+		if (p('diypage') && $perm->is_perm_plugin('diypage')) 
 		{
 			$has_plugins[] = 'diypage';
 		}
-		if (p('creditshop')) 
+		if (p('creditshop') && $perm->is_perm_plugin('creditshop')) 
 		{
 			$has_plugins[] = 'creditshop';
 		}

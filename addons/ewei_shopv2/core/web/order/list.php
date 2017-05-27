@@ -22,7 +22,6 @@ class List_EweiShopV2Page extends WebPage
 		{
 			$is_openmerch = 0;
 		}
-		$ccard_plugin = p('ccard');
 		if ($st == 'main') 
 		{
 			$st = '';
@@ -98,15 +97,15 @@ class List_EweiShopV2Page extends WebPage
 			}
 			else if ($searchfield == 'goodstitle') 
 			{
-				$sqlcondition = ' inner join ( select  og.orderid from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and (locate(:keyword,g.title)>0)) gs on gs.orderid=o.id';
+				$sqlcondition = ' inner join ( select DISTINCT(og.orderid) from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and (locate(:keyword,g.title)>0)) gs on gs.orderid=o.id';
 			}
 			else if ($searchfield == 'goodssn') 
 			{
-				$sqlcondition = ' inner join ( select og.orderid from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and (((locate(:keyword,g.goodssn)>0)) or (locate(:keyword,og.goodssn)>0))) gs on gs.orderid=o.id';
+				$sqlcondition = ' inner join ( select DISTINCT(og.orderid) from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and (((locate(:keyword,g.goodssn)>0)) or (locate(:keyword,og.goodssn)>0))) gs on gs.orderid=o.id';
 			}
 			else if ($searchfield == 'goodsoptiontitle') 
 			{
-				$sqlcondition = ' inner join ( select  og.orderid from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and (locate(:keyword,og.optionname)>0)) gs on gs.orderid=o.id';
+				$sqlcondition = ' inner join ( select  DISTINCT(og.orderid) from ' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.uniacid = \'' . $uniacid . '\' and (locate(:keyword,og.optionname)>0)) gs on gs.orderid=o.id';
 			}
 			else if ($searchfield == 'merch') 
 			{
@@ -327,14 +326,7 @@ class List_EweiShopV2Page extends WebPage
 					}
 					else if (empty($value['addressid'])) 
 					{
-						if (!(empty($value['ccard']))) 
-						{
-							$value['status'] = '待充值';
-						}
-						else 
-						{
-							$value['status'] = '待取货';
-						}
+						$value['status'] = '待取货';
 					}
 					else if (0 < $value['sendtype']) 
 					{
@@ -618,11 +610,6 @@ class List_EweiShopV2Page extends WebPage
 					}
 					$value['commission'] = $commission_level;
 				}
-				if ($ccard_plugin && !(empty($value['ccardid']))) 
-				{
-					$ccard_data = $ccard_plugin->getOne($value['ccardid']);
-					$value['ccard_data'] = $ccard_data;
-				}
 			}
 		}
 		unset($value);
@@ -636,14 +623,13 @@ class List_EweiShopV2Page extends WebPage
 				$columns[] = array('title' => '分销级别', 'field' => 'level', 'width' => 24);
 				$columns[] = array('title' => '分销佣金', 'field' => 'commission', 'width' => 24);
 			}
-			if ($ccard_plugin) 
+			if (!(empty($diy_title_data))) 
 			{
 				foreach ($diy_title_data as $key => $value ) 
 				{
 					$field = 'goods_' . $key;
 					$columns[] = array('title' => $value . '(商品自定义信息)', 'field' => $field, 'width' => 24);
 				}
-				$columns[] = array('title' => '导入发货(1为发货)', 'field' => '', 'width' => 24);
 			}
 			if ($merch_plugin) 
 			{
@@ -826,7 +812,7 @@ class List_EweiShopV2Page extends WebPage
 		}
 		if (($condition != ' o.uniacid = :uniacid and o.ismr=0 and o.deleted=0 and o.isparent=0') || !(empty($sqlcondition))) 
 		{
-			$t = pdo_fetch('SELECT COUNT(*) as count, ifnull(sum(o.price),0) as sumprice   FROM ' . tablename('ewei_shop_order') . ' o ' . ' left join ' . tablename('ewei_shop_order_refund') . ' r on r.id =o.refundid ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid  and m.uniacid =  o.uniacid' . ' left join ' . tablename('ewei_shop_member_address') . ' a on o.addressid = a.id ' . ' left join ' . tablename('ewei_shop_saler') . ' s on s.openid = o.verifyopenid and s.uniacid=o.uniacid' . ' left join ' . tablename('ewei_shop_member') . ' sm on sm.openid = s.openid and sm.uniacid=s.uniacid' . ' ' . $sqlcondition . ' WHERE ' . $condition . ' ' . $statuscondition, $paras);
+			$t = pdo_fetch('SELECT COUNT(DISTINCT(o.id)) as count, ifnull(sum(o.price),0) as sumprice   FROM ' . tablename('ewei_shop_order') . ' o ' . ' left join ' . tablename('ewei_shop_order_refund') . ' r on r.id =o.refundid ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid  and m.uniacid =  o.uniacid' . ' left join ' . tablename('ewei_shop_member_address') . ' a on o.addressid = a.id ' . ' left join ' . tablename('ewei_shop_saler') . ' s on s.openid = o.verifyopenid and s.uniacid=o.uniacid' . ' left join ' . tablename('ewei_shop_member') . ' sm on sm.openid = s.openid and sm.uniacid=s.uniacid' . ' ' . $sqlcondition . ' WHERE ' . $condition . ' ' . $statuscondition, $paras);
 		}
 		else 
 		{

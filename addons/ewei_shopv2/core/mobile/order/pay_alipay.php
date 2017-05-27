@@ -41,6 +41,11 @@ class Pay_Alipay_EweiShopV2Page extends MobilePage
 			{
 				$this->message('支付出现错误，请重试(2)!', mobileUrl('order'));
 			}
+			if (strexists($tid, 'GJ')) 
+			{
+				$tids = explode('GJ', $tid);
+				$tid = $tids[0];
+			}
 		}
 		else 
 		{

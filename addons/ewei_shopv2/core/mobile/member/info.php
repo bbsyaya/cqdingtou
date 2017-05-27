@@ -73,21 +73,28 @@ class Info_EweiShopV2Page extends MobileLoginPage
 			$m_data['diymemberid'] = $diyform_id;
 			$m_data['diymemberfields'] = iserializer($fields);
 			$m_data['diymemberdata'] = $data;
+			unset($m_data['credit1']);
+			unset($m_data['credit2']);
 			pdo_update('ewei_shop_member', $m_data, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
 			if (!(empty($this->member['uid']))) 
 			{
 				if (!(empty($mc_data))) 
 				{
+					unset($mc_data['credit1']);
+					unset($mc_data['credit2']);
 					m('member')->mc_update($this->member['uid'], $mc_data);
 				}
 			}
 		}
 		else 
 		{
-			pdo_update('ewei_shop_member', $memberdata, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
+			$arr = array('realname' => trim($memberdata['realname']), 'weixin' => trim($memberdata['weixin']), 'birthyear' => intval($memberdata['birthyear']), 'birthmonth' => intval($memberdata['birthmonth']), 'birthday' => intval($memberdata['birthday']), 'province' => trim($memberdata['province']), 'city' => trim($memberdata['city']), 'datavalue' => trim($memberdata['datavalue']));
+			pdo_update('ewei_shop_member', $arr, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
 			if (!(empty($this->member['uid']))) 
 			{
 				$mcdata = $_GPC['mcdata'];
+				unset($mcdata['credit1']);
+				unset($mcdata['credit2']);
 				m('member')->mc_update($this->member['uid'], $mcdata);
 			}
 		}

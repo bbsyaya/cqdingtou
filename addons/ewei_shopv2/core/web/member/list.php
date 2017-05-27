@@ -100,7 +100,7 @@ class List_EweiShopV2Page extends WebPage
 		{
 			$res_fans = pdo_fetchall('select fanid,openid,follow as followed, unfollowtime from ' . tablename('mc_mapping_fans') . ' where openid in (\'' . implode('\',\'', $list_fans) . '\')', array(), 'openid');
 		}
-		$shop = $_W['shopset']['shop'];
+		$shop = m('common')->getSysset('shop');
 		foreach ($list as &$row ) 
 		{
 			$row['groupname'] = ((isset($res_group[$row['groupid']]) ? $res_group[$row['groupid']]['groupname'] : ''));

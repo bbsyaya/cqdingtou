@@ -104,6 +104,8 @@ class Register_EweiShopV2Page extends CommissionMobileLoginPage
 				$m_data['agentid'] = $mid;
 				$m_data['status'] = $become_check;
 				$m_data['agenttime'] = (($become_check == 1 ? time() : 0));
+				unset($m_data['credit1']);
+				unset($m_data['credit2']);
 				pdo_update('ewei_shop_member', $m_data, array('id' => $member['id']));
 				if ($become_check == 1) 
 				{
@@ -113,6 +115,8 @@ class Register_EweiShopV2Page extends CommissionMobileLoginPage
 				{
 					if (!(empty($mc_data))) 
 					{
+						unset($mc_data['credit1']);
+						unset($mc_data['credit2']);
 						m('member')->mc_update($member['uid'], $mc_data);
 					}
 				}
@@ -151,7 +155,7 @@ class Register_EweiShopV2Page extends CommissionMobileLoginPage
 		{
 			if (empty($member['status']) || empty($member['isagent'])) 
 			{
-				$data = array('isagent' => 1, 'agentid' => $mid, 'status' => $become_check, 'realname' => $_GPC['realname'], 'mobile' => $_GPC['mobile'], 'weixin' => $_GPC['weixin'], 'agenttime' => ($become_check == 1 ? time() : 0));
+				$data = array('isagent' => 1, 'agentid' => $mid, 'status' => $become_check, 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'weixin' => trim($_GPC['weixin']), 'agenttime' => ($become_check == 1 ? time() : 0));
 				pdo_update('ewei_shop_member', $data, array('id' => $member['id']));
 				if ($become_check == 1) 
 				{

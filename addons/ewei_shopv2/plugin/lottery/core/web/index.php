@@ -66,17 +66,14 @@ class Index_EweiShopV2Page extends PluginWebPage
 		}
 		if ($_W['ispost']) 
 		{
-			
 			$itemCount = count(json_decode(htmlspecialchars_decode(trim($_GPC['reward_data']))));
 			if ((intval($_GPC['lottery_type']) == 3) && ($itemCount != 8) && !(empty($itemCount))) 
 			{
-				//show_json(0, '九宫格奖项必须为8个');
-				show_json(0, array('message' => '九宫格奖项必须为8个'));
+				show_json(0, '九宫格奖项必须为8个');
 			}
 			else if ((intval($_GPC['lottery_type']) == 1) && ($itemCount < 5) && !(empty($itemCount))) 
 			{
-				//show_json(0, '大转盘奖项不得少于5个');
-				show_json(0, array('message' => '大转盘奖项不得少于5个'));
+				show_json(0, '大转盘奖项不得少于5个');
 			}
 			$data = array();
 			$data['uniacid'] = $_W['uniacid'];
@@ -91,15 +88,9 @@ class Index_EweiShopV2Page extends PluginWebPage
 			$data['lottery_type'] = intval($_GPC['lottery_type']);
 			$data['addtime'] = time();
 			$taskTypeIsExist = intval($this->taskTypeIsExist(intval($_GPC['task_type']), $id));
-			
-			
 			if (!(empty($taskTypeIsExist))) 
 			{
-				
-				//show_json(0, '该场景已经存在，不能给一个场景添加两个游戏');
-				show_json(0, array('message' => '该场景已经存在，不能给一个场景添加两个游戏！'));
-				
-				
+				show_json(0, '该场景已经存在，不能给一个场景添加两个游戏');
 			}
 			if ($_GPC['task_type'] == 1) 
 			{
@@ -224,9 +215,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 				}
 				else 
 				{
-					//show_json(0, '更新操作失败');
-					show_json(0, array('message' => '更新操作失败！'));
-					
+					show_json(0, '更新操作失败');
 				}
 				show_json(1, array('url' => webUrl('lottery')));
 			}
@@ -240,9 +229,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 				}
 				else 
 				{
-					//show_json(0, '添加操作失败');
-					show_json(0, array('message' => '添加操作失败！'));
-					
+					show_json(0, '添加操作失败');
 				}
 				show_json(1, array('url' => webUrl('lottery/edit', array('id' => $id, 'lottery_type' => $data['lottery_type']))));
 			}

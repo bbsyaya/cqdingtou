@@ -7,6 +7,9 @@ $item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods') . ' WHERE id =
 $status = $item['status'];
 $labelname = json_decode($item['labelname'], true);
 $endtime = ((empty($item['endtime']) ? date('Y-m-d H:i', time()) : date('Y-m-d H:i', $item['endtime'])));
+$item['statustimestart'] = ((0 < $item['statustimestart'] ? $item['statustimestart'] : time()));
+$item['statustimeend'] = ((0 < $item['statustimeend'] ? $item['statustimeend'] : strtotime('+1 month')));
+$intervalprices = iunserializer($item['intervalprice']);
 if (empty($labelname)) 
 {
 	$labelname = array();
@@ -76,6 +79,80 @@ if ($_W['ispost'])
 		$goodstype = intval($_GPC['goodstype']);
 	}
 	$data = array('uniacid' => intval($_W['uniacid']), 'displayorder' => intval($_GPC['displayorder']), 'title' => trim($_GPC['goodsname']), 'subtitle' => trim($_GPC['subtitle']), 'shorttitle' => trim($_GPC['shorttitle']), 'keywords' => trim($_GPC['keywords']), 'thumb_first' => intval($_GPC['thumb_first']), 'type' => $goodstype, 'ispresell' => intval($_GPC['ispresell']), 'presellover' => intval($_GPC['presellover']), 'presellovertime' => (0 < intval($_GPC['presellovertime']) ? intval($_GPC['presellovertime']) : 0), 'presellprice' => floatval($_GPC['presellprice']), 'presellstart' => intval($_GPC['presellstart']), 'presellend' => intval($_GPC['presellend']), 'preselltimestart' => (0 < intval($_GPC['presellstart']) ? strtotime($_GPC['preselltimestart']) : 0), 'preselltimeend' => (0 < intval($_GPC['presellend']) ? strtotime($_GPC['preselltimeend']) : 0), 'presellsendtype' => intval($_GPC['presellsendtype']), 'presellsendstatrttime' => strtotime($_GPC['presellsendstatrttime']), 'presellsendtime' => intval($_GPC['presellsendtime']), 'labelname' => json_encode($_GPC['labelname']), 'isrecommand' => intval($_GPC['isrecommand']), 'ishot' => intval($_GPC['ishot']), 'isnew' => intval($_GPC['isnew']), 'isdiscount' => intval($_GPC['isdiscount']), 'isdiscount_title' => trim(mb_substr($_GPC['isdiscount_title'], 0, 5, 'UTF-8')), 'isdiscount_time' => strtotime($_GPC['isdiscount_time']), 'issendfree' => intval($_GPC['issendfree']), 'isnodiscount' => intval($_GPC['isnodiscount']), 'istime' => intval($_GPC['istime']), 'timestart' => strtotime($_GPC['saletime']['start']), 'timeend' => strtotime($_GPC['saletime']['end']), 'description' => trim($_GPC['description']), 'goodssn' => trim($_GPC['goodssn']), 'unit' => trim($_GPC['unit']), 'createtime' => TIMESTAMP, 'total' => intval($_GPC['total']), 'showtotal' => intval($_GPC['showtotal']), 'totalcnf' => intval($_GPC['totalcnf']), 'unite_total' => intval($_GPC['unite_total']), 'marketprice' => $_GPC['marketprice'], 'weight' => $_GPC['weight'], 'costprice' => $_GPC['costprice'], 'productprice' => trim($_GPC['productprice']), 'productsn' => trim($_GPC['productsn']), 'credit' => trim($_GPC['credit']), 'maxbuy' => intval($_GPC['maxbuy']), 'minbuy' => intval($_GPC['minbuy']), 'usermaxbuy' => intval($_GPC['usermaxbuy']), 'hasoption' => intval($_GPC['hasoption']), 'sales' => intval($_GPC['sales']), 'share_icon' => trim($_GPC['share_icon']), 'share_title' => trim($_GPC['share_title']), 'status' => ($status != 2 ? intval($_GPC['status']) : $status), 'groupstype' => intval($_GPC['groupstype']), 'virtualsend' => intval($_GPC['virtualsend']), 'virtualsendcontent' => trim($_GPC['virtualsendcontent']), 'buyshow' => intval($_GPC['buyshow']), 'showlevels' => (is_array($_GPC['showlevels']) ? implode(',', $_GPC['showlevels']) : ''), 'buylevels' => (is_array($_GPC['buylevels']) ? implode(',', $_GPC['buylevels']) : ''), 'showgroups' => (is_array($_GPC['showgroups']) ? implode(',', $_GPC['showgroups']) : ''), 'buygroups' => (is_array($_GPC['buygroups']) ? implode(',', $_GPC['buygroups']) : ''), 'noticeopenid' => (is_array($_GPC['noticeopenid']) ? implode(',', $_GPC['noticeopenid']) : ''), 'noticetype' => (is_array($_GPC['noticetype']) ? implode(',', $_GPC['noticetype']) : ''), 'needfollow' => intval($_GPC['needfollow']), 'followurl' => trim($_GPC['followurl']), 'followtip' => trim($_GPC['followtip']), 'deduct' => $_GPC['deduct'], 'manydeduct' => $_GPC['manydeduct'], 'deduct2' => $_GPC['deduct2'], 'virtual' => ($goodstype == 3 ? intval($_GPC['virtual']) : 0), 'ednum' => intval($_GPC['ednum']), 'edareas' => trim($_GPC['edareas']), 'edareas_code' => trim($_GPC['edareas_code']), 'edmoney' => trim($_GPC['edmoney']), 'invoice' => intval($_GPC['invoice']), 'repair' => intval($_GPC['repair']), 'seven' => intval($_GPC['seven']), 'money' => trim($_GPC['money']), 'province' => trim($_GPC['province']), 'city' => trim($_GPC['city']), 'quality' => intval($_GPC['quality']), 'sharebtn' => intval($_GPC['sharebtn']), 'autoreceive' => intval($_GPC['autoreceive']), 'cannotrefund' => intval($_GPC['cannotrefund']), 'buyagain' => floatval($_GPC['buyagain']), 'buyagain_islong' => intval($_GPC['buyagain_islong']), 'buyagain_condition' => intval($_GPC['buyagain_condition']), 'buyagain_sale' => intval($_GPC['buyagain_sale']), 'diypage' => intval($_GPC['diypage']), 'cashier' => intval($_GPC['cashier']));
+	$data['isstatustime'] = intval($_GPC['isstatustime']);
+	$statustimestart = strtotime($_GPC['statustime']['start']);
+	$statustimeend = strtotime($_GPC['statustime']['end']);
+	$data['statustimestart'] = $statustimestart;
+	$data['statustimeend'] = $statustimeend;
+	if (($data['status'] == 1) && (0 < $data['isstatustime'])) 
+	{
+		if (!(($statustimestart < time()) && (time() < $statustimeend))) 
+		{
+			show_json(0, '上架时间不符合要求！');
+		}
+	}
+	$intervalfloor = 0;
+	$intervalprice = '';
+	if ($goodstype == 4) 
+	{
+		$intervalfloor = intval($_GPC['intervalfloor']);
+		if ((3 < $intervalfloor) || ($intervalfloor < 1)) 
+		{
+			show_json(0, '请至少添加一个区间价格！');
+		}
+		$intervalprices = array();
+		if (0 < $intervalfloor) 
+		{
+			if (intval($_GPC['intervalnum1']) <= 0) 
+			{
+				show_json(0, '请设置起批发量！');
+			}
+			if (floatval($_GPC['intervalprice1']) <= 0) 
+			{
+				show_json(0, '批发价必须大于0！');
+			}
+			$intervalprices[] = array('intervalnum' => intval($_GPC['intervalnum1']), 'intervalprice' => floatval($_GPC['intervalprice1']));
+		}
+		if (1 < $intervalfloor) 
+		{
+			if (intval($_GPC['intervalnum2']) <= 0) 
+			{
+				show_json(0, '请设置起批发量！');
+			}
+			if (intval($_GPC['intervalnum2']) <= intval($_GPC['intervalnum1'])) 
+			{
+				show_json(0, '批发量需大于上级批发量！');
+			}
+			if (floatval($_GPC['intervalprice1']) <= floatval($_GPC['intervalprice2'])) 
+			{
+				show_json(0, '批发价需小于上级批发价！');
+			}
+			$intervalprices[] = array('intervalnum' => intval($_GPC['intervalnum2']), 'intervalprice' => floatval($_GPC['intervalprice2']));
+		}
+		if (2 < $intervalfloor) 
+		{
+			if (intval($_GPC['intervalnum3']) <= 0) 
+			{
+				show_json(0, '请设置起批发量！');
+			}
+			if (intval($_GPC['intervalnum3']) <= intval($_GPC['intervalnum2'])) 
+			{
+				show_json(0, '批发量需大于上级批发量！');
+			}
+			if (floatval($_GPC['intervalprice2']) <= floatval($_GPC['intervalprice3'])) 
+			{
+				show_json(0, '批发价需小于上级批发价！');
+			}
+			$intervalprices[] = array('intervalnum' => intval($_GPC['intervalnum3']), 'intervalprice' => floatval($_GPC['intervalprice3']));
+		}
+		$intervalprice = iserializer($intervalprices);
+		$data['intervalfloor'] = $intervalfloor;
+		$data['intervalprice'] = $intervalprice;
+		$data['minbuy'] = $_GPC['intervalnum1'];
+		$data['marketprice'] = $_GPC['intervalprice1'];
+		$data['productprice'] = 0;
+		$data['costprice'] = 0;
+	}
 	if (intval($_GPC['ispresell']) == 1) 
 	{
 		if (floatval($_GPC['presellprice'] <= 0)) 
@@ -268,6 +345,25 @@ if ($_W['ispost'])
 		unset($thumb_url[0]);
 		$data['thumb_url'] = serialize(m('common')->array_images($thumb_url));
 	}
+	if (p('threen')) 
+	{
+		$threen = $_GPC['threen'];
+		if (!(empty($threen['discount'])) && !(empty($threen['price']))) 
+		{
+			show_json(0, '3N营销优惠只能设置一个');
+		}
+		$threen['price'] = floatval(round($threen['price'], 2));
+		$threen['discount'] = floatval(round($threen['discount'], 2));
+		if (!(empty($threen['price'])) && (0 < !($threen['price']))) 
+		{
+			show_json(0, '3N营销会员价必须大于0');
+		}
+		if (!(empty($threen['discount'])) && ((10 < $threen['discount']) || ($threen < 0.10000000000000001))) 
+		{
+			show_json(0, '3N营销优惠需在0.1-10之间');
+		}
+		$data['threen'] = json_encode($threen);
+	}
 	if (empty($id)) 
 	{
 		$data['merchid'] = 0;
@@ -421,6 +517,13 @@ if ($_W['ispost'])
 		}
 		$newids = implode('_', $newids);
 		$a = array('uniacid' => $_W['uniacid'], 'title' => $optionArray['option_title'][$k], 'productprice' => $optionArray['option_productprice'][$k], 'costprice' => $optionArray['option_costprice'][$k], 'marketprice' => $optionArray['option_marketprice'][$k], 'presellprice' => $optionArray['option_presellprice'][$k], 'stock' => $optionArray['option_stock'][$k], 'weight' => $optionArray['option_weight'][$k], 'goodssn' => $optionArray['option_goodssn'][$k], 'productsn' => $optionArray['option_productsn'][$k], 'goodsid' => $id, 'specs' => $newids, 'virtual' => ($data['type'] == 3 ? $optionArray['option_virtual'][$k] : 0));
+		if ($goodstype == 4) 
+		{
+			$a['presellprice'] = 0;
+			$a['productprice'] = 0;
+			$a['costprice'] = 0;
+			$a['marketprice'] = intval($_GPC['intervalprice1']);
+		}
 		$totalstocks += $a['stock'];
 		if (empty($get_option_id)) 
 		{

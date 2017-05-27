@@ -39,7 +39,7 @@ if (!(empty($ordersn)))
 	}
 	else if ($paytype == 6) 
 	{
-		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=threen.register.threen_complete&alidata=' . $get;
+		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=threen.register.threen_complete&alidata=' . $get . '&logno=' . $ordersn;
 	}
 }
 header('location: ' . $url);

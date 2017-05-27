@@ -221,6 +221,10 @@ a {
     background-repeat: no-repeat;
     background-size: cover;
 }
+.fui-goods-group.block .fui-goods-item .image.auto {
+    height: auto;
+    padding-bottom: 0;
+}
 
 .fui-goods-group .fui-goods-item .salez {
     position: absolute;
@@ -572,6 +576,11 @@ a {
     white-space: nowrap;
     overflow: hidden;
     padding: 0 .2rem;
+    display: none;
+}
+
+.page-goods-list .screen.in .cate .item nav {
+    display: block;
 }
 
 .page-goods-list .screen .cate .item nav.on {
@@ -862,11 +871,15 @@ a {
 }
 
 /*顶部导航*/
-.page-goods-detail .fui-tab {
+.page-goods-detail .fui-tab:not(.detail-tab) {
     margin-bottom: 0;
     background: none;
     width: 80%;
     margin: 0 10%;
+}
+
+.page-goods-detail .fui-tab.detail-tab {
+    margin-top: 0.5rem;
 }
 
 .page-goods-detail .fui-tab a {
@@ -874,9 +887,39 @@ a {
     line-height: 2.2rem;
 }
 
+.page-goods-detail .detail-tab {
+    margin-bottom: 0;
+}
+.detail-tab-panel {
+    background: #fff;
+    height: auto;
+    overflow: hidden;
+    display: block;
+    padding-bottom: 0.5rem;
+}
+.detail-tab-panel .tab-panel {
+    display: none;
+}
+.detail-tab-panel .tab-panel.show {
+    display: block;
+}
+.detail-tab-panel .tab-panel.detail-block,
+.detail-tab-panel .tab-panel.comment-block {
+    position: relative;
+    transform: none;
+    -webkit-transform: none;
+    transition-property: none;
+    -webkit-transition-property: none;
+    top: 0;
+}
+.detail-tab-panel .tab-panel.comment-block .fui-icon-group {
+    border-top: 0;
+}
+.detail-tab-panel .tab-panel.comment-block .content-empty {
+    margin: 1rem 0;
+}
 
 .page-goods-detail .seckill-container {
-
     display: -webkit-box;
     display: -ms-flexbox;
     display: -webkit-flex;

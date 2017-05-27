@@ -75,6 +75,52 @@ class Detail_EweiShopV2Page extends MobilePage
 				$goods['maxprice'] = $goods['presellprice'];
 			}
 		}
+		if ($goods['type'] == 4) 
+		{
+			$intervalprice = iunserializer($goods['intervalprice']);
+			if (0 < $goods['intervalfloor']) 
+			{
+				$goods['intervalprice1'] = $intervalprice[0]['intervalprice'];
+				$goods['intervalnum1'] = $intervalprice[0]['intervalnum'];
+			}
+			if (1 < $goods['intervalfloor']) 
+			{
+				$goods['intervalprice2'] = $intervalprice[1]['intervalprice'];
+				$goods['intervalnum2'] = $intervalprice[1]['intervalnum'];
+			}
+			if (2 < $goods['intervalfloor']) 
+			{
+				$goods['intervalprice3'] = $intervalprice[2]['intervalprice'];
+				$goods['intervalnum3'] = $intervalprice[2]['intervalnum'];
+			}
+		}
+		$isfullback = false;
+		if ($goods['isfullback']) 
+		{
+			$isfullback = true;
+			$fullbackgoods = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' limit 1 ');
+			if ($goods['hasoption'] == 1) 
+			{
+				$fullprice = pdo_fetch('select min(allfullbackprice) as minfullprice,max(allfullbackprice) as maxfullprice,min(allfullbackratio) as minfullratio' . "\r\n" . '                            ,max(allfullbackratio) as maxfullratio,min(fullbackprice) as minfullbackprice,max(fullbackprice) as maxfullbackprice' . "\r\n" . '                            ,min(fullbackratio) as minfullbackratio,max(fullbackratio) as maxfullbackratio,min(`day`) as minday,max(`day`) as maxday' . "\r\n" . '                            from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '');
+				$fullbackgoods['minallfullbackallprice'] = $fullprice['minfullprice'];
+				$fullbackgoods['maxallfullbackallprice'] = $fullprice['maxfullprice'];
+				$fullbackgoods['minallfullbackallratio'] = $fullprice['minfullratio'];
+				$fullbackgoods['maxallfullbackallratio'] = $fullprice['maxfullratio'];
+				$fullbackgoods['minfullbackprice'] = $fullprice['minfullbackprice'];
+				$fullbackgoods['maxfullbackprice'] = $fullprice['maxfullbackprice'];
+				$fullbackgoods['minfullbackratio'] = $fullprice['minfullbackratio'];
+				$fullbackgoods['maxfullbackratio'] = $fullprice['maxfullbackratio'];
+				$fullbackgoods['fullbackratio'] = $fullprice['minfullbackratio'];
+				$fullbackgoods['fullbackprice'] = $fullprice['minfullbackprice'];
+				$fullbackgoods['minday'] = $fullprice['minday'];
+				$fullbackgoods['maxday'] = $fullprice['maxday'];
+			}
+			else 
+			{
+				$fullbackgoods['maxallfullbackallprice'] = $fullbackgoods['minallfullbackallprice'];
+				$fullbackgoods['maxallfullbackallratio'] = $fullbackgoods['minallfullbackallratio'];
+			}
+		}
 		$merchid = $goods['merchid'];
 		$labelname = json_decode($goods['labelname'], true);
 		$style = pdo_fetch('SELECT id,uniacid,style FROM ' . tablename('ewei_shop_goods_labelstyle') . ' WHERE uniacid=' . $uniacid);
@@ -614,6 +660,11 @@ class Detail_EweiShopV2Page extends MobilePage
 			include $this->template('ccard/cmember_detail');
 			exit();
 		}
+		$new_temp = ((!(is_mobile()) ? 1 : intval($_W['shopset']['template']['detail_temp'])));
+		if ($new_temp && $getComments) 
+		{
+			$showComments = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order_comment') . ' where goodsid=:goodsid and level>=0 and deleted=0 and checked=0 and uniacid=:uniacid', array(':goodsid' => $id, ':uniacid' => $_W['uniacid']));
+		}
 		$plugin_diypage = p('diypage');
 		if ($plugin_diypage) 
 		{
@@ -868,16 +919,16 @@ class Detail_EweiShopV2Page extends MobilePage
 				{
 					if (!(empty($row['timedays']))) 
 					{
-						$row['timestr'] = date('Y-m-d H:i', $row['gettime'] + ($row['timedays'] * 86400));
+						$row['timestr'] = '自领取日后' . $row['timedays'] . '天有效';
 					}
 				}
 				else if ($time <= $row['timestart']) 
 				{
-					$row['timestr'] = date('Y-m-d H:i', $row['timestart']) . '-' . date('Y-m-d H:i', $row['timeend']);
+					$row['timestr'] = '有效期至:' . date('Y-m-d', $row['timestart']) . '-' . date('Y-m-d', $row['timeend']);
 				}
 				else 
 				{
-					$row['timestr'] = date('Y-m-d H:i', $row['timeend']);
+					$row['timestr'] = '有效期至:' . date('Y-m-d', $row['timeend']);
 				}
 				if ($row['backtype'] == 0) 
 				{

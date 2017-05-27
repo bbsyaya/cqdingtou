@@ -521,7 +521,11 @@ class CashierModel extends PluginModel
 					$options = $setting['payment']['wechat'];
 					$options['appid'] = $account['key'];
 					$options['secret'] = $account['secret'];
-					$wechat = array('appid' => $options['appid'], 'mch_id' => $options['mchid'], 'apikey' => $options['signkey']);
+					if (IMS_VERSION <= 0.80000000000000004) 
+					{
+						$options['apikey'] = $options['signkey'];
+					}
+					$wechat = array('appid' => $options['appid'], 'mch_id' => $options['mchid'], 'apikey' => $options['apikey']);
 					$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
 				}
 			}
@@ -559,24 +563,7 @@ class CashierModel extends PluginModel
 			{
 				$res['openid'] = ((isset($res['openid']) ? $res['openid'] : ''));
 				$log['openid'] = ((empty($log['openid']) ? $res['openid'] : $log['openid']));
-				$coupon = 0;
-				if (!(empty($res['openid']))) 
-				{
-					if ($user['isopen_commission']) 
-					{
-						$this->becomeDown($res['openid'], $user['manageopenid']);
-					}
-					$this->sendMessage(array('logno' => $log['logno'], 'money' => $log['money'], 'deduction' => $log['deduction'], 'paytime' => time(), 'cashier_title' => $user['title']), self::PAY_CASHIER_USER, $res['openid']);
-					$coupon = $this->seedCoupon($log['money'], $res['openid']);
-				}
-				pdo_update('ewei_shop_cashier_pay_log', array('openid' => $log['openid'], 'payopenid' => $res['openid'], 'money' => $log['money'], 'status' => 1, 'paytime' => (0 < $log['paytime'] ? $log['paytime'] : time()), 'coupon' => $coupon), array('id' => $log['id']));
-				$log['deduction'] = (double) $log['deduction'];
-				if (!(empty($log['deduction']))) 
-				{
-					$userinfo = m('member')->getMobileMember($log['mobile']);
-					m('member')->setCredit($userinfo['openid'], 'credit2', -$log['deduction'], array(0, '收银台 ' . $_W['cashieruser']['title'], '收款'));
-				}
-				$this->paySuccess($log, $user);
+				$this->paySuccess($log, $user, $res);
 			}
 			return (int) $log['id'];
 		}
@@ -584,6 +571,23 @@ class CashierModel extends PluginModel
 	public function paySuccess($log, $user) 
 	{
 		global $_W;
+		$coupon = 0;
+		if (!(empty($log['openid']))) 
+		{
+			if ($user['isopen_commission']) 
+			{
+				$this->becomeDown($log['openid'], $user['manageopenid']);
+			}
+			$this->sendMessage(array('logno' => $log['logno'], 'money' => $log['money'], 'deduction' => $log['deduction'], 'paytime' => time(), 'cashier_title' => $user['title']), self::PAY_CASHIER_USER, $log['openid']);
+			$coupon = $this->seedCoupon($log['money'] + $log['deduction'], $log['openid']);
+		}
+		pdo_update('ewei_shop_cashier_pay_log', array('openid' => $log['openid'], 'payopenid' => $log['openid'], 'money' => $log['money'], 'status' => 1, 'paytime' => (0 < $log['paytime'] ? $log['paytime'] : time()), 'coupon' => $coupon), array('id' => $log['id']));
+		$log['deduction'] = (double) $log['deduction'];
+		if (!(empty($log['deduction']))) 
+		{
+			$userinfo = m('member')->getMobileMember($log['mobile']);
+			m('member')->setCredit($userinfo['openid'], 'credit2', -$log['deduction'], array(0, '收银台 ' . $_W['cashieruser']['title'], '收款'));
+		}
 		if (!(empty($log['orderid']))) 
 		{
 			$paytype = 1;

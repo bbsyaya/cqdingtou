@@ -1253,7 +1253,8 @@ class Notice_EweiShopV2Model
 		}
 		else 
 		{
-			$merch_tm = '';
+			goto label102;
+			label102: $merch_tm = '';
 			return;
 		}*/
 		if (!(empty($templateid))) 

@@ -9,14 +9,14 @@ class Order_EweiShopV2Model
 	{
 		global $_W;
 		$uniacid = $_W['uniacid'];
-		$order = pdo_fetch('select o.id,o.ordersn,o.openid,og.optionid,og.goodsid,og.price from ' . tablename('ewei_shop_order') . ' as o' . "\r\n" . '                left join ' . tablename('ewei_shop_order_goods') . ' as og on og.orderid = o.id' . "\r\n" . '                where  o.id=:id and o.uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':id' => $orderid));
+		$order = pdo_fetch('select o.id,o.ordersn,o.openid,og.optionid,og.goodsid,og.price from ' . tablename('ewei_shop_order') . ' as o' . "\n" . '                left join ' . tablename('ewei_shop_order_goods') . ' as og on og.orderid = o.id' . "\n" . '                where  o.id=:id and o.uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':id' => $orderid));
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid and isfullback = 1 limit 1', array(':id' => $order['goodsid'], ':uniacid' => $uniacid));
 		if (0 < $goods['isfullback']) 
 		{
-			$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\r\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`' . "\r\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $order['goodsid'] . ' limit 1');
+			$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $order['goodsid'] . ' limit 1');
 			if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $order['optionid'])) 
 			{
-				$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\r\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $order['goodsid'], ':id' => $order['optionid']));
+				$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $order['goodsid'], ':id' => $order['optionid']));
 				if (!(empty($option))) 
 				{
 					$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
@@ -26,9 +26,10 @@ class Order_EweiShopV2Model
 					$fullbackgoods['day'] = $option['day'];
 				}
 			}
+			$fullbackgoods['startday'] = $fullbackgoods['startday'] - 1;
 			if (!(empty($fullbackgoods))) 
 			{
-				$data = array('uniacid' => $uniacid, 'orderid' => $orderid, 'openid' => $order['openid'], 'day' => $fullbackgoods['day'], 'createtime' => time());
+				$data = array('uniacid' => $uniacid, 'orderid' => $orderid, 'openid' => $order['openid'], 'day' => $fullbackgoods['day'], 'fullbacktime' => strtotime('+' . $fullbackgoods['startday'] . ' days'), 'goodsid' => $order['goodsid'], 'createtime' => time());
 				if (0 < $fullbackgoods['type']) 
 				{
 					$data['price'] = ($order['price'] * $fullbackgoods['minallfullbackallratio']) / 100;
@@ -42,6 +43,15 @@ class Order_EweiShopV2Model
 				pdo_insert('ewei_shop_fullback_log', $data);
 			}
 		}
+	}
+	public function fullbackstop($orderid) 
+	{
+		global $_W;
+		global $_S;
+		$uniacid = $_W['uniacid'];
+		$shopset = $_S['shop'];
+		$fullback_log = pdo_fetch('select * from ' . tablename('ewei_shop_fullback_log') . ' where uniacid = ' . $uniacid . ' and orderid = ' . $orderid . ' ');
+		pdo_update('ewei_shop_fullback_log', array('isfullback' => 1), array('id' => $fullback_log['id'], 'uniacid' => $uniacid));
 	}
 	public function payResult($params) 
 	{
@@ -630,15 +640,16 @@ class Order_EweiShopV2Model
 					}
 				}
 			}
-			if ($gprice < $price1) 
+			if ($gprice <= $price1) 
 			{
 				$isdiscountprice = 0;
+				$isCdiscount = 0;
 			}
 			else 
 			{
 				$isdiscountprice = abs($price1 - $gprice);
+				$isCdiscount = 1;
 			}
-			$isCdiscount = 1;
 		}
 		if (empty($g['isnodiscount']) && $buyagain_sale) 
 		{
@@ -679,8 +690,16 @@ class Order_EweiShopV2Model
 					}
 				}
 			}
-			$discountprice = abs($price2 - $gprice);
-			$isHdiscount = 1;
+			if ($gprice <= $price2) 
+			{
+				$discountprice = 0;
+				$isHdiscount = 0;
+			}
+			else 
+			{
+				$discountprice = abs($price2 - $gprice);
+				$isHdiscount = 1;
+			}
 		}
 		if ($isCdiscount == 1) 
 		{
@@ -1128,7 +1147,7 @@ class Order_EweiShopV2Model
 							}
 						}
 					}
-					if (!$sendfree  && !$sendfree && ($isnodispatch == 0))
+					if (!$sendfree  && !$sendfree && ($isnodispatch == 0)) 
 					{
 						$areas = unserialize($dispatch_data['areas']);
 						if ($dispatch_data['calculatetype'] == 1) 

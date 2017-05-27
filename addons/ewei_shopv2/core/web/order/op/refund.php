@@ -158,7 +158,7 @@ class Refund_EweiShopV2Page extends WebPage
 					}
 				}
 				$realprice = $refund['applyprice'];
-				$goods = pdo_fetchall('SELECT g.id,g.credit, o.total,o.realprice FROM ' . tablename('ewei_shop_order_goods') . ' o left join ' . tablename('ewei_shop_goods') . ' g on o.goodsid=g.id ' . ' WHERE o.orderid=:orderid and o.uniacid=:uniacid', array(':orderid' => $item['id'], ':uniacid' => $uniacid));
+				$goods = pdo_fetchall('SELECT g.id,g.credit, o.total,o.realprice,g.isfullback FROM ' . tablename('ewei_shop_order_goods') . ' o left join ' . tablename('ewei_shop_goods') . ' g on o.goodsid=g.id ' . ' WHERE o.orderid=:orderid and o.uniacid=:uniacid', array(':orderid' => $item['id'], ':uniacid' => $uniacid));
 				$refundtype = 0;
 				if (empty($item['transid']) && ($item['paytype'] == 22) && empty($item['apppay'])) 
 				{
@@ -244,6 +244,10 @@ class Refund_EweiShopV2Page extends WebPage
 				if (is_error($result)) 
 				{
 					show_json(0, $result['message']);
+				}
+				if (0 < $goods['isfullback']) 
+				{
+					m('order')->fullbackstop($item['id']);
 				}
 				$credits = m('order')->getGoodsCredit($goods);
 				if (0 < $credits) 

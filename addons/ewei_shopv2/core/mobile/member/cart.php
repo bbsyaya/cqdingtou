@@ -227,25 +227,6 @@ class Cart_EweiShopV2Page extends MobileLoginPage
 		{
 			show_json(0, '商品未找到');
 		}
-		
-$optionidarr = pdo_fetchall("SELECT id FROM ".tablename('ewei_shop_goods_option')." WHERE goodsid = ".$id);
-		
-		$ver = 0;
-		if(is_array($optionidarr)){
-			foreach($optionidarr as $arr){
-				if($optionid == $arr['id']){
-					$ver = 1;
-					break;
-				}
-			}
-		}else{
-			$optionid = 0;
-		}
-		if($ver){
-			$optionid = intval($_GPC['optionid']);
-		}else{
-			$optionid = 0;
-		}
 		$member = m('member')->getMember($_W['openid']);
 		if (!(empty($_W['shopset']['wap']['open'])) && !(empty($_W['shopset']['wap']['mustbind'])) && empty($member['mobileverify'])) 
 		{
