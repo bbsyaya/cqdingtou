@@ -10,7 +10,7 @@
 			<span>启用代付功能后，代付发起人（买家）下单后，可将订单分享给小伙伴（朋友圈、微信群、微信好友），请他帮忙付款。</span>
 		</div>
 		<div class="col-sm-2 pull-right" style="padding-top:10px;text-align: right" >
-			{ifp 'sale.deduct'}
+			{ifp 'sale.peerpay.edit'}
 			<input type="checkbox" class="js-switch" name="data[open]" value="1" {if $data['open']==1}checked{/if} />
 			{else}
 			{if $data['open']==1}
@@ -19,7 +19,6 @@
 			<span class='text-default'>关闭</span>
 			{/if}
 			{/if}
-
 		</div>
 	</div>
 
@@ -33,7 +32,6 @@
 			</ul>
 			<div class="tab-content ">
 				<div class="tab-pane   {if empty($_GPC['tab']) || $_GPC['tab']=='basic'}active{/if}" id="tab_basic">{template 'sale/peerpay/basic'}</div>
-
 				<div class="tab-pane   {if $_GPC['tab']=='money'}active{/if}" id="tab_money">{template 'sale/peerpay/money'}</div>
 			</div>
 		</div>

@@ -43,11 +43,11 @@ class Printer_EweiShopV2ComModel extends ComModel
 				break;
 
 			case self::CONTENT_CENTER:
-				$res = '<C>' . $str . '</C><BR>';
+				$res = '<C>' . trim($str) . '</C>';
 				break;
 
 			case self::CONTENT_CENTER_BOLD:
-				$res = '<CB>' . $str . '</CB><BR>';
+				$res = '<CB>' . trim($str) . '</CB><BR>';
 				break;
 
 			case self::CONTENT_CODE:
@@ -71,11 +71,11 @@ class Printer_EweiShopV2ComModel extends ComModel
 				break;
 
 			case self::CONTENT_CENTER:
-				$res = '<center>' . $str . '</center>' . "\n";
+				$res = '<center>' . trim($str) . '</center>';
 				break;
 
 			case self::CONTENT_CENTER_BOLD:
-				$res = '<center>@@2' . $str . '</center>' . "\n";
+				$res = '<center>@@2' . trim($str) . '</center>' . "\n";
 				break;
 
 			case self::CONTENT_CODE:
@@ -107,6 +107,9 @@ class Printer_EweiShopV2ComModel extends ComModel
 			case self::CONTENT_QRCODE:
 				$qrlength = chr(strlen($str));
 				$res = '^Q' . $qrlength . $str . "\n";
+				break;
+			default:
+				$res = $str . "\n";
 				break;
 			}
 		}
@@ -288,6 +291,9 @@ class Printer_EweiShopV2ComModel extends ComModel
 			break;
 			case self::PRINTRT_YILIANYUN_NEW:
 				$res = $this->printerYilianyunNew();
+			break;
+			case self::PRINTRT_365:
+				$res = $this->printer365();
 			break;
 		}
 		return $res;

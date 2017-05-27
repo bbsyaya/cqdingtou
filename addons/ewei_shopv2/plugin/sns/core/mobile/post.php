@@ -299,13 +299,14 @@ class Post_EweiShopV2Page extends SnsMobilePage
 		{
 			$condition .= ' and `checked`=1';
 		}
-		$sql = 'select id,rpid,title,createtime,content,images ,openid, nickname,avatar,checked from ' . tablename('ewei_shop_sns_post') . '  where 1 ' . $condition . ' ORDER BY createtime asc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+		$sql = 'select id,rpid,title,createtime,content,images ,openid, nickname,avatar,checked from ' . tablename('ewei_shop_sns_post') . '  where 1 ' . $condition . ' ORDER BY createtime desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall($sql, $params);
 		$total = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_sns_post') . ' where 1 ' . $condition, $params);
 		foreach ($list as $key => &$row ) 
 		{
 			$row['avatar'] = tomedia($row['avatar']);
 			$row['avatar'] = $this->model->getAvatar($row['avatar']);
+			$row['createtime'] = date('Y-m-d H:i', $row['createtime']);
 			$row['goodcount'] = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_sns_like') . ' where pid=:pid limit 1', array(':pid' => $row['id']));
 			$row['postcount'] = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_sns_post') . ' where pid=:pid limit 1', array(':pid' => $row['id']));
 			$images = array();
@@ -324,7 +325,6 @@ class Post_EweiShopV2Page extends SnsMobilePage
 			$row['imagewidth'] = '32%';
 			$row['imagecount'] = count($rowimages);
 			$row['content'] = $this->model->replaceContent($row['content']);
-			$row['createtime'] = $this->model->timeBefore($row['createtime']);
 			$row['parent'] = false;
 			if (!(empty($row['rpid']))) 
 			{

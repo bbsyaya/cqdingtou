@@ -9,6 +9,7 @@ class VerifyProcessor extends ComProcessor
 {
 	protected $sessionkey;
 	protected $errkey;
+	protected $codekey;
 	public function __construct() 
 	{
 		parent::__construct('verify');
@@ -128,7 +129,7 @@ class VerifyProcessor extends ComProcessor
 						{
 							return $obj->respText(' 请输入核销次数:');
 						}
-						$result = com('verify')->verify($session['orderid'], 0, $session[$this->codekey], $openid);
+						$result = com('verify')->verify($session['orderid'], 0, $_SESSION[$this->codekey], $openid);
 						if (is_error($result)) 
 						{
 							unset($_SESSION[$this->sessionkey]);

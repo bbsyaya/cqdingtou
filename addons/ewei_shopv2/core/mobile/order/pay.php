@@ -19,7 +19,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		if (!(empty($ispeerpay))) 
 		{
 			$peerpayMessage = trim($_GPC['peerpaymessage']);
-			$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) price from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
+			$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
 			$peerprice = floatval($_GPC['peerprice']);
 			if (empty($peerprice) || ($peerprice <= 0)) 
 			{
@@ -116,7 +116,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			if (!(empty($ispeerpay))) 
 			{
 				$params['fee'] = $peerprice;
-				$params['tid'] = $params['tid'] . time();
+				$params['tid'] = $params['tid'] . $member['id'];
 				@session_start();
 				$_SESSION['peerpaytid'] = $params['tid'];
 			}
@@ -387,7 +387,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			}
 		}
 		$log = pdo_fetch('SELECT * FROM ' . tablename('core_paylog') . ' WHERE `uniacid`=:uniacid AND `module`=:module AND `tid`=:tid limit 1', array(':uniacid' => $uniacid, ':module' => 'ewei_shopv2', ':tid' => $order['ordersn']));
-		if (empty($log)) 
+		if (empty($log) && empty($ispeerpay)) 
 		{
 			if ($_W['ispost']) 
 			{
@@ -706,7 +706,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 				{
 					$peerheadimg['avatar'] = 'http://of6odhdq1.bkt.clouddn.com/d7fd47dc6163ec00abfe644ab3c33ac6.jpg';
 				}
-				m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => '', 'price' => $log['fee'], 'createtime' => time(), 'headimg' => $peerheadimg['avatar'], 'usay' => trim($_GPC['peerpaymessage'])));
+				m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => '', 'price' => $log['fee'], 'createtime' => time(), 'headimg' => $peerheadimg['avatar'], 'openid' => $peerheadimg['openid'], 'usay' => trim($_GPC['peerpaymessage'])));
 			}
 			$pay_result = m('order')->payResult($ret);
 			if ($_W['ispost']) 
@@ -757,10 +757,36 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 				$payquery = m('finance')->isWeixinPay($ordersn, $order['price'], (is_h5app() ? true : false));
 				$payquery_jie = m('finance')->isWeixinPayBorrow($ordersn, $order['price']);
 			}
-			if (!(empty($ispeerpay)) && (($payquery['message'] == '金额出错') || ($payquery_jie['message'] == '金额出错'))) 
+			if (!(empty($ispeerpay))) 
 			{
-				m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => trim($_GPC['peerpaymessage']), 'price' => $log['fee'], 'createtime' => time(), 'headimg' => $member['openid']));
+				m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => trim($_GPC['peerpaymessage']), 'price' => $log['fee'], 'createtime' => time(), 'openid' => $member['openid'], 'headimg' => $member['avatar'], 'tid' => $_SESSION['peerpaytid']));
 				unset($_SESSION['peerpaytid']);
+				$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
+				if ($ispeerpay['peerpay_realprice'] <= $peerpay_info) 
+				{
+					$ret = array();
+					$ret['result'] = 'success';
+					$ret['type'] = 'wechat';
+					$ret['from'] = 'return';
+					$ret['tid'] = $log['tid'];
+					$ret['user'] = $log['openid'];
+					$ret['fee'] = $log['fee'];
+					$ret['weid'] = $log['weid'];
+					$ret['uniacid'] = $log['uniacid'];
+					$ret['deduct'] = intval($_GPC['deduct']) == 1;
+					$pay_result = m('order')->payResult($ret);
+					@session_start();
+					$_SESSION[EWEI_SHOPV2_PREFIX . '_order_pay_complete'] = 1;
+					if ($_W['ispost']) 
+					{
+						show_json(1, array('result' => $pay_result));
+					}
+					else 
+					{
+						header('location:' . mobileUrl('order/pay/success', array('id' => $order['id'], 'result' => $pay_result)));
+					}
+					exit();
+				}
 				show_json(1, '支付成功');
 			}
 			if (!(is_error($payquery)) || !(is_error($payquery_jie))) 

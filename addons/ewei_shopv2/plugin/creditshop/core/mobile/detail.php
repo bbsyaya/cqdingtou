@@ -761,8 +761,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			$update['dispatchstatus'] = '1';
 		}
-		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
-		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $logid));
+		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $log['id']));
 		if ($status == 2) 
 		{
 			if ($goods['goodstype'] == 1) 

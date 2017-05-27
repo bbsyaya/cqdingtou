@@ -101,7 +101,7 @@ class Detail_EweiShopV2Page extends MobilePage
 			$fullbackgoods = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' limit 1 ');
 			if ($goods['hasoption'] == 1) 
 			{
-				$fullprice = pdo_fetch('select min(allfullbackprice) as minfullprice,max(allfullbackprice) as maxfullprice,min(allfullbackratio) as minfullratio' . "\r\n" . '                            ,max(allfullbackratio) as maxfullratio,min(fullbackprice) as minfullbackprice,max(fullbackprice) as maxfullbackprice' . "\r\n" . '                            ,min(fullbackratio) as minfullbackratio,max(fullbackratio) as maxfullbackratio,min(`day`) as minday,max(`day`) as maxday' . "\r\n" . '                            from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '');
+				$fullprice = pdo_fetch('select min(allfullbackprice) as minfullprice,max(allfullbackprice) as maxfullprice,min(allfullbackratio) as minfullratio' . "\n" . '                            ,max(allfullbackratio) as maxfullratio,min(fullbackprice) as minfullbackprice,max(fullbackprice) as maxfullbackprice' . "\n" . '                            ,min(fullbackratio) as minfullbackratio,max(fullbackratio) as maxfullbackratio,min(`day`) as minday,max(`day`) as maxday' . "\n" . '                            from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '');
 				$fullbackgoods['minallfullbackallprice'] = $fullprice['minfullprice'];
 				$fullbackgoods['maxallfullbackallprice'] = $fullprice['maxfullprice'];
 				$fullbackgoods['minallfullbackallratio'] = $fullprice['minfullratio'];
@@ -119,6 +119,7 @@ class Detail_EweiShopV2Page extends MobilePage
 			{
 				$fullbackgoods['maxallfullbackallprice'] = $fullbackgoods['minallfullbackallprice'];
 				$fullbackgoods['maxallfullbackallratio'] = $fullbackgoods['minallfullbackallratio'];
+				$fullbackgoods['minday'] = $fullbackgoods['day'];
 			}
 		}
 		$merchid = $goods['merchid'];
@@ -220,10 +221,10 @@ class Detail_EweiShopV2Page extends MobilePage
 		{
 			$has_city = 0;
 		}
-		$package_goods = pdo_fetch('select pg.id,pg.pid,pg.goodsid,p.displayorder from ' . tablename('ewei_shop_package_goods') . ' as pg' . "\r\n" . '                        left join ' . tablename('ewei_shop_package') . ' as p on pg.pid = p.id' . "\r\n" . '                        where pg.uniacid = ' . $uniacid . ' and pg.goodsid = ' . $id . ' ORDER BY p.displayorder desc,pg.id desc limit 1 ');
+		$package_goods = pdo_fetch('select pg.id,pg.pid,pg.goodsid,p.displayorder from ' . tablename('ewei_shop_package_goods') . ' as pg' . "\n" . '                        left join ' . tablename('ewei_shop_package') . ' as p on pg.pid = p.id' . "\n" . '                        where pg.uniacid = ' . $uniacid . ' and pg.goodsid = ' . $id . ' ORDER BY p.displayorder desc,pg.id desc limit 1 ');
 		if ($package_goods['pid']) 
 		{
-			$packages = pdo_fetchall('SELECT id,title,thumb,packageprice FROM ' . tablename('ewei_shop_package_goods') . "\r\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $package_goods['pid'] . '  ORDER BY id DESC');
+			$packages = pdo_fetchall('SELECT id,title,thumb,packageprice FROM ' . tablename('ewei_shop_package_goods') . "\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $package_goods['pid'] . '  ORDER BY id DESC');
 			$packages = set_medias($packages, array('thumb'));
 		}
 		$goods['dispatchprice'] = $this->getGoodsDispatchPrice($goods);
@@ -413,7 +414,7 @@ class Detail_EweiShopV2Page extends MobilePage
 				{
 					$optionids[] = $val['id'];
 				}
-				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\r\n" . '        g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '        g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '        where g.id = ' . $id . ' and g.hasoption=1';
+				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\n" . '        g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\n" . '        g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\n" . '        where g.id = ' . $id . ' and g.hasoption=1';
 				pdo_query($sql);
 			}
 			else 

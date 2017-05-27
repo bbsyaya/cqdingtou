@@ -122,6 +122,10 @@ class EweiShopWechatPay
 		{
 			$this->wxapp_coupon();
 		}
+		else if ($this->type == '17') 
+		{
+			$this->grant();
+		}
 		$this->success();
 	}
 	public function order() 
@@ -339,6 +343,43 @@ class EweiShopWechatPay
 		if (p('threen')) 
 		{
 			p('threen')->payResult($orderno, 'wechat', ($this->isapp ? true : false));
+		}
+	}
+	public function grant() 
+	{
+		global $_W;
+		$setting = pdo_fetch('select * from ' . tablename('ewei_shop_system_grant_setting') . ' where id = 1 limit 1 ');
+		if (0 < $setting['weixin']) 
+		{
+			ksort($this->get);
+			$string1 = '';
+			foreach ($this->get as $k => $v ) 
+			{
+				if (($v != '') && ($k != 'sign')) 
+				{
+					$string1 .= $k . '=' . $v . '&';
+				}
+			}
+			$this->sign = strtoupper(md5($string1 . 'key=' . $setting['apikey']));
+			if ($this->sign == $this->get['sign']) 
+			{
+				$order = pdo_fetch('select * from ' . tablename('ewei_shop_system_grant_order') . ' where logno = \'' . $this->get['out_trade_no'] . '\'');
+				pdo_update('ewei_shop_system_grant_order', array('paytime' => time(), 'paystatus' => 1), array('logno' => $this->get['out_trade_no']));
+				$plugind = explode(',', $order['pluginid']);
+				$data = array('logno' => $order['logno'], 'uniacid' => $order['uniacid'], 'code' => $order['code'], 'type' => 'pay', 'month' => $order['month'], 'createtime' => time());
+				foreach ($plugind as $key => $value ) 
+				{
+					$plugin = pdo_fetch('select `identity` from ' . tablename('ewei_shop_plugin') . ' where id = ' . $value . ' ');
+					$data['identity'] = $plugin['identity'];
+					$data['pluginid'] = $value;
+					pdo_insert('ewei_shop_system_grant_log', $data);
+					$id = pdo_insertid();
+					if (m('grant')) 
+					{
+						m('grant')->pluginGrant($id);
+					}
+				}
+			}
 		}
 	}
 	public function mr() 

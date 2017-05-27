@@ -1045,8 +1045,8 @@ class MerchModel extends PluginModel
 			case 3: $condition .= ' and o.merchapply = 3';
 			break;
 			default: $tradeset = m('common')->getSysset('trade');
-		}
 			$refunddays = intval($tradeset['refunddays']);
+		}
 			if (0 < $refunddays) 
 			{
 				$finishtime = intval(time() - ($refunddays * 3600 * 24));

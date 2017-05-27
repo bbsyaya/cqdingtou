@@ -1,4 +1,4 @@
-define(['core', 'tpl'], function (core, tpl) {
+define(['core', 'tpl'], function (core) {
     var modal = {couponid: 0, couponmerchid: 0, coupondiv: null};
     modal.init = function (jie, cashierid, operatorid, id) {
         modal.cashierid = cashierid;
@@ -6,7 +6,6 @@ define(['core', 'tpl'], function (core, tpl) {
         modal.coupondiv = $('#coupondiv');
         var $money = $("#money");
         var goodstitle = $money.data('title');
-        $money.val('');
         $("#btn-wechat").unbind('click').click(function () {
             var money = parseFloat($money.val());
             if (isNaN(money) || money <= 0) {

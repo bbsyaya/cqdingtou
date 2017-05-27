@@ -50,6 +50,17 @@
 			</div>
 		{/if}
 
+		{if !empty($roleuser)}
+			<div class="fui-cell-group fui-cell-click external">
+				<a class="fui-cell"  href="{php echo mobileUrl('mmanage')}" data-nocache="true">
+					<div class="fui-cell-icon"><i class="icon icon-mobilephone"></i></div>
+					<div class="fui-cell-text">{php echo m('plugin')->getName('mmanage')}</div>
+					<div class="fui-cell-remark"></div>
+				</a>
+				<div class="fui-cell-tip">当前用户已绑定操作员，您可以通过手机管理商城</div>
+			</div>
+		{/if}
+
 
 	<div class="fui-cell-group fui-cell-click">
 			<a class="fui-cell external" href="{php echo mobileUrl('order')}">

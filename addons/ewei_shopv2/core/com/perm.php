@@ -12,7 +12,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 	{
 		if (empty(self::$allPerms)) 
 		{
-			$perms = array('shop' => $this->perm_shop(), 'goods' => $this->perm_goods(), 'member' => $this->perm_member(), 'order' => $this->perm_order(), 'finance' => $this->perm_finance(), 'statistics' => $this->perm_statistics(), 'sysset' => $this->perm_sysset(), 'sale' => $this->perm_sale(), 'bargain' => $this->perm_bargain(), 'exchange' => $this->perm_exchange(), 'commission' => $this->perm_commission(), 'diyform' => $this->perm_diyform(), 'poster' => $this->perm_poster(), 'postera' => $this->perm_postera(), 'taobao' => $this->perm_taobao(), 'article' => $this->perm_article(), 'creditshop' => $this->perm_creditshop(), 'exhelper' => $this->perm_exhelper(), 'diypage' => $this->perm_diypage(), 'groups' => $this->perm_groups(), 'perm' => $this->perm_perm(), 'globonus' => $this->perm_globonus(), 'merch' => $this->perm_merch(), 'hotelreservation' => $this->perm_hotelreservation(), 'mr' => $this->perm_mr(), 'qa' => $this->perm_qa(), 'abonus' => $this->perm_abonus(), 'pstore' => $this->perm_pstore(), 'sign' => $this->perm_sign(), 'wangdian' => $this->perm_wangdian(), 'quick' => $this->perm_quick(), 'author' => $this->perm_author(), 'sns' => $this->perm_sns(), 'backone' => $this->perm_backone(), 'task' => $this->perm_task(), 'cashier' => $this->perm_cashier(), 'seckill' => $this->perm_seckill(), 'lottery' => $this->perm_lottery(), 'threen' => $this->perm_threen(), 'messages' => $this->perm_messages(), 'app' => $this->perm_app(), 'polyapi' => $this->perm_polyapi());
+			$perms = array('shop' => $this->perm_shop(), 'goods' => $this->perm_goods(), 'member' => $this->perm_member(), 'order' => $this->perm_order(), 'finance' => $this->perm_finance(), 'statistics' => $this->perm_statistics(), 'sysset' => $this->perm_sysset(), 'sale' => $this->perm_sale(), 'bargain' => $this->perm_bargain(), 'exchange' => $this->perm_exchange(), 'commission' => $this->perm_commission(), 'diyform' => $this->perm_diyform(), 'poster' => $this->perm_poster(), 'postera' => $this->perm_postera(), 'taobao' => $this->perm_taobao(), 'article' => $this->perm_article(), 'creditshop' => $this->perm_creditshop(), 'exhelper' => $this->perm_exhelper(), 'diypage' => $this->perm_diypage(), 'groups' => $this->perm_groups(), 'perm' => $this->perm_perm(), 'globonus' => $this->perm_globonus(), 'merch' => $this->perm_merch(), 'mr' => $this->perm_mr(), 'qa' => $this->perm_qa(), 'abonus' => $this->perm_abonus(), 'pstore' => $this->perm_pstore(), 'sign' => $this->perm_sign(), 'wangdian' => $this->perm_wangdian(), 'quick' => $this->perm_quick(), 'author' => $this->perm_author(), 'sns' => $this->perm_sns(), 'backone' => $this->perm_backone(), 'task' => $this->perm_task(), 'cashier' => $this->perm_cashier(), 'seckill' => $this->perm_seckill(), 'lottery' => $this->perm_lottery(), 'threen' => $this->perm_threen(), 'messages' => $this->perm_messages(), 'app' => $this->perm_app(), 'polyapi' => $this->perm_polyapi(), 'mmanage' => $this->perm_mmanage());
 			self::$allPerms = $perms;
 		}
 		return self::$allPerms;
@@ -35,7 +35,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 	}
 	protected function perm_goods() 
 	{
-		return array( 'text' => '商品管理', 'main' => '浏览列表', 'view' => '查看详情', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'delete1' => '彻底删除-log', 'restore' => '恢复到仓库-log', 'xxx' => array('status' => 'edit', 'property' => 'edit', 'goodsprice' => 'edit', 'change' => 'edit'), 'category' => array( 'text' => '商品分类', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'group' => array( 'text' => '商品组', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'group' => array( 'text' => '标签管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'virtual' => ($this->isopen('virtual', true) && $this->is_perm_plugin('virtual', true) ? array( 'text' => '虚拟卡密', 'temp' => array('text' => '卡密模板管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log'), 'category' => array('text' => '卡密分类管理', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log'), 'data' => array('text' => '卡密数据', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'export' => '导出-log', 'temp' => '下载模板', 'import' => '导入-log') ) : array()) );
+		return array( 'text' => '商品管理', 'main' => '浏览列表', 'view' => '查看详情', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'delete1' => '彻底删除-log', 'restore' => '恢复到仓库-log', 'xxx' => array('status' => 'edit', 'property' => 'edit', 'goodsprice' => 'edit', 'change' => 'edit'), 'category' => array( 'text' => '商品分类', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'group' => array( 'text' => '商品组', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'label' => array( 'text' => '标签管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'virtual' => ($this->isopen('virtual', true) && $this->is_perm_plugin('virtual', true) ? array( 'text' => '虚拟卡密', 'temp' => array('text' => '卡密模板管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log'), 'category' => array('text' => '卡密分类管理', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log'), 'data' => array('text' => '卡密数据', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'export' => '导出-log', 'temp' => '下载模板', 'import' => '导入-log') ) : array()) );
 	}
 	protected function perm_member() 
 	{
@@ -51,7 +51,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 	}
 	protected function perm_sale() 
 	{
-		$array = array( 'text' => '营销', 'coupon' => ($this->isopen('coupon', true) && $this->is_perm_plugin('coupon', true) ? array( 'text' => '优惠券管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'send' => '发放-log', 'set' => '修改设置-log', 'xxx' => array('displayorder' => 'edit'), 'category' => array('text' => '优惠券分类', 'main' => '查看', 'edit' => '修改-log'), 'log' => array('text' => '优惠券记录', 'main' => '查看', 'export' => '导出记录') ) : array()), 'wxcard' => array('text' => '微信卡券管理', 'view' => '浏览', 'add' => '添加', 'edit' => '修改', 'stock' => '修改库存', 'qrcode' => '下载推送二维码', 'delete' => '删除', 'set' => '修改设置-log'), 'virtual' => array('text' => '关注回复', 'view' => '浏览', 'edit' => '修改-log'), 'package' => array( 'text' => '套餐管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete1' => '彻底删除-log', 'xxx' => array('status' => 'edit', 'change' => 'edit') ), 'gift' => array( 'text' => '赠品管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete1' => '彻底删除-log', 'xxx' => array('status' => 'edit', 'change' => 'edit') ), 'fullback' => array( 'text' => '全返管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete1' => '彻底删除-log', 'xxx' => array('status' => 'edit', 'change' => 'edit') ), 'goodscode' => array( 'text' => '商品二维码管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete1' => '彻底删除-log', 'download' => '二维码下载-log', 'xxx' => array('status' => 'edit', 'change' => 'edit') ) );
+		$array = array( 'text' => '营销', 'coupon' => ($this->isopen('coupon', true) && $this->is_perm_plugin('coupon', true) ? array( 'text' => '优惠券管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'send' => '发放-log', 'set' => '修改设置-log', 'xxx' => array('displayorder' => 'edit'), 'category' => array('text' => '优惠券分类', 'main' => '查看', 'edit' => '修改-log'), 'log' => array('text' => '优惠券记录', 'main' => '查看', 'export' => '导出记录') ) : array()), 'wxcard' => array('text' => '微信卡券管理', 'view' => '浏览', 'add' => '添加', 'edit' => '修改', 'stock' => '修改库存', 'qrcode' => '下载推送二维码', 'delete' => '删除', 'set' => '修改设置-log'), 'virtual' => array('text' => '关注回复', 'view' => '浏览', 'edit' => '修改-log'), 'package' => array( 'text' => '套餐管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete1' => '彻底删除-log', 'xxx' => array('status' => 'edit', 'change' => 'edit') ), 'gift' => array( 'text' => '赠品管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete1' => '彻底删除-log', 'xxx' => array('status' => 'edit', 'change' => 'edit') ), 'fullback' => array( 'text' => '全返管理', 'view' => '浏览', 'add' => '添加-log', 'edit' => '修改-log', 'delete1' => '彻底删除-log', 'xxx' => array('status' => 'edit', 'change' => 'edit') ), 'peerpay' => array('text' => '找人代付', 'main' => '查看', 'edit' => '编辑') );
 		if ($this->isopen('sale', true) && $this->is_perm_plugin('sale', true)) 
 		{
 			$sale = array('deduct' => '修改抵扣设置-log', 'enough' => '修改满额立减-log', 'enoughfree' => '修改满额包邮-log', 'recharge' => '修改充值优惠设置-log', 'credit1' => '积分优惠优惠设置-log');
@@ -119,6 +119,10 @@ class Perm_EweiShopV2ComModel extends ComModel
 	{
 		return ($this->isopen('sign') && $this->is_perm_plugin('sign') ? array( 'text' => m('plugin')->getName('sign'), 'rule' => array('text' => '签到规则', 'main' => '查看', 'edit' => '编辑-log'), 'set' => array('text' => '签到入口', 'main' => '查看', 'edit' => '编辑-log'), 'records' => array('text' => '签到记录', 'main' => '查看') ) : array());
 	}
+	protected function perm_mmanage() 
+	{
+		return ($this->isopen('mmanage') && $this->is_perm_plugin('mmanage') ? array( 'text' => m('plugin')->getName('mmanage'), 'setting' => array('text' => '基本设置', 'main' => '查看', 'save' => '保存-log') ) : array());
+	}
 	protected function perm_wangdian() 
 	{
 		return ($this->isopen('wangdian') && $this->is_perm_plugin('wangdian') ? array( 'text' => m('plugin')->getName('wangdian'), 'set' => array('text' => '设同步置', 'main' => '查看设置', 'save' => '保存-log') ) : array());
@@ -149,7 +153,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 	}
 	protected function perm_hotelreservation() 
 	{
-		return ($this->isopen('hotelreservation') && $this->is_perm_plugin('hotelreservation') ? array( 'text' => p('hotelreservation')->getName('hotelreservation'), 'goods' => array('text' => '民宿商品管理', 'view' => '查看', 'add' => '添加-log', 'edit' => '编辑-log'), 'adv' => array( 'text' => '幻灯片管理', 'main' => '查看列表', 'view' => '查看', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'xxx' => array('displayorder' => 'edit', 'enabled' => 'edit') ), 'recommend' => array( 'text' => '民宿推荐管理', 'main' => '查看列表', 'view' => '查看', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'xxx' => array('displayorder' => 'edit', 'enabled' => 'edit') ) ) : array());
+		return ($this->isopen('hotelreservation') && $this->is_perm_plugin('hotelreservation') ? array( 'text' => m('plugin')->getName('hotelreservation'), 'goods' => array('text' => '民宿商品管理', 'view' => '查看', 'add' => '添加-log', 'edit' => '编辑-log'), 'adv' => array( 'text' => '幻灯片管理', 'main' => '查看列表', 'view' => '查看', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'xxx' => array('displayorder' => 'edit', 'enabled' => 'edit') ), 'recommend' => array( 'text' => '民宿推荐管理', 'main' => '查看列表', 'view' => '查看', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'xxx' => array('displayorder' => 'edit', 'enabled' => 'edit') ) ) : array());
 	}
 	protected function perm_merch() 
 	{
@@ -238,11 +242,27 @@ class Perm_EweiShopV2ComModel extends ComModel
 		{
 			$plugins = explode(',', $perm_plugin['plugins']);
 			$coms = explode(',', $perm_plugin['coms']);
-			if ($iscom) 
+			$filename = '../addons/ewei_shopv2/core/model/grant.php';
+			if (file_exists($filename)) 
+			{
+				$check = m('grant')->checkplugin($pluginname);
+				if (!($check)) 
+				{
+					if ($iscom) 
+					{
+						return in_array($pluginname, $coms);
+					}
+					return in_array($pluginname, $plugins);
+				}
+			}
+			else if ($iscom) 
 			{
 				return in_array($pluginname, $coms);
 			}
-			return in_array($pluginname, $plugins);
+			else 
+			{
+				return in_array($pluginname, $plugins);
+			}
 		}
 		return true;
 	}
@@ -402,7 +422,19 @@ class Perm_EweiShopV2ComModel extends ComModel
 			$allow_plugins = explode(',', $ac_perm['plugins']);
 			if (!(in_array($pluginname, $allow_plugins))) 
 			{
-				$allow = false;
+				$filename = '../addons/ewei_shopv2/core/model/grant.php';
+				if (file_exists($filename)) 
+				{
+					$check = m('grant')->checkplugin($pluginname);
+					if (!($check)) 
+					{
+						$allow = false;
+					}
+				}
+				else 
+				{
+					$allow = false;
+				}
 			}
 		}
 		else 
@@ -412,6 +444,11 @@ class Perm_EweiShopV2ComModel extends ComModel
 			if (in_array($_W['uniacid'], array_keys($accounts))) 
 			{
 				$allow = true;
+				$filename = '../addons/ewei_shopv2/core/model/grant.php';
+				if (file_exists($filename)) 
+				{
+					$allow = m('grant')->checkplugin($pluginname);
+				}
 			}
 			else 
 			{
@@ -460,7 +497,23 @@ class Perm_EweiShopV2ComModel extends ComModel
 			$allow_coms = explode(',', $ac_perm['coms']);
 			if (!(in_array($comname, $allow_coms))) 
 			{
-				$allow = false;
+				$allow_plugins = explode(',', $ac_perm['plugins']);
+				if (!(in_array($comname, $allow_plugins))) 
+				{
+					$filename = '../addons/ewei_shopv2/core/model/grant.php';
+					if (file_exists($filename)) 
+					{
+						$check = m('grant')->checkplugin($comname);
+						if (!($check)) 
+						{
+							$allow = false;
+						}
+					}
+					else 
+					{
+						$allow = false;
+					}
+				}
 			}
 		}
 		else 
@@ -470,6 +523,11 @@ class Perm_EweiShopV2ComModel extends ComModel
 			if (in_array($_W['uniacid'], array_keys($accounts))) 
 			{
 				$allow = true;
+				$filename = '../addons/ewei_shopv2/core/model/grant.php';
+				if (file_exists($filename)) 
+				{
+					$allow = m('grant')->checkplugin($comname);
+				}
 			}
 			else 
 			{

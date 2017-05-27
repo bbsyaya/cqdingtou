@@ -134,13 +134,16 @@ class Refund_EweiShopV2Page extends WebPage
 			{
 				if (0 < $item['parentid']) 
 				{
-					$parent_item = pdo_fetch('SELECT id,ordersn,ordersn2,price FROM ' . tablename('ewei_shop_order') . ' WHERE id = :id and uniacid=:uniacid Limit 1', array(':id' => $item['parentid'], ':uniacid' => $_W['uniacid']));
+					$parent_item = pdo_fetch('SELECT id,ordersn,ordersn2,price,transid,paytype,apppay FROM ' . tablename('ewei_shop_order') . ' WHERE id = :id and uniacid=:uniacid Limit 1', array(':id' => $item['parentid'], ':uniacid' => $_W['uniacid']));
 					if (empty($parent_item)) 
 					{
 						show_json(0, '未找到退款订单!');
 					}
 					$order_price = $parent_item['price'];
 					$ordersn = $parent_item['ordersn'];
+					$item['transid'] = $parent_item['transid'];
+					$item['paytype'] = $parent_item['paytype'];
+					$item['apppay'] = $parent_item['apppay'];
 					if (!(empty($parent_item['ordersn2']))) 
 					{
 						$var = sprintf('%02d', $parent_item['ordersn2']);
@@ -164,6 +167,8 @@ class Refund_EweiShopV2Page extends WebPage
 				{
 					$item['paytype'] = 23;
 				}
+				$ispeerpay = m('order')->checkpeerpay($id);
+				$item['paytype'] = 21;
 				if ($item['paytype'] == 1) 
 				{
 					m('member')->setCredit($item['openid'], 'credit2', $realprice, array(0, $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']));
@@ -178,7 +183,28 @@ class Refund_EweiShopV2Page extends WebPage
 					else 
 					{
 						$realprice = round($realprice - $item['deductcredit2'], 2);
-						if (0 < $realprice) 
+						if (!(empty($ispeerpay))) 
+						{
+							$pid = 'SELECT id,peerpay_realprice FROM ' . tablename('ewei_shop_order_peerpay') . ' WHERE orderid = :id AND uniacid = :uniacid';
+							$pid = pdo_fetch($pid, array(':id' => $id, ':uniacid' => $_W['uniacid']));
+							$peerpaysql = 'SELECT * FROM ' . tablename('ewei_shop_order_peerpay_payinfo') . ' WHERE pid = :pid';
+							$peerpaylist = pdo_fetchall($peerpaysql, array(':pid' => $pid['id']));
+							if (empty($peerpaylist)) 
+							{
+								show_json(0, '没有这个代付订单');
+							}
+							foreach ($peerpaylist as $k => $v ) 
+							{
+								if (empty($v['tid'])) 
+								{
+									m('member')->setCredit($v['openid'], 'credit2', $v['price'], array(0, $shopset['name'] . '退款: ' . $realprice . '元 代付订单号: ' . $item['ordersn']));
+									$result = true;
+									continue;
+								}
+								$result = m('finance')->refund($v['openid'], $v['tid'], $refund['refundno'] . $v['id'], $pid['peerpay_realprice'] * 100, $v['price'] * 100, (!(empty($item['apppay'])) ? true : false));
+							}
+						}
+						else if (0 < $realprice) 
 						{
 							if (empty($item['isborrow'])) 
 							{

@@ -114,6 +114,10 @@ class Index_EweiShopV2Page extends MobileLoginPage
 				$needbind = true;
 			}
 		}
+		if (p('mmanage')) 
+		{
+			$roleuser = pdo_fetch('SELECT id, uid, username, status FROM' . tablename('ewei_shop_perm_user') . 'WHERE openid=:openid AND uniacid=:uniacid AND status=1 LIMIT 1', array(':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
+		}
 		include $this->template();
 	}
 }

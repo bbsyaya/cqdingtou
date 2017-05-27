@@ -149,6 +149,14 @@ class Check_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 		$status = intval($_GPC['status']);
 		$item = $this->model->getOneApply($id);
+		if (empty($item['applytype'])) 
+		{
+			$merch_user = pdo_fetch('select * from ' . tablename('ewei_shop_merch_user') . ' where uniacid=:uniacid and id=' . $item['merchid'], array(':uniacid' => $_W['uniacid']));
+			if (!(empty($merch_user['payopenid']))) 
+			{
+				$member = m('member')->getMember($merch_user['payopenid']);
+			}
+		}
 		$apply_type = array(0 => '微信钱包', 2 => '支付宝', 3 => '银行卡');
 		if ($status == 1) 
 		{

@@ -249,7 +249,7 @@
 }
 
 .diymenu {
-    height: 50px;
+    height: 2.5rem;
     width: 100%;
     position: absolute;
     z-index: 1;
@@ -261,7 +261,7 @@
 }
 
 .diymenu .item {
-    height: 50px;
+    height: 2.5rem;
     width: 25%;
     display: block;
     background: #fff;
@@ -387,7 +387,10 @@
     z-index: 997;
     text-align: center;
     color: #fff;
-    padding: 8px 0;
+    padding: 0;
+}
+.diymenu .item .inner.left {
+    padding-top: 0.25rem;
 }
 
 .diymenu .item .inner:before {
@@ -416,19 +419,18 @@
 
 .diymenu .item .inner .icon {
     display: block;
-    font-size: 20px;
-    line-height: 20px;
-    color: #666;
+    font-size: 1rem;
+    height: 1.5rem;
+    line-height: 1.7rem;
+    color: #f90;
 }
 
 .diymenu .item .inner .text {
     display: block;
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 0.55rem;
     color: #999;
     overflow: hidden;
     margin: 0 2px;
-    height: 16px;
 }
 .diymenu .item .inner .icon.left,
 .diymenu .item .inner .text.left {

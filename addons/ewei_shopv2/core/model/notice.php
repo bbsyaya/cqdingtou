@@ -344,6 +344,7 @@ class Notice_EweiShopV2Model
 		$is_merch = 0;
 		$openid = $order['openid'];
 		$url = $this->getUrl('order/detail', array('id' => $orderid));
+		$appurl = '/pages/order/detail/index?id=' . $orderid;
 		$param = array();
 		$param[':uniacid'] = $_W['uniacid'];
 		if ($order['isparent'] == 1) 
@@ -459,7 +460,7 @@ class Notice_EweiShopV2Model
 						$remark = '<a href=\'' . $url . '\'>点击快速查询物流信息</a>';
 						$text = '您申请换货的宝贝已经成功发货，请注意查收 ' . "\n\n" . '订单编号：' . "\n" . '[订单号]' . "\n" . '快递公司：[换货快递公司]' . "\n" . '快递单号：[换货快递单号]' . "\n\n" . $remark;
 						$msg = array( 'first' => array('value' => '您申请换货的宝贝已经成功发货，请注意查收！' . "\n", 'color' => '#ff0000'), 'keyword1' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword2' => array('title' => '快递公司', 'value' => $refund['rexpresscom'], 'color' => '#000000'), 'keyword3' => array('title' => '快递单号', 'value' => $refund['rexpresssn'], 'color' => '#000000'), 'remark' => array('value' => "\n" . '点击快速查询物流信息', 'color' => '#000000') );
-						$this->sendNotice(array('openid' => $openid, 'tag' => 'refund4', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+						$this->sendNotice(array('openid' => $openid, 'tag' => 'refund4', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 						com_run('sms::callsms', array('tag' => 'refund4', 'datas' => $datas, 'mobile' => $member['mobile']));
 					}
 				}
@@ -478,7 +479,7 @@ class Notice_EweiShopV2Model
 						$text = '您好，您的换货申请已经通过，请您及时发送快递。' . "\n\n" . '申请换货订单号：' . "\n" . '[订单号]' . "\n" . '请将快递发送到以下地址，并随包裹填写您的订单编号以及联系方式，我们将尽快为您处理' . "\n" . '邮寄地址：[卖家收货地址]' . "\n" . '联系电话：[卖家联系电话]' . "\n" . '收货人：[卖家收货人]' . "\n\n" . '感谢您关注，如有疑问请联系在线客服或<a href=\'' . $url . '\'>点击查看详情</a>';
 						$remark2 = '请将快递发送到以下地址，并随包裹填写您的订单编号以及联系方式，我们将尽快为您处理' . "\n\n" . '邮寄地址：' . $salerefund['province'] . $salerefund['city'] . $salerefund['area'] . ' ' . $salerefund['address'] . "\n" . '联系电话：' . $salerefund['mobile'] . "\n" . '收货人：' . $salerefund['name'] . "\n\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情';
 						$msg = array( 'first' => array('value' => '您好，您的换货申请已经通过，请您及时发送快递。' . "\n", 'color' => '#ff0000'), 'keyword1' => array('title' => '任务名称', 'value' => '退换货申请', 'color' => '#000000'), 'keyword2' => array('title' => '通知类型', 'value' => '换货通过', 'color' => '#4b9528'), 'remark' => array('value' => $remark2, 'color' => '#000000') );
-						$this->sendNotice(array('openid' => $openid, 'tag' => 'refund3', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+						$this->sendNotice(array('openid' => $openid, 'tag' => 'refund3', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 						com_run('sms::callsms', array('tag' => 'refund3', 'datas' => $datas, 'mobile' => $member['mobile']));
 					}
 				}
@@ -505,7 +506,7 @@ class Notice_EweiShopV2Model
 						}
 						$text = '您好，您有一笔退款已经成功，[退款金额].元已经退回您的申请退款账户内，请及时查看 。' . "\n\n" . '订单编号：' . "\n" . '[订单号]' . "\n" . '退款金额：[退款金额]元' . "\n" . '退款原因：[售后类型]' . "\n" . '退款去向：' . $refundtype . "\n\n" . '感谢您关注，如有疑问请联系在线客服或<a href=\'' . $url . '\'>点击查看详情</a>';
 						$msg = array( 'first' => array('value' => '您好，您有一笔退款已经成功，' . $refund['price'] . '元已经退回您的申请退款账户内，请及时查看 。', 'color' => '#ff0000'), 'orderProductPrice' => array('title' => '退款金额', 'value' => $refund['price'] . '元', 'color' => '#000000'), 'orderProductName' => array('title' => '商品名称', 'value' => str_replace("\n", '', $goodsname), 'color' => '#000000'), 'orderName' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'remark' => array('value' => "\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情', 'color' => '#000000') );
-						$this->sendNotice(array('openid' => $openid, 'tag' => 'refund1', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+						$this->sendNotice(array('openid' => $openid, 'tag' => 'refund1', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 						com_run('sms::callsms', array('tag' => 'refund1', 'datas' => $datas, 'mobile' => $member['mobile']));
 					}
 				}
@@ -519,7 +520,7 @@ class Notice_EweiShopV2Model
 					$text = '您好，你那有一笔' . $r_type[$refund['rtype']] . '被驳回，您可以与我们取得联系！' . "\n\n" . '退款金额：[申请金额]元' . "\n" . '订单编号：' . "\n" . '[订单号]' . "\n" . $remark;
 					$remark2 = '商品详情：' . substr_replace(str_replace("\n\n", "\n", $goodsname), '', strrpos($goodsname, "\n"), strlen("\n")) . '订单编号：' . $order['ordersn'] . "\n" . '退款金额：' . (($refund['rtype'] == 2 ? '-' : $refund['applyprice'])) . '元' . "\n\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情';
 					$msg = array( 'first' => array('value' => '您好，你有一笔' . $r_type[$refund['rtype']] . '被驳回，您可以与我们取得联系！' . "\n", 'color' => '#ff0000'), 'keyword1' => array('title' => '任务名称', 'value' => '退换货申请', 'color' => '#000000'), 'keyword2' => array('title' => '通知类型', 'value' => '驳回通知', 'color' => '#ff0000'), 'remark' => array('value' => $remark2, 'color' => '#000000') );
-					$this->sendNotice(array('openid' => $openid, 'tag' => 'refund2', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'mobile' => $buyerinfo_mobile));
+					$this->sendNotice(array('openid' => $openid, 'tag' => 'refund2', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'mobile' => $buyerinfo_mobile, 'appurl' => $appurl));
 					com_run('sms::callsms', array('tag' => 'refund2', 'datas' => $datas, 'mobile' => $member['mobile']));
 				}
 			}
@@ -534,7 +535,7 @@ class Notice_EweiShopV2Model
 			$remark = '，或<a href=\'' . $url . '\'>点击查看详情</a>';
 			$text = '您好，您的订单由于长时间未付款已经关闭！！！' . "\n\n" . '商品名称：' . substr_replace($goodsname, '', strrpos($goodsname, "\n\n"), strlen("\n\n")) . "\n" . '订单编号：' . "\n" . '[订单号]' . "\n" . '订单金额：[订单金额]' . "\n" . '下单时间：[下单时间]' . "\n" . '关闭时间：[取消时间]' . "\n\n" . '感谢您的关注，如有疑问请联系在线客服咨询' . $remark;
 			$msg = array( 'first' => array('value' => '您好，您的订单由于长时间未付款已经关闭！！！', 'color' => '#ff0000'), 'keyword1' => array('title' => '订单商品', 'value' => substr_replace($goodsname, '', strrpos($goodsname, "\n\n"), strlen("\n\n")), 'color' => '#000000'), 'keyword2' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword3' => array('title' => '下单时间', 'value' => date('Y-m-d H:i', $order['createtime']), 'color' => '#000000'), 'keyword4' => array('title' => '订单金额', 'value' => $order['price'], 'color' => '#000000'), 'keyword5' => array('title' => '关闭时间', 'value' => date('Y-m-d H:i', $order['canceltime']), 'color' => '#000000'), 'remark' => array('value' => "\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情！', 'color' => '#000000') );
-			$this->sendNotice(array('openid' => $openid, 'tag' => 'cancel', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'mobile' => $buyerinfo_mobile));
+			$this->sendNotice(array('openid' => $openid, 'tag' => 'cancel', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'mobile' => $buyerinfo_mobile, 'appurl' => $appurl));
 			com_run('sms::callsms', array('tag' => 'cancel', 'datas' => $datas, 'mobile' => $member['mobile']));
 		}
 		else if (($order['status'] == 0) && ($order['paytype'] == 3)) 
@@ -698,7 +699,7 @@ class Notice_EweiShopV2Model
 				$cusurl = '<a href=\'' . $url . '\'>点击查看详情</a>';
 				$text = '您的订单已经成功支付，我们将尽快为您安排发货！！ ' . "\n\n" . '订单号：' . "\n" . '[订单号]' . "\n" . '商品名称：' . "\n" . '[商品名称]商品数量：[商品数量]' . "\n" . '下单时间：[下单时间]' . "\n" . '订单金额：[订单金额]' . "\n" . $remark . $cusurl;
 				$msg = array( 'first' => array('value' => '您的订单已于' . date('Y-m-d H:i', $order['paytime']) . '成功支付，我们将尽快为您安排发货！!' . "\n", 'color' => '#4b9528'), 'keyword1' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword2' => array('title' => '商品名称', 'value' => substr_replace($goodsname, "\n", strrpos($goodsname, "\n\n"), strlen("\n\n")), 'color' => '#000000'), 'keyword3' => array('title' => '商品数量', 'value' => $goodsnum, 'color' => '#000000'), 'keyword4' => array('title' => '支付金额', 'value' => $order['price'], 'color' => '#000000'), 'remark' => array('value' => $remark, 'color' => '#000000') );
-				$this->sendNotice(array('openid' => $openid, 'tag' => 'pay', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+				$this->sendNotice(array('openid' => $openid, 'tag' => 'pay', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 				com_run('sms::callsms', array('tag' => 'pay', 'datas' => $datas, 'mobile' => $member['mobile']));
 			}
 			if (($order['dispatchtype'] == 1) && empty($order['isverify'])) 
@@ -714,7 +715,7 @@ class Notice_EweiShopV2Model
 				$remark = "\n" . '请您到选择的自提点进行取货, 自提联系人: ' . $store['realname'] . ' 联系电话: ' . $store['mobile'] . "\n\n" . '<a href=\'' . $url . '\'>点击查看详情</a>';
 				$text = '自提订单提交成功!！' . "\n" . '自提码：[自提码]' . "\n" . '商品详情：[商品详情]' . "\n" . '提货地址：[门店地址]' . "\n" . '提货时间：[门店营业时间]' . "\n" . $remark;
 				$msg = array( 'first' => array('value' => '自提订单提交成功!', 'color' => '#000000'), 'keyword1' => array('title' => '自提码', 'value' => $order['verifycode'], 'color' => '#000000'), 'keyword2' => array('title' => '商品详情', 'value' => $goods . $orderpricestr, 'color' => '#000000'), 'keyword3' => array('title' => '提货地址', 'value' => $store['address'], 'color' => '#000000'), 'keyword4' => array('title' => '提货时间', 'value' => $store['saletime'], 'color' => '#000000'), 'remark' => array('value' => "\n" . '请您到选择的自提点进行取货, 自提联系人: ' . $store['realname'] . ' 联系电话: ' . $store['mobile'], 'color' => '#000000') );
-				$this->sendNotice(array('openid' => $openid, 'tag' => 'carrier', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+				$this->sendNotice(array('openid' => $openid, 'tag' => 'carrier', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 				com_run('sms::callsms', array('tag' => 'carrier', 'datas' => $datas, 'mobile' => $member['mobile']));
 			}
 		}
@@ -736,9 +737,33 @@ class Notice_EweiShopV2Model
 							return;
 						}
 						$remark = '<a href=\'' . $url . '\'>点击快速查询物流信息</a>';
-						$text = '您的宝贝已经成功发货！ ' . "\n" . '商品名称：[商品详情]' . "\n" . '快递公司：[快递公司]' . "\n" . '快递单号：[快递单号]' . "\n" . $remark;
-						$msg = array( 'first' => array('value' => '您的宝贝已经发货！', 'color' => '#000000'), 'keyword1' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword2' => array('title' => '快递公司', 'value' => $order['expresscom'], 'color' => '#000000'), 'keyword3' => array('title' => '快递单号', 'value' => $order['expresssn'], 'color' => '#000000'), 'remark' => array('value' => "\n" . '我们正加速送到您的手上，请您耐心等候。', 'color' => '#000000') );
-						$this->sendNotice(array('openid' => $openid, 'tag' => 'send', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+						$text = '您的宝贝已经成功发货！ ' . "\n" . '商品名称：[商品详情]' . "\n" . '快递公司：[快递公司]' . "\n" . '快递单号：[快递单号]' . "\n";
+						$msg = array();
+						$msg['first'] = array('value' => '您的宝贝已经发货！', 'color' => '#000000');
+						$msg['keyword1'] = array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000');
+						$msg['keyword2'] = array('title' => '快递公司', 'value' => $order['expresscom'], 'color' => '#000000');
+						$msg['keyword3'] = array('title' => '快递单号', 'value' => $order['expresssn'], 'color' => '#000000');
+						$remark_value = '';
+						if (0 < $order['merchid']) 
+						{
+							$merch_user = p('merch')->getListUserOne($order['merchid']);
+							if (!(empty($merch_user['mobile']))) 
+							{
+								$datas[] = array('name' => '商户电话', 'value' => $merch_user['mobile']);
+								$text .= "\n" . '商户电话：[商户电话]';
+								$remark_value .= "\n" . '商户电话：' . $merch_user['mobile'];
+							}
+							if (!(empty($merch_user['address']))) 
+							{
+								$datas[] = array('name' => '商户地址', 'value' => $merch_user['address']);
+								$text .= "\n" . '商户地址：[商户地址]';
+								$remark_value .= "\n" . '商户地址：' . $merch_user['address'];
+							}
+						}
+						$text .= $remark;
+						$remark_value .= "\n" . '我们正加速送到您的手上，请您耐心等候';
+						$msg['remark'] = array('value' => $remark_value, 'color' => '#000000');
+						$this->sendNotice(array('openid' => $openid, 'tag' => 'send', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 						com_run('sms::callsms', array('tag' => 'send', 'datas' => $datas, 'mobile' => $member['mobile']));
 					}
 					else 
@@ -787,7 +812,7 @@ class Notice_EweiShopV2Model
 						$remark = '<a href=\'' . $url . '\'>点击快速查询物流信息</a>';
 						$text = '您的包裹已经成功发货！ ' . "\n" . '商品名称：[包裹商品名称]快递公司：[包裹快递公司]' . "\n" . '快递单号：[包裹快递单号]' . "\n" . $remark;
 						$msg = array( 'first' => array('value' => '您的包裹已经发货！', 'color' => '#000000'), 'keyword1' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword2' => array('title' => '快递公司', 'value' => $package_expresscom, 'color' => '#000000'), 'keyword3' => array('title' => '快递单号', 'value' => $package_expresssn, 'color' => '#000000'), 'remark' => array('value' => "\n" . '我们正加速送到您的手上，请您耐心等候。', 'color' => '#000000') );
-						$this->sendNotice(array('openid' => $openid, 'tag' => 'send', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+						$this->sendNotice(array('openid' => $openid, 'tag' => 'send', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 						com_run('sms::callsms', array('tag' => 'send', 'datas' => $datas, 'mobile' => $member['mobile']));
 					}
 				}
@@ -801,7 +826,7 @@ class Notice_EweiShopV2Model
 					{
 						$text = '您的商品已购买成功，以下为您的购物信息。' . "\n\n" . '商品名称:' . str_replace("\n", '', $goodsname) . "\n" . '订单金额：[订单金额]' . "\n" . '卡密信息：<a href=\'' . $url . '\'> 点击查看</a>';
 						$msg = array( 'first' => array('value' => '您的商品已购买成功，以下为您的购物信息。', 'color' => '#4b9528'), 'keyword1' => array('title' => '商品名称', 'value' => str_replace("\n", '', $goodsname), 'color' => '#000000'), 'keyword2' => array('title' => '订单号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword3' => array('title' => '订单金额', 'value' => '¥' . $order['price'] . '元', 'color' => '#000000'), 'keyword4' => array('title' => '卡密信息', 'value' => '点击查看详情', 'color' => '#ff0000') );
-						$this->sendNotice(array('openid' => $openid, 'tag' => 'virtualsend', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+						$this->sendNotice(array('openid' => $openid, 'tag' => 'virtualsend', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 						com_run('sms::callsms', array('tag' => 'virtualsend', 'datas' => $datas, 'mobile' => $member['mobile']));
 					}
 					$first = '买家购买的商品已经自动发货!' . "\n";
@@ -878,7 +903,7 @@ class Notice_EweiShopV2Model
 					{
 						$text = '您的商品已购买成功，以下为您的购物信息。' . "\n\n" . '商品名称:' . str_replace("\n", '', $goodsname) . "\n" . '订单金额：[订单金额]' . "\n" . '卡密信息：<a href=\'' . $url . '\'> 点击查看</a>';
 						$msg = array( 'first' => array('value' => '您的商品已购买成功，以下为您的购物信息。', 'color' => '#4b9528'), 'keyword1' => array('title' => '商品名称', 'value' => str_replace("\n", '', $goodsname), 'color' => '#000000'), 'keyword2' => array('title' => '订单号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword3' => array('title' => '订单金额', 'value' => '¥' . $order['price'] . '元', 'color' => '#000000'), 'keyword4' => array('title' => '卡密信息', 'value' => '点击查看详情', 'color' => '#ff0000') );
-						$this->sendNotice(array('openid' => $openid, 'tag' => 'virtualsend', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+						$this->sendNotice(array('openid' => $openid, 'tag' => 'virtualsend', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 						com_run('sms::callsms', array('tag' => 'virtualsend', 'datas' => $datas, 'mobile' => $member['mobile']));
 					}
 					$first = '买家购买的商品已经自动发货!' . "\n";
@@ -1042,6 +1067,7 @@ class Notice_EweiShopV2Model
 		global $_GPC;
 		$member = m('member')->getMember($openid);
 		$detailurl = $this->getUrl('member');
+		$appurl = '/pages/member/index/index';
 		$usernotice = unserialize($member['noticeset']);
 		if (!(is_array($usernotice))) 
 		{
@@ -1060,7 +1086,7 @@ class Notice_EweiShopV2Model
 		$datas = array( array('name' => '商城名称', 'value' => $_W['shopset']['shop']['name']), array('name' => '粉丝昵称', 'value' => $member['nickname']), array('name' => '旧等级', 'value' => $oldlevelname), array('name' => '新等级', 'value' => $level['levelname']) );
 		$remark = "\n" . '<a href=\'' . $detailurl . '\'>点击进入查看充值订单详情</a>';
 		$text = '亲爱的' . $member['nickname'] . '， 恭喜您成功升级！' . "\n\n" . '您会员等级从[旧等级] 升级为[新等级] , 特此通知!' . "\n" . '您即可享有[新等级]的专属优惠及服务！' . $remark;
-		$this->sendNotice(array('openid' => $openid, 'tag' => 'upgrade', 'default' => $message, 'cusdefault' => $text, 'url' => $detailurl, 'datas' => $datas));
+		$this->sendNotice(array('openid' => $openid, 'tag' => 'upgrade', 'default' => $message, 'cusdefault' => $text, 'url' => $detailurl, 'datas' => $datas, 'appurl' => $appurl));
 		com_run('sms::callsms', array('tag' => 'upgrade', 'datas' => $datas, 'mobile' => $member['mobile']));
 	}
 	public function sendMemberPointChange($openid, $pointchange = 0, $changetype = 0) 
@@ -1108,6 +1134,7 @@ class Notice_EweiShopV2Model
 		global $_W;
 		global $_GPC;
 		$url = $this->getUrl('member/log');
+		$appurl = '/pages/member/log/index';
 		$log_info = pdo_fetch('select * from ' . tablename('ewei_shop_member_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $log_id, ':uniacid' => $_W['uniacid']));
 		$member = m('member')->getMember($log_info['openid']);
 		$usernotice = unserialize($member['noticeset']);
@@ -1177,7 +1204,7 @@ class Notice_EweiShopV2Model
 						$money .= '，系统赠送' . $log_info['gives'] . $yuan . '合计:' . $totalmoney . $yuan;
 					}
 					$message = array( 'first' => array('value' => '亲爱的' . $member['nickname'] . '，您的' . $moneytext . '发生变动，具体如下：' . "\n", 'color' => '#000000'), 'keyword1' => array('title' => '充值金额', 'value' => $log_info['money'] . $yuan, 'color' => '#ff0000'), 'keyword2' => array('title' => '充值时间', 'value' => date('Y-m-d H:i', $log_info['createtime']), 'color' => '#000000'), 'keyword3' => array('title' => '账户余额', 'value' => $member['credit2'] . $yuan, 'color' => '#ff0000'), 'remark' => array('value' => '充值方式：管理员后台处理' . "\n\n" . $_W['shopset']['shop']['name'] . '感谢您的支持，如有疑问请联系在线客服。', 'color' => '#000000') );
-					$this->sendNotice(array('openid' => $log_info['openid'], 'tag' => 'backrecharge_ok', 'default' => $message, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
+					$this->sendNotice(array('openid' => $log_info['openid'], 'tag' => 'backrecharge_ok', 'default' => $message, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
 					com_run('sms::callsms', array('tag' => 'backrecharge_ok', 'datas' => $datas, 'mobile' => $member['mobile']));
 				}
 				else if (!(empty($usernotice['recharge_ok']))) 
@@ -1231,6 +1258,14 @@ class Notice_EweiShopV2Model
 		{
 			$tm = m('common')->getSysset('notice');
 		}
+		$data = m('common')->getSysset('app');
+		$miniprogram = array();
+		if (p('app') && !(empty($data)) && empty($data['closetext']) && !(empty($data['appid'])) && !(empty($params['appurl']))) 
+		{
+			$miniprogram['appid'] = $data['appid'];
+			$miniprogram['pagepath'] = $params['appurl'];
+		}
+		$data = m('common')->getSysset('app');
 		$tm_temp = $tm[$tag . '_template'];
 		$templateid = $tm_temp;
 		$datas = ((isset($params['datas']) ? $params['datas'] : array()));
@@ -1253,8 +1288,8 @@ class Notice_EweiShopV2Model
 		}
 		else 
 		{
-			goto label102;
-			label102: $merch_tm = '';
+			
+			$merch_tm = '';
 			return;
 		}*/
 		if (!(empty($templateid))) 
@@ -1276,7 +1311,7 @@ class Notice_EweiShopV2Model
 					$ret = m('message')->sendTexts($touser, $Custom_message, $url, $account);
 					if (is_error($ret)) 
 					{
-						$ret = m('message')->sendTplNotice($touser, $template['template_id'], $template_message, $url, $account);
+						$ret = m('message')->sendTplNotice($touser, $template['template_id'], $template_message, $url, $account, $miniprogram);
 					}
 				}
 				else if ($messagetype == 1) 
@@ -1287,7 +1322,7 @@ class Notice_EweiShopV2Model
 					{
 						$template_message[$d['keywords']] = array('value' => $this->replaceTemplate($d['value'], $datas), 'color' => $d['color']);
 					}
-					$ret = m('message')->sendTplNotice($touser, $template['template_id'], $template_message, $url, $account);
+					$ret = m('message')->sendTplNotice($touser, $template['template_id'], $template_message, $url, $account, $miniprogram);
 				}
 				else if ($messagetype == 2) 
 				{
@@ -1304,7 +1339,7 @@ class Notice_EweiShopV2Model
 					$templatetype = pdo_fetch('select templateid  from ' . tablename('ewei_shop_member_message_template_default') . ' where typecode=:typecode and uniacid=:uniacid  limit 1', array(':typecode' => $tag, ':uniacid' => $_W['uniacid']));
 					if (!(empty($templatetype['templateid']))) 
 					{
-						$ret = m('message')->sendTplNotice($touser, $templatetype['templateid'], $default_message, $url, $account);
+						$ret = m('message')->sendTplNotice($touser, $templatetype['templateid'], $default_message, $url, $account, $miniprogram);
 					}
 				}
 			}
@@ -1317,7 +1352,7 @@ class Notice_EweiShopV2Model
 				$templatetype = pdo_fetch('select templateid  from ' . tablename('ewei_shop_member_message_template_default') . ' where typecode=:typecode and uniacid=:uniacid  limit 1', array(':typecode' => $tag, ':uniacid' => $_W['uniacid']));
 				if (!(empty($templatetype['templateid']))) 
 				{
-					$ret = m('message')->sendTplNotice($touser, $templatetype['templateid'], $default_message, $url, $account);
+					$ret = m('message')->sendTplNotice($touser, $templatetype['templateid'], $default_message, $url, $account, $miniprogram);
 				}
 			}
 		}

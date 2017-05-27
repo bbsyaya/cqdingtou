@@ -171,7 +171,7 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 		}
 		if ((($rtype == 0) || ($rtype == 1)) && (3 <= $order['status'])) 
 		{
-			if (($orderprice <= $fullback_log['price']) || ($fullbackgoods['refund'] == 0)) 
+			if ((($orderprice <= $fullback_log['price']) || ($fullbackgoods['refund'] == 0)) && $fullback_log) 
 			{
 				show_json(0, '此订单不可退款');
 			}

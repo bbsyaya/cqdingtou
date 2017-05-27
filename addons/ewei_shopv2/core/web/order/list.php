@@ -90,6 +90,10 @@ class List_EweiShopV2Page extends WebPage
 			{
 				$condition .= ' AND (locate(:keyword,sm.realname)>0 or locate(:keyword,sm.mobile)>0 or locate(:keyword,sm.nickname)>0 or locate(:keyword,s.salername)>0 )';
 			}
+			else if ($searchfield == 'verifycode') 
+			{
+				$condition .= ' AND (verifycode=:keyword or locate(:keyword,o.verifycodes)>0)';
+			}
 			else if ($searchfield == 'store') 
 			{
 				$condition .= ' AND (locate(:keyword,store.storename)>0)';

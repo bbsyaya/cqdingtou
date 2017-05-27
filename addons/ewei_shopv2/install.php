@@ -863,6 +863,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_commission_level` (
   `ordercount` int(11) DEFAULT '0',
   `withdraw` decimal(10,2) DEFAULT '0.00',
   `repurchase` decimal(10,2) DEFAULT '0.00',
+  `goodsids` varchar(1000) DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
@@ -2264,6 +2265,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `isstatustime` tinyint(3) NOT NULL DEFAULT '0',
   `statustimestart` int(10) NOT NULL DEFAULT '0',
   `statustimeend` int(10) NOT NULL DEFAULT '0',
+  `nosearch` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_pcate` (`pcate`),
@@ -2283,7 +2285,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   FULLTEXT KEY `idx_buylevels` (`buylevels`),
   FULLTEXT KEY `idx_showgroups` (`showgroups`),
   FULLTEXT KEY `idx_buygroups` (`buygroups`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=198 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=199 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_goodscode_good`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goodscode_good` (
@@ -2378,7 +2380,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_option` (
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_goodsid` (`goodsid`),
   KEY `idx_displayorder` (`displayorder`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=393 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=405 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_goods_param`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_param` (
@@ -2392,7 +2394,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_param` (
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_goodsid` (`goodsid`),
   KEY `idx_displayorder` (`displayorder`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1085 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1110 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_goods_spec`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_spec` (
@@ -2409,7 +2411,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_spec` (
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_goodsid` (`goodsid`),
   KEY `idx_displayorder` (`displayorder`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=91 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=93 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_goods_spec_item`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_spec_item` (
@@ -2427,7 +2429,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_spec_item` (
   KEY `idx_specid` (`specid`),
   KEY `idx_show` (`show`),
   KEY `idx_displayorder` (`displayorder`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=283 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=291 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_groups_adv`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_groups_adv` (
@@ -2863,6 +2865,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member` (
   `openid_wa` varchar(50) DEFAULT NULL,
   `nickname_wechat` varchar(255) DEFAULT '',
   `avatar_wechat` varchar(255) DEFAULT '',
+  `updateaddress` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_shareid` (`agentid`),
@@ -3077,6 +3080,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member_printer` (
   `type` tinyint(3) DEFAULT '0',
   `print_data` text,
   `createtime` int(11) DEFAULT '0',
+  `merchid` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`) USING BTREE,
   KEY `idx_createtime` (`createtime`) USING BTREE
@@ -3094,6 +3098,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member_printer_template` (
   `code` varchar(500) DEFAULT '',
   `qrcode` varchar(500) DEFAULT '',
   `createtime` int(11) DEFAULT '0',
+  `merchid` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`) USING BTREE,
   KEY `idx_createtime` (`createtime`) USING BTREE
@@ -3370,6 +3375,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_merch_reg` (
   `diyformfields` text,
   `applytime` int(11) DEFAULT '0',
   `reason` text,
+  `uname` varchar(50) NOT NULL DEFAULT '',
+  `upass` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=112 ;
 
@@ -3447,6 +3454,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_merch_user` (
   `lat` varchar(255) DEFAULT '',
   `lng` varchar(255) DEFAULT '',
   `pluginset` text NOT NULL,
+  `uname` varchar(50) NOT NULL DEFAULT '',
+  `upass` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_status` (`status`),
@@ -3893,7 +3902,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_perm_log` (
   KEY `idx_uniacid` (`uniacid`),
   FULLTEXT KEY `idx_type` (`type`),
   FULLTEXT KEY `idx_op` (`op`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6722 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6725 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_perm_plugin`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_perm_plugin` (
@@ -3940,6 +3949,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_perm_user` (
   `realname` varchar(255) DEFAULT '',
   `mobile` varchar(255) DEFAULT '',
   `perms2` text,
+  `openid` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_uid` (`uid`),
@@ -3966,7 +3976,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_plugin` (
   PRIMARY KEY (`id`),
   KEY `idx_displayorder` (`displayorder`),
   KEY `idx_identity` (`identity`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=40 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=52 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_poster`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_poster` (
@@ -5424,6 +5434,7 @@ INSERT INTO `ims_ewei_shop_plugin` (`id`, `displayorder`, `identity`, `name`, `v
 (36, 39, 'exchange','兑换中心','1.0','官方',1,'biz',1,'../addons/ewei_shopv2/static/images/exchange.jpg','',0,0),
 (37, 40, 'lottery', '游戏营销', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/lottery.jpg', '', 0, 0),
 (38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', 1,'', '', 1, 0),
-(39, 42, 'quick', '快速购买', '1.0', '官方', 1, 'biz', 1,'../addons/ewei_shopv2/static/images/quick.jpg', '', 0, 0);
+(39, 42, 'quick', '快速购买', '1.0', '官方', 1, 'biz', 1,'../addons/ewei_shopv2/static/images/quick.jpg', '', 0, 0),
+(40, 43, 'mmanage', '手机端商家管理中心', '1.0', '官方', 1, 'tool',1, '../addons/ewei_shopv2/static/images/mmanage.jpg', '', 0, 0);
 
 ");

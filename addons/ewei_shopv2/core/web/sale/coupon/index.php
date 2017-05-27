@@ -306,6 +306,13 @@ class Index_EweiShopV2Page extends ComWebPage
 			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
 		$items = pdo_fetchall('SELECT id,couponname FROM ' . tablename('ewei_shop_coupon') . ' WHERE id in( ' . $id . ' ) and merchid=0 AND uniacid=' . $_W['uniacid']);
+		$key = 'ewei_shopv2:com:coupon:' . $id;
+		$rule = pdo_fetch('select * from ' . tablename('rule') . ' where uniacid=:uniacid and module=:module and name=:name  limit 1', array(':uniacid' => $_W['uniacid'], ':module' => 'ewei_shopv2', ':name' => $key));
+		if (!(empty($rule))) 
+		{
+			pdo_delete('rule_keyword', array('rid' => $rule['id']));
+			pdo_delete('rule', array('id' => $rule['id']));
+		}
 		foreach ($items as $item ) 
 		{
 			pdo_delete('ewei_shop_coupon', array('id' => $item['id'], 'uniacid' => $_W['uniacid']));

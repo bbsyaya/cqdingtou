@@ -52,7 +52,7 @@
             </div>
             {/if}
 
-            {if ($alipay['success'] && !is_h5app()) || (is_h5app() &&$payinfo['alipay'])}
+            {if ($alipay['success'] && !is_h5app()) || (is_h5app() &&$payinfo['alipay']) && empty($ispeerpay)}
             <div class='fui-list pay-btn' data-type='alipay'>
                 <div class='fui-list-media'>
                     <i class='icon icon-alipay alipay'></i>
@@ -65,7 +65,23 @@
             </div>
             {/if}
 
-            {if $credit['success']}
+
+            {if $bestpay['success'] || (is_h5app() &&$bestpay['wechat'])}
+                <div class='fui-list pay-btn' data-type='bestpay'>
+                    <div class='fui-list-media'>
+                        <i class='icon icon-money credit'></i>
+                    </div>
+                    <div class='fui-list-inner'>
+                        <div class="title">翼支付</div>
+                        <div class="subtitle">使用翼支付进行支付</div>
+                    </div>
+                    <div class='fui-list-angle'><span class="angle"></span></div>
+                </div>
+            {/if}
+
+
+
+        {if $credit['success']}
             <div class='fui-list pay-btn' data-type='credit'>
                 <div class='fui-list-media'>
                     <i class='icon icon-money credit'></i>
@@ -82,7 +98,7 @@
                 </div>
             </div>
             {/if}
-            {if $cash['success']}
+            {if $cash['success'] && empty($ispeerpay)}
             <div class='fui-list pay-btn' data-type='cash'>
                 <div class='fui-list-media'>
                     <i class='icon icon-deliver1 cash'></i>

@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -35,7 +35,7 @@ class Index_EweiShopV2Page extends MobilePage
 		{
 			if ($v['verifycode'] == $verifycode) 
 			{
-				if (!empty($v['select'])) 
+				if (!(empty($v['select']))) 
 				{
 					$v['select'] = 0;
 				}
@@ -93,8 +93,6 @@ class Index_EweiShopV2Page extends MobilePage
 	{
 		global $_W;
 		global $_GPC;
-		$openid = $_W['openid'];
-		$uniacid = $_W['uniacid'];
 		$orderid = intval($_GPC['id']);
 		$times = intval($_GPC['times']);
 		com('verify')->verify($orderid, $times);

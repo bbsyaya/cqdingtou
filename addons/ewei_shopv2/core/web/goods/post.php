@@ -522,7 +522,7 @@ if ($_W['ispost'])
 			$a['presellprice'] = 0;
 			$a['productprice'] = 0;
 			$a['costprice'] = 0;
-			$a['marketprice'] = intval($_GPC['intervalprice1']);
+			$a['marketprice'] = floatval($_GPC['intervalprice1']);
 		}
 		$totalstocks += $a['stock'];
 		if (empty($get_option_id)) 
@@ -635,7 +635,7 @@ if ($_W['ispost'])
 	if ((0 < count($optionids)) && ($data['hasoption'] !== 0)) 
 	{
 		pdo_query('delete from ' . tablename('ewei_shop_goods_option') . ' where goodsid=' . $id . ' and id not in ( ' . implode(',', $optionids) . ')');
-		$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\n" . '            g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
+		$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\r\n" . '            g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
 		pdo_query($sql);
 	}
 	else 

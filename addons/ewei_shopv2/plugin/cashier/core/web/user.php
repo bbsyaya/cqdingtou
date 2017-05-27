@@ -197,7 +197,7 @@ class User_EweiShopV2Page extends PluginWebPage
 		}
 		$wechatpay = json_decode($item['wechatpay'], true);
 		$alipay = json_decode($item['alipay'], true);
-		$order_template = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE uniacid=:uniacid ', array(':uniacid' => $_W['uniacid']));
+		$order_template = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE uniacid=:uniacid  AND merchid=0', array(':uniacid' => $_W['uniacid']));
 		$order_printer_array = array();
 		if (!(empty($userset['printer']))) 
 		{

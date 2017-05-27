@@ -137,13 +137,16 @@ class Refund_EweiShopV2Page extends MerchWebPage
 			{
 				if (0 < $item['parentid']) 
 				{
-					$parent_item = pdo_fetch('SELECT id,ordersn,ordersn2,price FROM ' . tablename('ewei_shop_order') . ' WHERE id = :id and uniacid=:uniacid Limit 1', array(':id' => $item['parentid'], ':uniacid' => $_W['uniacid']));
+					$parent_item = pdo_fetch('SELECT id,ordersn,ordersn2,price,transid,paytype,apppay FROM ' . tablename('ewei_shop_order') . ' WHERE id = :id and uniacid=:uniacid Limit 1', array(':id' => $item['parentid'], ':uniacid' => $_W['uniacid']));
 					if (empty($parent_item)) 
 					{
 						show_json(0, '未找到退款订单!');
 					}
 					$order_price = $parent_item['price'];
 					$ordersn = $parent_item['ordersn'];
+					$item['transid'] = $parent_item['transid'];
+					$item['paytype'] = $parent_item['paytype'];
+					$item['apppay'] = $parent_item['apppay'];
 					if (!(empty($parent_item['ordersn2']))) 
 					{
 						$var = sprintf('%02d', $parent_item['ordersn2']);
@@ -163,6 +166,10 @@ class Refund_EweiShopV2Page extends MerchWebPage
 				$realprice = $refund['applyprice'];
 				$goods = pdo_fetchall('SELECT g.id,g.credit, o.total,o.realprice FROM ' . tablename('ewei_shop_order_goods') . ' o left join ' . tablename('ewei_shop_goods') . ' g on o.goodsid=g.id ' . ' WHERE o.orderid=:orderid and o.uniacid=:uniacid and o.merchid=:merchid', array(':orderid' => $item['id'], ':uniacid' => $uniacid, ':merchid' => $merchid));
 				$refundtype = 0;
+				if (empty($item['transid']) && ($item['paytype'] == 22) && empty($item['apppay'])) 
+				{
+					$item['paytype'] = 23;
+				}
 				if ($item['paytype'] == 1) 
 				{
 					m('member')->setCredit($item['openid'], 'credit2', $realprice, array(0, $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']));
@@ -183,6 +190,65 @@ class Refund_EweiShopV2Page extends MerchWebPage
 						}
 					}
 					$refundtype = 2;
+				}
+				else if ($item['paytype'] == 21) 
+				{
+					if ($item['apppay'] == 2) 
+					{
+						$result = m('finance')->wxapp_refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
+					}
+					else 
+					{
+						$realprice = round($realprice - $item['deductcredit2'], 2);
+						if (0 < $realprice) 
+						{
+							if (empty($item['isborrow'])) 
+							{
+								$result = m('finance')->refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
+							}
+							else 
+							{
+								$result = m('finance')->refundBorrow($item['borrowopenid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['ordersn2'])) ? 1 : 0));
+							}
+						}
+					}
+					$refundtype = 2;
+				}
+				else if ($item['paytype'] == 22) 
+				{
+					$sec = m('common')->getSec($uniacid);
+					$sec = iunserializer($sec['sec']);
+					if (!(empty($item['apppay']))) 
+					{
+						if (empty($sec['app_alipay']['private_key']) || empty($sec['app_alipay']['appid'])) 
+						{
+							show_json(0, '支付参数错误，私钥为空或者APPID为空!');
+						}
+						$params = array('out_request_no' => time(), 'out_trade_no' => $ordersn, 'refund_amount' => $realprice, 'refund_reason' => $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']);
+						$config = array('app_id' => $sec['app_alipay']['appid'], 'privatekey' => $sec['app_alipay']['private_key'], 'publickey' => '', 'alipublickey' => '');
+						$result = m('finance')->newAlipayRefund($params, $config);
+					}
+					else 
+					{
+						if (empty($item['transid'])) 
+						{
+							show_json(0, '仅支持 升级后此功能后退款的订单!');
+						}
+						$setting = uni_setting($_W['uniacid'], array('payment'));
+						if (!(is_array($setting['payment']))) 
+						{
+							return error(1, '没有设定支付参数');
+						}
+						$alipay_config = $setting['payment']['alipay'];
+						$batch_no_money = $realprice * 100;
+						$batch_no = date('Ymd') . 'RF' . $item['id'] . 'MONEY' . $batch_no_money;
+						$res = m('finance')->AlipayRefund(array('trade_no' => $item['transid'], 'refund_price' => $realprice, 'refund_reason' => $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']), $batch_no, $alipay_config);
+						if (is_error($res)) 
+						{
+							show_json(0, $res['message']);
+						}
+						show_json(1, array('url' => $res));
+					}
 				}
 				else 
 				{

@@ -102,7 +102,9 @@
 	   </a>
 	           <div class="price">
 		   <span class="text">￥<%g.minprice%></span>
-           <span class="buy"><%if g.bargain >0%>砍价活动<%else%><i class="icon icon-cart"></i><%/if%></span></div>
+           			<span class="buy" data-type="<%g.type%>" ><%if g.bargain >0%>砍价活动 <%else%><i class="icon icon-cart"></i><%/if%>
+				</span>
+		   </div>
  	    </div>
 	</div>
     <%/each%>
@@ -116,6 +118,7 @@
         </div>
 </script>
     {template 'goods/picker'}
+	{template 'goods/wholesalePicker'}
     <script language="javascript">
 	  window.category = false;
 	  {if $catlevel!=-1}

@@ -64,5 +64,22 @@ class Adv_EweiShopV2Page extends PluginWebPage
 		}
 		include $this->template();
 	}
+	public function delete() 
+	{
+		global $_W;
+		global $_GPC;
+		$id = intval($_GPC['id']);
+		if (empty($id)) 
+		{
+			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
+		}
+		$items = pdo_fetchall('SELECT id,`name` FROM ' . tablename('ewei_shop_diypage_plu') . ' WHERE id in( ' . $id . ' ) and merch=:merch and uniacid=:uniacid and `type`=1 ', array(':merch' => intval($_W['merchid']), ':uniacid' => $_W['uniacid']));
+		foreach ($items as $item ) 
+		{
+			pdo_delete('ewei_shop_diypage_plu', array('id' => $item['id'], 'uniacid' => $_W['uniacid'], 'merch' => intval($_W['merchid'])));
+			plog('diypage.adv.delete', '删除启动广告 id: ' . $item['id'] . '  名称:' . $item['name']);
+		}
+		show_json(1);
+	}
 }
 ?>

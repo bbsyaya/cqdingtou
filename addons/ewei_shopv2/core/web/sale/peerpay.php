@@ -5,6 +5,20 @@ if (!(defined('IN_IA')))
 }
 class Peerpay_EweiShopV2Page extends ComWebPage 
 {
+	public function __construct() 
+	{
+		if (!(com('perm')->check_com('sale'))) 
+		{
+			if (cv('sale.peerpay')) 
+			{
+				header('location: ' . webUrl('sale/peerpay'));
+			}
+			else 
+			{
+				$this->message('你没有相应的权限查看');
+			}
+		}
+	}
 	public function main() 
 	{
 		global $_W;

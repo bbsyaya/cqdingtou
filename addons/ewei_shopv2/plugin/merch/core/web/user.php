@@ -51,6 +51,13 @@ class User_EweiShopV2Page extends PluginWebPage
 		}
 		$list = pdo_fetchall($sql, $params);
 		$total = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_merch_user') . ' u  ' . ' left join  ' . tablename('ewei_shop_merch_group') . ' g on u.groupid = g.id ' . ' where u.uniacid = :uniacid ' . $condition, $params);
+		foreach ($list as &$row ) 
+		{
+			$row['tmoney'] = $this->model->getMerchOrderTotalPrice($row['id']);
+			$row['status0'] = $row['tmoney']['status0'];
+			$row['status3'] = $row['tmoney']['status3'];
+		}
+		unset($row);
 		if ($_GPC['export'] == '1') 
 		{
 			ca('merch.user.export');
@@ -64,7 +71,7 @@ class User_EweiShopV2Page extends PluginWebPage
 				$row['accounttime'] = date('Y-m-d H:i', $row['accounttime']);
 			}
 			unset($row);
-			m('excel')->export($list, array( 'title' => '商户数据-' . date('Y-m-d-H-i', time()), 'columns' => array( array('title' => 'ID', 'field' => 'id', 'width' => 12), array('title' => '商户名', 'field' => 'merchname', 'width' => 24), array('title' => '主营项目', 'field' => 'salecate', 'width' => 12), array('title' => '联系人', 'field' => 'realname', 'width' => 12), array('title' => '手机号', 'field' => 'moible', 'width' => 12), array('title' => '子帐号数', 'field' => 'accounttotal', 'width' => 12), array('title' => '到期时间', 'field' => 'accounttime', 'width' => 12), array('title' => '申请时间', 'field' => 'applytime', 'width' => 12), array('title' => '审核时间', 'field' => 'checktime', 'width' => 12), array('title' => '状态', 'field' => 'createtime', 'width' => 12) ) ));
+			m('excel')->export($list, array( 'title' => '商户数据-' . date('Y-m-d-H-i', time()), 'columns' => array( array('title' => 'ID', 'field' => 'id', 'width' => 12), array('title' => '商户名', 'field' => 'merchname', 'width' => 24), array('title' => '主营项目', 'field' => 'salecate', 'width' => 12), array('title' => '联系人', 'field' => 'realname', 'width' => 12), array('title' => '手机号', 'field' => 'moible', 'width' => 12), array('title' => '子帐号数', 'field' => 'accounttotal', 'width' => 12), array('title' => '可提现金额', 'field' => 'status0', 'width' => 12), array('title' => '已结算金额', 'field' => 'status3', 'width' => 12), array('title' => '到期时间', 'field' => 'accounttime', 'width' => 12), array('title' => '申请时间', 'field' => 'applytime', 'width' => 12), array('title' => '审核时间', 'field' => 'checktime', 'width' => 12), array('title' => '状态', 'field' => 'createtime', 'width' => 12) ) ));
 		}
 		$pager = pagination($total, $pindex, $psize);
 		load()->func('tpl');
@@ -117,6 +124,15 @@ class User_EweiShopV2Page extends PluginWebPage
 		if (!(empty($item['pluginset']))) 
 		{
 			$item['pluginset'] = iunserializer($item['pluginset']);
+		}
+		if (empty($account)) 
+		{
+			$show_name = $item['uname'];
+			$show_pass = m('util')->pwd_encrypt($item['upass'], 'D');
+		}
+		else 
+		{
+			$show_name = $account['username'];
 		}
 		$diyform_flag = 0;
 		$diyform_plugin = p('diyform');
@@ -321,6 +337,27 @@ class User_EweiShopV2Page extends PluginWebPage
 		$ds = pdo_fetchall('SELECT id,merchname FROM ' . tablename('ewei_shop_merch_user') . ' WHERE ' . $condition . ' order by id asc', $params);
 		include $this->template();
 		exit();
+	}
+	public function querymerchs() 
+	{
+		global $_W;
+		global $_GPC;
+		$kwd = trim($_GPC['keyword']);
+		$params = array();
+		$params[':uniacid'] = $_W['uniacid'];
+		$condition = ' and uniacid=:uniacid  and status =1';
+		if (!(empty($kwd))) 
+		{
+			$condition .= ' AND `merchname` LIKE :keyword';
+			$params[':keyword'] = '%' . $kwd . '%';
+		}
+		$ds = pdo_fetchall('SELECT id,merchname as title ,logo as thumb FROM ' . tablename('ewei_shop_merch_user') . ' WHERE 1 ' . $condition . ' order by id desc', $params);
+		$ds = set_medias($ds, array('thumb', 'share_icon'));
+		if ($_GPC['suggest']) 
+		{
+			exit(json_encode(array('value' => $ds)));
+		}
+		include $this->template();
 	}
 }
 ?>

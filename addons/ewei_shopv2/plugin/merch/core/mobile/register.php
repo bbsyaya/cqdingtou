@@ -61,7 +61,33 @@ class Register_EweiShopV2Page extends PluginMobileLoginPage
 			{
 				show_json(0, '您已经申请，无需重复申请!');
 			}
-			$data = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'status' => 0, 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'merchname' => trim($_GPC['merchname']), 'salecate' => trim($_GPC['salecate']), 'desc' => trim($_GPC['desc']));
+			$uname = trim($_GPC['uname']);
+			$upass = $_GPC['upass'];
+			if (empty($uname)) 
+			{
+				show_json(0, '请填写帐号!');
+			}
+			if (empty($upass)) 
+			{
+				show_json(0, '请填写密码!');
+			}
+			$where1 = ' uname=:uname';
+			$params1 = array(':uname' => $uname);
+			if (!(empty($reg))) 
+			{
+				$where1 .= ' and id<>:id';
+				$params1[':id'] = $reg['id'];
+			}
+			$usercount1 = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_merch_reg') . ' where ' . $where1 . ' limit 1', $params1);
+			$where2 = ' username=:username';
+			$params2 = array(':username' => $uname);
+			$usercount2 = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_merch_account') . ' where ' . $where2 . ' limit 1', $params2);
+			if ((0 < $usercount1) || (0 < $usercount2)) 
+			{
+				show_json(0, '帐号 ' . $uname . ' 已经存在,请更改!');
+			}
+			$upass = m('util')->pwd_encrypt($upass, 'E');
+			$data = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'status' => 0, 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'uname' => $uname, 'upass' => $upass, 'merchname' => trim($_GPC['merchname']), 'salecate' => trim($_GPC['salecate']), 'desc' => trim($_GPC['desc']));
 			if ($template_flag == 1) 
 			{
 				$mdata = $_GPC['mdata'];

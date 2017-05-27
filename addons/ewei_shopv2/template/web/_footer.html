@@ -80,13 +80,6 @@
 
     });
 </script>
-<script language="javascript">myrequire(['web/init'],function(){
-    $(function () {
-        setTimeout( function() {
-            $('#page-loading').remove();
-        },500);
-    });
-});</script>
 {if !empty($_W['setting']['copyright']['statcode'])}{$_W['setting']['copyright']['statcode']}{/if}
 {if !empty($copyright) && !empty($copyright['copyright'])}
 <div class="footer" style='width:100%;'>
@@ -99,7 +92,18 @@
         <div class="sk-double-bounce2"></div>
     </div>
 </div>
-
+<script language="javascript">
+    myrequire(['web/init']);
+    if( $('form.form-validate').length<=0){
+        window.formInited = true;
+    }
+    window.formInitTimer = setInterval(function () {
+         if (typeof(window.formInited ) !== 'undefined') {
+             $('#page-loading').remove();
+              clearInterval(window.formInitTimer);
+          }
+    }, 1);
+</script>
 {if !empty($_W['shopset']['shop']['funbar'])}
     {php echo $this->show_funbar()}
 {/if}

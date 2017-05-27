@@ -157,10 +157,10 @@
         }
         //无规格计算
         $("input.minfullbackprice,input.allfullbackprice,input.allfullbackallratio,input.minfullbackratio").change(function () {
-            var allprice = parseFloat(Math.abs($(this).parents(".goods-item").find("input.allfullbackprice").val()));
-            var minprice = parseInt(Math.abs($(this).parents(".goods-item").find("input.minfullbackprice").val()));
-            var allratio = parseInt(Math.abs($(this).parents(".goods-item").find("input.allfullbackallratio").val()));
-            var minratio = parseInt(Math.abs($(this).parents(".goods-item").find("input.minfullbackratio").val()));
+            var allprice = parseFloat(Math.abs($(this).parents(".goods-item").find("input.allfullbackprice").val())).toFixed(2);
+            var minprice = parseFloat(Math.abs($(this).parents(".goods-item").find("input.minfullbackprice").val())).toFixed(2);
+            var allratio = parseFloat(Math.abs($(this).parents(".goods-item").find("input.allfullbackallratio").val())).toFixed(2);
+            var minratio = parseFloat(Math.abs($(this).parents(".goods-item").find("input.minfullbackratio").val())).toFixed(2);
             var day = 0;
             if(fullType==1){
                 day = Math.ceil(allratio/minratio);
@@ -179,10 +179,10 @@
         //规格计算
         $("input.option_minfullbackprice,input.option_allfullbackprice,input.option_allfullbackallratio,input.option_minfullbackratio").change(function () {
             var opid = $(this).parents(".option-item").attr("data-id");
-            var option_allprice = parseFloat(Math.abs($("input.option_allfullbackprice_"+opid+"").val()));
-            var option_minprice = parseInt(Math.abs($("input.option_minfullbackprice_"+opid+"").val()));
-            var option_allratio = parseInt(Math.abs($("input.option_allfullbackallratio_"+opid+"").val()));
-            var option_minratio = parseInt(Math.abs($("input.option_minfullbackratio_"+opid+"").val()));
+            var option_allprice = parseFloat(Math.abs($("input.option_allfullbackprice_"+opid+"").val())).toFixed(2);
+            var option_minprice = parseFloat(Math.abs($("input.option_minfullbackprice_"+opid+"").val())).toFixed(2);
+            var option_allratio = parseFloat(Math.abs($("input.option_allfullbackallratio_"+opid+"").val())).toFixed(2);
+            var option_minratio = parseFloat(Math.abs($("input.option_minfullbackratio_"+opid+"").val())).toFixed(2);
             var option_day = 0;
             if(fullType==1){
                 option_day = Math.ceil(option_allratio/option_minratio);
@@ -246,10 +246,10 @@
             $("#param-items .option-item").each(function (index) {
                 if($(this).find("input[name='optionid']").prop("checked")){
                     option[index] = $(this).find("input[name='optionid']").val();
-                    fullbackprice = $(this).find("input[name^='option_allfullbackprice']").val() ? parseFloat($(this).find("input[name^='option_allfullbackprice']").val()) : 0;
-                    minfullbackprice = $(this).find("input[name^='option_minfullbackprice']").val() ? parseFloat($(this).find("input[name^='option_minfullbackprice']").val()) : 0;
-                    allfullbackallratio = $(this).find("input[name^='option_allfullbackallratio']").val() ? parseFloat($(this).find("input[name^='option_allfullbackallratio']").val()) : 0;
-                    minfullbackratio = $(this).find("input[name^='option_minfullbackratio']").val() ? parseFloat($(this).find("input[name^='option_minfullbackratio']").val()) : 0;
+                    fullbackprice = $(this).find("input[name^='option_allfullbackprice']").val() ? parseFloat($(this).find("input[name^='option_allfullbackprice']").val()).toFixed(2) : 0;
+                    minfullbackprice = $(this).find("input[name^='option_minfullbackprice']").val() ? parseFloat($(this).find("input[name^='option_minfullbackprice']").val()).toFixed(2) : 0;
+                    allfullbackallratio = $(this).find("input[name^='option_allfullbackallratio']").val() ? parseFloat($(this).find("input[name^='option_allfullbackallratio']").val()).toFixed(2) : 0;
+                    minfullbackratio = $(this).find("input[name^='option_minfullbackratio']").val() ? parseFloat($(this).find("input[name^='option_minfullbackratio']").val()).toFixed(2) : 0;
                     if(fullType==1){
                         day = Math.ceil(allfullbackallratio/minfullbackratio);
                     }else{
@@ -318,10 +318,10 @@
         $("."+cls).val( $("."+cls+"_all").val());
         $(".option-item").each(function () {
             var opid = $(this).attr("data-id");
-            var option_allprice = parseFloat(Math.abs($("input.option_allfullbackprice_"+opid+"").val()));
-            var option_minprice = parseInt(Math.abs($("input.option_minfullbackprice_"+opid+"").val()));
-            var option_allratio = parseInt(Math.abs($("input.option_allfullbackallratio_"+opid+"").val()));
-            var option_minratio = parseInt(Math.abs($("input.option_minfullbackratio_"+opid+"").val()));
+            var option_allprice = parseFloat(Math.abs($("input.option_allfullbackprice_"+opid+"").val())).toFixed(2);
+            var option_minprice = parseFloat(Math.abs($("input.option_minfullbackprice_"+opid+"").val())).toFixed(2);
+            var option_allratio = parseFloat(Math.abs($("input.option_allfullbackallratio_"+opid+"").val())).toFixed(2);
+            var option_minratio = parseFloat(Math.abs($("input.option_minfullbackratio_"+opid+"").val())).toFixed(2);
             var option_day = 0;
             var fullType = $(":radio[name=type]:checked").val();
             if(fullType==1){

@@ -15,29 +15,29 @@
     {/if}
 
     {if $goods['type']==4}
-    <!--批发价格-->
-    <div class="fui-cell goods-bulk">
-        <div class="fui-cell-text  flex">
-            {if $goods['intervalfloor']>0}
-            <span>
-                    <p class="price"><small>￥</small>{$goods['intervalprice1']}</p>
-                    <p>{$goods['intervalnum1']}-{php echo intval($goods['intervalnum2'])-1}件</p>
-                </span>
-            {/if}
-            {if $goods['intervalfloor']>1}
-            <span>
-                    <p class="price"><small>￥</small>{$goods['intervalprice2']}</p>
-                    <p>{$goods['intervalnum2']}-{php echo intval($goods['intervalnum3'])-1}件</p>
-                </span>
-            {/if}
-            {if $goods['intervalfloor']>2}
-            <span>
-                    <p class="price"><small>￥</small>{$goods['intervalprice3']}</p>
-                    <p>>{$goods['intervalnum3']}件</p>
-                </span>
-            {/if}
+        <!--批发价格-->
+        <div class="fui-cell goods-bulk">
+            <div class="fui-cell-text  flex">
+                {if $goods['intervalfloor']>0}
+                <span>
+                        <p class="price"><small>￥</small>{$goods['intervalprice1']}</p>
+                        <p>{$goods['intervalnum1']} {if $goods['intervalfloor']>1}-{php echo intval($goods['intervalnum2'])-1}件{else}件以上{/if}</p>
+                    </span>
+                {/if}
+                {if $goods['intervalfloor']>1}
+                <span>
+                        <p class="price"><small>￥</small>{$goods['intervalprice2']}</p>
+                        <p>{$goods['intervalnum2']}{if $goods['intervalfloor']>2}-{php echo intval($goods['intervalnum3'])-1}件{else}件以上{/if}</p>
+                    </span>
+                {/if}
+                {if $goods['intervalfloor']>2}
+                <span>
+                        <p class="price"><small>￥</small>{$goods['intervalprice3']}</p>
+                        <p>>{$goods['intervalnum3']}件</p>
+                    </span>
+                {/if}
+            </div>
         </div>
-    </div>
     {/if}
 
     {if empty($seckillinfo) && $goods['type']!=4}

@@ -256,13 +256,13 @@
         {/if}
 
         {if $canAddCart && empty($diypage['navbar']['params']['hidecartbtn'])}
-        <a  class="nav-item btn cartbtn" style="background: {$diypage['navbar']['style']['cartcolor']};">加入购物车</a>
+        <a  class="nav-item btn cartbtn" style="background: {$diypage['navbar']['style']['cartcolor']};"  data-type="{$goods['type']}">加入购物车</a>
         {/if}
         {if empty($seckillinfo) || $seckillinfo['status']==0 || $seckillinfo['status']==-1}
-        <a  class="nav-item btn buybtn" style="background: {$diypage['navbar']['style']['buycolor']};">{php echo !empty($diypage['navbar']['params']['textbuy'])?$diypage['navbar']['params']['textbuy']:"立刻购买"}</a>
+        <a  class="nav-item btn buybtn" style="background: {$diypage['navbar']['style']['buycolor']};"  data-type="{$goods['type']}">{php echo !empty($diypage['navbar']['params']['textbuy'])?$diypage['navbar']['params']['textbuy']:"立刻购买"}</a>
         {else}
 
-        <a  class="nav-item btn buybtn" style="color: {$diypage['seckill']['style']['buybtntextwait']};background: {$diypage['seckill']['style']['buybtnbgwait']};">
+        <a  class="nav-item btn buybtn" style="color: {$diypage['seckill']['style']['buybtntextwait']};background: {$diypage['seckill']['style']['buybtnbgwait']};"  data-type="{$goods['type']}">
             {php echo !empty($diypage['seckill']['params']['buybtn'])?$diypage['seckill']['params']['buybtn']:"原价购买"}
         </a>
 
@@ -560,7 +560,7 @@
             $(".alert-qrcode-i").qrcode({
                 typeNumber: 0,      //计算模式
                 correctLevel: 0,//纠错等级
-                text:"{php echo $_W['siteroot'].'app/'.mobileUrl('goods/detail', array('id'=>$goods['id']))}"/*{php echo $_W['siteroot'].'app/'.mobileUrl('goods/detail', array('id'=>$goods['id']))}*/
+                text:"{php echo mobileUrl('goods/detail', array('id'=>$goods['id'],'mid'=>$mid),true)}"
             });
         });
     </script>

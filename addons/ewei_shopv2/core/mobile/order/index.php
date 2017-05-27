@@ -51,11 +51,11 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		extract($merchdata);
 		$condition .= ' and merchshow=0 ';
 		$show_status = intval($show_status);
-		if($show_status == ""){
-			$show_status = 6;
-		}else{
-			$show_status = intval($show_status);
-		}
+		//if($show_status == ""){
+		///	$show_status = 6;
+		//}else{
+		//	$show_status = intval($show_status);
+		//}
 		switch ($show_status) 
 		{
 			case 0: $condition .= ' and status=0 and paytype!=3';
@@ -68,12 +68,14 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			break;
 			case 6: $condition .= ' and userdeleted=0 ';
 			break;
+			
 			default: $condition .= ' and status=' . intval($show_status);
 		}
+			
 			if ($show_status != 5) 
 			{
 				$condition .= ' and userdeleted=0 ';
-			
+				
 			}
 			$com_verify = com('verify');
 			$s_string = '';

@@ -254,8 +254,8 @@ class Verify_EweiShopV2ComModel extends ComModel
 					pdo_update('ewei_shop_order', array('status' => 3, 'sendtime' => $current_time, 'finishtime' => $current_time), array('id' => $order['id']));
 					$this->finish($openid, $order);
 					m('order')->setGiveBalance($orderid, 1);
-					m('notice')->sendOrderMessage($orderid);
 				}
+				m('notice')->sendOrderMessage($orderid);
 			}
 			else if ($order['verifytype'] == 2) 
 			{
@@ -325,9 +325,9 @@ class Verify_EweiShopV2ComModel extends ComModel
 					pdo_update('ewei_shop_order', array('status' => 3, 'sendtime' => $current_time, 'finishtime' => $current_time, 'verifytime' => $current_time, 'verified' => 1, 'verifyopenid' => $openid, 'verifystoreid' => $saler['storeid']), array('id' => $order['id']));
 					$this->finish($openid, $order);
 					m('order')->setGiveBalance($orderid, 1);
-					m('notice')->sendOrderMessage($orderid);
 					$this->finish(array('status' => 3, 'sendtime' => $current_time, 'finishtime' => $current_time, 'verifytime' => $current_time, 'verified' => 1, 'verifyopenid' => $openid, 'verifystoreid' => $saler['storeid']), $order);
 				}
+				m('notice')->sendOrderMessage($orderid);
 			}
 		}
 		else if ($order['dispatchtype'] == 1) 
@@ -342,7 +342,7 @@ class Verify_EweiShopV2ComModel extends ComModel
 	}
 	protected function finish($openid, $order) 
 	{
-		m('member')->upgradeLevel($openid);
+		m('member')->upgradeLevel($openid, $order['id']);
 		if (com('coupon')) 
 		{
 			$refurnid = com('coupon')->sendcouponsbytask($order['id']);

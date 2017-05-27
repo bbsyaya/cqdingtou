@@ -806,6 +806,8 @@ class Index_EweiShopV2Page extends WebPage
 					$change_data['province'] = '';
 					$change_data['city'] = '';
 					$change_data['area'] = '';
+					pdo_update('ewei_shop_member', $change_data, array('uniacid' => $uniacid));
+					pdo_update('ewei_shop_member_address', $change_data, array('uniacid' => $uniacid));
 				}
 				else 
 				{

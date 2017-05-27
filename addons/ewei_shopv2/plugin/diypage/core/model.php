@@ -585,7 +585,7 @@ class DiypageModel extends PluginModel
 								{
 									if ($goodssort == 1) 
 									{
-										$orderby = ((empty($item['params']['goodstype']) ? ' sales desc, displayorder desc' : ' joins desc, displayorder desc'));
+										$orderby = ((empty($item['params']['goodstype']) ? ' sales+salesreal desc, displayorder desc' : ' joins desc, displayorder desc'));
 									}
 									else if ($goodssort == 2) 
 									{
@@ -642,7 +642,7 @@ class DiypageModel extends PluginModel
 								{
 									if ($goodssort == 1) 
 									{
-										$orderby = ((empty($item['params']['goodstype']) ? ' order by sales desc, displayorder desc' : ' order by joins desc, displayorder desc'));
+										$orderby = ((empty($item['params']['goodstype']) ? ' order by sales+salesreal desc, displayorder desc' : ' order by joins desc, displayorder desc'));
 									}
 									else if ($goodssort == 2) 
 									{

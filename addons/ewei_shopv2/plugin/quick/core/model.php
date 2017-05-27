@@ -58,16 +58,19 @@ class QuickModel extends PluginModel
 		}
 		if (!(empty($goodsids))) 
 		{
+			$goodsids = array_filter($goodsids);
 			$goodsids = implode(',', $goodsids);
 			$allGoods = pdo_fetchall('SELECT id, title, subtitle, minprice, total, sales FROM' . tablename('ewei_shop_goods') . ' WHERE uniacid=:uniacid AND id in(' . $goodsids . ') AND `deleted`=0 AND `status`=1', array(':uniacid' => $_W['uniacid']), 'id');
 		}
 		if (!(empty($cateids))) 
 		{
+			$cateids = array_filter($cateids);
 			$cateids = implode(',', $cateids);
 			$allCates = pdo_fetchall('SELECT * FROM' . tablename('ewei_shop_category') . ' WHERE uniacid=:uniacid AND id in(' . $cateids . ') AND enabled=1', array(':uniacid' => $_W['uniacid']), 'id');
 		}
 		if (!(empty($groupids))) 
 		{
+			$groupids = array_filter($groupids);
 			$groupids = implode(',', $groupids);
 			$allGroups = pdo_fetchall('SELECT * FROM' . tablename('ewei_shop_goods_group') . ' WHERE uniacid=:uniacid AND id in(' . $groupids . ') AND enabled=1', array(':uniacid' => $_W['uniacid']), 'id');
 		}

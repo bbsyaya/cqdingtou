@@ -159,5 +159,50 @@ class Util_EweiShopV2Model
 		}
 		return $data;
 	}
+	public function pwd_encrypt($string, $operation, $key = 'key') 
+	{
+		$key = md5($key);
+		$key_length = strlen($key);
+		$string = (($operation == 'D' ? base64_decode($string) : substr(md5($string . $key), 0, 8) . $string));
+		$string_length = strlen($string);
+		$rndkey = $box = array();
+		$result = '';
+		$i = 0;
+		while ($i <= 255) 
+		{
+			$rndkey[$i] = ord($key[$i % $key_length]);
+			$box[$i] = $i;
+			++$i;
+		}
+		$j = $i = 0;
+		while ($i < 256) 
+		{
+			$j = ($j + $box[$i] + $rndkey[$i]) % 256;
+			$tmp = $box[$i];
+			$box[$i] = $box[$j];
+			$box[$j] = $tmp;
+			++$i;
+		}
+		$a = $j = $i = 0;
+		while ($i < $string_length) 
+		{
+			$a = ($a + 1) % 256;
+			$j = ($j + $box[$a]) % 256;
+			$tmp = $box[$a];
+			$box[$a] = $box[$j];
+			$box[$j] = $tmp;
+			$result .= chr(ord($string[$i]) ^ $box[($box[$a] + $box[$j]) % 256]);
+			++$i;
+		}
+		if ($operation == 'D') 
+		{
+			if (substr($result, 0, 8) == substr(md5(substr($result, 8) . $key), 0, 8)) 
+			{
+				return substr($result, 8);
+			}
+			return '';
+		}
+		return str_replace('=', '', base64_encode($result));
+	}
 }
 ?>

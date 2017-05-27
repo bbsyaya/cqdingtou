@@ -583,7 +583,7 @@ class CashierModel extends PluginModel
 		}
 		pdo_update('ewei_shop_cashier_pay_log', array('openid' => $log['openid'], 'payopenid' => $log['openid'], 'money' => $log['money'], 'status' => 1, 'paytime' => (0 < $log['paytime'] ? $log['paytime'] : time()), 'coupon' => $coupon), array('id' => $log['id']));
 		$log['deduction'] = (double) $log['deduction'];
-		if (!(empty($log['deduction']))) 
+		if (!(empty($log['deduction'])) && ($log['paytype'] != 2)) 
 		{
 			$userinfo = m('member')->getMobileMember($log['mobile']);
 			m('member')->setCredit($userinfo['openid'], 'credit2', -$log['deduction'], array(0, '收银台 ' . $_W['cashieruser']['title'], '收款'));

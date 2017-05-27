@@ -9,39 +9,37 @@ class Order_EweiShopV2Model
 	{
 		global $_W;
 		$uniacid = $_W['uniacid'];
-		$order = pdo_fetch('select o.id,o.ordersn,o.openid,og.optionid,og.goodsid,og.price from ' . tablename('ewei_shop_order') . ' as o' . "\n" . '                left join ' . tablename('ewei_shop_order_goods') . ' as og on og.orderid = o.id' . "\n" . '                where  o.id=:id and o.uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':id' => $orderid));
-		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid and isfullback = 1 limit 1', array(':id' => $order['goodsid'], ':uniacid' => $uniacid));
-		if (0 < $goods['isfullback']) 
+		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\r\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\r\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
+		foreach($order_goods as $value){
+		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid and isfullback = 1 limit 1', array(':id' => $value['goodsid'], ':uniacid' => $uniacid));
+		$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\r\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\r\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
+		if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $value['optionid'])) 
 		{
-			$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $order['goodsid'] . ' limit 1');
-			if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $order['optionid'])) 
+			$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\r\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $value['goodsid'], ':id' => $value['optionid']));
+			if (!(empty($option))) 
 			{
-				$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $order['goodsid'], ':id' => $order['optionid']));
-				if (!(empty($option))) 
-				{
-					$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
-					$fullbackgoods['minallfullbackallratio'] = $option['allfullbackratio'];
-					$fullbackgoods['fullbackprice'] = $option['fullbackprice'];
-					$fullbackgoods['fullbackratio'] = $option['fullbackratio'];
-					$fullbackgoods['day'] = $option['day'];
-				}
+				$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
+				$fullbackgoods['minallfullbackallratio'] = $option['allfullbackratio'];
+				$fullbackgoods['fullbackprice'] = $option['fullbackprice'];
+				$fullbackgoods['fullbackratio'] = $option['fullbackratio'];
+				$fullbackgoods['day'] = $option['day'];
 			}
-			$fullbackgoods['startday'] = $fullbackgoods['startday'] - 1;
-			if (!(empty($fullbackgoods))) 
-			{
-				$data = array('uniacid' => $uniacid, 'orderid' => $orderid, 'openid' => $order['openid'], 'day' => $fullbackgoods['day'], 'fullbacktime' => strtotime('+' . $fullbackgoods['startday'] . ' days'), 'goodsid' => $order['goodsid'], 'createtime' => time());
-				if (0 < $fullbackgoods['type']) 
-				{
-					$data['price'] = ($order['price'] * $fullbackgoods['minallfullbackallratio']) / 100;
-					$data['priceevery'] = ($order['price'] * $fullbackgoods['fullbackratio']) / 100;
-				}
-				else 
-				{
-					$data['price'] = $fullbackgoods['minallfullbackallprice'];
-					$data['priceevery'] = $fullbackgoods['fullbackprice'];
-				}
-				pdo_insert('ewei_shop_fullback_log', $data);
-			}
+		}
+		$fullbackgoods['startday'] = $fullbackgoods['startday'] - 1;
+		$data = array('uniacid' => $uniacid, 'orderid' => $orderid, 'openid' => $value['openid'], 'day' => $fullbackgoods['day'], 'fullbacktime' => strtotime('+' . $fullbackgoods['startday'] . ' days'), 'goodsid' => $value['goodsid'], 'createtime' => time());
+		if (0 < $fullbackgoods['type']) 
+		{
+			$data['price'] = ($value['price'] * $fullbackgoods['minallfullbackallratio']) / 100;
+			$data['priceevery'] = ($value['price'] * $fullbackgoods['fullbackratio']) / 100;
+		}
+		else 
+		{
+			$data['price'] = $fullbackgoods['minallfullbackallprice'];
+			$data['priceevery'] = $fullbackgoods['fullbackprice'];
+		}
+		$i = 0;
+		pdo_insert('ewei_shop_fullback_log', $data);
+		++$i;
 		}
 	}
 	public function fullbackstop($orderid) 
@@ -65,7 +63,7 @@ class Order_EweiShopV2Model
 		if (!(empty($ispeerpay))) 
 		{
 			$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) price from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
-			if ($peerpay_info != $ispeerpay['peerpay_realprice']) 
+			if ($peerpay_info < $ispeerpay['peerpay_realprice']) 
 			{
 				return;
 			}
@@ -133,6 +131,17 @@ class Order_EweiShopV2Model
 					com('coupon')->backConsumeCoupon($order['id']);
 				}
 				m('notice')->sendOrderMessage($orderid);
+				if ($order['isparent'] == 1) 
+				{
+					$child_list = $this->getChildOrder($order['id']);
+					foreach ($child_list as $k => $v ) 
+					{
+						if (!(empty($v['merchid']))) 
+						{
+							m('notice')->sendOrderMessage($v['id']);
+						}
+					}
+				}
 				com_run('printer::sendOrderMessage', $orderid);
 				if (p('commission')) 
 				{
@@ -675,7 +684,7 @@ class Order_EweiShopV2Model
 						{
 							$price2 = round($dd, 2);
 						}
-						else if (0 < $md) 
+						else if (0 < $md)
 						{
 							$price2 = round(($md / 10) * $gprice, 2);
 						}

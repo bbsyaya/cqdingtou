@@ -56,7 +56,6 @@ class Goodssend_EweiShopV2Page extends ComWebPage
 		if (!(empty($id))) 
 		{
 			$item = pdo_fetch('SELECT *  FROM ' . tablename('ewei_shop_coupon_goodsendtask') . ' WHERE uniacid = ' . $uniacid . ' and id =' . $id);
-			$item = set_medias($item, array('thumb'));
 			if (!(empty($item['couponid']))) 
 			{
 				$coupon = pdo_fetch('SELECT id,couponname as title , thumb  FROM ' . tablename('ewei_shop_coupon') . ' WHERE uniacid = ' . $uniacid . ' and id =' . $item['couponid']);

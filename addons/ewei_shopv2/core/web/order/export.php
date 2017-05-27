@@ -463,7 +463,14 @@ class Export_EweiShopV2Page extends WebPage
 				}
 				if (!(empty($value['verifystoreid']))) 
 				{
-					$value['storeinfo'] = pdo_fetchcolumn('select storename from ' . tablename('ewei_shop_store') . ' where id=:storeid limit 1 ', array(':storeid' => $value['verifystoreid']));
+					if (0 < $value['merchid']) 
+					{
+						$value['storeinfo'] = pdo_fetchcolumn('select storename from ' . tablename('ewei_shop_merch_store') . ' where id=:storeid limit 1 ', array(':storeid' => $value['verifystoreid']));
+					}
+					else 
+					{
+						$value['storeinfo'] = pdo_fetchcolumn('select storename from ' . tablename('ewei_shop_store') . ' where id=:storeid limit 1 ', array(':storeid' => $value['verifystoreid']));
+					}
 				}
 				if ($plugin_diyform && !(empty($value['diyformfields'])) && !(empty($value['diyformdata']))) 
 				{

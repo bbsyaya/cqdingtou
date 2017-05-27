@@ -6,7 +6,7 @@ define(['core', 'tpl'], function (core, tpl) {
         modal.page = 1;
         modal.lat = '';
         modal.lng = '';
-        modal.range = 500;
+        modal.range = 2000;
         modal.sorttype = 0;
 
         if (modal.cateid > 0) {
