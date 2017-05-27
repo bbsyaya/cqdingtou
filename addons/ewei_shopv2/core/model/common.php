@@ -610,7 +610,7 @@ class Common_EweiShopV2Model
 		}
 		libxml_disable_entity_loader(true);
 		$prepayid = $xml->prepay_id;
-		$wOpt = array('appId' => $wechat['appid'], 'timeStamp' => TIMESTAMP . '', 'nonceStr' => random(32), 'package' => 'prepay_id=' . $prepayid, 'signType' => 'MD5');
+		$wOpt = array('appId' => $wechat['sub_appid'], 'timeStamp' => TIMESTAMP . '', 'nonceStr' => random(32), 'package' => 'prepay_id=' . $prepayid, 'signType' => 'MD5');
 		ksort($wOpt, SORT_STRING);
 		$string = '';
 		foreach ($wOpt as $key => $v ) 

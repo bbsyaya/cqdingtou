@@ -520,7 +520,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 			{
 				$partin = -10000;
 			}
-			pdo_update('ewei_shop_bargain_account', array('partin' => $partin, 'rule' => $rule, 'follow_swi' => $follow_swi), array('id' => $_W['uniacid']));
+			pdo_update('ewei_shop_bargain_account', array('partin' => $partin, 'rule' => $rule, 'follow_swi' => $follow_swi, 'sharestyle' => intval($_GPC['sharestyle'])), array('id' => $_W['uniacid']));
 			show_json(1, '保存成功');
 			return;
 		}

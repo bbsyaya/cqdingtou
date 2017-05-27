@@ -311,16 +311,6 @@ class Finance_EweiShopV2Model
 		{
 			return error(-1, 'openid不能为空');
 		}
-		$member = m('member')->getMember($openid);
-		if (empty($member)) 
-		{
-			return error(-1, '未找到用户');
-		}
-		$setting = uni_setting($_W['uniacid'], array('payment'));
-		if (!(is_array($setting['payment']))) 
-		{
-			return error(1, '没有设定支付参数');
-		}
 		list($pay, $payment) = m('common')->public_build($app);
 		if (is_error($payment)) 
 		{
@@ -329,6 +319,11 @@ class Finance_EweiShopV2Model
 		$certs = $payment;
 		if ($payment['is_new'] == 0) 
 		{
+			$setting = uni_setting($_W['uniacid'], array('payment'));
+			if (!(is_array($setting['payment']))) 
+			{
+				return error(1, '没有设定支付参数');
+			}
 			if (!(empty($pay['weixin_sub']))) 
 			{
 				$wechat = array('appid' => $payment['appid_sub'], 'mchid' => $payment['mchid_sub'], 'sub_appid' => (!(empty($payment['sub_appid_sub'])) ? $payment['sub_appid_sub'] : ''), 'sub_mch_id' => $payment['sub_mchid_sub'], 'apikey' => $payment['apikey_sub']);
@@ -607,7 +602,19 @@ class Finance_EweiShopV2Model
 		{
 			return error(-1, 'openid不能为空');
 		}
-		$pay = m('common')->getSysset('pay');
+		if (!(empty($gaijia))) 
+		{
+			$out_trade_no = $out_trade_no . '_B';
+		}
+		else 
+		{
+			$out_trade_no = $out_trade_no . '_borrow';
+		}
+		list($pay, $payment) = m('common')->public_build();
+		if ($payment['is_new'] == 1) 
+		{
+			return $this->refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney);
+		}
 		$sec = m('common')->getSec();
 		$sec = iunserializer($sec['sec']);
 		$certs = $sec['jie'];
@@ -626,14 +633,6 @@ class Finance_EweiShopV2Model
 			{
 				return error(1, '没有设定支付参数');
 			}
-		}
-		if (!(empty($gaijia))) 
-		{
-			$out_trade_no = $out_trade_no . '_B';
-		}
-		else 
-		{
-			$out_trade_no = $out_trade_no . '_borrow';
 		}
 		$url = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
 		$pars = array();

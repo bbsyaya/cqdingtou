@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -21,15 +21,15 @@ class Sms_EweiShopV2ComModel extends ComModel
 			$result = $this->http_post('http://v.juhe.cn/sms/send', $data);
 			if (empty($result) || (0 < $result['error_code'])) 
 			{
-				return array('status' => 0, 'message' => '短信发送失败(' . $result['error_code'] . ')：' . $result['reason']);
-				
+				return array('status' => 0, 'message' => '短信发送失败(' . $result['error_code'] . ')：' . json_encode($result['reason']));
+			
+						
 				
 			}
 		}
 		
-		
-		if ($template['type'] == 'dayu') 
-		{
+			if ($template['type'] == 'dayu') 
+				{
 					include_once EWEI_SHOPV2_VENDOR . 'dayu/TopSdk.php';
 					$dayuClient = new TopClient();
 					$dayuClient->appkey = $smsset['dayu_key'];
@@ -42,17 +42,14 @@ class Sms_EweiShopV2ComModel extends ComModel
 					$dayuRequest->setSmsTemplateCode($template['smstplid']);
 					$dayuResult = $dayuClient->execute($dayuRequest);
 					$dayuResult = (array) $dayuResult;
-					if (empty($dayuResult) || !empty($dayuResult['code'])) 
+					if (empty($dayuResult) || !(empty($dayuResult['code']))) 
 					{
 						return array('status' => 0, 'message' => '短信发送失败(' . $dayuResult['sub_msg'] . '/code: ' . $dayuResult['code'] . '/sub_code: ' . $dayuResult['sub_code'] . ')');
 						
 					}
-		}
-		
-		
-		
-		if ($template['type'] == 'emay') 
-		{
+				}
+			if ($template['type'] == 'emay') 
+			{
 							include_once EWEI_SHOPV2_VENDOR . 'emay/SMSUtil.php';
 							$balance = $this->sms_num('emay', $smsset);
 							if ($balance <= 0) 
@@ -61,12 +58,11 @@ class Sms_EweiShopV2ComModel extends ComModel
 							}
 							$emayClient = new SMSUtil($smsset['emay_url'], $smsset['emay_sn'], $smsset['emay_pw'], $smsset['emay_sk'], array('proxyhost' => $smsset['emay_phost'], 'proxyport' => $smsset['pport'], 'proxyusername' => $smsset['puser'], 'proxypassword' => $smsset['ppw']), $smsset['emay_out'], $smsset['emay_outresp']);
 							$emayResult = $emayClient->send($mobile, '【' . $template['smssign'] . '】' . $params);
-							if (!empty($emayResult)) 
+							if (!(empty($emayResult))) 
 							{
 								return array('status' => 0, 'message' => '短信发送失败(错误信息: ' . $emayResult . ')');
 							}
-		}
-						
+			}
 						
 		
 		return array('status' => 1);
@@ -102,9 +98,9 @@ class Sms_EweiShopV2ComModel extends ComModel
 	{
 		if (empty($type)) 
 		{
-			return NULL;
+			return;
 		}
-		if (empty($smsset) || !is_array($smsset)) 
+		if (empty($smsset) || !(is_array($smsset))) 
 		{
 			$smsset = $this->sms_set();
 		}
@@ -113,7 +109,7 @@ class Sms_EweiShopV2ComModel extends ComModel
 			include_once EWEI_SHOPV2_VENDOR . 'emay/SMSUtil.php';
 			$emayClient = new SMSUtil($smsset['emay_url'], $smsset['emay_sn'], $smsset['emay_pw'], $smsset['emay_sk'], array('proxyhost' => $smsset['emay_phost'], 'proxyport' => $smsset['pport'], 'proxyusername' => $smsset['puser'], 'proxypassword' => $smsset['ppw']), $smsset['emay_out'], $smsset['emay_outresp']);
 			$num = $emayClient->getBalance();
-			if (!empty($smsset['emay_warn']) && !empty($smsset['emay_mobile']) && ($num < $smsset['emay_warn']) && (($smsset['emay_warn_time'] + (60 * 60 * 24)) < time())) 
+			if (!(empty($smsset['emay_warn'])) && !(empty($smsset['emay_mobile'])) && ($num < $smsset['emay_warn']) && (($smsset['emay_warn_time'] + (60 * 60 * 24)) < time())) 
 			{
 				$emayClient = new SMSUtil($smsset['emay_url'], $smsset['emay_sn'], $smsset['emay_pw'], $smsset['emay_sk'], array('proxyhost' => $smsset['emay_phost'], 'proxyport' => $smsset['pport'], 'proxyusername' => $smsset['puser'], 'proxypassword' => $smsset['ppw']), $smsset['emay_out'], $smsset['emay_outresp']);
 				$emayResult = $emayClient->send($smsset['emay_mobile'], '【系统预警】' . '您的亿美软通SMS余额为:' . $num . '，低于预警值:' . $smsset['emay_warn'] . ' (24小时内仅通知一次)');
@@ -152,7 +148,7 @@ class Sms_EweiShopV2ComModel extends ComModel
 			{
 				return array('status' => 0, 'message' => '未填写聚合数据Key!');
 			}
-			if (empty($template['data']) || !is_array($template['data'])) 
+			if (empty($template['data']) || !(is_array($template['data']))) 
 			{
 				return array('status' => 0, 'message' => '模板类型错误!');
 			}
@@ -171,7 +167,7 @@ class Sms_EweiShopV2ComModel extends ComModel
 			{
 				return array('status' => 0, 'message' => '未填写阿里大于Secret!');
 			}
-			if (empty($template['data']) || !is_array($template['data'])) 
+			if (empty($template['data']) || !(is_array($template['data']))) 
 			{
 				return array('status' => 0, 'message' => '模板类型错误!');
 			}
@@ -272,7 +268,7 @@ class Sms_EweiShopV2ComModel extends ComModel
 		$options = array( 'http' => array('method' => 'POST', 'header' => 'Content-type:application/x-www-form-urlencoded', 'content' => $postData, 'timeout' => 15 * 60) );
 		$context = stream_context_create($options);
 		$result = file_get_contents($url, false, $context);
-		if (!is_array($result)) 
+		if (!(is_array($result))) 
 		{
 			$result = json_decode($result, true);
 		}
@@ -290,7 +286,7 @@ class Sms_EweiShopV2ComModel extends ComModel
 		}
 		$smsid = $tm[$tag . '_sms'];
 		$smsclose = $tm[$tag . '_close_sms'];
-		if (!empty($smsid) && empty($smsclose) && !empty($params['mobile'])) 
+		if (!(empty($smsid)) && empty($smsclose) && !(empty($params['mobile']))) 
 		{
 			$sms_data = array();
 			foreach ($datas as $i => $value ) 

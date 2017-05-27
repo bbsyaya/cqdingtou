@@ -9,15 +9,13 @@ class Order_EweiShopV2Model
 	{
 		global $_W;
 		$uniacid = $_W['uniacid'];
-		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\r\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\r\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
+		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
 		foreach($order_goods as $value){
-			
-		
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid and isfullback = 1 limit 1', array(':id' => $value['goodsid'], ':uniacid' => $uniacid));
-		$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\r\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\r\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
+		$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
 		if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $value['optionid'])) 
 		{
-			$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\r\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $value['goodsid'], ':id' => $value['optionid']));
+			$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $value['goodsid'], ':id' => $value['optionid']));
 			if (!(empty($option))) 
 			{
 				$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
@@ -156,7 +154,6 @@ class Order_EweiShopV2Model
 						p('task')->checkTaskReward('commission_order', 1);
 					}
 					p('task')->checkTaskReward('cost_total', $order['price']);
-					p('task')->checkTaskReward('cost_enough', $order['price']);
 					p('task')->checkTaskReward('cost_count', 1);
 					$goodslist = pdo_fetchall('SELECT goodsid FROM ' . tablename('ewei_shop_order_goods') . ' WHERE orderid = :orderid AND uniacid = :uniacid', array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
 					foreach ($goodslist as $item ) 
@@ -223,6 +220,7 @@ class Order_EweiShopV2Model
 		$order_goods = pdo_fetch('select g.virtualsend,g.virtualsendcontent from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where og.orderid=:orderid and og.uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 		$time = time();
 		pdo_update('ewei_shop_order', array('virtualsend_info' => $order_goods['virtualsendcontent'], 'status' => '3', 'paytime' => $time, 'sendtime' => $time, 'finishtime' => $time), array('id' => $orderid));
+		m('order')->fullback($order['id']);
 		$this->setStocksAndCredits($orderid, 1);
 		m('member')->upgradeLevel($order['openid']);
 		$this->setGiveBalance($orderid, 1);

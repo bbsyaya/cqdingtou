@@ -43,7 +43,7 @@
                 {/if}
 
                 {if $merchid == 0}
-                <li {if $_GPC['tab']=='verify'}class="active"{/if}><a href="#tab_verify">线下核销</a></li>
+                <li {if $_GPC['tab']=='verify'}class="active"{/if} id="tab_nav_verify" {if $item['type']==3||($item['type']==2&&!empty($item['virtualsend']))}style="display:none;"{/if}><a href="#tab_verify">线下核销</a></li>
                 {/if}
 
                 {if p('diyform')}
@@ -79,7 +79,7 @@
                 {/if}
 
                 {if $merchid == 0}
-                <div class="tab-pane {if $_GPC['tab']=='verify'}active{/if}" id="tab_verify"> <div class="panel-body">{template 'goods/tab/verify'}</div></div>
+                <div class="tab-pane {if $_GPC['tab']=='verify'}active{/if}" id="tab_verify"  {if $item['type']==3||($item['type']==2&&!empty($item['virtualsend']))}style="display:none;"{/if}> <div class="panel-body">{template 'goods/tab/verify'}</div></div>
                 {/if}
 
                 {if p('diyform')}
@@ -645,12 +645,8 @@
 			$(".interval").show();
 			$(".price").hide();
 			$(".minbuy").hide();
-
 			$(".wholesalewarning").show();
-
-
-		}else
-		{
+		}else{
 			$(".interval").hide();
 			$(".price").show();
 			$(".minbuy").show();
@@ -662,21 +658,25 @@
             $('#product').show();
             $('#type_virtual').hide();
             $('.entity').show();
-            //$("#tab_nav_verify").show();
+            $("#tab_nav_verify").show();
         } else if(type == 2) {
             $('#product').hide();
             $('#type_virtual').hide();
             $('.entity').hide();
-            //$("#tab_nav_verify").hide();
+            if($("input[name='virtualsend']:checked").val()==1) {
+                $("#tab_nav_verify").hide();
+            }else{
+                $("#tab_nav_verify").show();
+            }
         } else if(type == 3) {
             $('#type_virtual').show();
             $('.entity').hide();
-            //$("#tab_nav_verify").hide();
+            $("#tab_nav_verify").hide();
         }else if(type == 10) {
             $('#type_virtual').hide();
             $('#product').hide();
             $('.entity').hide();
-            //$("#tab_nav_verify").hide();
+            $("#tab_nav_verify").hide();
         }
     }
 

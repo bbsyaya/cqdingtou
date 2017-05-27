@@ -72,5 +72,16 @@ class Order_EweiShopV2Page extends CashierWebPage
 		$pager = pagination($total, $pindex, $psize);
 		include $this->template();
 	}
+	public function refund() 
+	{
+		global $_W;
+		global $_GPC;
+		$res = $this->model->refund($_GPC['id']);
+		if (is_error($res)) 
+		{
+			show_json(0, $res['message']);
+		}
+		show_json(1);
+	}
 }
 ?>

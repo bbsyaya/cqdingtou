@@ -237,7 +237,8 @@ class Perm_EweiShopV2ComModel extends ComModel
 		{
 			return true;
 		}
-		$perm_plugin = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_perm_plugin') . ' WHERE acid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));
+		$acid = pdo_fetchcolumn('SELECT acid FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid LIMIT 1', array(':uniacid' => $_W['uniacid']));
+		$perm_plugin = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_perm_plugin') . ' WHERE acid=:uniacid limit 1', array(':uniacid' => $acid));
 		if (!(empty($perm_plugin))) 
 		{
 			$plugins = explode(',', $perm_plugin['plugins']);

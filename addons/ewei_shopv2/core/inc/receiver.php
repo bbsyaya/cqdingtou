@@ -28,16 +28,10 @@ class Receiver extends WeModuleReceiver
 		{
 			return false;
 		}
-		$totalagent = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['acid'] . ' and isagent =1');
-		$totalmember = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['acid']);
-		if (empty($totalagent)) 
-		{
-			$totalagent = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['uniacid'] . ' and isagent =1');
-		}
-		if (empty($totalmember)) 
-		{
-			$totalmember = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['uniacid']);
-		}
+		load()->model('account');
+		$account = account_fetch($_W['acid']);
+		$totalagent = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $account['uniacid'] . ' and isagent =1');
+		$totalmember = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $account['uniacid']);
 		$member = abs((int) $data['virtual_people']) + (int) $totalmember;
 		$commission = abs((int) $data['virtual_commission']) + (int) $totalagent;
 		$user = m('member')->checkMemberFromPlatform($obj->message['from']);
@@ -54,7 +48,7 @@ class Receiver extends WeModuleReceiver
 		$message = str_replace('[昵称]', $user['nickname'], $message);
 		$message = htmlspecialchars_decode($message, ENT_QUOTES);
 		$message = str_replace('"', '\\"', $message);
-		return $this->sendText(WeAccount::create($_W['acid']), $obj->message['from'], $message);
+		return $this->sendText(WeAccount::create($account), $obj->message['from'], $message);
 	}
 	public function sendText($acc, $openid, $content) 
 	{

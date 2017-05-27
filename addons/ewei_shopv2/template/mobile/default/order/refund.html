@@ -48,7 +48,7 @@
         <div class="fui-cell r-group" {if $refund['rtype']=='2'}style="display:none;"{/if}>
         <div class="fui-cell-label">退款金额</div>
         <div class="fui-cell-info">
-            <input type="number" id="price" class='fui-input' value="{php echo $show_price}" />
+            <input type="number" id="price" class='fui-input' placeholder="请输入需要退的金额" value="{if !empty($refund['id'])}{php echo $show_price}{/if}" />
         </div>
 
 
@@ -70,7 +70,7 @@
             data-name="images[]"
             data-max="5"
             data-count="{php echo count($refund['imgs'])}">
-            <input type="file" name='imgFile0' id='imgFile0' multiple="" accept="image/*" >
+            <input type="file" name='imgFile0' id='imgFile0'>
         </div>
 
     </div>
@@ -79,7 +79,9 @@
 <div class='fui-title r-group'  {if $refund['rtype']=='2'}style="display:none;"{/if}>
 提示:您可退款的最大金额为 <span class='text-danger'>￥{php echo number_format($order['refundprice'],2)}</span>
 </div>
+
 </div>
+
 
 </div>
 <div class='fui-footer text-right'>
@@ -183,8 +185,8 @@
 
 {/if}
 
+<div class='fui-title'>协商详情</div>
 <div class="fui-cell-group">
-    <div class='fui-cell-title'>协商详情</div>
     <div class="fui-cell">
         <div class="fui-cell-label">处理方式</div>
         <div class="fui-cell-info">
@@ -204,7 +206,7 @@
         <div class="fui-cell-label">{if $refund['rtype']=='2'}换货{else}退款{/if}说明</div>
         <div class="fui-cell-info">{if empty($refund['content'])}无{else}{$refund['content']} {/if}</div>
     </div>
-    {if $refund['applyprice']>0}
+    {if $refund['applyprice']>0 && $refund['rtype']!=2}
     <div class="fui-cell">
         <div class="fui-cell-label">退款金额</div>
         <div class="fui-cell-info">{php echo number_format($refund['applyprice'],2)} 元</div>
@@ -217,7 +219,6 @@
     </div>
 
 </div>
-
 
 </div>
 <div class='fui-footer text-right'>

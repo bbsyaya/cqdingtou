@@ -148,6 +148,49 @@ class Detail_EweiShopV2Page extends MobilePage
 			exit();
 		}
 		$member = m('member')->getMember($openid);
+		if (empty($member['updateaddress'])) 
+		{
+			$address_list = pdo_fetchall('select id,datavalue from ' . tablename('ewei_shop_member_address') . ' where openid=:openid and uniacid=:uniacid', array(':uniacid' => $uniacid, ':openid' => $openid));
+			if (!(empty($address_list))) 
+			{
+				$areas = m('common')->getAreas();
+				$datacode = array();
+				foreach ($areas['province'] as $value ) 
+				{
+					$pname = $value['@attributes']['name'];
+					$pcode = $value['@attributes']['code'];
+					$datacode[$pcode] = $pname;
+					foreach ($value['city'] as $city ) 
+					{
+						$cname = $city['@attributes']['name'];
+						$ccode = $city['@attributes']['code'];
+						$datacode[$ccode] = $cname;
+						foreach ($city['county'] as $county ) 
+						{
+							$aname = $county['@attributes']['name'];
+							$acode = $county['@attributes']['code'];
+							$datacode[$acode] = $aname;
+						}
+					}
+				}
+				$change_data = array();
+				foreach ($address_list as $k1 => $v1 ) 
+				{
+					if (!(empty($v1['datavalue']))) 
+					{
+						$datavalue = explode(' ', $v1['datavalue']);
+						$change_data['province'] = $datacode[$datavalue[0]];
+						$change_data['city'] = $datacode[$datavalue[1]];
+						$change_data['area'] = $datacode[$datavalue[2]];
+						if (!(empty($change_data['province'])) && !(empty($change_data['city'])) && !(empty($change_data['area']))) 
+						{
+							pdo_update('ewei_shop_member_address', $change_data, array('id' => $v1['id']));
+						}
+					}
+				}
+				pdo_update('ewei_shop_member', array('updateaddress' => 1), array('id' => $member['id']));
+			}
+		}
 		$showgoods = m('goods')->visit($goods, $member);
 		if (empty($goods) || empty($showgoods)) 
 		{
@@ -377,6 +420,14 @@ class Detail_EweiShopV2Page extends MobilePage
 		if ($enoughfree && ($enoughfree < $goods['minprice'])) 
 		{
 			$goods['dispatchprice'] = 0;
+		}
+		if (($is_openmerch == 1) && (0 < $goods['merchid'])) 
+		{
+			$merch_set = $merch_plugin->getSet('sale', $goods['merchid']);
+			if ($merch_set['enoughfree'] && ($merch_set['enoughorder'] < $goods['minprice'])) 
+			{
+				$goods['dispatchprice'] = 0;
+			}
 		}
 		$hasSales = false;
 		if ((0 < $goods['ednum']) || (0 < $goods['edmoney'])) 
@@ -672,6 +723,25 @@ class Detail_EweiShopV2Page extends MobilePage
 		if ($new_temp && $getComments) 
 		{
 			$showComments = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order_comment') . ' where goodsid=:goodsid and level>=0 and deleted=0 and checked=0 and uniacid=:uniacid', array(':goodsid' => $id, ':uniacid' => $_W['uniacid']));
+		}
+		$goodscode = '';
+		if (com('goodscode') && ($commission_data['codeShare'] == 3)) 
+		{
+			if ($goods['minprice'] == $goods['maxprice']) 
+			{
+				$price = '¥' . $goods['minprice'];
+			}
+			else 
+			{
+				$price = '¥' . $goods['minprice'] . ' ~ ' . $goods['maxprice'];
+			}
+			$url = mobileUrl('goods/detail', array('id' => $id, 'mid' => $mid), true);
+			$qrcode = m('qrcode')->createQrcode($url);
+			$title[0] = mb_substr($goods['title'], 0, 20, 'utf-8');
+			$title[1] = mb_substr($goods['title'], 21, 20, 'utf-8');
+			$title = $title[0] . "\n" . $title[1];
+			$codedata = array( 'title' => array('text' => $title, 'left' => 27, 'top' => 40, 'size' => 22, 'width' => 600, 'height' => 90, 'color' => '#333'), 'thumb' => array('thumb' => tomedia($goods['thumb']), 'left' => 0, 'top' => 150, 'width' => 640, 'height' => 640), 'qrcode' => array('thumb' => tomedia($qrcode), 'left' => 20, 'top' => 810, 'width' => 220, 'height' => 220), 'price' => array('text' => $price, 'left' => 280, 'top' => 870, 'size' => 30, 'color' => '#000'), 'desc' => array('text' => '长按二维码扫码购买', 'left' => 280, 'top' => 950, 'size' => 18, 'color' => '#666') );
+			$goodscode = com('goodscode')->createcode($id, $qrcode, $codedata, $mid);
 		}
 		$plugin_diypage = p('diypage');
 		if ($plugin_diypage) 

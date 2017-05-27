@@ -26,7 +26,7 @@ class Payment_EweiShopV2Page extends WebPage
 		$payment = $this->paytype;
 		if (p('qpay')) 
 		{
-			$payment[4] = '人人支付';
+			$payment[4] = '中信银行全付通';
 		}
 		include $this->template();
 	}
@@ -79,7 +79,7 @@ class Payment_EweiShopV2Page extends WebPage
 		$payment = $this->paytype;
 		if (p('qpay')) 
 		{
-			$payment[4] = '人人支付';
+			$payment[4] = '中信银行全付通';
 		}
 		include $this->template();
 	}
@@ -111,15 +111,15 @@ class Payment_EweiShopV2Page extends WebPage
 			if ($ext != '.pem') 
 			{
 				$errinput = '';
-				if ($fileinput == 'weixin_cert_file') 
+				if ($fileinput == 'cert_file') 
 				{
 					$errinput = 'CERT文件格式错误';
 				}
-				else if ($fileinput == 'weixin_key_file') 
+				else if ($fileinput == 'key_file') 
 				{
 					$errinput = 'KEY文件格式错误';
 				}
-				else if ($fileinput == 'weixin_root_file') 
+				else if ($fileinput == 'root_file') 
 				{
 					$errinput = 'ROOT文件格式错误';
 				}

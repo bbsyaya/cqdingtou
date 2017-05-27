@@ -306,13 +306,14 @@ class Bind_EweiShopV2Model
 		pdo_update('ewei_shop_commission_apply', array('mid' => $b['id']), array('uniacid' => $_W['uniacid'], 'mid' => $a['id']));
 		pdo_update('ewei_shop_order', array('agentid' => $b['id']), array('agentid' => $a['id']));
 		pdo_update('ewei_shop_member', array('agentid' => $b['id']), array('agentid' => $a['id']));
+		$mergeinfo = ' 合并前用户: ' . $a['nickname'] . '(' . $a['id'] . ') 合并后用户: ' . $b['nickname'] . '(' . $b['id'] . ')';
 		if (0 < $a['credit1']) 
 		{
-			m('member')->setCredit($b['openid'], 'credit1', abs($a['credit1']), '全网通会员数据合并增加积分 +' . $a['credit1']);
+			m('member')->setCredit($b['openid'], 'credit1', abs($a['credit1']), '全网通会员数据合并增加积分 +' . $a['credit1'] . $mergeinfo);
 		}
 		if (0 < $a['credit2']) 
 		{
-			m('member')->setCredit($b['openid'], 'credit2', abs($a['credit2']), '全网通会员数据合并增加余额 +' . $a['credit2']);
+			m('member')->setCredit($b['openid'], 'credit2', abs($a['credit2']), '全网通会员数据合并增加余额 +' . $a['credit2'] . $mergeinfo);
 		}
 		pdo_delete('ewei_shop_member', array('id' => $a['id'], 'uniacid' => $_W['uniacid']));
 		$tables = pdo_fetchall('SHOW TABLES like \'%_ewei_shop_%\'');
@@ -333,6 +334,8 @@ class Bind_EweiShopV2Model
 				pdo_update($tablename, array('mid' => $b['id']), array('uniacid' => $_W['uniacid'], 'mid' => $a['id']));
 			}
 		}
+		$c = m('member')->getMember($b['openid']);
+		pdo_insert('ewei_shop_member_mergelog', array('uniacid' => $_W['uniacid'], 'mergetime' => time(), 'openid_a' => $a['openid'], 'openid_b' => $b['openid'], 'mid_a' => $a['id'], 'mid_b' => $b['id'], 'detail_a' => iserializer($a), 'detail_b' => iserializer($b), 'detail_c' => iserializer($c)));
 		return error(1);
 	}
 }

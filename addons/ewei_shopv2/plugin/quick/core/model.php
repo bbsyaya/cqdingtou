@@ -264,7 +264,7 @@ class QuickModel extends PluginModel
 		{
 			$is_openmerch = 0;
 		}
-		$condition = ' and `uniacid` = :uniacid AND `deleted` = 0 and status=1 and bargain=0';
+		$condition = ' and `uniacid` = :uniacid AND `deleted` = 0 and status=1 and bargain=0 and `type`!=4 ';
 		$params = array(':uniacid' => $_W['uniacid']);
 		if (!(empty($merchid))) 
 		{

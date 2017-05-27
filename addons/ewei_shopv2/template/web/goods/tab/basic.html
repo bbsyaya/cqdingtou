@@ -210,8 +210,8 @@
     <label class="col-sm-2 control-label">自动发货</label>
     <div class="col-sm-9 col-xs-12">
         {ife 'goods' $item}
-        <label class="radio-inline"><input type="radio" name="virtualsend" value="0"  {if empty($item['virtualsend'])}checked="true"{/if}/> 否</label>
-        <label class="radio-inline"><input type="radio" name="virtualsend" value="1" {if $item['virtualsend'] == 1}checked="true"{/if}   /> 是</label>
+        <label class="radio-inline"><input type="radio" name="virtualsend" value="0"  {if empty($item['virtualsend'])}checked="true"{/if}  onclick="type_change(2);"/> 否</label>
+        <label class="radio-inline"><input type="radio" name="virtualsend" value="1" {if $item['virtualsend'] == 1}checked="true"{/if}  onclick="type_change(2);"/> 是</label>
         <span class="help-block">提示：发货后订单自动完成</span>
         {else}
         <div class='form-control-static'>{if empty($item['virtualsend'])}否{else}是{/if}</div>

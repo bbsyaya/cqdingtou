@@ -454,6 +454,56 @@ class CashierModel extends PluginModel
 		}
 		return $array;
 	}
+	public function refund($id) 
+	{
+		global $_W;
+		$id = (int) $id;
+		$pay_log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_cashier_pay_log') . ' WHERE uniacid=:uniacid AND id=:id', array(':uniacid' => $_W['uniacid'], ':id' => $id));
+		if ($pay_log['status'] != 1) 
+		{
+			return error(-1, '未支付或者已退款!');
+		}
+		$out_trade_no = 'CST' . date('YmdHis') . mt_rand(1000, 9999);
+		$res = array();
+		switch ($pay_log['paytype']) 
+		{
+			case '0': $res = $this->refundWechat($pay_log['openid'], $pay_log['logno'], $out_trade_no, $pay_log['money'] * 100, $pay_log['money'] * 100, false);
+			break;
+			case '1': $res = m('finance')->newAlipayRefund(array('out_trade_no' => $pay_log['logno'], 'refund_amount' => $pay_log['money'], 'refund_reason' => $_W['cashieruser']['title'] . ' 收银台退款! 退款订单号: ' . $out_trade_no), json_decode($_W['cashieruser']['alipay'], true));
+			break;
+			case '2': m('member')->setCredit($pay_log['openid'], 'credit2', $pay_log['money'] + $pay_log['deduction'], $_W['cashieruser']['title'] . ' 收银台退款! 退款订单号' . $out_trade_no);
+			break;
+			case '3': $res = true;
+			break;
+			case '101': $res = m('finance')->refund($pay_log['openid'], $pay_log['logno'], $out_trade_no, $pay_log['money'] * 100, $pay_log['money'] * 100, false);
+			break;
+			case '102': $res = m('finance')->refund($pay_log['openid'], $pay_log['logno'], $out_trade_no, $pay_log['money'] * 100, $pay_log['money'] * 100, false);
+			break;
+		}
+		if (is_error($res)) 
+		{
+			return $res;
+		}
+		$refunduser = 0;
+		if (isset($_W['cashieruser']['operator'])) 
+		{
+			$refunduser = $_W['cashieruser']['operator']['id'];
+		}
+		pdo_update('ewei_shop_cashier_pay_log', array('status' => -1, 'refundsn' => $out_trade_no, 'refunduser' => $refunduser), array('uniacid' => $_W['uniacid'], 'id' => $id));
+		if (com('coupon') && !(empty($pay_log['usecoupon']))) 
+		{
+			com('coupon')->returnConsumeCoupon($pay_log['usecoupon']);
+		}
+		if (!(empty($pay_log['present_credit1']))) 
+		{
+			m('member')->setCredit($pay_log['openid'], 'credit1', -$pay_log['present_credit1'], $_W['cashieruser']['title'] . ' 收银台退款收回赠送的积分! 退款订单号' . $out_trade_no);
+		}
+		if (!(empty($pay_log['orderid']))) 
+		{
+			pdo_update('ewei_shop_order', array('status' => -1), array('uniacid' => $_W['uniacid'], 'id' => $pay_log['orderid']));
+		}
+		return $res;
+	}
 	public function updateOrder($log) 
 	{
 		global $_W;
@@ -542,6 +592,11 @@ class CashierModel extends PluginModel
 		}
 		if (empty($res)) 
 		{
+			return false;
+		}
+		if (($res['trade_state'] == 'REFUND') || ($res['message'] == '该订单已经关闭或者已经退款')) 
+		{
+			pdo_update('ewei_shop_cashier_pay_log', array('status' => -1), array('uniacid' => $_W['uniacid'], 'id' => $log['id']));
 			return false;
 		}
 		if (($res['total_fee'] == round($realmoney * 100, 2)) || ($res['total_amount'] == round($realmoney, 2))) 
@@ -641,7 +696,12 @@ class CashierModel extends PluginModel
 			$type = substr($auto_code, 0, 2);
 			if (in_array($type, $alipay)) 
 			{
-				if (empty($_W['cashieruser']['alipay_status'])) 
+				list(, $payment) = m('common')->public_build();
+				if (($payment['is_new'] == 1) && ($payment['type'] == 4)) 
+				{
+					$paytype = 102;
+				}
+				if (empty($_W['cashieruser']['alipay_status']) && ($paytype != 102)) 
 				{
 					return error(-101, '暂时不支持支付宝支付!');
 				}
@@ -1263,6 +1323,152 @@ class CashierModel extends PluginModel
 		$price = $price * $credit1_double;
 		$credit1 = com_run('sale::getCredit1', $log['openid'], $price, 37, 1, 0, $log['title'] . '收银订单号 : ' . $log['logno'] . '  收银台消费送积分');
 		return $credit1;
+	}
+	public function upload_cert($fileinput) 
+	{
+		global $_W;
+		$filename = $_FILES[$fileinput]['name'];
+		$tmp_name = $_FILES[$fileinput]['tmp_name'];
+		if (!(empty($filename)) && !(empty($tmp_name))) 
+		{
+			$ext = strtolower(substr($filename, strrpos($filename, '.')));
+			if ($ext != '.pem') 
+			{
+				$errinput = '';
+				if ($fileinput == 'cert_file') 
+				{
+					$errinput = 'CERT文件格式错误';
+				}
+				else if ($fileinput == 'key_file') 
+				{
+					$errinput = 'KEY文件格式错误';
+				}
+				else if ($fileinput == 'root_file') 
+				{
+					$errinput = 'ROOT文件格式错误';
+				}
+				show_json(0, $errinput . ',请重新上传!');
+			}
+			return file_get_contents($tmp_name);
+		}
+		return '';
+	}
+	public function refundWechat($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney = 0, $app = false, $refund_account = false) 
+	{
+		global $_W;
+		global $_GPC;
+		if (empty($openid)) 
+		{
+			return error(-1, 'openid不能为空');
+		}
+		$wechatpay = json_decode($_W['cashieruser']['wechatpay'], true);
+		if (!(is_array($wechatpay))) 
+		{
+			return error(1, '没有设定支付参数');
+		}
+		$certs = array('cert' => $wechatpay['cert'], 'key' => $wechatpay['key'], 'root' => $wechatpay['root']);
+		if (empty($wechatpay['appid']) && empty($wechatpay['mch_id']) && !(empty($wechatpay['sub_appid']))) 
+		{
+			$wechatpay['appid'] = $wechatpay['sub_appid'];
+			$wechatpay['mch_id'] = $wechatpay['sub_mch_id'];
+			unset($wechatpay['sub_mch_id']);
+			unset($wechatpay['sub_appid']);
+		}
+		$url = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
+		$pars = array();
+		$pars['appid'] = $wechatpay['appid'];
+		$pars['mch_id'] = $wechatpay['mch_id'];
+		if (!(empty($wechatpay['sub_mch_id']))) 
+		{
+			$pars['sub_mch_id'] = $wechatpay['sub_mch_id'];
+		}
+		$pars['nonce_str'] = random(8);
+		$pars['out_trade_no'] = $out_trade_no;
+		$pars['out_refund_no'] = $out_refund_no;
+		$pars['total_fee'] = $totalmoney;
+		$pars['refund_fee'] = $refundmoney;
+		$pars['op_user_id'] = $wechatpay['mch_id'];
+		if ($refund_account) 
+		{
+			$pars['refund_account'] = $refund_account;
+		}
+		if (!(empty($wechatpay['sub_appid']))) 
+		{
+			$pars['sub_appid'] = $wechatpay['sub_appid'];
+		}
+		ksort($pars, SORT_STRING);
+		$string1 = '';
+		foreach ($pars as $k => $v ) 
+		{
+			$string1 .= $k . '=' . $v . '&';
+		}
+		$string1 .= 'key=' . $wechatpay['apikey'];
+		$pars['sign'] = strtoupper(md5($string1));
+		$xml = array2xml($pars);
+		$extras = array();
+		$errmsg = '未上传完整的微信支付证书，请到【系统设置】->【支付方式】中上传!';
+		if (is_array($certs)) 
+		{
+			if (empty($certs['cert']) || empty($certs['key']) || empty($certs['root'])) 
+			{
+				if ($_W['ispost']) 
+				{
+					show_json(0, array('message' => $errmsg));
+				}
+				show_message($errmsg, '', 'error');
+			}
+			$certfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(128);
+			file_put_contents($certfile, $certs['cert']);
+			$keyfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(128);
+			file_put_contents($keyfile, $certs['key']);
+			$rootfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(128);
+			file_put_contents($rootfile, $certs['root']);
+			$extras['CURLOPT_SSLCERT'] = $certfile;
+			$extras['CURLOPT_SSLKEY'] = $keyfile;
+			$extras['CURLOPT_CAINFO'] = $rootfile;
+		}
+		else 
+		{
+			if ($_W['ispost']) 
+			{
+				show_json(0, array('message' => $errmsg));
+			}
+			show_message($errmsg, '', 'error');
+		}
+		load()->func('communication');
+		$resp = ihttp_request($url, $xml, $extras);
+		@unlink($certfile);
+		@unlink($keyfile);
+		@unlink($rootfile);
+		if (is_error($resp)) 
+		{
+			return error(-2, $resp['message']);
+		}
+		if (empty($resp['content'])) 
+		{
+			return error(-2, '网络错误');
+		}
+		$arr = json_decode(json_encode(simplexml_load_string($resp['content'], 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+		if (($arr['return_code'] == 'SUCCESS') && ($arr['result_code'] == 'SUCCESS')) 
+		{
+			return true;
+		}
+		if (($arr['return_code'] == 'SUCCESS') && ($arr['result_code'] == 'FAIL') && ($arr['return_msg'] == 'OK') && !($refund_account)) 
+		{
+			if ($arr['err_code'] == 'NOTENOUGH') 
+			{
+				return $this->refundWechat($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney, $app, 'REFUND_SOURCE_RECHARGE_FUNDS');
+			}
+		}
+		if ($arr['return_msg'] == $arr['err_code_des']) 
+		{
+			$error = $arr['return_msg'];
+		}
+		else 
+		{
+			$error = $arr['return_msg'] . ' | ' . $arr['err_code_des'];
+		}
+		return error(-2, $error);
 	}
 }
 function sort_cashier($a, $b) 

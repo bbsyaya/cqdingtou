@@ -386,7 +386,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			$id = 1;
 		}
-		$account_set = pdo_get('ewei_shop_bargain_account', array('id' => $_W['uniacid']), array('partin', 'rule'));
+		$account_set = pdo_get('ewei_shop_bargain_account', array('id' => $_W['uniacid']), array('partin', 'rule', 'sharestyle'));
 		$res = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_bargain_actor') . ' WHERE id = :id', array(':id' => $id));
 		$res2 = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_bargain_goods') . ' WHERE id = :id AND status=\'0\'', array(':id' => $res['goods_id']));
 		$ewei_detail = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods') . ' WHERE id = :id AND status = \'1\' AND bargain > 0 AND deleted=0', array(':id' => $res2['goods_id']));

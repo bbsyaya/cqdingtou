@@ -466,7 +466,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_bargain_account` (
   `partin` int(11) DEFAULT '0',
   `rule` text,
   `end_message` int(11) DEFAULT '0',
-  `follow_swi` tinyint(1) NOT NULL DEFAULT '0'
+  `follow_swi` tinyint(1) NOT NULL DEFAULT '0',
+  `sharestyle` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_bargain_actor`;
@@ -678,6 +679,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_cashier_pay_log` (
   `usecouponprice` decimal(10,2) DEFAULT '0.00',
   `present_credit1` int(11) DEFAULT '0',
   `refundsn` varchar(50) DEFAULT '',
+  `refunduser` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`) USING BTREE,
   KEY `idx_type` (`paytype`) USING BTREE,
@@ -3041,6 +3043,24 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member_log` (
   KEY `idx_status` (`status`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=106 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_member_mergelog`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member_mergelog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `mergetime` int(11) NOT NULL DEFAULT '0',
+  `openid_a` varchar(30) NOT NULL,
+  `openid_b` varchar(30) NOT NULL,
+  `mid_a` int(11) NOT NULL,
+  `mid_b` int(11) NOT NULL,
+  `detail_a` text,
+  `detail_b` text,
+  `detail_c` text,
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_mid_a` (`mid_a`) USING BTREE,
+  KEY `idx_mid_b` (`mid_b`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_member_message_template`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member_message_template` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3804,7 +3824,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order_peerpay_payinfo` (
   `headimg` varchar(255) DEFAULT NULL,
   `refundstatus` tinyint(1) NOT NULL DEFAULT '0',
   `refundprice` decimal(10,2) NOT NULL DEFAULT '0.00',
-  `openid` VARCHAR( 50 ) NOT NULL,
+  `tid` varchar(255) NOT NULL DEFAULT '',
+  `openid` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -5126,7 +5147,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_extension` (
   `verb` varchar(255) NOT NULL DEFAULT '',
   `unit` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=12 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_task_extension_join`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_extension_join` (
@@ -5155,8 +5176,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_join` (
   `join_user` varchar(100) NOT NULL DEFAULT '',
   `task_id` int(11) NOT NULL DEFAULT '0',
   `task_type` tinyint(1) NOT NULL DEFAULT '0',
-  `needcount` tinyint(3) NOT NULL DEFAULT '0',
-  `completecount` tinyint(3) NOT NULL DEFAULT '0',
+  `needcount` int(11) NOT NULL DEFAULT '0',
+  `completecount` int(11) NOT NULL DEFAULT '0',
   `reward_data` text,
   `is_reward` tinyint(1) NOT NULL DEFAULT '0',
   `failtime` int(11) NOT NULL DEFAULT '0',

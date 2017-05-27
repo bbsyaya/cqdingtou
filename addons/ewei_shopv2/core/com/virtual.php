@@ -67,6 +67,15 @@ class Virtual_EweiShopV2ComModel extends ComModel
 	{
 		global $_W;
 		global $_GPC;
+		$orderid_cache = m('cache')->getString('orderid_' . $order['id']);
+		if (empty($orderid_cache)) 
+		{
+			m('cache')->set('orderid_' . $order['id'], 1);
+		}
+		else 
+		{
+			return false;
+		}
 		$goods = pdo_fetch('select id,goodsid,total,realprice from ' . tablename('ewei_shop_order_goods') . ' where  orderid=:orderid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':orderid' => $order['id']));
 		$g = pdo_fetch('select id,credit,sales,salesreal from ' . tablename('ewei_shop_goods') . ' where  id=:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $goods['goodsid']));
 		$virtual_data = pdo_fetchall('SELECT id,typeid,fields FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE typeid=:typeid and openid=:openid and uniacid=:uniacid and merchid = :merchid order by rand() limit ' . $goods['total'], array(':openid' => '', ':typeid' => $order['virtual'], ':uniacid' => $_W['uniacid'], ':merchid' => $order['merchid']));

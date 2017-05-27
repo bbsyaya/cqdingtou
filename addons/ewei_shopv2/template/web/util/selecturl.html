@@ -92,14 +92,14 @@
 							 	{if $category2['parentid']==$category['id']}
 								 	<div class="line">
 										<div class="icon icon-2"></div>
-										<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform=='wxapp'}/pages/goods/index/index?cate={$category['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category2['id']), $full)}{/if}">选择</nav>
+										<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform=='wxapp'}/pages/goods/index/index?cate={$category2['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category2['id']), $full)}{/if}">选择</nav>
 										<div class="text">{$category2['name']}</div>
 									</div>
 									{loop $categorys $category3}
 										 {if $category3['parentid']==$category2['id']}
 											 <div class="line">
 												<div class="icon icon-3"></div>
-												<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform=='wxapp'}/pages/goods/index/index?cate={$category['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category3['id']), $full)}{/if}">选择</nav>
+												<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform=='wxapp'}/pages/goods/index/index?cate={$category3['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category3['id']), $full)}{/if}">选择</nav>
 												<div class="text">{$category3['name']}</div>
 											</div>
 										 {/if}

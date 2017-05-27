@@ -1194,7 +1194,7 @@
             <div class="share-text1">截屏保存分享给您的朋友</div>
         </div>
     </div>
-    {else}
+    {elseif $commission_data['codeShare'] == 2}
     <div class="alert-content">
         <div class="alert2">
             <div class="fui-list alert2-goods">
@@ -1216,6 +1216,16 @@
             </div>
             <div class="share-text2">截屏保存分享给您的朋友</div>
             <a href="javascript:void(0);" class="alert-close2">{$_W['shopset']['shop']['name']}</a>
+        </div>
+    </div>
+    {else}
+    <div class="alert-content">
+        <div class="alert" style="padding:0;background: #f5f4f9;border:none;-webkit-border-radius: 0.3rem;border-radius: 0.3rem;top:2rem;">
+            <i class="alert-close alert-close1 icon icon-close" style="right: -0.7rem;top: -0.8rem;background: #e1040d;border:none;z-index:10"></i>
+            <div class="fui-list alert-header" style="-webkit-border-radius: 0.3rem;border-radius: 0.3rem;padding:0;">
+                <img src="{php echo tomedia($goodscode)}" class="alert-goods-img" alt="">
+            </div>
+
         </div>
     </div>
     {/if}

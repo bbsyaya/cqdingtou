@@ -759,40 +759,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 				$payquery = m('finance')->isWeixinPay($ordersn, $order['price'], (is_h5app() ? true : false));
 				$payquery_jie = m('finance')->isWeixinPayBorrow($ordersn, $order['price']);
 			}
-			if (!(empty($ispeerpay))) 
-			{
-				m('order')->setOrderPayType($order['id'], 21);
-				m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => trim($_GPC['peerpaymessage']), 'price' => $log['fee'], 'createtime' => time(), 'openid' => $member['openid'], 'headimg' => $member['avatar'], 'tid' => $_SESSION['peerpaytid']));
-				unset($_SESSION['peerpaytid']);
-				$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
-				if ($ispeerpay['peerpay_realprice'] <= $peerpay_info) 
-				{
-					$ret = array();
-					$ret['result'] = 'success';
-					$ret['type'] = 'wechat';
-					$ret['from'] = 'return';
-					$ret['tid'] = $log['tid'];
-					$ret['user'] = $log['openid'];
-					$ret['fee'] = $log['fee'];
-					$ret['weid'] = $log['weid'];
-					$ret['uniacid'] = $log['uniacid'];
-					$ret['deduct'] = intval($_GPC['deduct']) == 1;
-					$pay_result = m('order')->payResult($ret);
-					@session_start();
-					$_SESSION[EWEI_SHOPV2_PREFIX . '_order_pay_complete'] = 1;
-					if ($_W['ispost']) 
-					{
-						show_json(1, array('result' => $pay_result));
-					}
-					else 
-					{
-						header('location:' . mobileUrl('order/pay/success', array('id' => $order['id'], 'result' => $pay_result)));
-					}
-					exit();
-				}
-				show_json(1, '支付成功');
-			}
-			if (!(is_error($payquery)) || !(is_error($payquery_jie))) 
+			if (!(is_error($payquery)) || !(is_error($payquery_jie)) || !(empty($ispeerpay))) 
 			{
 				$record = array();
 				$record['status'] = '1';
@@ -813,10 +780,6 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 				$ret['weid'] = $log['weid'];
 				$ret['uniacid'] = $log['uniacid'];
 				$ret['deduct'] = intval($_GPC['deduct']) == 1;
-				if (!(empty($ispeerpay))) 
-				{
-					m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => '', 'price' => $log['fee'], 'createtime' => time(), 'headimg' => $member['openid']));
-				}
 				$pay_result = m('order')->payResult($ret);
 				@session_start();
 				$_SESSION[EWEI_SHOPV2_PREFIX . '_order_pay_complete'] = 1;

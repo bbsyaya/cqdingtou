@@ -50,12 +50,13 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		$merchdata = $this->merchData();
 		extract($merchdata);
 		$condition .= ' and merchshow=0 ';
-		$show_status = intval($show_status);
-		//if($show_status == ""){
-		///	$show_status = 6;
-		//}else{
-		//	$show_status = intval($show_status);
-		//}
+		
+		if($show_status == ""){
+			$show_status = 6;
+		}else{
+			$show_status = intval($show_status);
+		}
+		
 		switch ($show_status) 
 		{
 			case 0: $condition .= ' and status=0 and paytype!=3';

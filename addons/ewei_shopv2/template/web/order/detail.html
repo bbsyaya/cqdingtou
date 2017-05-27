@@ -514,8 +514,13 @@
                             <span class="text-default">已关闭</span>
                             {/if}
                         </h3>
+                        {if $item['status'] == -1 && (!empty($item['closereason']) || !empty($item['remarkclose']))}
+                        <div class="form-control-static">关闭原因:{if !empty($item['closereason'])}{php echo $item['closereason']}{else}{php echo $item['remarkclose']}{/if}</div>
+                        {/if}
                     </div>
                 </div>
+
+
 
                 <div class="form-group">
                     <label class="col-sm-3 control-label"></label>

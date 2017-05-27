@@ -5,7 +5,7 @@
         <div class="fui-goods-group {$diyitem['style']['liststyle']}" style="background: {$diyitem['style']['background']};">
             {loop $diyitem['data'] $goodsitem}
                 <a class="fui-goods-item" data-goodsid="{$goodsitem['gid']}" href="{php echo mobileUrl(empty($diyitem['params']['goodstype'])?'goods/detail':'creditshop/detail', array('id'=>$goodsitem['gid']))}" data-nocache="true" style="position: relative;">
-                    <div class="image {php echo $diyitem['style']['liststyle']=='block one'?'auto':''}" {if $diyitem['style']['liststyle']!='block one'}data-lazy-background="{php echo tomedia($goodsitem['thumb'])}"{else}style="background:none;"{/if}>
+                    <div class="image {php echo $diyitem['style']['liststyle']=='block one'?'auto':''}" {if $diyitem['style']['liststyle']!='block one'}data-lazy-background="{php echo tomedia($goodsitem['thumb'])}"{else}style="background:none; min-height: 50px;"{/if}>
                         {if $diyitem['style']['liststyle']=='block one'}
                             <img class="exclude" src="{php echo tomedia($_W['shopset']['shop']['loading'])}" data-lazy="{php echo tomedia($goodsitem['thumb'])}" />
                         {/if}
