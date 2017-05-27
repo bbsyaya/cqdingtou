@@ -700,7 +700,6 @@ class Notice_EweiShopV2Model
 				$text = '您的订单已经成功支付，我们将尽快为您安排发货！！ ' . "\n\n" . '订单号：' . "\n" . '[订单号]' . "\n" . '商品名称：' . "\n" . '[商品名称]商品数量：[商品数量]' . "\n" . '下单时间：[下单时间]' . "\n" . '订单金额：[订单金额]' . "\n" . $remark . $cusurl;
 				$msg = array( 'first' => array('value' => '您的订单已于' . date('Y-m-d H:i', $order['paytime']) . '成功支付，我们将尽快为您安排发货！!' . "\n", 'color' => '#4b9528'), 'keyword1' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword2' => array('title' => '商品名称', 'value' => substr_replace($goodsname, "\n", strrpos($goodsname, "\n\n"), strlen("\n\n")), 'color' => '#000000'), 'keyword3' => array('title' => '商品数量', 'value' => $goodsnum, 'color' => '#000000'), 'keyword4' => array('title' => '支付金额', 'value' => $order['price'], 'color' => '#000000'), 'remark' => array('value' => $remark, 'color' => '#000000') );
 				$this->sendNotice(array('openid' => $openid, 'tag' => 'pay', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
-				com_run('sms::callsms', array('tag' => 'pay', 'datas' => $datas, 'mobile' => $member['mobile']));
 			}
 			if (($order['dispatchtype'] == 1) && empty($order['isverify'])) 
 			{
@@ -716,7 +715,7 @@ class Notice_EweiShopV2Model
 				$text = '自提订单提交成功!！' . "\n" . '自提码：[自提码]' . "\n" . '商品详情：[商品详情]' . "\n" . '提货地址：[门店地址]' . "\n" . '提货时间：[门店营业时间]' . "\n" . $remark;
 				$msg = array( 'first' => array('value' => '自提订单提交成功!', 'color' => '#000000'), 'keyword1' => array('title' => '自提码', 'value' => $order['verifycode'], 'color' => '#000000'), 'keyword2' => array('title' => '商品详情', 'value' => $goods . $orderpricestr, 'color' => '#000000'), 'keyword3' => array('title' => '提货地址', 'value' => $store['address'], 'color' => '#000000'), 'keyword4' => array('title' => '提货时间', 'value' => $store['saletime'], 'color' => '#000000'), 'remark' => array('value' => "\n" . '请您到选择的自提点进行取货, 自提联系人: ' . $store['realname'] . ' 联系电话: ' . $store['mobile'], 'color' => '#000000') );
 				$this->sendNotice(array('openid' => $openid, 'tag' => 'carrier', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'appurl' => $appurl));
-				com_run('sms::callsms', array('tag' => 'carrier', 'datas' => $datas, 'mobile' => $member['mobile']));
+				com_run('sms::callsms', array('tag' => 'carrier', 'datas' => $datas, 'mobile' => (!(empty($buyerinfo_mobile)) ? $buyerinfo_mobile : $member['mobile'])));
 			}
 		}
 		else 

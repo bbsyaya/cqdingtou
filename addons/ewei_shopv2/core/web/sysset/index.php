@@ -427,60 +427,11 @@ class Index_EweiShopV2Page extends WebPage
 	{
 		global $_W;
 		global $_GPC;
-		$data = m('common')->getSysset('pay');
 		$sec = m('common')->getSec();
 		$sec = iunserializer($sec['sec']);
 		if ($_W['ispost']) 
 		{
 			ca('sysset.payset.edit');
-			if ($_FILES['weixin_cert_file']['name']) 
-			{
-				$sec['cert'] = $this->upload_cert('weixin_cert_file');
-			}
-			if ($_FILES['weixin_key_file']['name']) 
-			{
-				$sec['key'] = $this->upload_cert('weixin_key_file');
-			}
-			if ($_FILES['weixin_root_file']['name']) 
-			{
-				$sec['root'] = $this->upload_cert('weixin_root_file');
-			}
-			if ($_FILES['weixin_sub_cert_file']['name']) 
-			{
-				$sec['sub']['cert'] = $this->upload_cert('weixin_sub_cert_file');
-			}
-			if ($_FILES['weixin_sub_key_file']['name']) 
-			{
-				$sec['sub']['key'] = $this->upload_cert('weixin_sub_key_file');
-			}
-			if ($_FILES['weixin_sub_root_file']['name']) 
-			{
-				$sec['sub']['root'] = $this->upload_cert('weixin_sub_root_file');
-			}
-			if ($_FILES['weixin_jie_cert_file']['name']) 
-			{
-				$sec['jie']['cert'] = $this->upload_cert('weixin_jie_cert_file');
-			}
-			if ($_FILES['weixin_jie_key_file']['name']) 
-			{
-				$sec['jie']['key'] = $this->upload_cert('weixin_jie_key_file');
-			}
-			if ($_FILES['weixin_jie_root_file']['name']) 
-			{
-				$sec['jie']['root'] = $this->upload_cert('weixin_jie_root_file');
-			}
-			if ($_FILES['weixin_jie_sub_cert_file']['name']) 
-			{
-				$sec['jie_sub']['cert'] = $this->upload_cert('weixin_jie_sub_cert_file');
-			}
-			if ($_FILES['weixin_jie_sub_key_file']['name']) 
-			{
-				$sec['jie_sub']['key'] = $this->upload_cert('weixin_jie_sub_key_file');
-			}
-			if ($_FILES['weixin_jie_sub_root_file']['name']) 
-			{
-				$sec['jie_sub']['root'] = $this->upload_cert('weixin_jie_sub_root_file');
-			}
 			if ($_FILES['app_wechat_cert_file']['name']) 
 			{
 				$sec['app_wechat']['cert'] = $this->upload_cert('app_wechat_cert_file');
@@ -502,33 +453,10 @@ class Index_EweiShopV2Page extends WebPage
 			$sec['app_alipay']['public_key'] = trim($_GPC['data']['app_alipay_public_key']);
 			$sec['app_alipay']['private_key'] = trim($_GPC['data']['app_alipay_private_key']);
 			$sec['app_alipay']['appid'] = trim($_GPC['data']['app_alipay_appid']);
-			$sec['appid_sub'] = trim($_GPC['data']['appid_sub']);
-			$sec['sub_appid_sub'] = trim($_GPC['data']['sub_appid_sub']);
-			$sec['mchid_sub'] = trim($_GPC['data']['mchid_sub']);
-			$sec['sub_mchid_sub'] = trim($_GPC['data']['sub_mchid_sub']);
-			$sec['apikey_sub'] = trim($_GPC['data']['apikey_sub']);
-			$sec['appid'] = trim($_GPC['data']['appid']);
-			$sec['secret'] = trim($_GPC['data']['secret']);
-			$sec['mchid'] = trim($_GPC['data']['mchid']);
-			$sec['apikey'] = trim($_GPC['data']['apikey']);
-			$sec['appid_jie_sub'] = trim($_GPC['data']['appid_jie_sub']);
-			$sec['sub_appid_jie_sub'] = trim($_GPC['data']['sub_appid_jie_sub']);
-			$sec['sub_secret_jie_sub'] = trim($_GPC['data']['sub_secret_jie_sub']);
-			$sec['mchid_jie_sub'] = trim($_GPC['data']['mchid_jie_sub']);
-			$sec['sub_mchid_jie_sub'] = trim($_GPC['data']['sub_mchid_jie_sub']);
-			$sec['apikey_jie_sub'] = trim($_GPC['data']['apikey_jie_sub']);
-			$sec['weixin_wft_mchid'] = trim($_GPC['data']['weixin_wft_mchid']);
-			$sec['weixin_wft_key'] = trim($_GPC['data']['weixin_wft_key']);
-			$sec['weixin_wft_native'] = intval($_GPC['data']['weixin_wft_native']);
-			$sec['weixin_zxyh_mchid'] = trim($_GPC['data']['weixin_zxyh_mchid']);
-			$sec['weixin_zxyh_key'] = trim($_GPC['data']['weixin_zxyh_key']);
-			$sec['weixin_zxyh_key2'] = trim($_GPC['data']['weixin_zxyh_key2']);
-			$sec['weixin_zxyh_sub_mchid'] = trim($_GPC['data']['weixin_zxyh_sub_mchid']);
-			$sec['weixin_zxyhapp_mchid'] = trim($_GPC['data']['weixin_zxyhapp_mchid']);
-			$sec['weixin_zxyhapp_key'] = trim($_GPC['data']['weixin_zxyhapp_key']);
-			$sec['weixin_zxyhapp_key2'] = trim($_GPC['data']['weixin_zxyhapp_key2']);
 			pdo_update('ewei_shop_sysset', array('sec' => iserializer($sec)), array('uniacid' => $_W['uniacid']));
 			$inputdata = ((is_array($_GPC['data']) ? $_GPC['data'] : array()));
+			$data = array();
+			$data['weixin_id'] = intval($inputdata['weixin_id']);
 			$data['weixin'] = intval($inputdata['weixin']);
 			$data['weixin_sub'] = intval($inputdata['weixin_sub']);
 			$data['weixin_jie'] = intval($inputdata['weixin_jie']);
@@ -538,13 +466,67 @@ class Index_EweiShopV2Page extends WebPage
 			$data['cash'] = intval($inputdata['cash']);
 			$data['app_wechat'] = intval($inputdata['app_wechat']);
 			$data['app_alipay'] = intval($inputdata['app_alipay']);
-			$data['weixin_wft'] = intval($inputdata['weixin_wft']);
-			$data['weixin_zxyh'] = intval($inputdata['weixin_zxyh']);
-			$data['weixin_zxyhapp'] = intval($inputdata['weixin_zxyhapp']);
 			$data['paytype'] = ((isset($inputdata['paytype']) ? $inputdata['paytype'] : array()));
 			m('common')->updateSysset(array('pay' => $data));
 			plog('sysset.payset.edit', '修改系统设置-支付设置');
 			show_json(1);
+		}
+		$data = m('common')->getSysset('pay');
+		$payments = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
+		if (empty($payments)) 
+		{
+			$payments = array();
+			$setting = uni_setting($_W['uniacid'], array('payment'));
+			$payment = $setting['payment'];
+			if (!(empty($payment['wechat']['mchid']))) 
+			{
+				if (IMS_VERSION <= 0.80000000000000004) 
+				{
+					$payment['wechat']['apikey'] = $payment['wechat']['signkey'];
+				}
+				$default = array('uniacid' => $_W['uniacid'], 'title' => '微信支付', 'type' => 0, 'sub_appid' => $_W['account']['key'], 'sub_appsecret' => $_W['account']['secret'], 'sub_mch_id' => $payment['wechat']['mchid'], 'apikey' => $payment['wechat']['apikey'], 'cert_file' => $sec['cert'], 'key_file' => $sec['key'], 'root_file' => $sec['root'], 'createtime' => TIMESTAMP);
+				$payments[] = $default;
+				pdo_insert('ewei_shop_payment', $default);
+				$default_0 = pdo_insertid();
+			}
+			if (($data['weixin_sub'] == 1) || !(empty($sec['appid_sub']))) 
+			{
+				$default = array('uniacid' => $_W['uniacid'], 'title' => '微信支付子商户', 'type' => 1, 'appid' => $sec['appid_sub'], 'mch_id' => $sec['mchid_sub'], 'sub_appid' => $sec['sub_appid_sub'], 'sub_appsecret' => $_W['account']['secret'], 'sub_mch_id' => $sec['sub_mchid_sub'], 'apikey' => $sec['apikey_sub'], 'cert_file' => $sec['sub']['cert'], 'key_file' => $sec['sub']['key'], 'root_file' => $sec['sub']['root'], 'createtime' => TIMESTAMP);
+				$payments[] = $default;
+				pdo_insert('ewei_shop_payment', $default);
+				$default_1 = pdo_insertid();
+			}
+			if (($data['weixin_jie_sub'] == 1) || !(empty($sec['appid']))) 
+			{
+				$default = array('uniacid' => $_W['uniacid'], 'title' => '借用微信支付', 'type' => 2, 'sub_appid' => $sec['appid'], 'sub_appsecret' => $sec['secret'], 'sub_mch_id' => $sec['mchid'], 'apikey' => $sec['apikey'], 'cert_file' => $sec['jie']['cert'], 'key_file' => $sec['jie']['key'], 'root_file' => $sec['jie']['root'], 'createtime' => TIMESTAMP);
+				$payments[] = $default;
+				pdo_insert('ewei_shop_payment', $default);
+				$default_2 = pdo_insertid();
+			}
+			if (($data['weixin_jie_sub'] == 1) || !(empty($sec['appid_jie_sub']))) 
+			{
+				$default = array('uniacid' => $_W['uniacid'], 'title' => '借用微信支付子商户', 'type' => 3, 'appid' => $sec['appid_jie_sub'], 'mch_id' => $sec['mchid_jie_sub'], 'sub_appid' => $sec['sub_appid_jie_sub'], 'sub_appsecret' => $sec['sub_secret_jie_sub'], 'sub_mch_id' => $sec['sub_mchid_jie_sub'], 'apikey' => $sec['apikey_jie_sub'], 'cert_file' => $sec['jie_sub']['cert'], 'key_file' => $sec['jie_sub']['key'], 'root_file' => $sec['jie_sub']['root'], 'createtime' => TIMESTAMP);
+				$payments[] = $default;
+				pdo_insert('ewei_shop_payment', $default);
+				$default_3 = pdo_insertid();
+			}
+			if ($data['weixin'] == 1) 
+			{
+				$data['weixin_id'] = $default_0;
+			}
+			else if ($data['weixin_sub'] == 1) 
+			{
+				$data['weixin_id'] = $default_1;
+			}
+			else if ($data['weixin_jie'] == 1) 
+			{
+				$data['weixin_id'] = $default_2;
+			}
+			else if ($data['weixin_jie_sub'] == 1) 
+			{
+				$data['weixin_id'] = $default_3;
+			}
+			m('common')->updateSysset(array('pay' => $data));
 		}
 		$url = $_W['siteroot'] . 'addons/ewei_shopv2/payment/wechat/notify.php';
 		load()->func('communication');

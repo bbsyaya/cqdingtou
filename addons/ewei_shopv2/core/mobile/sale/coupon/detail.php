@@ -330,7 +330,14 @@ class Detail_EweiShopV2Page extends MobilePage
 					if (!(is_error($wechat))) 
 					{
 						$wechat['success'] = true;
-						$wechat['weixin'] = true;
+						if (!(empty($wechat['code_url']))) 
+						{
+							$wechat['weixin_jie'] = true;
+						}
+						else 
+						{
+							$wechat['weixin'] = true;
+						}
 					}
 				}
 				if ((isset($set['pay']) && ($set['pay']['weixin_jie'] == 1) && !($wechat['success'])) || ($jie === 1)) 

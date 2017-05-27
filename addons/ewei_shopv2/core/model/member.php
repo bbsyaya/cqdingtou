@@ -208,6 +208,15 @@ class Member_EweiShopV2Model
 				}
 			}
 		}
+		if (empty($log)) 
+		{
+			$log = array($uid, '未记录');
+		}
+		else if (!(is_array($log))) 
+		{
+			$log = array(0, $log);
+		}
+		$log_data = array('uid' => intval($uid), 'credittype' => $credittype, 'uniacid' => $_W['uniacid'], 'num' => $credits, 'createtime' => TIMESTAMP, 'module' => 'ewei_shopv2', 'operator' => intval($log[0]), 'remark' => $log[1]);
 		if (!(empty($uid))) 
 		{
 			$value = pdo_fetchcolumn('SELECT ' . $credittype . ' FROM ' . tablename('mc_members') . ' WHERE `uid` = :uid', array(':uid' => $uid));
@@ -217,16 +226,6 @@ class Member_EweiShopV2Model
 				$newcredit = 0;
 			}
 			pdo_update('mc_members', array($credittype => $newcredit), array('uid' => $uid));
-			if (empty($log)) 
-			{
-				$log = array($uid, '未记录');
-			}
-			else if (!(is_array($log))) 
-			{
-				$log = array(0, $log);
-			}
-			$data = array('uid' => $uid, 'credittype' => $credittype, 'uniacid' => $_W['uniacid'], 'num' => $credits, 'createtime' => TIMESTAMP, 'module' => 'ewei_shopv2', 'operator' => intval($log[0]), 'remark' => $log[1]);
-			pdo_insert('mc_credits_record', $data);
 		}
 		else 
 		{
@@ -237,6 +236,19 @@ class Member_EweiShopV2Model
 				$newcredit = 0;
 			}
 			pdo_update('ewei_shop_member', array($credittype => $newcredit), array('uniacid' => $_W['uniacid'], 'openid' => $openid));
+			$log_data['remark'] = $log_data['remark'] . ' OPENID: ' . $openid;
+		}
+		pdo_insert('mc_credits_record', $log_data);
+		if (p('task')) 
+		{
+			if ($credittype == 'credit1') 
+			{
+			}
+			else 
+			{
+				p('task')->checkTaskReward('cost_rechargeenough', $credits, $openid);
+				p('task')->checkTaskReward('cost_rechargetotal', $credits, $openid);
+			}
 		}
 	}
 	public function getCredit($openid = '', $credittype = 'credit1') 
@@ -714,7 +726,8 @@ class Member_EweiShopV2Model
 	public function wxuser($appid, $secret, $snsapi = 'snsapi_base', $expired = '600') 
 	{
 		global $_W;
-		if ($wxuser = $_COOKIE[$_W['config']['cookie']['pre'] . $appid] === NULL) 
+		$wxuser = $_COOKIE[$_W['config']['cookie']['pre'] . $appid];
+		if ($wxuser === NULL) 
 		{
 			$code = ((isset($_GET['code']) ? $_GET['code'] : ''));
 			if (!($code)) 
@@ -727,11 +740,7 @@ class Member_EweiShopV2Model
 			load()->func('communication');
 			$getOauthAccessToken = ihttp_get('https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . $appid . '&secret=' . $secret . '&code=' . $code . '&grant_type=authorization_code');
 			$json = json_decode($getOauthAccessToken['content'], true);
-			if (!(empty($json['errcode'])) && ($json['errcode'] != '40029')) 
-			{
-				return $json['errmsg'];
-			}
-			if (!(empty($json['errcode'])) && ($json['errcode'] == '40029')) 
+			if (!(empty($json['errcode'])) && (($json['errcode'] == '40029') || ($json['errcode'] == '40163'))) 
 			{
 				$url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . ((strpos($_SERVER['REQUEST_URI'], '?') ? '' : '?'));
 				$parse = parse_url($url);

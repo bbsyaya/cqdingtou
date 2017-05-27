@@ -41,7 +41,10 @@
 
 {php $merchid = !empty($goods['merchid'])?$goods['merchid']:$_GPC['merchid']}
 
-{php $this->diyLayer(true, $diypage, $merchid?$merchid:false)}
+{if !$hideLayer}
+	{php $this->diyLayer(true, $diypage, $merchid?$merchid:false)}
+{/if}
+
 {if !$hideGoTop}
 	{php $this->diyGotop(true, $diypage)}
 {/if}

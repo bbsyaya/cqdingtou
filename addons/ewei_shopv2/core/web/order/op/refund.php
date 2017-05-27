@@ -168,7 +168,10 @@ class Refund_EweiShopV2Page extends WebPage
 					$item['paytype'] = 23;
 				}
 				$ispeerpay = m('order')->checkpeerpay($id);
-				$item['paytype'] = 21;
+				if (!(empty($ispeerpay))) 
+				{
+					$item['paytype'] = 21;
+				}
 				if ($item['paytype'] == 1) 
 				{
 					m('member')->setCredit($item['openid'], 'credit2', $realprice, array(0, $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']));

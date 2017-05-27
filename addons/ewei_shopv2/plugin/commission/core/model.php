@@ -37,7 +37,7 @@ if (!(class_exists('CommissionModel')))
 				$numm = $order['goodsprice'] - $order['isdiscountprice'] - $order['discountprice'];
 				if ($numm != 0) 
 				{
-					$rate = (($order['price'] - $order['changeprice']) + $order['deductcredit2']) / $numm;
+					$rate = (($order['price'] - $order['changeprice'] - $order['dispatchprice']) + $order['deductcredit2']) / $numm;
 				}
 				else 
 				{
@@ -285,6 +285,12 @@ if (!(class_exists('CommissionModel')))
 									}
 								}
 							}
+						}
+						if (p('task')) 
+						{
+							p('task')->checkTaskReward('commission_money', $commissions['level1'], $m1['openid']);
+							p('task')->checkTaskReward('commission_money', $commissions['level2'], $m2['openid']);
+							p('task')->checkTaskReward('commission_money', $commissions['level3'], $m3['openid']);
 						}
 						pdo_update('ewei_shop_order_goods', array('commission1' => iserializer($cinfo['commission1']), 'commission2' => iserializer($cinfo['commission2']), 'commission3' => iserializer($cinfo['commission3']), 'commissions' => iserializer($commissions), 'nocommission' => $cinfo['nocommission']), array('id' => $cinfo['id']));
 					}
@@ -1356,6 +1362,10 @@ if (!(class_exists('CommissionModel')))
 						$click = array('uniacid' => $_W['uniacid'], 'openid' => $openid, 'from_openid' => $parent['openid'], 'clicktime' => time());
 						pdo_insert('ewei_shop_commission_clickcount', $click);
 						pdo_update('ewei_shop_member', array('clickcount' => $parent['clickcount'] + 1), array('uniacid' => $_W['uniacid'], 'id' => $parent['id']));
+						if (p('task')) 
+						{
+							p('task')->checkTaskReward('commission_member', 1, $parent['openid']);
+						}
 					}
 				}
 			}
@@ -2329,7 +2339,7 @@ if (!(class_exists('CommissionModel')))
 			$level = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and id=:id limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $member['agentlevel']));
 			return $level;
 		}
-		public function upgradeLevelByOrder($openid)
+		 public function upgradeLevelByOrder($openid)
         {
             global $_W;
 

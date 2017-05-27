@@ -25,7 +25,6 @@
 
 {ifp 'cashier.set'}
 <div class='menu-header'>设置</div>
-
 <ul>
 	<li {if $_GPC['r']=='cashier.set'}class="active"{/if}><a href="{php echo webUrl('cashier/set')}">基础设置</a></li>
 	<li {if $_GPC['r']=='cashier.notice'}class="active"{/if}><a href="{php echo webUrl('cashier/notice')}">消息通知</a></li>

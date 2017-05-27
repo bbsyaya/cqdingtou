@@ -1,65 +1,168 @@
 SET FOREIGN_KEY_CHECKS=0;
 
+ALTER TABLE `ims_ewei_shop_cashier_pay_log` ADD COLUMN `refundsn`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' AFTER `present_credit1`;
+
+CREATE TABLE `ims_ewei_shop_coupon_usesendtasks` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`uniacid`  int(11) NULL DEFAULT NULL ,
+`usecouponid`  int(11) NULL DEFAULT 0 ,
+`couponid`  int(11) NULL DEFAULT 0 ,
+`starttime`  int(11) NULL DEFAULT 0 ,
+`endtime`  int(11) NULL DEFAULT 0 ,
+`sendnum`  int(11) NULL DEFAULT 1 ,
+`num`  int(11) NULL DEFAULT 0 ,
+`status`  tinyint(1) NULL DEFAULT 0 ,
+PRIMARY KEY (`id`)
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Fixed
+DELAY_KEY_WRITE=0
+;
+
+ALTER TABLE `ims_ewei_shop_express` ADD COLUMN `code`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `displayorder`;
 
 
-ALTER TABLE `ims_ewei_shop_commission_level` ADD COLUMN `goodsids`  varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' AFTER `repurchase`;
+ALTER TABLE `ims_ewei_shop_order_peerpay_payinfo` ADD COLUMN `refundstatus`  tinyint(1) NOT NULL DEFAULT 0 AFTER `headimg`;
+ALTER TABLE `ims_ewei_shop_order_peerpay_payinfo` ADD COLUMN `refundprice`  decimal(10,2) NOT NULL DEFAULT 0.00 AFTER `refundstatus`;
 
-ALTER TABLE `ims_ewei_shop_goods` ADD COLUMN `nosearch`  tinyint(1) NOT NULL DEFAULT 0 AFTER `statustimeend`;
+CREATE TABLE `ims_ewei_shop_payment` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`uniacid`  int(11) NOT NULL DEFAULT 0 ,
+`title`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`type`  tinyint(2) NOT NULL DEFAULT 0 ,
+`appid`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' ,
+`mch_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`apikey`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`sub_appid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' ,
+`sub_appsecret`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' ,
+`sub_mch_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' ,
+`cert_file`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`key_file`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`root_file`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`is_raw`  tinyint(1) NULL DEFAULT 0 ,
+`createtime`  int(10) UNSIGNED NULL DEFAULT 0 ,
+PRIMARY KEY (`id`),
+INDEX `idx_uniacid` (`uniacid`) USING BTREE ,
+INDEX `idx_type` (`type`) USING BTREE 
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
 
-ALTER TABLE `ims_ewei_shop_member` ADD COLUMN `updateaddress`  tinyint(1) NOT NULL DEFAULT 0 AFTER `avatar_wechat`;
-ALTER TABLE `ims_ewei_shop_member_printer` ADD COLUMN `merchid`  int(11) NULL DEFAULT 0 AFTER `createtime`;
-ALTER TABLE `ims_ewei_shop_member_printer_template` ADD COLUMN `merchid`  int(11) NULL DEFAULT 0 AFTER `createtime`;
-ALTER TABLE `ims_ewei_shop_merch_reg` ADD COLUMN `uname`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `reason`;
-ALTER TABLE `ims_ewei_shop_merch_reg` ADD COLUMN `upass`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `uname`;
-ALTER TABLE `ims_ewei_shop_merch_user` ADD COLUMN `uname`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `pluginset`;
-ALTER TABLE `ims_ewei_shop_merch_user` ADD COLUMN `upass`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `uname`;
+CREATE TABLE `ims_ewei_shop_polyapi_key` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`uniacid`  int(11) NOT NULL DEFAULT 0 ,
+`merchid`  int(11) NOT NULL DEFAULT 0 ,
+`appkey`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`token`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`appsecret`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`createtime`  int(11) NOT NULL DEFAULT 0 ,
+`updatetime`  int(11) NOT NULL DEFAULT 0 ,
+`status`  tinyint(1) NOT NULL DEFAULT 0 ,
+PRIMARY KEY (`id`),
+INDEX `idx_uniacid` (`uniacid`) USING BTREE ,
+INDEX `idx_appkey` (`appkey`) USING BTREE ,
+INDEX `idx_token` (`token`) USING BTREE ,
+INDEX `idx_appsecret` (`appsecret`) USING BTREE 
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
 
-ALTER TABLE `ims_ewei_shop_perm_user` ADD COLUMN `openid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `perms2`;
+CREATE TABLE `ims_ewei_shop_task` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`uniacid`  int(11) NOT NULL ,
+`title`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`type`  int(11) NOT NULL ,
+`starttime`  int(11) NOT NULL ,
+`endtime`  int(11) NOT NULL ,
+`dotime`  int(11) NOT NULL DEFAULT 0 ,
+`donetime`  int(11) NOT NULL DEFAULT 0 ,
+`timelimit`  float(11,1) NOT NULL ,
+`keyword`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`status`  tinyint(1) NOT NULL DEFAULT 0 ,
+`explain`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`require_data`  text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`reward_data`  text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`period`  int(11) NOT NULL DEFAULT 0 ,
+`repeat`  int(11) NOT NULL DEFAULT 0 ,
+`maxtimes`  int(11) NOT NULL DEFAULT 0 ,
+`everyhours`  float(11,1) NOT NULL DEFAULT 0.0 ,
+`logo`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+PRIMARY KEY (`id`)
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
+CREATE TABLE `ims_ewei_shop_task_extension` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`taskname`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`taskclass`  varchar(25) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`status`  tinyint(1) NOT NULL DEFAULT 0 ,
+`classify`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`classify_name`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`verb`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`unit`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+PRIMARY KEY (`id`)
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
+CREATE TABLE `ims_ewei_shop_task_extension_join` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`uniacid`  int(11) NOT NULL ,
+`title`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`uid`  int(11) NOT NULL ,
+`taskid`  int(11) NOT NULL ,
+`openid`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`require_data`  text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`progress_data`  text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`reward_data`  text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`completetime`  int(11) NOT NULL DEFAULT 0 ,
+`pickuptime`  int(11) NOT NULL ,
+`endtime`  int(11) NOT NULL ,
+`dotime`  int(11) NOT NULL DEFAULT 0 ,
+`rewarded`  text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`logo`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,
+PRIMARY KEY (`id`)
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
 
-truncate table ims_ewei_shop_plugin;
-INSERT INTO `ims_ewei_shop_plugin` (`id`, `displayorder`, `identity`, `name`, `version`, `author`, `status`, `category`, `isv2`, `thumb`, `desc`, `iscom`, `deprecated`) VALUES
-(1, 1, 'qiniu', '七牛存储', '1.0', '官方', 1, 'tool', 0, '../addons/ewei_shopv2/static/images/qiniu.jpg', NULL, 1, 0),
-(2, 2, 'taobao', '商品助手', '1.0', '官方', 1, 'tool', 0, '../addons/ewei_shopv2/static/images/taobao.jpg', '', 0, 0),
-(3, 3, 'commission', '人人分销', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/commission.jpg', '', 0, 0),
-(4, 4, 'poster', '超级海报', '1.2', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/poster.jpg', '', 0, 0),
-(5, 5, 'verify', 'O2O核销', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/verify.jpg', NULL, 1, 0),
-(6, 6, 'tmessage', '会员群发', '1.0', '官方', 1, 'tool', 0, '../addons/ewei_shopv2/static/images/tmessage.jpg', NULL, 1, 0),
-(7, 7, 'perm', '分权系统', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/perm.jpg', NULL, 1, 0),
-(8, 8, 'sale', '营销宝', '1.0', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/sale.jpg', NULL, 1, 0),
-(9, 9, 'designer', '店铺装修V1', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/designer.jpg', NULL, 0, 1),
-(10, 10, 'creditshop', '积分商城', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/creditshop.jpg', '', 0, 0),
-(11, 11, 'virtual', '虚拟物品', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/virtual.jpg', NULL, 1, 0),
-(12, 11, 'article', '文章营销', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/article.jpg', '', 0, 0),
-(13, 13, 'coupon', '超级券', '1.0', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/coupon.jpg', NULL, 1, 0),
-(14, 14, 'postera', '活动海报', '1.0', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/postera.jpg', '', 0, 0),
-(15, 16, 'system', '系统工具', '1.0', '官方', 0, 'help', 0, '../addons/ewei_shopv2/static/images/system.jpg', NULL, 0, 1),
-(16, 15, 'diyform', '自定表单', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/diyform.jpg', '', 0, 0),
-(17, 16, 'exhelper', '快递助手', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/exhelper.jpg', '', 0, 0),
-(18, 19, 'groups', '人人拼团', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/groups.jpg', '', 0, 0),
-(19, 20, 'diypage', '店铺装修', '2.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/designer.jpg', '', 0, 0),
-(20, 22, 'globonus', '全民股东', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/globonus.jpg', '', 0, 0),
-(21, 23, 'merch', '多商户', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/merch.jpg', '', 0, 0),
-(22, 26, 'qa', '帮助中心', '1.0', '官方', 1, 'help', 1, '../addons/ewei_shopv2/static/images/qa.jpg', '', 0, 0),
-(24, 27, 'sms', '短信提醒', '1.0', '官方', 1, 'tool', 1, '../addons/ewei_shopv2/static/images/sms.jpg', '', 1, 0),
-(25, 29, 'sign', '积分签到', '1.0', '官方', 1, 'tool', 1, '../addons/ewei_shopv2/static/images/sign.jpg', '', 0, 0),
-(26, 30, 'sns', '全民社区', '1.0', '官方', 1, 'sale', 1, '../addons/ewei_shopv2/static/images/sns.jpg', '', 0, 0),
-(27, 33, 'wap', '全网通', '1.0', '官方', 1, 'tool', 1, '', '', 1, 0),
-(28, 34, 'h5app', 'H5APP', '1.0', '官方', 1, 'tool', 1, '', '', 1, 0),
-(29, 26, 'abonus', '区域代理', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/abonus.jpg', '', 0, 0),
-(30, 33, 'printer', '小票打印机', '1.0', '官方', 1, 'tool', 1, '', '', 1, 0),
-(31, 34, 'bargain', '砍价活动', '1.0', '官方', 1, 'tool', 1, '../addons/ewei_shopv2/static/images/bargain.jpg', '', 0, 0),
-(32, 35, 'task','任务中心','1.0','官方',1,'sale',1,'../addons/ewei_shopv2/static/images/task.jpg','',0,0),
-(33, 36, 'cashier','收银台','1.0','官方',1,'biz',1,'../addons/ewei_shopv2/static/images/cashier.jpg','',0,0),
-(34, 37, 'messages', '消息群发', '1.0','官方', 1, 'tool',1,'../addons/ewei_shopv2/static/images/messages.jpg','',0,0),
-(35, 38, 'seckill','整点秒杀','1.0','官方',1,'sale',1,'../addons/ewei_shopv2/static/images/seckill.jpg','',0,0),
-(36, 39, 'exchange','兑换中心','1.0','官方',1,'biz',1,'../addons/ewei_shopv2/static/images/exchange.jpg','',0,0),
-(37, 40, 'lottery', '游戏营销', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/lottery.jpg', '', 0, 0),
-(38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', 1,'', '', 1, 0),
-(39, 42, 'quick', '快速购买', '1.0', '官方', 1, 'biz', 1,'../addons/ewei_shopv2/static/images/quick.jpg', '', 0, 0),
-(40, 43, 'mmanage', '手机端商家管理中心', '1.0', '官方', 1, 'tool',1, '../addons/ewei_shopv2/static/images/mmanage.jpg', '', 0, 0);
+ALTER TABLE  `ims_ewei_shop_order_peerpay_payinfo` ADD  `openid` VARCHAR( 50 ) NOT NULL;
 
+INSERT INTO `ims_ewei_shop_task_extension` (`id`, `taskname`, `taskclass`, `status`, `classify`, `classify_name`, `verb`, `unit`) VALUES
+(1, '推荐人数', 'commission_member', 1, 'number', 'number', '推荐', '人'),
+(2, '分销佣金', 'commission_money', 1, 'number', 'number', '达到', '元'),
+(3, '分销订单', 'commission_order', 1, 'number', 'number', '达到', '笔'),
+(4, '订单满额', 'cost_enough', 1, 'number', 'number', '满', '元'),
+(5, '累计金额', 'cost_total', 1, 'number', 'number', '累计', '元'),
+(6, '订单数量', 'cost_count', 1, 'number', 'number', '达到', '单'),
+(7, '指定商品', 'cost_goods', 1, 'select', 'select', '购买指定商品', '件'),
+(8, '商品评价', 'cost_comment', 1, 'number', 'number', '评价订单', '次'),
+(9, '累计充值', 'cost_rechargetotal', 1, 'number', 'number', '达到', '元'),
+(10, '充值满额', 'cost_rechargeenough', 1, 'number', 'number', '满', '元'),
+(11, '完善信息', 'member_info', 1, 'boole', 'boole', '填写手机号', '');
 
-UPDATE  `ims_modules` SET  `version` =  '2.9.7',
+UPDATE  `ims_modules` SET  `version` =  '2.9.8',
 `author` =  '微上宝科技',
 `url` =  'https://shop140828924.taobao.com' WHERE  `name` ='ewei_shopv2';
 

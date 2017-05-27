@@ -37,7 +37,7 @@ class Picker_EweiShopV2Page extends MobilePage
 				}
 			}
 		}
-		$goods = pdo_fetch('select id,thumb,title,marketprice,total,maxbuy,minbuy,unit,hasoption,showtotal,diyformid,diyformtype,diyfields,isdiscount,presellprice,' . "\n" . '                isdiscount_time,isdiscount_discounts, needfollow, followtip, followurl, `type`, isverify, maxprice, minprice, merchsale,ispresell,preselltimeend,unite_total,threen' . "\n" . '                from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		$goods = pdo_fetch('select id,thumb,title,marketprice,total,maxbuy,minbuy,unit,hasoption,showtotal,diyformid,diyformtype,diyfields,isdiscount,presellprice,' . "\n" . '                isdiscount_time,isdiscount_discounts, needfollow, followtip, followurl, `type`, isverify, maxprice, minprice, merchsale,ispresell,preselltimeend,unite_total,' . "\n" . '                threen,preselltimestart,presellovertime,presellover' . "\n" . '                from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		if (empty($goods)) 
 		{
 			show_json(0);
@@ -66,6 +66,17 @@ class Picker_EweiShopV2Page extends MobilePage
 		if (!(empty($_W['shopset']['wap']['open'])) && !(empty($_W['shopset']['wap']['mustbind'])) && empty($member['mobileverify'])) 
 		{
 			show_json(3);
+		}
+		if (0 < $goods['ispresell']) 
+		{
+			if ((0 < $goods['preselltimestart']) && (time() < $goods['preselltimestart'])) 
+			{
+				show_json(5, '预售未开始');
+			}
+			if ((0 < $goods['preselltimeend']) && ($goods['preselltimeend'] < time())) 
+			{
+				show_json(5, '预售已结束');
+			}
 		}
 		if ($goods['isdiscount'] && (time() <= $goods['isdiscount_time'])) 
 		{

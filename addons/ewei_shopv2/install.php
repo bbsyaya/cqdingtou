@@ -677,6 +677,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_cashier_pay_log` (
   `usecoupon` int(11) DEFAULT '0',
   `usecouponprice` decimal(10,2) DEFAULT '0.00',
   `present_credit1` int(11) DEFAULT '0',
+  `refundsn` varchar(50) DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`) USING BTREE,
   KEY `idx_type` (`paytype`) USING BTREE,
@@ -1140,6 +1141,20 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_coupon_taskdata` (
   `sendpoint` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_coupon_usesendtasks`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_coupon_usesendtasks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT NULL,
+  `usecouponid` int(11) DEFAULT '0',
+  `couponid` int(11) DEFAULT '0',
+  `starttime` int(11) DEFAULT '0',
+  `endtime` int(11) DEFAULT '0',
+  `sendnum` int(11) DEFAULT '1',
+  `num` int(11) DEFAULT '0',
+  `status` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_creditshop_adv`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_creditshop_adv` (
@@ -1865,6 +1880,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_express` (
   `express` varchar(50) DEFAULT '',
   `status` tinyint(1) DEFAULT '1',
   `displayorder` tinyint(3) unsigned DEFAULT '0',
+  `code` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=92 ;
 
@@ -3786,6 +3802,9 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order_peerpay_payinfo` (
   `price` decimal(10,2) NOT NULL DEFAULT '0.00',
   `createtime` int(11) NOT NULL DEFAULT '0',
   `headimg` varchar(255) DEFAULT NULL,
+  `refundstatus` tinyint(1) NOT NULL DEFAULT '0',
+  `refundprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `openid` VARCHAR( 50 ) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -3886,6 +3905,28 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_package_goods_option` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_payment`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_payment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `type` tinyint(2) NOT NULL DEFAULT '0',
+  `appid` varchar(255) DEFAULT '',
+  `mch_id` varchar(50) NOT NULL DEFAULT '',
+  `apikey` varchar(50) NOT NULL DEFAULT '',
+  `sub_appid` varchar(50) DEFAULT '',
+  `sub_appsecret` varchar(50) DEFAULT '',
+  `sub_mch_id` varchar(50) DEFAULT '',
+  `cert_file` text,
+  `key_file` text,
+  `root_file` text,
+  `is_raw` tinyint(1) DEFAULT '0',
+  `createtime` int(10) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_type` (`type`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_perm_log`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_perm_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3976,7 +4017,25 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_plugin` (
   PRIMARY KEY (`id`),
   KEY `idx_displayorder` (`displayorder`),
   KEY `idx_identity` (`identity`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=52 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=41 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_polyapi_key`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_polyapi_key` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `merchid` int(11) NOT NULL DEFAULT '0',
+  `appkey` varchar(200) NOT NULL DEFAULT '',
+  `token` varchar(200) NOT NULL DEFAULT '',
+  `appsecret` varchar(200) NOT NULL DEFAULT '',
+  `createtime` int(11) NOT NULL DEFAULT '0',
+  `updatetime` int(11) NOT NULL DEFAULT '0',
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_appkey` (`appkey`) USING BTREE,
+  KEY `idx_token` (`token`) USING BTREE,
+  KEY `idx_appsecret` (`appsecret`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_poster`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_poster` (
@@ -5011,6 +5070,30 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_system_site` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_task`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `type` int(11) NOT NULL,
+  `starttime` int(11) NOT NULL,
+  `endtime` int(11) NOT NULL,
+  `dotime` int(11) NOT NULL DEFAULT '0',
+  `donetime` int(11) NOT NULL DEFAULT '0',
+  `timelimit` float(11,1) NOT NULL,
+  `keyword` varchar(255) NOT NULL DEFAULT '',
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `explain` text,
+  `require_data` text NOT NULL,
+  `reward_data` text NOT NULL,
+  `period` int(11) NOT NULL DEFAULT '0',
+  `repeat` int(11) NOT NULL DEFAULT '0',
+  `maxtimes` int(11) NOT NULL DEFAULT '0',
+  `everyhours` float(11,1) NOT NULL DEFAULT '0.0',
+  `logo` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_task_adv`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_adv` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5029,6 +5112,39 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_default` (
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `data` text,
   `addtime` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_task_extension`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_extension` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `taskname` varchar(255) NOT NULL DEFAULT '',
+  `taskclass` varchar(25) NOT NULL DEFAULT '',
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `classify` varchar(255) NOT NULL DEFAULT '',
+  `classify_name` varchar(255) NOT NULL DEFAULT '',
+  `verb` varchar(255) NOT NULL DEFAULT '',
+  `unit` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_task_extension_join`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_extension_join` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `uid` int(11) NOT NULL,
+  `taskid` int(11) NOT NULL,
+  `openid` varchar(255) NOT NULL,
+  `require_data` text NOT NULL,
+  `progress_data` text NOT NULL,
+  `reward_data` text NOT NULL,
+  `completetime` int(11) NOT NULL DEFAULT '0',
+  `pickuptime` int(11) NOT NULL,
+  `endtime` int(11) NOT NULL,
+  `dotime` int(11) NOT NULL DEFAULT '0',
+  `rewarded` text NOT NULL,
+  `logo` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -5436,5 +5552,19 @@ INSERT INTO `ims_ewei_shop_plugin` (`id`, `displayorder`, `identity`, `name`, `v
 (38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', 1,'', '', 1, 0),
 (39, 42, 'quick', '快速购买', '1.0', '官方', 1, 'biz', 1,'../addons/ewei_shopv2/static/images/quick.jpg', '', 0, 0),
 (40, 43, 'mmanage', '手机端商家管理中心', '1.0', '官方', 1, 'tool',1, '../addons/ewei_shopv2/static/images/mmanage.jpg', '', 0, 0);
+
+INSERT INTO `ims_ewei_shop_task_extension` (`id`, `taskname`, `taskclass`, `status`, `classify`, `classify_name`, `verb`, `unit`) VALUES
+(1, '推荐人数', 'commission_member', 1, 'number', 'number', '推荐', '人'),
+(2, '分销佣金', 'commission_money', 1, 'number', 'number', '达到', '元'),
+(3, '分销订单', 'commission_order', 1, 'number', 'number', '达到', '笔'),
+(4, '订单满额', 'cost_enough', 1, 'number', 'number', '满', '元'),
+(5, '累计金额', 'cost_total', 1, 'number', 'number', '累计', '元'),
+(6, '订单数量', 'cost_count', 1, 'number', 'number', '达到', '单'),
+(7, '指定商品', 'cost_goods', 1, 'select', 'select', '购买指定商品', '件'),
+(8, '商品评价', 'cost_comment', 1, 'number', 'number', '评价订单', '次'),
+(9, '累计充值', 'cost_rechargetotal', 1, 'number', 'number', '达到', '元'),
+(10, '充值满额', 'cost_rechargeenough', 1, 'number', 'number', '满', '元'),
+(11, '完善信息', 'member_info', 1, 'boole', 'boole', '填写手机号', '');
+
 
 ");

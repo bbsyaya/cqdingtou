@@ -93,7 +93,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 		{
 			$page = 'LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		}
-		$list = pdo_fetchall('SELECT o.id,o.orderno,o.status,o.expresssn,o.addressid,o.express,o.remark,o.is_team,o.pay_type,o.isverify,o.refundtime,o.price,o.creditmoney,' . "\r\n\t\t\t\t" . 'o.freight,o.discount,o.creditmoney,o.createtime,o.success,o.deleted,' . "\r\n\t\t\t\t" . 'g.title,g.category,g.thumb,g.groupsprice,g.singleprice,g.price as gprice,g.goodssn,m.nickname,m.id as mid,m.realname as mrealname,m.mobile as mmobile,' . "\r\n\t\t\t\t" . 'a.realname as arealname,a.mobile as amobile,a.province as aprovince ,a.city as acity , a.area as aarea,a.address as aaddress' . "\r\n\t\t\t\t" . 'FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\r\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\r\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid' . "\r\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid' . "\r\n\t\t\t\t" . 'WHERE 1 ' . $condition . ' GROUP BY o.id  ORDER BY o.createtime DESC ' . $page, $params);
+		$list = pdo_fetchall('SELECT o.id,o.orderno,o.status,o.expresssn,o.addressid,o.express,o.remark,o.is_team,o.pay_type,o.isverify,o.refundtime,o.price,o.creditmoney,' . "\n\t\t\t\t" . 'o.freight,o.discount,o.creditmoney,o.createtime,o.success,o.deleted,' . "\n\t\t\t\t" . 'g.title,g.category,g.thumb,g.groupsprice,g.singleprice,g.price as gprice,g.goodssn,m.nickname,m.id as mid,m.realname as mrealname,m.mobile as mmobile,' . "\n\t\t\t\t" . 'a.realname as arealname,a.mobile as amobile,a.province as aprovince ,a.city as acity , a.area as aarea,a.address as aaddress' . "\n\t\t\t\t" . 'FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid' . "\n\t\t\t\t" . 'WHERE 1 ' . $condition . ' GROUP BY o.id  ORDER BY o.createtime DESC ' . $page, $params);
 		foreach ($list as $key => $value ) 
 		{
 			if (!(empty($value['address']))) 
@@ -111,7 +111,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 				$list[$key]['addressdata'] = array('realname' => $user['realname'], 'mobile' => $user['mobile']);
 			}
 		}
-		$total = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\r\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\r\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid' . "\r\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid' . "\r\n\t\t\t\t" . 'WHERE 1 ' . $condition . ' ', $params);
+		$total = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid' . "\n\t\t\t\t" . 'WHERE 1 ' . $condition . ' ', $params);
 		$pager = pagination($total, $pindex, $psize);
 		$paytype = array('credit' => '余额支付', 'wechat' => '微信支付', 'other' => '其他支付');
 		$paystatus = array(0 => '未付款', 1 => '已付款', 2 => '待收货', 3 => '已完成', -1 => '已取消', 4 => '待发货');
@@ -173,7 +173,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 		$status = $_GPC['status'];
 		$orderid = intval($_GPC['orderid']);
 		$params = array(':orderid' => $orderid);
-		$order = pdo_fetch('SELECT o.*,g.title,g.category,g.groupsprice,g.singleprice,g.thumb,g.id as gid FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\r\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\r\n\t\t\t\t" . 'WHERE o.id = :orderid ', $params);
+		$order = pdo_fetch('SELECT o.*,g.title,g.category,g.groupsprice,g.singleprice,g.thumb,g.id as gid FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\n\t\t\t\t" . 'WHERE o.id = :orderid ', $params);
 		$order = set_medias($order, 'thumb');
 		$member = m('member')->getMember($order['openid'], true);
 		if ($order['verifytype'] == 0) 
@@ -191,12 +191,12 @@ class Order_EweiShopV2Page extends PluginWebPage
 		}
 		else if ($order['verifytype'] == 1) 
 		{
-			$verifyinfo = pdo_fetchall('select v.*,sm.id as salerid,sm.nickname as salernickname,s.salername,store.storename from ' . tablename('ewei_shop_groups_verify') . ' as v' . "\r\n\t\t\t\t\t" . 'left join ' . tablename('ewei_shop_saler') . ' s on s.openid = v.verifier and s.uniacid = v.uniacid' . "\r\n\t\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' sm on sm.openid = s.openid and sm.uniacid = s.uniacid' . "\r\n\t\t\t\t\t" . 'left join ' . tablename('ewei_shop_store') . ' store on store.id = v.storeid and store.uniacid = v.uniacid' . "\r\n\t\t\t\t\t" . 'where v.uniacid = :uniacid and v.orderid = :orderid ', array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
+			$verifyinfo = pdo_fetchall('select v.*,sm.id as salerid,sm.nickname as salernickname,s.salername,store.storename from ' . tablename('ewei_shop_groups_verify') . ' as v' . "\n\t\t\t\t\t" . 'left join ' . tablename('ewei_shop_saler') . ' s on s.openid = v.verifier and s.uniacid = v.uniacid' . "\n\t\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' sm on sm.openid = s.openid and sm.uniacid = s.uniacid' . "\n\t\t\t\t\t" . 'left join ' . tablename('ewei_shop_store') . ' store on store.id = v.storeid and store.uniacid = v.uniacid' . "\n\t\t\t\t\t" . 'where v.uniacid = :uniacid and v.orderid = :orderid ', array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
 		}
 		if (!(empty($order['address']))) 
 		{
 			$user = unserialize($order['address']);
-			$user['address'] = $user['province'] . ' ' . $user['city'] . ' ' . $user['area'] . ' ' . $user['address'];
+			$user['address'] = $user['province'] . ',' . $user['city'] . ',' . $user['area'] . ',' . $user['street'] . ',' . $user['address'];
 			$item['addressdata'] = array('realname' => $user['realname'], 'mobile' => $user['mobile'], 'address' => $user['address']);
 		}
 		else 
@@ -206,7 +206,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 			{
 				$user = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_address') . ' WHERE id = :id and uniacid=:uniacid', array(':id' => $order['addressid'], ':uniacid' => $_W['uniacid']));
 			}
-			$user['address'] = $user['province'] . ' ' . $user['city'] . ' ' . $user['area'] . ' ' . $user['address'];
+			$user['address'] = $user['province'] . ',' . $user['city'] . ',' . $user['area'] . ',' . $user['street'] . ',' . $user['address'];
 			$item['addressdata'] = array('realname' => $user['realname'], 'mobile' => $user['mobile'], 'address' => $user['address']);
 		}
 		include $this->template();
@@ -276,7 +276,8 @@ class Order_EweiShopV2Page extends PluginWebPage
 				$user = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_address') . ' WHERE id = :id and uniacid=:uniacid', array(':id' => $item['addressid'], ':uniacid' => $_W['uniacid']));
 			}
 			$address_info = $user['address'];
-			$user['address'] = $user['province'] . ' ' . $user['city'] . ' ' . $user['area'] . ' ' . $user['address'];
+			$user_address = $user['address'];
+			$user['address'] = $user['province'] . ' ' . $user['city'] . ' ' . $user['area'] . ' ' . $user['street'] . ' ' . $user['address'];
 			$item['addressdata'] = $oldaddress = array('realname' => $user['realname'], 'mobile' => $user['mobile'], 'address' => $user['address']);
 		}
 		if ($_W['ispost']) 
@@ -286,6 +287,8 @@ class Order_EweiShopV2Page extends PluginWebPage
 			$province = $_GPC['province'];
 			$city = $_GPC['city'];
 			$area = $_GPC['area'];
+			$street = $_GPC['street'];
+			$changead = intval($_GPC['changead']);
 			$address = trim($_GPC['address']);
 			if (!(empty($id))) 
 			{
@@ -313,10 +316,22 @@ class Order_EweiShopV2Page extends PluginWebPage
 				$address_array = iunserializer($item['address']);
 				$address_array['realname'] = $realname;
 				$address_array['mobile'] = $mobile;
-				$address_array['province'] = $province;
-				$address_array['city'] = $city;
-				$address_array['area'] = $area;
-				$address_array['address'] = $address;
+				if ($changead) 
+				{
+					$address_array['province'] = $province;
+					$address_array['city'] = $city;
+					$address_array['area'] = $area;
+					$address_array['street'] = $street;
+					$address_array['address'] = $address;
+				}
+				else 
+				{
+					$address_array['province'] = $user['province'];
+					$address_array['city'] = $user['city'];
+					$address_array['area'] = $user['area'];
+					$address_array['street'] = $user['street'];
+					$address_array['address'] = $user_address;
+				}
 				$address_array = iserializer($address_array);
 				pdo_update('ewei_shop_groups_order', array('address' => $address_array), array('id' => $id, 'uniacid' => $_W['uniacid']));
 				plog('groups.order.changeaddress', '修改收货地址 ID: ' . $item['id'] . ' 订单号: ' . $item['orderno'] . ' <br>原地址: 收件人: ' . $oldaddress['realname'] . ' 手机号: ' . $oldaddress['mobile'] . ' 收件地址: ' . $oldaddress['address'] . '<br>新地址: 收件人: ' . $realname . ' 手机号: ' . $mobile . ' 收件地址: ' . $province . ' ' . $city . ' ' . $area . ' ' . $address);

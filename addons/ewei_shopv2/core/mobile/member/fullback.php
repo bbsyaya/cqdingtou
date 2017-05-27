@@ -27,8 +27,8 @@ class Fullback_EweiShopV2Page extends MobileLoginPage
 		foreach ($list as &$row ) 
 		{
 			$row['createtime'] = date('Y/m/d H:i:s', $row['createtime']);
-			$row['price'] = price_format($row['price']);
-			$row['priceevery'] = price_format($row['priceevery']);
+			$row['price'] = price_format($row['price'], 2);
+			$row['priceevery'] = price_format($row['priceevery'], 2);
 			if ($row['fullbackday'] < $row['day']) 
 			{
 				$row['surplusday'] = $row['day'] - $row['fullbackday'];

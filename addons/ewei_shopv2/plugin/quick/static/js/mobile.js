@@ -460,7 +460,11 @@ define(['core', 'tpl', 'biz/goods/picker', './picker.js', 'biz/plugin/diyform', 
                         }
                     } else {
                         FoxUI.loader.show("loading");
-                        location.href = core.getUrl('order/create', {id: modal.goodsid, total: modal.total});
+                        var obj = {id: item.id, total: total};
+                        if(optionid>0){
+                            obj.optionid = optionid;
+                        }
+                        location.href = core.getUrl('order/create', obj);
                         modal.child = '';
                         modal.childelm = '';
                         picker.close();
@@ -632,6 +636,9 @@ define(['core', 'tpl', 'biz/goods/picker', './picker.js', 'biz/plugin/diyform', 
             } else if (src.indexOf('images/') == 0 || src.indexOf('audios/') == 0) {
                 return modal.attachurl + src
             }
+        });
+        tpl.helper("calculate", function (value) {
+            return parseFloat(value).toFixed(2);
         });
     };
     return modal

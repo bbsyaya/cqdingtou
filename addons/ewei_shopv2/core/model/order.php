@@ -11,6 +11,8 @@ class Order_EweiShopV2Model
 		$uniacid = $_W['uniacid'];
 		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\r\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\r\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
 		foreach($order_goods as $value){
+			
+		
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid and isfullback = 1 limit 1', array(':id' => $value['goodsid'], ':uniacid' => $uniacid));
 		$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\r\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\r\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
 		if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $value['optionid'])) 
@@ -146,6 +148,21 @@ class Order_EweiShopV2Model
 				if (p('commission')) 
 				{
 					p('commission')->checkOrderPay($order['id']);
+				}
+				if (p('task')) 
+				{
+					if ($order['iscomment']) 
+					{
+						p('task')->checkTaskReward('commission_order', 1);
+					}
+					p('task')->checkTaskReward('cost_total', $order['price']);
+					p('task')->checkTaskReward('cost_enough', $order['price']);
+					p('task')->checkTaskReward('cost_count', 1);
+					$goodslist = pdo_fetchall('SELECT goodsid FROM ' . tablename('ewei_shop_order_goods') . ' WHERE orderid = :orderid AND uniacid = :uniacid', array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
+					foreach ($goodslist as $item ) 
+					{
+						p('task')->checkTaskReward('cost_goods' . $item['goodsid'], 1, $_W['openid']);
+					}
 				}
 				if (p('lottery') && empty($ispeerpay)) 
 				{
@@ -310,7 +327,7 @@ class Order_EweiShopV2Model
 			$condition = ' og.orderid=:orderid';
 			$param[':orderid'] = $orderid;
 		}
-		$goods = pdo_fetchall('select og.goodsid,og.total,g.totalcnf,og.realprice,g.credit,og.optionid,og.optionid,g.sales,g.salesreal from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where ' . $condition . ' and og.uniacid=:uniacid ', $param);
+		$goods = pdo_fetchall('select og.goodsid,og.total,g.totalcnf,og.realprice,g.credit,og.optionid,g.total as goodstotal,og.optionid,g.sales,g.salesreal from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where ' . $condition . ' and og.uniacid=:uniacid ', $param);
 		$credits = 0;
 		foreach ($goods as $g ) 
 		{

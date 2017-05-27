@@ -144,8 +144,15 @@ class Recharge_EweiShopV2Page extends MobileLoginPage
 				$wechat = m('common')->wechat_build($params, $options, 1);
 				if (!(is_error($wechat))) 
 				{
-					$wechat['weixin'] = true;
 					$wechat['success'] = true;
+					if (!(empty($wechat['code_url']))) 
+					{
+						$wechat['weixin_jie'] = true;
+					}
+					else 
+					{
+						$wechat['weixin'] = true;
+					}
 				}
 			}
 			if ((isset($set['pay']) && ($set['pay']['weixin_jie'] == 1) && !($wechat['success'])) || ($jie === 1)) 

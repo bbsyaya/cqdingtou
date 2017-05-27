@@ -72,7 +72,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			$condition .= ' and g.type = 1 ';
 		}
-		$sql = 'SELECT COUNT(*) FROM ' . tablename('ewei_shop_creditshop_log') . ' log' . "\n" . '                left join ' . tablename('ewei_shop_creditshop_goods') . ' g on log.goodsid = g.id' . "\n" . '                where 1 ' . $condition;
+		$sql = 'SELECT COUNT(*) FROM ' . tablename('ewei_shop_creditshop_log') . ' log' . "\r\n" . '                left join ' . tablename('ewei_shop_creditshop_goods') . ' g on log.goodsid = g.id' . "\r\n" . '                where 1 ' . $condition;
 		$total = pdo_fetchcolumn($sql, $params);
 		$list = array();
 		if (!(empty($total))) 
@@ -183,7 +183,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 			{
 				$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and status=1 and type in(2,3)', array(':uniacid' => $_W['uniacid']));
 			}
-			$isverify = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_verify') . "\n" . '            where logid = ' . $log['id'] . ' ' . $condition . ' and isverify = 1 limit 1 ', array(':uniacid' => $log['uniacid']));
+			$isverify = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_verify') . "\r\n" . '            where logid = ' . $log['id'] . ' ' . $condition . ' and isverify = 1 limit 1 ', array(':uniacid' => $log['uniacid']));
 			if (0 < $isverify['isverify']) 
 			{
 				$carrier = m('member')->getMember($isverify['verifier']);
@@ -191,7 +191,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 				{
 					$carrier = false;
 				}
-				$store = pdo_fetch('select * from ' . tablename('ewei_shop_store') . "\n" . '                    where id = ' . $isverify['storeid'] . ' and uniacid=:uniacid and status=1 and `type` in(2,3)', array(':uniacid' => $_W['uniacid']));
+				$store = pdo_fetch('select * from ' . tablename('ewei_shop_store') . "\r\n" . '                    where id = ' . $isverify['storeid'] . ' and uniacid=:uniacid and status=1 and `type` in(2,3)', array(':uniacid' => $_W['uniacid']));
 			}
 		}
 		$_W['shopshare'] = array('title' => $this->set['share_title'], 'imgUrl' => tomedia($this->set['share_icon']), 'link' => mobileUrl('creditshop', array(), true), 'desc' => $this->set['share_desc']);
@@ -250,25 +250,13 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 			show_json(0, $packet['message']);
 		}
 		$money = abs($packet['money']);
-		$setting = uni_setting($_W['uniacid'], array('payment'));
-		if (!(is_array($setting['payment']))) 
-		{
-			show_json(0, array('message' => '没有设定支付参数！'));
-		}
-		$sec = m('common')->getSec();
-		$sec = iunserializer($sec['sec']);
-		$certs = $sec;
-		$wechat = $setting['payment']['wechat'];
-		$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-		$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
 		$params = array('openid' => $openid, 'tid' => $log['logno'], 'send_name' => ($set['sendname'] ? $set['sendname'] : $_W['shopset']['shop']['name']), 'money' => $money, 'wishing' => ($set['sendname'] ? $set['wishing'] : '红包领到手抽筋，别人加班你加薪!'), 'act_name' => '积分兑换红包', 'remark' => '积分兑换红包');
-		$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
 		$goods = pdo_fetch('select surplusmoney from ' . tablename('ewei_shop_creditshop_goods') . ' where id = ' . $log['goodsid'] . ' ' . $condition . ' ');
 		if (($goods['surplusmoney'] <= 0) || (($goods['surplusmoney'] - $money) < 0)) 
 		{
 			show_json(0, array('message' => '剩余金额不足，请联系管理员!'));
 		}
-		$err = m('common')->sendredpack($params, $wechat);
+		$err = m('common')->sendredpack($params);
 		if (is_error($err)) 
 		{
 			show_json(0, array('message' => '红包发放出错，请联系管理员!'));
@@ -443,8 +431,15 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 				$wechat['success'] = false;
 				if (!(is_error($wechat))) 
 				{
-					$wechat['weixin'] = true;
 					$wechat['success'] = true;
+					if (!(empty($wechat['code_url']))) 
+					{
+						$wechat['weixin_jie'] = true;
+					}
+					else 
+					{
+						$wechat['weixin'] = true;
+					}
 				}
 			}
 			if ((isset($set['pay']) && ($set['pay']['weixin_jie'] == 1) && !($wechat['success'])) || ($jie === 1)) 
@@ -562,7 +557,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 			}
 			if (!(m('finance')->isAlipayNotify($_GET))) 
 			{
-				$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where dispatchno=:dispatchno  and uniacid=:uniacid limit 1', array(':dispatchno' => $tid, ':uniacid' => $_W['uniacid']));
+				$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                    where dispatchno=:dispatchno  and uniacid=:uniacid limit 1', array(':dispatchno' => $tid, ':uniacid' => $_W['uniacid']));
 				if (0 < $lastlog['dispatchstatus']) 
 				{
 					if ($fromwechat) 
@@ -577,7 +572,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 				$this->message(array('message' => '支付出现错误，请重试(支付验证失败)!', 'buttondisplay' => ($fromwechat ? false : true)), ($fromwechat ? NULL : mobileUrl('order')));
 			}
 		}
-		$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where dispatchno=:dispatchno and uniacid=:uniacid limit 1', array(':dispatchno' => $tid, ':uniacid' => $_W['uniacid']));
+		$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                    where dispatchno=:dispatchno and uniacid=:uniacid limit 1', array(':dispatchno' => $tid, ':uniacid' => $_W['uniacid']));
 		if (empty($lastlog)) 
 		{
 			$this->message(array('message' => '支付出现错误，请重试(支付验证失败2)!', 'buttondisplay' => ($fromwechat ? false : true)), ($fromwechat ? NULL : mobileUrl('order')));
@@ -596,7 +591,7 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 			$record = array();
 			$record['dispatchstatus'] = '1';
 			pdo_update('ewei_shop_creditshop_log', $record, array('dispatchno' => $tid));
-			$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where dispatchno=:dispatchno and openid=:openid and dispatchstatus=1 and uniacid=:uniacid limit 1', array(':dispatchno' => $tid, ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
+			$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                    where dispatchno=:dispatchno and openid=:openid and dispatchstatus=1 and uniacid=:uniacid limit 1', array(':dispatchno' => $tid, ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
 			if (is_h5app()) 
 			{
 				pdo_update('ewei_shop_creditshop_log', array('apppay' => 1), array('logno' => $tid));

@@ -11,11 +11,15 @@ if (!(empty($input)) && empty($_GET['out_trade_no']))
 	{
 		exit('fail');
 	}
-	if (($data['result_code'] != 'SUCCESS') || ($data['return_code'] != 'SUCCESS')) 
+	if (empty($data['version']) && (($data['result_code'] != 'SUCCESS') || ($data['return_code'] != 'SUCCESS'))) 
 	{
 		$result = array('return_code' => 'FAIL', 'return_msg' => (empty($data['return_msg']) ? $data['err_code_des'] : $data['return_msg']));
 		echo array2xml($result);
 		exit();
+	}
+	if (!(empty($data['version'])) && (($data['result_code'] != '0') || ($data['status'] != '0'))) 
+	{
+		exit('fail');
 	}
 	$get = $data;
 }
@@ -219,7 +223,7 @@ class EweiShopWechatPay
 		}
 		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_log') . ' WHERE `uniacid`=:uniacid and `logno`=:logno limit 1', array(':uniacid' => $_W['uniacid'], ':logno' => $logno));
 		$OK = !(empty($log)) && empty($log['status']) && ($log['money'] == $this->total_fee);
-		if (!($this->set['pay']['weixin_jie']) && !($this->isapp)) 
+		if (!($this->set['weixin_jie']) && !($this->isapp)) 
 		{
 			$OK = $OK && ($log['openid'] == $this->get['openid']);
 		}
@@ -542,59 +546,85 @@ class EweiShopWechatPay
 	public function publicMethod() 
 	{
 		global $_W;
-		$this->set = m('common')->getSysset(array('shop', 'pay'));
 		if (empty($_W['uniacid'])) 
 		{
 			return false;
 		}
-		$this->setting = uni_setting($_W['uniacid'], array('payment'));
-		if (is_array($this->setting['payment']) || ($this->set['pay']['weixin_jie'] == 1) || ($this->set['pay']['weixin_sub'] == 1) || ($this->set['pay']['weixin_jie_sub'] == 1) || ($this->get['trade_type'] == 'APP')) 
+		list($set, $payment) = m('common')->public_build();
+		$this->set = $set;
+		if (empty($payment['is_new']) || ($this->get['trade_type'] == 'APP')) 
 		{
-			$this->is_jie = (strpos($this->get['out_trade_no'], '_B') !== false) || (strpos($this->get['out_trade_no'], '_borrow') !== false);
-			$sec_yuan = m('common')->getSec();
-			$this->sec = iunserializer($sec_yuan['sec']);
-			if ((($this->set['pay']['weixin_jie'] == 1) && $this->is_jie) || ($this->set['pay']['weixin_sub'] == 1) || (($this->set['pay']['weixin_jie_sub'] == 1) && $this->is_jie)) 
+			$this->setting = uni_setting($_W['uniacid'], array('payment'));
+			if (is_array($this->setting['payment']) || ($this->set['weixin_jie'] == 1) || ($this->set['weixin_sub'] == 1) || ($this->set['weixin_jie_sub'] == 1) || ($this->get['trade_type'] == 'APP')) 
 			{
-				if ($this->set['pay']['weixin_sub'] == 1) 
+				$this->is_jie = (strpos($this->get['out_trade_no'], '_B') !== false) || (strpos($this->get['out_trade_no'], '_borrow') !== false);
+				$sec_yuan = m('common')->getSec();
+				$this->sec = iunserializer($sec_yuan['sec']);
+				if ((($this->set['weixin_jie'] == 1) && $this->is_jie) || ($this->set['weixin_sub'] == 1) || (($this->set['weixin_jie_sub'] == 1) && $this->is_jie)) 
 				{
-					$wechat = array('version' => 1, 'key' => $this->sec['apikey_sub'], 'signkey' => $this->sec['apikey_sub']);
-				}
-				if (($this->set['pay']['weixin_jie'] == 1) && $this->is_jie) 
-				{
-					$wechat = array('version' => 1, 'key' => $this->sec['apikey'], 'signkey' => $this->sec['apikey']);
-				}
-				if (($this->set['pay']['weixin_jie_sub'] == 1) && $this->is_jie) 
-				{
-					$wechat = array('version' => 1, 'key' => $this->sec['apikey_jie_sub'], 'signkey' => $this->sec['apikey_jie_sub']);
-				}
-			}
-			else if ($this->set['pay']['weixin'] == 1) 
-			{
-				$wechat = $this->setting['payment']['wechat'];
-			}
-			if (($this->get['trade_type'] == 'APP') && ($this->set['pay']['app_wechat'] == 1)) 
-			{
-				$this->isapp = true;
-				$wechat = array('version' => 1, 'key' => $this->sec['app_wechat']['apikey'], 'signkey' => $this->sec['app_wechat']['apikey'], 'appid' => $this->sec['app_wechat']['appid'], 'mchid' => $this->sec['app_wechat']['merchid']);
-			}
-			if (!(empty($wechat))) 
-			{
-				ksort($this->get);
-				$string1 = '';
-				foreach ($this->get as $k => $v ) 
-				{
-					if (($v != '') && ($k != 'sign')) 
+					if ($this->set['weixin_sub'] == 1) 
 					{
-						$string1 .= $k . '=' . $v . '&';
+						$wechat = array('version' => 1, 'key' => $this->sec['apikey_sub'], 'apikey' => $this->sec['apikey_sub']);
+					}
+					if (($this->set['weixin_jie'] == 1) && $this->is_jie) 
+					{
+						$wechat = array('version' => 1, 'key' => $this->sec['apikey'], 'apikey' => $this->sec['apikey']);
+					}
+					if (($this->set['weixin_jie_sub'] == 1) && $this->is_jie) 
+					{
+						$wechat = array('version' => 1, 'key' => $this->sec['apikey_jie_sub'], 'apikey' => $this->sec['apikey_jie_sub']);
 					}
 				}
-				$wechat['signkey'] = (($wechat['version'] == 1 ? $wechat['key'] : $wechat['signkey']));
-				$this->sign = strtoupper(md5($string1 . 'key=' . $wechat['signkey']));
-				$this->get['openid'] = ((isset($this->get['sub_openid']) ? $this->get['sub_openid'] : $this->get['openid']));
-				if ($this->sign == $this->get['sign']) 
+				else if ($this->set['weixin'] == 1) 
 				{
-					return true;
+					$wechat = $this->setting['payment']['wechat'];
+					if (IMS_VERSION <= 0.80000000000000004) 
+					{
+						$wechat['apikey'] = $wechat['signkey'];
+					}
 				}
+				if (($this->get['trade_type'] == 'APP') && ($this->set['app_wechat'] == 1)) 
+				{
+					$this->isapp = true;
+					$wechat = array('version' => 1, 'key' => $this->sec['app_wechat']['apikey'], 'apikey' => $this->sec['app_wechat']['apikey'], 'appid' => $this->sec['app_wechat']['appid'], 'mchid' => $this->sec['app_wechat']['merchid']);
+				}
+				if (!(empty($wechat))) 
+				{
+					ksort($this->get);
+					$string1 = '';
+					foreach ($this->get as $k => $v ) 
+					{
+						if (($v != '') && ($k != 'sign')) 
+						{
+							$string1 .= $k . '=' . $v . '&';
+						}
+					}
+					$wechat['apikey'] = (($wechat['version'] == 1 ? $wechat['key'] : $wechat['apikey']));
+					$this->sign = strtoupper(md5($string1 . 'key=' . $wechat['apikey']));
+					$this->get['openid'] = ((isset($this->get['sub_openid']) ? $this->get['sub_openid'] : $this->get['openid']));
+					if ($this->sign == $this->get['sign']) 
+					{
+						return true;
+					}
+				}
+			}
+		}
+		else if (!(is_error($payment))) 
+		{
+			ksort($this->get);
+			$string1 = '';
+			foreach ($this->get as $k => $v ) 
+			{
+				if (($v != '') && ($k != 'sign')) 
+				{
+					$string1 .= $k . '=' . $v . '&';
+				}
+			}
+			$this->sign = strtoupper(md5($string1 . 'key=' . $payment['apikey']));
+			$this->get['openid'] = ((isset($this->get['sub_openid']) ? $this->get['sub_openid'] : $this->get['openid']));
+			if ($this->sign == $this->get['sign']) 
+			{
+				return true;
 			}
 		}
 		return false;

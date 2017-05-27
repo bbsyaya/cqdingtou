@@ -123,7 +123,14 @@ class Detail_EweiShopV2Page extends MobilePage
 			}
 		}
 		$merchid = $goods['merchid'];
-		$labelname = json_decode($goods['labelname'], true);
+		if (json_decode($goods['labelname'], true)) 
+		{
+			$labelname = json_decode($goods['labelname'], true);
+		}
+		else 
+		{
+			$labelname = unserialize($goods['labelname']);
+		}
 		$style = pdo_fetch('SELECT id,uniacid,style FROM ' . tablename('ewei_shop_goods_labelstyle') . ' WHERE uniacid=' . $uniacid);
 		if ($is_openmerch == 0) 
 		{

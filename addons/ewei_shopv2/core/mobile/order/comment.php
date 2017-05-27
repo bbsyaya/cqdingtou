@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -9,7 +9,7 @@ class Comment_EweiShopV2Page extends MobileLoginPage
 	{
 		parent::__construct();
 		$trade = m('common')->getSysset('trade');
-		if (!empty($trade['closecomment'])) 
+		if (!(empty($trade['closecomment']))) 
 		{
 			$this->message('不允许评论!', '', 'error');
 		}
@@ -53,12 +53,12 @@ class Comment_EweiShopV2Page extends MobileLoginPage
 		}
 		$member = m('member')->getMember($openid);
 		$comments = $_GPC['comments'];
-		if (!is_array($comments)) 
+		if (!(is_array($comments))) 
 		{
 			show_json(0, '数据出错，请重试!');
 		}
 		$trade = m('common')->getSysset('trade');
-		if (!empty($trade['commentchecked'])) 
+		if (!(empty($trade['commentchecked']))) 
 		{
 			$checked = 0;
 		}
@@ -73,6 +73,10 @@ class Comment_EweiShopV2Page extends MobileLoginPage
 			{
 				$comment = array('uniacid' => $uniacid, 'orderid' => $orderid, 'goodsid' => $c['goodsid'], 'level' => $c['level'], 'content' => trim($c['content']), 'images' => (is_array($c['images']) ? iserializer($c['images']) : iserializer(array())), 'openid' => $openid, 'nickname' => $member['nickname'], 'headimgurl' => $member['avatar'], 'createtime' => time(), 'checked' => $checked);
 				pdo_insert('ewei_shop_order_comment', $comment);
+				if (p('task')) 
+				{
+					p('task')->checkTaskReward('cost_comment', 1);
+				}
 			}
 			else 
 			{

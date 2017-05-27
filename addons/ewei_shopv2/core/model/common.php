@@ -5,6 +5,7 @@ if (!(defined('IN_IA')))
 }
 class Common_EweiShopV2Model 
 {
+	public $public_build;
 	public function getSetData($uniacid = 0) 
 	{
 		global $_W;
@@ -401,86 +402,95 @@ class Common_EweiShopV2Model
 		}
 		return error($result[$key]['code'], $result[$key]['msg'] . ':' . $result[$key]['sub_msg']);
 	}
+	public function public_build($isapp = false) 
+	{
+		global $_W;
+		if (!(empty($this->public_build))) 
+		{
+			return $this->public_build;
+		}
+		$set = $this->getSysset('pay');
+		if (!(empty($set['weixin_id'])) && ($isapp == false)) 
+		{
+			$payments = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid AND id=:id', array(':uniacid' => $_W['uniacid'], ':id' => $set['weixin_id']));
+			if (empty($payments)) 
+			{
+				error(-1, '支付参数不存在!');
+			}
+			$payments['is_new'] = 1;
+		}
+		else 
+		{
+			$payments = m('common')->getSec();
+			$payments = iunserializer($payments['sec']);
+			$payments['is_new'] = 0;
+		}
+		$this->public_build = array($set, $payments);
+		return $this->public_build;
+	}
 	public function wechat_build($params, $wechat, $type = 0) 
 	{
 		global $_W;
-		$set = m('common')->getSysset('pay');
-		$sec = m('common')->getSec();
-		$sec = iunserializer($sec['sec']);
-		if (!(empty($set['weixin_sub']))) 
+		list(, $payment) = $this->public_build();
+		if (is_error($payment)) 
 		{
-			$wechat = array('appid' => $sec['appid_sub'], 'mch_id' => $sec['mchid_sub'], 'sub_appid' => (!(empty($sec['sub_appid_sub'])) ? $sec['sub_appid_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_sub'], 'apikey' => $sec['apikey_sub']);
+			return $payment;
+		}
+		if (($payment['is_new'] == 0) && !(empty($payment['weixin_sub']))) 
+		{
+			$wechat = array('appid' => $payment['appid_sub'], 'mch_id' => $payment['mchid_sub'], 'sub_appid' => (!(empty($payment['sub_appid_sub'])) ? $payment['sub_appid_sub'] : ''), 'sub_mch_id' => $payment['sub_mchid_sub'], 'apikey' => $payment['apikey_sub']);
 			$params['openid'] = ((isset($params['user']) ? $params['user'] : $_W['openid']));
 			return $this->wechat_child_build($params, $wechat, $type);
 		}
+		if ($payment['is_new'] == 1) 
+		{
+			if (empty($payment['type'])) 
+			{
+				return $this->wechat_jspay($params, $payment, $type);
+			}
+			if ($payment['type'] == 1) 
+			{
+				$params['openid'] = ((isset($params['user']) ? $params['user'] : $_W['openid']));
+				return $this->wechat_child_build($params, $payment, $type);
+			}
+			if ($payment['type'] == 2) 
+			{
+				$wechat = array('appid' => $payment['sub_appid'], 'mchid' => $payment['sub_mch_id'], 'apikey' => $payment['apikey']);
+				if (!(empty($payment['sub_appsecret']))) 
+				{
+					$wxuser = m('member')->wxuser($payment['sub_appid'], $payment['sub_appsecret']);
+					$params['openid'] = $wxuser['openid'];
+				}
+				return $this->wechat_native_build($params, $wechat, $type);
+			}
+			if ($payment['type'] == 3) 
+			{
+				return $this->wechat_native_child_build($params, $payment, $type);
+			}
+			if ($payment['type'] == 4) 
+			{
+				$params = array('service' => 'pay.weixin.jspay', 'body' => $params['title'], 'out_trade_no' => $params['tid'], 'total_fee' => $params['fee'], 'openid' => (empty($params['openid']) ? $_W['openid'] : $params['openid']));
+				$payRes = m('pay')->build($params, $payment, $type);
+				if (is_error($payRes)) 
+				{
+					return $payRes;
+				}
+				return json_decode($payRes['pay_info'], true);
+			}
+		}
+		$payment['sub_appid'] = $wechat['appid'];
+		$payment['sub_mch_id'] = $wechat['mchid'];
+		$payment['apikey'] = $wechat['apikey'];
+		return $this->wechat_jspay($params, $payment, $type);
+	}
+	public function wechat_jspay($params, $wechat, $type = 0) 
+	{
+		global $_W;
 		load()->func('communication');
-		if (empty($wechat['version']) && !(empty($wechat['signkey']))) 
-		{
-			$wechat['version'] = 1;
-		}
 		$wOpt = array();
-		if ($wechat['version'] == 1) 
-		{
-			$wOpt['appId'] = $wechat['appid'];
-			$wOpt['timeStamp'] = TIMESTAMP . '';
-			$wOpt['nonceStr'] = random(32);
-			$package = array();
-			$package['bank_type'] = 'WX';
-			$package['body'] = urlencode($params['title']);
-			$package['attach'] = $_W['uniacid'] . ':' . $type;
-			$package['partner'] = $wechat['partner'];
-			$package['device_info'] = 'ewei_shopv2';
-			$package['out_trade_no'] = $params['tid'];
-			$package['total_fee'] = $params['fee'] * 100;
-			$package['fee_type'] = '1';
-			$package['notify_url'] = $_W['siteroot'] . 'addons/ewei_shopv2/payment/wechat/notify.php';
-			$package['spbill_create_ip'] = CLIENT_IP;
-			$package['input_charset'] = 'UTF-8';
-			ksort($package);
-			$string1 = '';
-			foreach ($package as $key => $v ) 
-			{
-				if (empty($v)) 
-				{
-					continue;
-				}
-				$string1 .= $key . '=' . $v . '&';
-			}
-			$string1 .= 'key=' . $wechat['key'];
-			$sign = strtoupper(md5($string1));
-			$string2 = '';
-			foreach ($package as $key => $v ) 
-			{
-				$v = urlencode($v);
-				$string2 .= $key . '=' . $v . '&';
-			}
-			$string2 .= 'sign=' . $sign;
-			$wOpt['package'] = $string2;
-			$string = '';
-			$keys = array('appId', 'timeStamp', 'nonceStr', 'package', 'appKey');
-			sort($keys);
-			foreach ($keys as $key ) 
-			{
-				$v = $wOpt[$key];
-				if ($key == 'appKey') 
-				{
-					$v = $wechat['signkey'];
-				}
-				$key = strtolower($key);
-				$string .= $key . '=' . $v . '&';
-			}
-			$string = rtrim($string, '&');
-			$wOpt['signType'] = 'SHA1';
-			$wOpt['paySign'] = sha1($string);
-			return $wOpt;
-		}
-		if (IMS_VERSION <= 0.80000000000000004) 
-		{
-			$wechat['apikey'] = $wechat['signkey'];
-		}
 		$package = array();
-		$package['appid'] = $wechat['appid'];
-		$package['mch_id'] = $wechat['mchid'];
+		$package['appid'] = $wechat['sub_appid'];
+		$package['mch_id'] = $wechat['sub_mch_id'];
 		$package['nonce_str'] = random(32);
 		$package['body'] = $params['title'];
 		$package['device_info'] = 'ewei_shopv2';
@@ -523,7 +533,7 @@ class Common_EweiShopV2Model
 			return error(-1, strval($xml->err_code) . ': ' . strval($xml->err_code_des));
 		}
 		$prepayid = $xml->prepay_id;
-		$wOpt['appId'] = $wechat['appid'];
+		$wOpt['appId'] = $wechat['sub_appid'];
 		$wOpt['timeStamp'] = TIMESTAMP . '';
 		$wOpt['nonceStr'] = random(32);
 		$wOpt['package'] = 'prepay_id=' . $prepayid;
@@ -616,21 +626,39 @@ class Common_EweiShopV2Model
 		global $_W;
 		if ($diy === NULL) 
 		{
-			$set = m('common')->getSysset('pay');
-			$sec = m('common')->getSec();
-			$sec = iunserializer($sec['sec']);
-			if (!(empty($set['weixin_jie_sub']))) 
+			list(, $payment) = $this->public_build();
+			if (is_error($payment)) 
 			{
-				$wechat = array('appid' => $sec['appid_jie_sub'], 'mch_id' => $sec['mchid_jie_sub'], 'sub_appid' => (!(empty($sec['sub_appid_jie_sub'])) ? $sec['sub_appid_jie_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_jie_sub'], 'apikey' => $sec['apikey_jie_sub']);
+				return $payment;
+			}
+			if (($payment['is_new'] == 0) && !(empty($payment['weixin_jie_sub']))) 
+			{
+				$wechat = array('appid' => $payment['appid_jie_sub'], 'mch_id' => $payment['mchid_jie_sub'], 'sub_appid' => (!(empty($payment['sub_appid_jie_sub'])) ? $payment['sub_appid_jie_sub'] : ''), 'sub_appsecret' => (!(empty($payment['sub_secret_jie_sub'])) ? $payment['sub_secret_jie_sub'] : ''), 'sub_mch_id' => $payment['sub_mchid_jie_sub'], 'apikey' => $payment['apikey_jie_sub']);
 				return $this->wechat_native_child_build($params, $wechat, $type);
+			}
+			if ($payment['is_new'] == 1) 
+			{
+				if ($payment['type'] == 3) 
+				{
+					return $this->wechat_native_child_build($params, $payment, $type);
+				}
+				if ($payment['type'] == 4) 
+				{
+					$params = array('service' => 'pay.weixin.jspay', 'body' => $params['title'], 'out_trade_no' => $params['tid'], 'total_fee' => $params['fee'], 'openid' => (empty($params['openid']) ? $_W['openid'] : $params['openid']));
+					$payRes = m('pay')->build($params, $payment, 0);
+					if (is_error($payRes)) 
+					{
+						return $payRes;
+					}
+					return $payRes;
+				}
 			}
 		}
 		if (!(empty($params['openid']))) 
 		{
-			$wechat['version'] = 2;
-			$wechat['signkey'] = $wechat['apikey'];
-			$wechat['mch_id'] = $wechat['mchid'];
-			return $this->wechat_build($params, $wechat, $type);
+			$wechat['sub_appid'] = $wechat['appid'];
+			$wechat['sub_mch_id'] = $wechat['mchid'];
+			return $this->wechat_jspay($params, $wechat, $type);
 		}
 		$package = array();
 		$package['appid'] = $wechat['appid'];
@@ -686,8 +714,10 @@ class Common_EweiShopV2Model
 	public function wechat_native_child_build($params, $wechat, $type = 0) 
 	{
 		global $_W;
-		if (!(empty($params['openid']))) 
+		if (!(empty($wechat['sub_appsecret']))) 
 		{
+			$wxuser = m('member')->wxuser($wechat['sub_appid'], $wechat['sub_appsecret']);
+			$params['openid'] = $wxuser['openid'];
 			return $this->wechat_child_build($params, $wechat, $type);
 		}
 		$package = array();
@@ -781,12 +811,35 @@ class Common_EweiShopV2Model
 		$result = json_decode(json_encode($xml), true);
 		return $result;
 	}
-	public function sendredpack($params, $wechat) 
+	public function sendredpack($params) 
 	{
 		global $_W;
+		$payment = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid AND `type`=\'0\'', array(':uniacid' => $_W['uniacid']));
+		if (empty($payment)) 
+		{
+			$payment = array();
+			$setting = uni_setting($_W['uniacid'], array('payment'));
+			if (!(is_array($setting['payment']))) 
+			{
+				return error(1, '没有设定支付参数');
+			}
+			$sec = m('common')->getSec();
+			$sec = iunserializer($sec['sec']);
+			$wechat = $setting['payment']['wechat'];
+			$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
+			$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+			$payment['sub_appid'] = $row['key'];
+			$payment['sub_mch_id'] = $wechat['mchid'];
+			$payment['apikey'] = $wechat['apikey'];
+			$certs = $sec;
+		}
+		else 
+		{
+			$certs = array('cert' => $payment['cert_file'], 'key' => $payment['key_file'], 'root' => $payment['root_file']);
+		}
 		$package = array();
-		$package['wxappid'] = $wechat['appid'];
-		$package['mch_id'] = $wechat['mchid'];
+		$package['wxappid'] = $payment['sub_appid'];
+		$package['mch_id'] = $payment['sub_mch_id'];
 		$package['mch_billno'] = $params['tid'];
 		$package['send_name'] = $params['send_name'];
 		$package['nonce_str'] = random(32);
@@ -805,14 +858,14 @@ class Common_EweiShopV2Model
 		{
 			$string1 .= $k . '=' . $v . '&';
 		}
-		$string1 .= 'key=' . $wechat['apikey'];
+		$string1 .= 'key=' . $payment['apikey'];
 		$package['sign'] = strtoupper(md5($string1));
 		$xml = array2xml($package);
 		$extras = array();
 		$errmsg = '未上传完整的微信支付证书，请到【系统设置】->【支付方式】中上传!';
-		if (is_array($wechat['certs'])) 
+		if (is_array($certs)) 
 		{
-			if (empty($wechat['certs']['cert']) || empty($wechat['certs']['key']) || empty($wechat['certs']['root'])) 
+			if (empty($certs['cert']) || empty($certs['key']) || empty($certs['root'])) 
 			{
 				if ($_W['ispost']) 
 				{
@@ -821,11 +874,11 @@ class Common_EweiShopV2Model
 				show_message($errmsg, '', 'error');
 			}
 			$certfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(128);
-			file_put_contents($certfile, $wechat['certs']['cert']);
+			file_put_contents($certfile, $certs['cert']);
 			$keyfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(128);
-			file_put_contents($keyfile, $wechat['certs']['key']);
+			file_put_contents($keyfile, $certs['key']);
 			$rootfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(128);
-			file_put_contents($rootfile, $wechat['certs']['root']);
+			file_put_contents($rootfile, $certs['root']);
 			$extras['CURLOPT_SSLCERT'] = $certfile;
 			$extras['CURLOPT_SSLKEY'] = $keyfile;
 			$extras['CURLOPT_CAINFO'] = $rootfile;
@@ -869,6 +922,41 @@ class Common_EweiShopV2Model
 	public function wechat_micropay_build($params, $wechat, $type = 0) 
 	{
 		global $_W;
+		if (empty($params['old'])) 
+		{
+			list(, $payment) = $this->public_build();
+			if (is_error($payment)) 
+			{
+				return $payment;
+			}
+			$wechat = array();
+			if ($payment['is_new'] == 1) 
+			{
+				if (empty($payment['type']) || ($payment['type'] == 2)) 
+				{
+					$wechat['appid'] = $payment['sub_appid'];
+					$wechat['mch_id'] = $payment['sub_mch_id'];
+					$wechat['apikey'] = $payment['apikey'];
+				}
+				else 
+				{
+					if (($payment['type'] == 1) || ($payment['type'] == 3)) 
+					{
+						$wechat = $payment;
+					}
+					else if ($payment['type'] == 4) 
+					{
+						$params = array('service' => 'unified.trade.micropay', 'body' => $params['title'], 'out_trade_no' => $params['tid'], 'total_fee' => $params['fee'], 'auth_code' => $params['auth_code']);
+						$payRes = m('pay')->build($params, $payment, $type);
+						if (is_error($payRes)) 
+						{
+							return $payRes;
+						}
+						return $payRes;
+					}
+				}
+			}
+		}
 		load()->func('communication');
 		$package = array();
 		$package['appid'] = $wechat['appid'];

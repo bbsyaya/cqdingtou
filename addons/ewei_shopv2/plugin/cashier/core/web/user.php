@@ -155,7 +155,7 @@ class User_EweiShopV2Page extends PluginWebPage
 					$this->model->sendMessage(array('name' => $params['name'], 'mobile' => $params['mobile'], 'status' => $message, 'createtime' => time()), 'checked', $params['manageopenid']);
 				}
 			}
-			if ($user_totle) 
+			/*if ($user_totle) 
 			{
 				show_json(0, '该登录用户名称,已经存在!请更换!');
 			}
@@ -169,7 +169,7 @@ class User_EweiShopV2Page extends PluginWebPage
 				{
 					show_json(0, '该门店收银台,已经存在!请更换!');
 				}
-			}
+			}*/
 			$res = $this->model->savaUser($params);
 			if (isset($res['createtime'])) 
 			{

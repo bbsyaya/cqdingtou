@@ -109,6 +109,9 @@
     $(function () {
         $("table tbody tr").each(function (index,item) {
             var td = $(item).find('td').eq(0);
+            if ($.trim(td.text()) == '已支付'){
+                return;
+            }
             var id = td.attr('id');
             if (typeof id != 'undefined'){
                 $.getJSON("{php echo cashierUrl('index/orderquery')}"+"&orderid="+id,function (order) {

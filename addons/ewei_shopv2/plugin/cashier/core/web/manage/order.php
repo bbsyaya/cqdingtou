@@ -37,7 +37,7 @@ class Order_EweiShopV2Page extends CashierWebPage
 			$params[':start'] = intval($start);
 			$params[':end'] = intval($end);
 		}
-		$goods = pdo_fetchall('SELECT id,orderid,isgoods FROM ' . tablename('ewei_shop_cashier_pay_log') . ' WHERE uniacid=:uniacid AND cashierid=:cashierid AND status=0 AND createtime < ' . (time() - (3600 * 12)), array(':uniacid' => $_W['uniacid'], ':cashierid' => $_W['cashierid']), 'id');
+		$goods = pdo_fetchall('SELECT id,orderid,isgoods FROM ' . tablename('ewei_shop_cashier_pay_log') . ' WHERE uniacid=:uniacid AND cashierid=:cashierid AND status=0 AND createtime < ' . (time() - (3600 * 24)), array(':uniacid' => $_W['uniacid'], ':cashierid' => $_W['cashierid']), 'id');
 		$gids = array();
 		$selfgids = array();
 		foreach ($goods as $v ) 

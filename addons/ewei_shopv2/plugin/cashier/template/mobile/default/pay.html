@@ -61,8 +61,12 @@
             #FF785A 支付宝-->
             {if is_weixin()}
             <td rowspan="3" class="weiKeyNum1" style="background: #04be02;color: #fff;" id="btn-wechat"><i class="icon icon-wechat" style="font-size: 2.5rem;"></i><br/>支付</td>
-            {elseif $_W['cashieruser']['alipay_status']}
-            <td rowspan="3" class="weiKeyNum1" style="background: #FF785A;color: #fff;" id="btn-alipay"><i class="icon icon-rectangle390" style="font-size: 2.5rem;"></i><br/>支付</td>
+            {elseif $_W['cashieruser']['alipay_status'] }
+            <td rowspan="3" class="weiKeyNum1" style="background: #FF785A;color: #fff;" id="btn-alipay" data-paytype="1"><i class="icon icon-rectangle390" style="font-size: 2.5rem;"></i><br/>支付</td>
+            {elseif $paytype == 102 }
+            <td rowspan="3" class="weiKeyNum1" style="background: #FF785A;color: #fff;" id="btn-alipay" data-paytype="102"><i class="icon icon-rectangle390" style="font-size: 2.5rem;"></i><br/>支付</td>
+            {else}
+            <td rowspan="3" class="weiKeyNum1" style="background: #cccccc;color: #fff;">请用<br/>微信</td>
             {/if}
         </tr>
         <tr>
@@ -85,4 +89,5 @@
         });
     </script>
 </div>
+<iframe id="ali" style="display: none;"></iframe>
 {template '_footer'}

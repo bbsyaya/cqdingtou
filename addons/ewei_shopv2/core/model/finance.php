@@ -23,22 +23,33 @@ class Finance_EweiShopV2Model
 			m('member')->setCredit($openid, 'credit2', $money, array(0, $desc));
 			return true;
 		}
-		$setting = uni_setting($_W['uniacid'], array('payment'));
-		if (!(is_array($setting['payment']))) 
+		$payment = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid AND `type`=\'0\'', array(':uniacid' => $_W['uniacid']));
+		if (empty($payment)) 
 		{
-			return error(1, '没有设定支付参数');
+			$payment = array();
+			$setting = uni_setting($_W['uniacid'], array('payment'));
+			if (!(is_array($setting['payment']))) 
+			{
+				return error(1, '没有设定支付参数');
+			}
+			$sec = m('common')->getSec();
+			$sec = iunserializer($sec['sec']);
+			$wechat = $setting['payment']['wechat'];
+			$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
+			$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+			$payment['sub_appid'] = $row['key'];
+			$payment['sub_mch_id'] = $wechat['mchid'];
+			$payment['apikey'] = $wechat['apikey'];
+			$certs = $sec;
 		}
-		$pay = m('common')->getSysset('pay');
-		$sec = m('common')->getSec();
-		$sec = iunserializer($sec['sec']);
-		$wechat = $setting['payment']['wechat'];
-		$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-		$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
-		$certs = $sec;
+		else 
+		{
+			$certs = array('cert' => $payment['cert_file'], 'key' => $payment['key_file'], 'root' => $payment['root_file']);
+		}
 		$url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers';
 		$pars = array();
-		$pars['mch_appid'] = $row['key'];
-		$pars['mchid'] = $wechat['mchid'];
+		$pars['mch_appid'] = $payment['sub_appid'];
+		$pars['mchid'] = $payment['sub_mch_id'];
 		$pars['nonce_str'] = random(32);
 		$pars['partner_trade_no'] = ((empty($trade_no) ? time() . random(4, true) : $trade_no));
 		$pars['openid'] = $openid;
@@ -52,7 +63,7 @@ class Finance_EweiShopV2Model
 		{
 			$string1 .= $k . '=' . $v . '&';
 		}
-		$string1 .= 'key=' . $wechat['apikey'];
+		$string1 .= 'key=' . $payment['apikey'];
 		$pars['sign'] = strtoupper(md5($string1));
 		$xml = array2xml($pars);
 		$extras = array();
@@ -156,13 +167,6 @@ class Finance_EweiShopV2Model
 		}
 		$shopset = m('common')->getSysset('shop');
 		$params = array('openid' => $openid, 'tid' => '', 'send_name' => mb_substr($shopset['name'], 0, 10, 'UTF-8'), 'money' => '', 'wishing' => '恭喜发财,大吉大利!', 'act_name' => $_W['shopset']['shop']['name'] . '活动', 'remark' => $desc);
-		$setting = uni_setting($_W['uniacid'], array('payment'));
-		$wechats = $setting['payment']['wechat'];
-		$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-		$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
-		$sec = m('common')->getSec();
-		$sec = iunserializer($sec['sec']);
-		$wechat = array('appid' => $row['key'], 'mchid' => $wechats['mchid'], 'apikey' => $wechats['apikey'], 'certs' => $sec);
 		if ($redpack < $realsendmoney) 
 		{
 			$for_count = ceil($realsendmoney / $redpack);
@@ -183,7 +187,7 @@ class Finance_EweiShopV2Model
 				}
 				else 
 				{
-					$res = m('common')->sendredpack($params, $wechat);
+					$res = m('common')->sendredpack($params);
 				}
 				if (is_error($res)) 
 				{
@@ -206,7 +210,7 @@ class Finance_EweiShopV2Model
 			}
 			else 
 			{
-				$res = m('common')->sendredpack($params, $wechat);
+				$res = m('common')->sendredpack($params);
 			}
 			if (is_error($res)) 
 			{
@@ -317,36 +321,72 @@ class Finance_EweiShopV2Model
 		{
 			return error(1, '没有设定支付参数');
 		}
-		$pay = m('common')->getSysset('pay');
-		$sec = m('common')->getSec();
-		$sec = iunserializer($sec['sec']);
-		$certs = $sec;
-		if (!(empty($pay['weixin_sub']))) 
+		list($pay, $payment) = m('common')->public_build($app);
+		if (is_error($payment)) 
 		{
-			$wechat = array('appid' => $sec['appid_sub'], 'mchid' => $sec['mchid_sub'], 'sub_appid' => (!(empty($sec['sub_appid_sub'])) ? $sec['sub_appid_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_sub'], 'apikey' => $sec['apikey_sub']);
-			$row = array('key' => $sec['appid_sub']);
-			$certs = $sec['sub'];
+			return $payment;
 		}
-		else 
+		$certs = $payment;
+		if ($payment['is_new'] == 0) 
 		{
-			$wechat = $setting['payment']['wechat'];
-			$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-			$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+			if (!(empty($pay['weixin_sub']))) 
+			{
+				$wechat = array('appid' => $payment['appid_sub'], 'mchid' => $payment['mchid_sub'], 'sub_appid' => (!(empty($payment['sub_appid_sub'])) ? $payment['sub_appid_sub'] : ''), 'sub_mch_id' => $payment['sub_mchid_sub'], 'apikey' => $payment['apikey_sub']);
+				$row = array('key' => $payment['appid_sub']);
+				$certs = $payment['sub'];
+			}
+			else 
+			{
+				$wechat = $setting['payment']['wechat'];
+				$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
+				$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+			}
+		}
+		if (($payment['is_new'] == 1) && !($app)) 
+		{
+			$wechat = array('appid' => $payment['sub_appid'], 'mchid' => $payment['sub_mch_id'], 'apikey' => $payment['apikey']);
+			$sub_wechat = array('appid' => $payment['appid'], 'mchid' => $payment['mch_id'], 'sub_appid' => (!(empty($payment['sub_appid'])) ? $payment['sub_appid'] : ''), 'sub_mch_id' => $payment['sub_mch_id'], 'apikey' => $payment['apikey']);
+			switch ($payment['type']) 
+			{
+				case '1': $wechat = $sub_wechat;
+				break;
+				case '3': $wechat = $sub_wechat;
+				break;
+				case '4': $params = array('out_trade_no' => $out_trade_no, 'out_refund_no' => $out_refund_no, 'total_fee' => $totalmoney, 'refund_fee' => $refundmoney);
+				$resp = m('pay')->refund($params, $payment);
+				if (!(is_error($resp)) && ($resp['result_code'] == 0) && ($resp['status'] == 0)) 
+				{
+					$respQuery = m('pay')->refundQuery($out_refund_no, $payment);
+					if (($respQuery['refund_status_0'] == 'SUCCESS') || ($respQuery['refund_status_0'] == 'PROCESSING')) 
+					{
+						return true;
+					}
+					return error('-2', '退款失败!');
+				}
+				return $resp;
+			}
+			unset($sub_wechat);
+			$certs = array('cert' => $payment['cert_file'], 'key' => $payment['key_file'], 'root' => $payment['root_file']);
+			$row = array('key' => $payment['sub_appid']);
 		}
 		if ($app) 
 		{
-			if (empty($sec['app_wechat']['appid']) || empty($sec['app_wechat']['appsecret']) || empty($sec['app_wechat']['merchid']) || empty($sec['app_wechat']['apikey'])) 
+			if (empty($payment['app_wechat']['appid']) || empty($payment['app_wechat']['appsecret']) || empty($payment['app_wechat']['merchid']) || empty($payment['app_wechat']['apikey'])) 
 			{
 				return error(1, '没有设定APP支付参数');
 			}
-			$wechat = array('appid' => $sec['app_wechat']['appid'], 'mchid' => $sec['app_wechat']['merchid'], 'apikey' => $sec['app_wechat']['apikey']);
-			$row = array('key' => $sec['app_wechat']['appid'], 'secret' => $sec['app_wechat']['appsecret']);
-			$certs = array('cert' => $sec['app_wechat']['cert'], 'key' => $sec['app_wechat']['key'], 'root' => $sec['app_wechat']['root']);
+			$wechat = array('appid' => $payment['app_wechat']['appid'], 'mchid' => $payment['app_wechat']['merchid'], 'apikey' => $payment['app_wechat']['apikey']);
+			$row = array('key' => $payment['app_wechat']['appid'], 'secret' => $payment['app_wechat']['appsecret']);
+			$certs = array('cert' => $payment['app_wechat']['cert'], 'key' => $payment['app_wechat']['key'], 'root' => $payment['app_wechat']['root']);
 		}
 		$url = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
 		$pars = array();
 		$pars['appid'] = $row['key'];
 		$pars['mch_id'] = $wechat['mchid'];
+		if (!(empty($wechat['sub_mch_id']))) 
+		{
+			$pars['sub_mch_id'] = $wechat['sub_mch_id'];
+		}
 		$pars['nonce_str'] = random(8);
 		$pars['out_trade_no'] = $out_trade_no;
 		$pars['out_refund_no'] = $out_refund_no;
@@ -887,36 +927,61 @@ class Finance_EweiShopV2Model
 	{
 		global $_W;
 		global $_GPC;
-		$pay = m('common')->getSysset('pay');
-		$sec = m('common')->getSec();
-		$sec = iunserializer($sec['sec']);
-		if (!(empty($pay['weixin_sub']))) 
+		list(, $payment) = m('common')->public_build($app);
+		if ($payment['is_new'] == 0) 
 		{
-			$wechat = array('appid' => $sec['appid_sub'], 'mchid' => $sec['mchid_sub'], 'sub_appid' => (!(empty($sec['sub_appid_sub'])) ? $sec['sub_appid_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_sub'], 'apikey' => $sec['apikey_sub']);
-			$row = array('key' => $sec['appid_sub']);
-		}
-		else 
-		{
-			$setting = uni_setting($_W['uniacid'], array('payment'));
-			if (!(is_array($setting['payment']))) 
+			if (!(empty($payment['weixin_sub']))) 
 			{
-				return error(1, '没有设定支付参数');
+				$wechat = array('appid' => $payment['appid_sub'], 'mchid' => $payment['mchid_sub'], 'sub_appid' => (!(empty($payment['sub_appid_sub'])) ? $payment['sub_appid_sub'] : ''), 'sub_mch_id' => $payment['sub_mchid_sub'], 'apikey' => $payment['apikey_sub']);
+				$payment['apikey'] = $payment['apikey_sub'];
 			}
-			$wechat = $setting['payment']['wechat'];
-			$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-			$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+			else 
+			{
+				$setting = uni_setting($_W['uniacid'], array('payment'));
+				if (!(is_array($setting['payment']))) 
+				{
+					return error(1, '没有设定支付参数');
+				}
+				$wechat = $setting['payment']['wechat'];
+				$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
+				$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+				$wechat['appid'] = $row['key'];
+			}
+		}
+		if (($payment['is_new'] == 1) && !($app)) 
+		{
+			$wechat = array('appid' => $payment['sub_appid'], 'mchid' => $payment['sub_mch_id'], 'apikey' => $payment['apikey']);
+			$sub_wechat = array('appid' => $payment['appid'], 'mchid' => $payment['mch_id'], 'sub_appid' => (!(empty($payment['sub_appid'])) ? $payment['sub_appid'] : ''), 'sub_mch_id' => $payment['sub_mch_id'], 'apikey' => $payment['apikey']);
+			switch ($payment['type']) 
+			{
+				case '1': $wechat = $sub_wechat;
+				break;
+				case '3': $wechat = $sub_wechat;
+				break;
+				case '4': $resp = m('pay')->query($out_trade_no, $payment);
+				if (($resp['result_code'] == 0) && ($resp['status'] == 0)) 
+				{
+					if ($resp['trade_state'] == 'SUCCESS') 
+					{
+						return true;
+					}
+					return error(-2, $resp['trade_state'] . '|' . '支付失败');
+				}
+				return $resp;
+			}
+			unset($sub_wechat);
 		}
 		if ($app) 
 		{
-			$wechat = array('version' => 1, 'apikey' => $sec['app_wechat']['apikey'], 'signkey' => $sec['app_wechat']['apikey'], 'appid' => $sec['app_wechat']['appid'], 'mchid' => $sec['app_wechat']['merchid']);
+			$wechat = array('version' => 1, 'apikey' => $payment['app_wechat']['apikey'], 'signkey' => $payment['app_wechat']['apikey'], 'appid' => $payment['app_wechat']['appid'], 'mchid' => $payment['app_wechat']['merchid']);
 		}
 		$url = 'https://api.mch.weixin.qq.com/pay/orderquery';
 		$pars = array();
-		$pars['appid'] = (($app ? $wechat['appid'] : $row['key']));
+		$pars['appid'] = $wechat['appid'];
 		$pars['mch_id'] = $wechat['mchid'];
-		$pars['nonce_str'] = random(8);
+		$pars['nonce_str'] = random(32);
 		$pars['out_trade_no'] = $out_trade_no;
-		if (!(empty($pay['weixin_sub'])) && !(is_h5app())) 
+		if (!(empty($wechat['sub_mch_id'])) && !(is_h5app())) 
 		{
 			$pars['sub_mch_id'] = $wechat['sub_mch_id'];
 		}
@@ -939,7 +1004,6 @@ class Finance_EweiShopV2Model
 		{
 			return error(-2, '网络错误');
 		}
-		$arr = json_decode(json_encode((array) simplexml_load_string($resp['content'])), true);
 		$xml = '<?xml version="1.0" encoding="utf-8"?>' . $resp['content'];
 		$dom = new DOMDocument();
 		if ($dom->loadXML($xml)) 
@@ -981,22 +1045,38 @@ class Finance_EweiShopV2Model
 		{
 			$out_trade_no = $out_trade_no . '_borrow';
 		}
-		$pay = m('common')->getSysset('pay');
-		$sec = m('common')->getSec();
-		$sec = iunserializer($sec['sec']);
-		if (!(empty($pay['weixin_jie_sub']))) 
+		list($pay, $payment) = m('common')->public_build();
+		$sec = array();
+		if (empty($payment['is_new'])) 
 		{
-			$wechat = array('sub_appid' => (!(empty($sec['sub_appid_jie_sub'])) ? $sec['sub_appid_jie_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_jie_sub']);
-			$sec['appid'] = $sec['appid_jie_sub'];
-			$sec['mchid'] = $sec['mchid_jie_sub'];
-			$sec['apikey'] = $sec['apikey_jie_sub'];
+			if (!(empty($pay['weixin_jie_sub']))) 
+			{
+				$sec['sub_mch_id'] = $payment['sub_mchid_jie_sub'];
+				$sec['appid'] = $payment['appid_jie_sub'];
+				$sec['mchid'] = $payment['mchid_jie_sub'];
+				$sec['apikey'] = $payment['apikey_jie_sub'];
+			}
+			else 
+			{
+				if (empty($sec['appid']) || empty($sec['mchid']) || empty($sec['apikey'])) 
+				{
+					return error(1, '没有设定支付参数');
+					if ($payment['type'] == 3) 
+					{
+						$sec['sub_mch_id'] = $payment['sub_mch_id'];
+					}
+					$sec['appid'] = $payment['appid'];
+					$sec['mchid'] = $payment['mch_id'];
+					$sec['apikey'] = $payment['apikey'];
+				}
+			}
 		}
 		else 
 		{
-			if (empty($sec['appid']) || empty($sec['mchid']) || empty($sec['apikey'])) 
-			{
-				return error(1, '没有设定支付参数');
-			}
+			$sec['sub_mch_id'] = $payment['sub_mch_id'];
+			$sec['appid'] = $payment['appid'];
+			$sec['mchid'] = $payment['mch_id'];
+			$sec['apikey'] = $payment['apikey'];
 		}
 		$url = 'https://api.mch.weixin.qq.com/pay/orderquery';
 		$pars = array();
@@ -1004,9 +1084,9 @@ class Finance_EweiShopV2Model
 		$pars['mch_id'] = $sec['mchid'];
 		$pars['nonce_str'] = random(8);
 		$pars['out_trade_no'] = $out_trade_no;
-		if (!(empty($pay['weixin_jie_sub']))) 
+		if (!(empty($sec['sub_mch_id']))) 
 		{
-			$pars['sub_mch_id'] = $wechat['sub_mch_id'];
+			$pars['sub_mch_id'] = $sec['sub_mch_id'];
 		}
 		ksort($pars, SORT_STRING);
 		$string1 = '';

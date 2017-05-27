@@ -423,7 +423,7 @@ class Orders_EweiShopV2Page extends PluginMobileLoginPage
 			}
 			else 
 			{
-				$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . "\n\t\t\t\t" . 'where openid=:openid and deleted=0 and isdefault=1  and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid));
+				$address = pdo_fetch('select * from ' . tablename('ewei_shop_member_address') . "\n\t\t\t\t" . 'where openid=:openid and deleted=0 and isdefault=1  and uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':openid' => $openid));
 			}
 			$creditdeduct = pdo_fetch('SELECT creditdeduct,groupsdeduct,credit,groupsmoney FROM' . tablename('ewei_shop_groups_set') . 'WHERE uniacid = :uniacid ', array(':uniacid' => $uniacid));
 			if (intval($creditdeduct['creditdeduct'])) 

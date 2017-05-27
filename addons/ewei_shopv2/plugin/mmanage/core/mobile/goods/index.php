@@ -59,7 +59,7 @@ class Index_EweiShopV2Page extends MmanageMobilePage
 		}
 		if ($_W['ispost']) 
 		{
-			$data = array('title' => trim($_GPC['title']), 'subtitle' => trim($_GPC['subtitle']), 'unit' => trim($_GPC['unit']), 'status' => intval($_GPC['status']), 'showtotal' => intval($_GPC['showtotal']), 'cash' => intval($_GPC['cash']), 'invoice' => intval($_GPC['invoice']), 'isnodiscount' => intval($_GPC['isnodiscount']), 'nocommission' => intval($_GPC['nocommission']), 'isrecommand' => intval($_GPC['isrecommand']), 'isnew' => intval($_GPC['isnew']), 'ishot' => intval($_GPC['ishot']), 'issendfree' => intval($_GPC['issendfree']), 'totalcnf' => intval($_GPC['totalcnf']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'showlevels' => trim($_GPC['showlevels']), 'showgroups' => trim($_GPC['showgroups']), 'buylevels' => trim($_GPC['buylevels']), 'buygroups' => trim($_GPC['buygroups']), 'cates' => trim($_GPC['cates']), 'maxbuy' => intval($_GPC['maxbuy']), 'minbuy' => intval($_GPC['minbuy']), 'usermaxbuy' => intval($_GPC['usermaxbuy']), 'diypage' => intval($_GPC['diypage']), 'displayorder' => intval($_GPC['displayorder']));
+			$data = array('title' => trim($_GPC['title']), 'subtitle' => trim($_GPC['subtitle']), 'unit' => trim($_GPC['unit']), 'status' => intval($_GPC['status']), 'showtotal' => intval($_GPC['showtotal']), 'cash' => intval($_GPC['cash']), 'invoice' => intval($_GPC['invoice']), 'isnodiscount' => intval($_GPC['isnodiscount']), 'nocommission' => intval($_GPC['nocommission']), 'isrecommand' => intval($_GPC['isrecommand']), 'isnew' => intval($_GPC['isnew']), 'ishot' => intval($_GPC['ishot']), 'issendfree' => intval($_GPC['issendfree']), 'totalcnf' => intval($_GPC['totalcnf']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'showlevels' => trim($_GPC['showlevels']), 'showgroups' => trim($_GPC['showgroups']), 'buylevels' => trim($_GPC['buylevels']), 'buygroups' => trim($_GPC['buygroups']), 'maxbuy' => intval($_GPC['maxbuy']), 'minbuy' => intval($_GPC['minbuy']), 'usermaxbuy' => intval($_GPC['usermaxbuy']), 'diypage' => intval($_GPC['diypage']), 'displayorder' => intval($_GPC['displayorder']));
 			if (empty($item)) 
 			{
 				$data['type'] = intval($_GPC['type']);
@@ -90,7 +90,10 @@ class Index_EweiShopV2Page extends MmanageMobilePage
 			if ($item['diyformtype'] != 2) 
 			{
 				$data['diyformid'] = intval($_GPC['diyformid']);
-				$data['diyformtype'] = 1;
+				if (!(empty($data['diyformid']))) 
+				{
+					$data['diyformtype'] = 1;
+				}
 			}
 			if (empty($data['dispatchtype'])) 
 			{
@@ -100,6 +103,67 @@ class Index_EweiShopV2Page extends MmanageMobilePage
 			{
 				$data['dispatchprice'] = trim($_GPC['dispatchprice']);
 			}
+			$cateset = m('common')->getSysset('shop');
+			$pcates = array();
+			$ccates = array();
+			$tcates = array();
+			$fcates = array();
+			$cates = array();
+			$pcateid = 0;
+			$ccateid = 0;
+			$tcateid = 0;
+			$cates = $_GPC['cates'];
+			if (!(is_array($cates)) && !(empty($cates))) 
+			{
+				$cates = explode(',', $cates);
+			}
+			if (is_array($cates)) 
+			{
+				foreach ($cates as $key => $cid ) 
+				{
+					$c = pdo_fetch('select level from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+					if ($c['level'] == 1) 
+					{
+						$pcates[] = $cid;
+					}
+					else if ($c['level'] == 2) 
+					{
+						$ccates[] = $cid;
+					}
+					else if ($c['level'] == 3) 
+					{
+						$tcates[] = $cid;
+					}
+					if ($key == 0) 
+					{
+						if ($c['level'] == 1) 
+						{
+							$pcateid = $cid;
+						}
+						else if ($c['level'] == 2) 
+						{
+							$crow = pdo_fetch('select parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+							$pcateid = $crow['parentid'];
+							$ccateid = $cid;
+						}
+						else if ($c['level'] == 3) 
+						{
+							$tcateid = $cid;
+							$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+							$ccateid = $tcate['parentid'];
+							$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
+							$pcateid = $ccate['parentid'];
+						}
+					}
+				}
+			}
+			$data['pcate'] = $pcateid;
+			$data['ccate'] = $ccateid;
+			$data['tcate'] = $tcateid;
+			$data['cates'] = implode(',', $cates);
+			$data['pcates'] = implode(',', $pcates);
+			$data['ccates'] = implode(',', $ccates);
+			$data['tcates'] = implode(',', $tcates);
 			$result = array();
 			if (!(empty($item))) 
 			{
@@ -115,6 +179,21 @@ class Index_EweiShopV2Page extends MmanageMobilePage
 				$result['id'] = $id;
 				plog('goods.add', '添加商品 ID: ' . $id . '<br>' . ((!(empty($data['nocommission'])) ? '是否参与分销 -- 否' : '是否参与分销 -- 是')));
 			}
+			if (!(empty($item['hasoption']))) 
+			{
+				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\r\n" . '            g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
+				pdo_query($sql);
+			}
+			else 
+			{
+				pdo_query('delete from ' . tablename('ewei_shop_goods_option') . ' where goodsid=' . $id);
+				$sql = 'update ' . tablename('ewei_shop_goods') . ' set minprice = marketprice,maxprice = marketprice where id = ' . $id . ' and hasoption=0;';
+				pdo_query($sql);
+			}
+			$sqlgoods = 'SELECT id,title,thumb,marketprice,productprice,minprice,maxprice,isdiscount,isdiscount_time,isdiscount_discounts,sales,total,description,merchsale FROM ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1';
+			$goodsinfo = pdo_fetch($sqlgoods, array(':id' => $id, ':uniacid' => $_W['uniacid']));
+			$goodsinfo = m('goods')->getOneMinPrice($goodsinfo);
+			pdo_update('ewei_shop_goods', array('minprice' => $goodsinfo['minprice'], 'maxprice' => $goodsinfo['maxprice']), array('id' => $id, 'uniacid' => $_W['uniacid']));
 			show_json(1, $result);
 		}
 		else 

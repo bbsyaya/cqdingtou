@@ -1,6 +1,4 @@
-{template '_header'}
-
-<link href="../addons/ewei_shopv2/plugin/mmanage/static/css/style.css?v={php echo time()}"rel="stylesheet"type="text/css"/>
+{template 'mmanage/common'}
 
 <div class='fui-page fui-page-current'>
     <div class="fui-header fui-header-success">
@@ -72,14 +70,14 @@
             <div class="fui-cell-group fui-cell-click">
                 <a class="fui-cell external" href="{ifp 'finance.recharge.credit2'}{php echo mobileUrl('mmanage/finance/recharge', array('type'=>0, 'id'=>$member['id']))}{else}javascript:;{/if}">
                     <div class="fui-cell-label">余额</div>
-                    <div class="fui-cell-info">{$member['credit1']}</div>
+                    <div class="fui-cell-info">{$member['credit2']}</div>
                     {ifp 'finance.recharge.credit2'}
                         <div class="fui-cell-remark">充值</div>
                     {/if}
                 </a>
                 <a class="fui-cell external" href="{ifp 'finance.recharge.credit1'}{php echo mobileUrl('mmanage/finance/recharge', array('type'=>1, 'id'=>$member['id']))}{else}javascript:;{/if}">
                     <div class="fui-cell-label">积分</div>
-                    <div class="fui-cell-info">{$member['credit2']}</div>
+                    <div class="fui-cell-info">{$member['credit1']}</div>
                     {ifp 'finance.recharge.credit1'}
                         <div class="fui-cell-remark">充值</div>
                     {/if}
@@ -209,29 +207,31 @@
 
         {if $hascommission}
             <div class="tab-content " id="tab_commission">
-                <div class="fui-title">上级分销商(PC可编辑)</div>
-                <div class="fui-list-group">
-                    <a class="fui-list" href="{php echo mobileUrl('mmanage/member/detail', array('id'=>$parentagent['id']))}" data-nocache="true">
-                        <div class="fui-list-media">
-                            <img src="{$parentagent['avatar']}" class="round">
-                        </div>
-                        <div class="fui-list-inner">
-                            <div class="title">{$parentagent['nickname']}{if !empty($parentagent['realname'])}({$parentagent['realname']}){/if}</div>
-                            <div class="subtitle">
-                                <div class="total half">手机号: {php echo empty($parentagent['mobile'])?"未填写":$parentagent['mobile']}</div>
-                                <div class="total half">微信号: {php echo empty($parentagent['weixin'])?"未填写":$parentagent['weixin']}</div>
+                {if !empty($parentagent)}
+                    <div class="fui-title">上级分销商(PC可编辑)</div>
+                    <div class="fui-list-group">
+                        <a class="fui-list" href="{php echo mobileUrl('mmanage/member/detail', array('id'=>$parentagent['id']))}" data-nocache="true">
+                            <div class="fui-list-media">
+                                <img src="{$parentagent['avatar']}" class="round">
                             </div>
-                        </div>
-                        <div class="angle"></div>
-                    </a>
-                </div>
+                            <div class="fui-list-inner">
+                                <div class="title">{$parentagent['nickname']}{if !empty($parentagent['realname'])}({$parentagent['realname']}){/if}</div>
+                                <div class="subtitle">
+                                    <div class="total half">手机号: {php echo empty($parentagent['mobile'])?"未填写":$parentagent['mobile']}</div>
+                                    <div class="total half">微信号: {php echo empty($parentagent['weixin'])?"未填写":$parentagent['weixin']}</div>
+                                </div>
+                            </div>
+                            <div class="angle"></div>
+                        </a>
+                    </div>
+                {/if}
 
                 <div class="fui-title">分销商信息</div>
                 <div class="fui-cell-group fui-cell-click">
                     <div class="fui-cell noactive">
                         <div class="fui-cell-label ">固定上级</div>
                         <div class="fui-cell-info">
-                            {ifp 'member.list.edit'}
+                            {ifp 'commission.agent.changeagent&commission.agent.check'}
                                 <input type="checkbox" class="fui-switch fui-switch-small fui-switch-success pull-right" id="fixagentid" {if !empty($member['fixagentid'])}checked="checked"{/if}>
                             {else}
                                 {if !empty($member['fixagentid'])}固定{else}不固定{/if}
@@ -241,7 +241,7 @@
                     <div class="fui-cell noactive">
                         <div class="fui-cell-label ">分销商权限</div>
                         <div class="fui-cell-info">
-                            {ifp 'member.list.edit'}
+                            {ifp 'commission.agent.check'}
                                 <input type="checkbox" class="fui-switch fui-switch-small fui-switch-success pull-right" id="isagent" {if !empty($member['isagent'])}checked="checked"{/if}>
                             {else}
                                 {if !empty($member['isagent'])}通过{else}未通过{/if}
@@ -251,7 +251,7 @@
                     <div class="fui-cell noactive">
                         <div class="fui-cell-label ">审核通过</div>
                         <div class="fui-cell-info">
-                            {ifp 'member.list.edit'}
+                            {ifp 'commission.agent.check'}
                                 <input type="checkbox" class="fui-switch fui-switch-small fui-switch-success pull-right" id="status" {if !empty($member['status'])}checked="checked"{/if}>
                             {else}
                                 {if !empty($member['status'])}通过{else}未通过{/if}
@@ -261,22 +261,28 @@
                     <div class="fui-cell noactive">
                         <div class="fui-cell-label ">自动升级</div>
                         <div class="fui-cell-info">
-                            {ifp 'member.list.edit'}
+                            {ifp 'commission.agent.check'}
                                 <input type="checkbox" class="fui-switch fui-switch-small fui-switch-success pull-right" id="agentnotupgrade" {if empty($member['agentnotupgrade'])}checked="checked"{/if}>
                             {else}
                                 {if empty($member['agentnotupgrade'])}是{else}否{/if}
                             {/if}
                         </div>
                     </div>
-                    <div class="fui-cell check-param" data-action="agentlevel">
+                    <div class="fui-cell {ifp 'commission.agent.check'}check-param{/if}" data-action="agentlevel">
                         <div class="fui-cell-label">分销商等级</div>
                         <div class="fui-cell-info">{$comlevel_title}</div>
-                        <div class="fui-cell-remark"></div>
+                        {ifp 'commission.agent.check'}
+                            <div class="fui-cell-remark"></div>
+                        {/if}
                     </div>
-                    <div class="fui-cell check-param" data-action="goods">
+                    <div class="fui-cell {ifp 'commission.agent.check'}check-param{/if}" data-action="goods">
                         <div class="fui-cell-label">自选商品</div>
                         <div class="fui-cell-info"></div>
-                        <div class="fui-cell-remark">{$goods_title}</div>
+                        {ifp 'commission.agent.check'}
+                            <div class="fui-cell-remark">{$goods_title}</div>
+                        {else}
+                            <div class="fui-cell-remark noremark">{$goods_title}</div>
+                        {/if}
                     </div>
                 </div>
                 {if $hascommission && $member['status']==1 && $member['isagent']==1}

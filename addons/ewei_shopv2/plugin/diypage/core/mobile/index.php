@@ -56,7 +56,7 @@ class Index_EweiShopV2Page extends PluginMobilePage
 			$visit_c = $page['data']['page']['visitlevel']['commission'];
 			$visit_c = ((isset($visit_c) ? explode(',', $visit_c) : array()));
 			$visit_m = ((isset($visit_m) ? explode(',', $visit_m) : array()));
-			if (!(in_array((empty($member['level']) ? 'default' : $member['level']), $visit_m)) && (!(in_array($member['agentlevel'], $visit_c)) || empty($member['isagent']))) 
+			if (!(in_array((empty($member['level']) ? 'default' : $member['level']), $visit_m)) && (!(in_array($member['agentlevel'], $visit_c)) || empty($member['isagent']) || empty($member['status']))) 
 			{
 				$this->message($title, $link);
 			}
@@ -196,6 +196,5 @@ class Index_EweiShopV2Page extends PluginMobilePage
 		}
 		show_json(0, '错误的请求');
 	}
-
 }
 ?>

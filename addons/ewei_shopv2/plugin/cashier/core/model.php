@@ -11,7 +11,7 @@ class CashierModel extends PluginModel
 	const PAY = 'pay';
 	const PAY_CASHIER = 'pay_cashier';
 	const PAY_CASHIER_USER = 'pay_cashier_user';
-	static public $paytype = array(0 => '微信', 1 => '支付宝', 2 => '商城余额', 3 => '现金收款', 101 => '系统微信');
+	static public $paytype = array(0 => '微信', 1 => '支付宝', 2 => '商城余额', 3 => '现金收款', 101 => '系统微信', 102 => '系统支付宝');
 	public $setmeal = array('标准套餐', '豪华套餐');
 	static public $UserSet = array();
 	static public function perm() 
@@ -232,28 +232,29 @@ class CashierModel extends PluginModel
 		{
 			case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => date('Y-m-d H:i:s', $params['createtime']));
 			break;
-			switch ($type) 
+			default: switch ($type) 
 			{
 				case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[审核状态]' => $params['status'], '[审核时间]' => $params['createtime'], '[驳回原因]' => $params['reason']);
 				break;
-				switch ($type) 
+				default: switch ($type) 
 				{
 					case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => $params['createtime'], '[申请金额]' => $params['money']);
 					break;
-					switch ($type) 
+					default: switch ($type) 
 					{
 						case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => $params['createtime'], '[打款时间]' => $params['paytime'], '[申请金额]' => $params['money'], '[打款金额]' => $params['realmoney']);
 						break;
-						switch ($type) 
+						default: switch ($type) 
 						{
 							case self: $datas = array('[订单编号]' => $params['logno'], '[付款金额]' => $params['money'], '[余额抵扣]' => $params['deduction'], '[付款时间]' => $params['paytime'], '[收银台名称]' => $params['cashier_title']);
 							break;
-							switch ($type) 
+							default: switch ($type) 
 							{
 								case self: $datas = array('[订单编号]' => $params['logno'], '[付款金额]' => $params['money'], '[余额抵扣]' => $params['deduction'], '[付款时间]' => $params['paytime'], '[收银台名称]' => $params['cashier_title']);
 								break;
 								break;
 								$datas = ((isset($datas) ? $datas : array()));
+								$notice['openid'] = ((is_null($openid) ? $notice['openid'] : $openid));
 							}
 						}
 					}
@@ -320,45 +321,12 @@ class CashierModel extends PluginModel
 	{
 		global $_W;
 		$wechat = $this->wechayPayInfo($_W['cashieruser']);
+		$params['old'] = true;
 		return m('common')->wechat_micropay_build($params, $wechat, 13);
 	}
 	public function wechatpay_101($params) 
 	{
-		global $_W;
-		$set = m('common')->getSysset(array('shop', 'pay'));
-		if (isset($set['pay']) && ($set['pay']['weixin'] == 1)) 
-		{
-			load()->model('payment');
-			$setting = uni_setting($_W['uniacid'], array('payment'));
-			$account = pdo_get('account_wechats', array('uniacid' => $_W['uniacid']), array('key', 'secret'));
-			if (is_array($setting['payment'])) 
-			{
-				$options = $setting['payment']['wechat'];
-				$options['appid'] = $account['key'];
-				$options['secret'] = $account['secret'];
-				$wechat = array('appid' => $options['appid'], 'mch_id' => $options['mchid'], 'apikey' => $options['signkey']);
-			}
-		}
-		else if (isset($set['pay']) && ($set['pay']['weixin_sub'] == 1)) 
-		{
-			$sec = m('common')->getSec();
-			$sec = iunserializer($sec['sec']);
-			$wechat = array('appid' => $sec['appid_sub'], 'mch_id' => $sec['mchid_sub'], 'sub_appid' => (!(empty($sec['sub_appid_sub'])) ? $sec['sub_appid_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_sub'], 'apikey' => $sec['apikey_sub']);
-		}
-		if (empty($wechat)) 
-		{
-			$sec = m('common')->getSec();
-			$sec = iunserializer($sec['sec']);
-			if (isset($set['pay']) && ($set['pay']['weixin_jie'] == 1)) 
-			{
-				$wechat = array('appid' => $sec['appid'], 'mch_id' => $sec['mchid'], 'apikey' => $sec['apikey']);
-			}
-			else if (isset($set['pay']) && ($set['pay']['weixin_jie_sub'] == 1)) 
-			{
-				$wechat = array('appid' => $sec['appid_jie_sub'], 'mch_id' => $sec['mchid_jie_sub'], 'sub_appid' => (!(empty($sec['sub_appid_jie_sub'])) ? $sec['sub_appid_jie_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_jie_sub'], 'apikey' => $sec['apikey_jie_sub']);
-			}
-		}
-		return (isset($wechat) ? m('common')->wechat_micropay_build($params, $wechat, 13) : error(-1, '$wechat' . '参数错误'));
+		return m('common')->wechat_micropay_build($params, array(), 13);
 	}
 	public function alipay($params) 
 	{
@@ -495,7 +463,7 @@ class CashierModel extends PluginModel
 		}
 		$realmoney = floatval($log['money']);
 		$user = $this->userInfo($log['cashierid']);
-		if ($log['paytype'] != '101') 
+		if (($log['paytype'] != '101') && ($log['paytype'] != '102')) 
 		{
 			if (empty($log['paytype'])) 
 			{
@@ -510,45 +478,65 @@ class CashierModel extends PluginModel
 		}
 		else 
 		{
-			$set = m('common')->getSysset(array('shop', 'pay'));
-			if (isset($set['pay']) && ($set['pay']['weixin'] == 1)) 
+			list($set, $payment) = m('common')->public_build();
+			if ($payment['is_new'] == 1) 
 			{
-				load()->model('payment');
-				$setting = uni_setting($_W['uniacid'], array('payment'));
-				$account = pdo_get('account_wechats', array('uniacid' => $_W['uniacid']), array('key', 'secret'));
-				if (is_array($setting['payment'])) 
+				if ($payment['type'] == 4) 
 				{
-					$options = $setting['payment']['wechat'];
-					$options['appid'] = $account['key'];
-					$options['secret'] = $account['secret'];
-					if (IMS_VERSION <= 0.80000000000000004) 
+					$res = m('pay')->query($log['logno'], $payment);
+				}
+				else 
+				{
+					if (($payment['type'] == 0) || ($payment['type'] == 2)) 
 					{
-						$options['apikey'] = $options['signkey'];
+						$payment['appid'] = $payment['sub_appid'];
+						$payment['mch_id'] = $payment['sub_mch_id'];
+						unset($payment['sub_mch_id']);
 					}
-					$wechat = array('appid' => $options['appid'], 'mch_id' => $options['mchid'], 'apikey' => $options['apikey']);
-					$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
+					$res = m('common')->wechat_order_query($log['logno'], 0, $payment);
 				}
 			}
-			else if (isset($set['pay']) && ($set['pay']['weixin_sub'] == 1)) 
+			else 
 			{
-				$sec = m('common')->getSec();
-				$sec = iunserializer($sec['sec']);
-				$wechat = array('appid' => $sec['appid_sub'], 'mch_id' => $sec['mchid_sub'], 'sub_appid' => (!(empty($sec['sub_appid_sub'])) ? $sec['sub_appid_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_sub'], 'apikey' => $sec['apikey_sub']);
-				$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
-			}
-			if (empty($res)) 
-			{
-				$sec = m('common')->getSec();
-				$sec = iunserializer($sec['sec']);
-				if (isset($set['pay']) && ($set['pay']['weixin_jie'] == 1)) 
+				if (isset($set) && ($set['weixin'] == 1)) 
 				{
-					$wechat = array('appid' => $sec['appid'], 'mch_id' => $sec['mchid'], 'apikey' => $sec['apikey']);
+					load()->model('payment');
+					$setting = uni_setting($_W['uniacid'], array('payment'));
+					$account = pdo_get('account_wechats', array('uniacid' => $_W['uniacid']), array('key', 'secret'));
+					if (is_array($setting['payment'])) 
+					{
+						$options = $setting['payment']['wechat'];
+						$options['appid'] = $account['key'];
+						$options['secret'] = $account['secret'];
+						if (IMS_VERSION <= 0.80000000000000004) 
+						{
+							$options['apikey'] = $options['signkey'];
+						}
+						$wechat = array('appid' => $options['appid'], 'mch_id' => $options['mchid'], 'apikey' => $options['apikey']);
+						$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
+					}
+				}
+				else if (isset($set) && ($set['weixin_sub'] == 1)) 
+				{
+					$sec = m('common')->getSec();
+					$sec = iunserializer($sec['sec']);
+					$wechat = array('appid' => $sec['appid_sub'], 'mch_id' => $sec['mchid_sub'], 'sub_appid' => (!(empty($sec['sub_appid_sub'])) ? $sec['sub_appid_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_sub'], 'apikey' => $sec['apikey_sub']);
 					$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
 				}
-				else if (isset($set['pay']) && ($set['pay']['weixin_jie_sub'] == 1)) 
+				if (empty($res)) 
 				{
-					$wechat = array('appid' => $sec['appid_jie_sub'], 'mch_id' => $sec['mchid_jie_sub'], 'sub_appid' => (!(empty($sec['sub_appid_jie_sub'])) ? $sec['sub_appid_jie_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_jie_sub'], 'apikey' => $sec['apikey_jie_sub']);
-					$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
+					$sec = m('common')->getSec();
+					$sec = iunserializer($sec['sec']);
+					if (isset($set) && ($set['weixin_jie'] == 1)) 
+					{
+						$wechat = array('appid' => $sec['appid'], 'mch_id' => $sec['mchid'], 'apikey' => $sec['apikey']);
+						$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
+					}
+					else if (isset($set) && ($set['weixin_jie_sub'] == 1)) 
+					{
+						$wechat = array('appid' => $sec['appid_jie_sub'], 'mch_id' => $sec['mchid_jie_sub'], 'sub_appid' => (!(empty($sec['sub_appid_jie_sub'])) ? $sec['sub_appid_jie_sub'] : ''), 'sub_mch_id' => $sec['sub_mchid_jie_sub'], 'apikey' => $sec['apikey_jie_sub']);
+						$res = m('common')->wechat_order_query($log['logno'], 0, $wechat);
+					}
 				}
 			}
 		}
@@ -648,18 +636,20 @@ class CashierModel extends PluginModel
 		}
 		if (($paytype == -1) && ($auto_code !== NULL)) 
 		{
+			$wechat = array(10, 11, 12, 13, 14, 15);
+			$alipay = array(28);
 			$type = substr($auto_code, 0, 2);
-			if ($type == '13') 
-			{
-				$paytype = 0;
-			}
-			else if ($type == '28') 
+			if (in_array($type, $alipay)) 
 			{
 				if (empty($_W['cashieruser']['alipay_status'])) 
 				{
 					return error(-101, '暂时不支持支付宝支付!');
 				}
 				$paytype = 1;
+			}
+			else if (in_array($type, $wechat)) 
+			{
+				$paytype = 0;
 			}
 		}
 		if (empty($paytype) && !(empty($_W['cashieruser']['wechat_status']))) 
@@ -677,6 +667,10 @@ class CashierModel extends PluginModel
 		else if ($paytype == '3') 
 		{
 			$paytype = 3;
+		}
+		else if ($paytype == '102') 
+		{
+			$paytype = 102;
 		}
 		else 
 		{

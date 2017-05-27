@@ -689,12 +689,12 @@ class SeckillModel extends PluginModel
 		{
 			return '';
 		}
-		if ($order['status'] < 0) 
+		if (intval($order['status']) < 0) 
 		{
 			$this->orderRefund($order);
 			return 'refund';
 		}
-		$goods = pdo_fetchall('select  uniacid, total , goodsid,optionid,seckill_timeid,seckill_taskid from  ' . tablename('ewei_shop_order_goods') . ' where orderid=' . $order['id'] . ' and  seckill=1 ');
+		$goods = pdo_fetchall('select uniacid,total,goodsid,optionid,seckill_timeid,seckill_taskid from  ' . tablename('ewei_shop_order_goods') . ' where orderid=' . $order['id'] . ' and  seckill=1 ');
 		foreach ($goods as $g ) 
 		{
 			$key = $redis_prefix . 'queue_' . $date . '_' . $g['seckill_taskid'] . '_' . $g['seckill_timeid'] . '_' . $g['goodsid'] . '_' . $g['optionid'];

@@ -113,6 +113,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$return = array();
 		$table1 = tablename('ewei_shop_exchange_group');
 		$table2 = tablename('ewei_shop_exchange_code');
+		$this->model->checkRepeatExchange($key);
 		$codeResult = pdo_fetch('SELECT * FROM ' . $table2 . ' WHERE uniacid = :uniacid AND `key` = :key', array(':uniacid' => $_W['uniacid'], ':key' => $key));
 		if ($_SESSION['exchangeGroupId'] != $codeResult['groupid']) 
 		{
@@ -247,7 +248,11 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			$balance_res = intval($balance_res);
 			if ($balance_res === 1) 
 			{
-				pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid'], 'status' => 1));
+				$repeatcount = $this->model->setRepeatCount($key);
+				if (empty($repeatcount)) 
+				{
+					pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid'], 'status' => 1, 'repeatcount' => 1));
+				}
 				$info = m('member')->getInfo($_W['openid']);
 				$record = array('key' => $key, 'uniacid' => $_W['uniacid'], 'balance' => $balance, 'time' => time(), 'openid' => $_W['openid'], 'nickname' => $info['nickname'], 'mode' => 2, 'title' => $groupResult['title'], 'groupid' => $groupResult['id'], 'serial' => $codeResult['serial']);
 				pdo_insert('ewei_shop_exchange_record', $record);
@@ -317,7 +322,11 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			$balance_res = intval($balance_res);
 			if ($balance_res === 1) 
 			{
-				pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid'], 'status' => 1));
+				$repeatcount = $this->model->setRepeatCount($key);
+				if (empty($repeatcount)) 
+				{
+					pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid'], 'status' => 1, 'repeatcount' => 1));
+				}
 				$info = m('member')->getInfo($_W['openid']);
 				$record = array('key' => $key, 'uniacid' => $_W['uniacid'], 'score' => $score, 'time' => time(), 'openid' => $_W['openid'], 'nickname' => $info['nickname'], 'mode' => 4, 'title' => $groupResult['title'], 'groupid' => $groupResult['id'], 'serial' => $codeResult['serial']);
 				pdo_insert('ewei_shop_exchange_record', $record);
@@ -374,15 +383,6 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$exchange = trim($_GPC['exchange']);
 		if ($exchange == '1') 
 		{
-			load()->model('payment');
-			$setting = uni_setting($_W['uniacid'], array('payment'));
-			if (isset($setting['payment']['wechat']) && is_array($setting['payment']['wechat'])) 
-			{
-				$wechat = $setting['payment']['wechat'];
-			}
-			$account = pdo_get('account_wechats', array('uniacid' => $_W['uniacid']), array('key', 'secret'));
-			$sec = m('common')->getSec();
-			$sec = iunserializer($sec['sec']);
 			if ($groupResult['type'] == 1) 
 			{
 				$red = $groupResult['red'];
@@ -392,11 +392,14 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 				$red = rand($groupResult['red_left'] * 100, $groupResult['red_right'] * 100) / 100;
 			}
 			$params = array('openid' => $_W['openid'], 'tid' => time(), 'send_name' => $groupResult['sendname'], 'money' => $red, 'wishing' => $groupResult['wishing'], 'act_name' => $groupResult['actname'], 'remark' => $groupResult['remark']);
-			$wechat = array('appid' => $account['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $sec);
-			$result = m('common')->sendredpack($params, $wechat);
+			$result = m('common')->sendredpack($params);
 			if (!(is_error($result))) 
 			{
-				pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid'], 'status' => 1));
+				$repeatcount = $this->model->setRepeatCount($key);
+				if (empty($repeatcount)) 
+				{
+					pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid'], 'status' => 1, 'repeatcount' => 1));
+				}
 				$info = m('member')->getInfo($_W['openid']);
 				$record = array('key' => $key, 'uniacid' => $_W['uniacid'], 'red' => $red, 'time' => time(), 'openid' => $_W['openid'], 'nickname' => $info['nickname'], 'mode' => 3, 'title' => $groupResult['title'], 'groupid' => $groupResult['id'], 'serial' => $codeResult['serial']);
 				pdo_insert('ewei_shop_exchange_record', $record);
@@ -493,7 +496,11 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 				pdo_insert('ewei_shop_coupon_data', $data);
 			}
 			$this->model->sendMessage($resp, 1, $m);
-			pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid']));
+			$repeatcount = $this->model->setRepeatCount($key);
+			if (empty($repeatcount)) 
+			{
+				pdo_update('ewei_shop_exchange_code', array('status' => 2), array('key' => $key, 'uniacid' => $_W['uniacid'], 'status' => 1, 'repeatcount' => 1));
+			}
 			$info = m('member')->getInfo($_W['openid']);
 			$record = array('key' => $key, 'uniacid' => $_W['uniacid'], 'coupon' => $record_coupon, 'time' => time(), 'openid' => $_W['openid'], 'nickname' => $info['nickname'], 'mode' => 5, 'title' => $groupResult['title'], 'groupid' => $groupResult['id'], 'serial' => $codeResult['serial']);
 			pdo_insert('ewei_shop_exchange_record', $record);
@@ -723,15 +730,6 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			{
 				show_json(0, $checkSubmit['message']);
 			}
-			load()->model('payment');
-			$setting = uni_setting($_W['uniacid'], array('payment'));
-			if (isset($setting['payment']['wechat']) && is_array($setting['payment']['wechat'])) 
-			{
-				$wechat = $setting['payment']['wechat'];
-			}
-			$account = pdo_get('account_wechats', array('uniacid' => $_W['uniacid']), array('key', 'secret'));
-			$sec = m('common')->getSec();
-			$sec = iunserializer($sec['sec']);
 			if ($groupResult['red_type'] == 1) 
 			{
 				$red = $groupResult['red'];
@@ -741,8 +739,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 				$red = rand($groupResult['red_left'] * 100, $groupResult['red_right'] * 100) / 100;
 			}
 			$params = array('openid' => $_W['openid'], 'tid' => time(), 'send_name' => $groupResult['sendname'], 'money' => $red, 'wishing' => $groupResult['wishing'], 'act_name' => $groupResult['actname'], 'remark' => $groupResult['remark']);
-			$wechat = array('appid' => $account['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $sec);
-			$result = m('common')->sendredpack($params, $wechat);
+			$result = m('common')->sendredpack($params);
 			if (!(is_error($result))) 
 			{
 				pdo_update('ewei_shop_exchange_code', array('redstatus' => 2), array('key' => $key, 'uniacid' => $_W['uniacid']));

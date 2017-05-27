@@ -100,7 +100,8 @@ class Virtual_EweiShopV2ComModel extends ComModel
 		}
 		$salesreal = pdo_fetchcolumn('select ifnull(sum(total),0) from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = og.orderid ' . ' where og.goodsid=:goodsid and o.status>=1 and o.uniacid=:uniacid limit 1', array(':goodsid' => $g['id'], ':uniacid' => $_W['uniacid']));
 		pdo_update('ewei_shop_goods', array('salesreal' => $salesreal), array('id' => $g['id']));
-		m('member')->upgradeLevel($order['openid']);
+		m('order')->fullback($order['id']);
+		m('member')->upgradeLevel($order['openid'], $order['id']);
 		m('notice')->sendOrderMessage($order['id']);
 		m('order')->setGiveBalance($order['id'], 1);
 		if (com('coupon')) 

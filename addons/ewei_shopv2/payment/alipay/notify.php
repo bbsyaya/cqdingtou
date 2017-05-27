@@ -451,7 +451,7 @@ class aliApy
 		$change_refund['reply'] = '';
 		$change_refund['status'] = 1;
 		$change_refund['refundtype'] = $refundtype;
-		$change_refund['price'] = $money;
+		$change_refund['price'] = round($money / 100, 2);
 		$change_refund['refundtime'] = $time;
 		if (empty($refund['operatetime'])) 
 		{

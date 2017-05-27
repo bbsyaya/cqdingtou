@@ -139,7 +139,14 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 				if (!(is_error($wechat))) 
 				{
 					$wechat['success'] = true;
-					$wechat['weixin'] = true;
+					if (!(empty($wechat['code_url']))) 
+					{
+						$wechat['weixin_jie'] = true;
+					}
+					else 
+					{
+						$wechat['weixin'] = true;
+					}
 				}
 			}
 			if ((isset($set['pay']) && ($set['pay']['weixin_jie'] == 1) && !($wechat['success'])) || ($jie === 1)) 
@@ -183,7 +190,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			$wechat['jie'] = $jie;
 		}
 		$alipay = array('success' => false);
-		if (empty($seckill_goods)) 
+		if (empty($seckill_goods) && empty($ispeerpay)) 
 		{
 			if (isset($set['pay']) && ($set['pay']['alipay'] == 1)) 
 			{
@@ -215,15 +222,10 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		{
 			$cash = array('success' => false);
 		}
-		$bestpay = array('success' => false);
-		if (isset($set['pay']) && ($set['pay']['bestpay'] == 1)) 
-		{
-			$bestpay = array('success' => true, 'merchantid' => $sec['bestpay']['merchantid'], 'submerchantid' => $sec['bestpay']['submerchantid'], 'merchantPwd' => $sec['bestpay']['merchantPwd']);
-		}
-		$payinfo = array('orderid' => $orderid, 'credit' => $credit, 'alipay' => $alipay, 'wechat' => $wechat, 'cash' => $cash, 'bestpay' => $bestpay, 'money' => $order['price']);
+		$payinfo = array('orderid' => $orderid, 'credit' => $credit, 'alipay' => $alipay, 'wechat' => $wechat, 'cash' => $cash, 'money' => $order['price']);
 		if (is_h5app()) 
 		{
-			$payinfo = array('wechat' => (!(empty($sec['app_wechat']['merchname'])) && !(empty($set['pay']['app_wechat'])) && !(empty($sec['app_wechat']['appid'])) && !(empty($sec['app_wechat']['appsecret'])) && !(empty($sec['app_wechat']['merchid'])) && !(empty($sec['app_wechat']['apikey'])) && (0 < $order['price']) ? true : false), 'alipay' => (!(empty($set['pay']['app_alipay'])) && !(empty($sec['app_alipay']['public_key'])) ? true : false), 'mcname' => $sec['app_wechat']['merchname'], 'aliname' => (empty($_W['shopset']['shop']['name']) ? $sec['app_wechat']['merchname'] : $_W['shopset']['shop']['name']), 'ordersn' => $log['tid'], 'money' => $order['price'], 'attach' => $_W['uniacid'] . ':0', 'type' => 0, 'orderid' => $orderid, 'credit' => $credit, 'cash' => $cash, 'bestpay' => $bestpay);
+			$payinfo = array('wechat' => (!(empty($sec['app_wechat']['merchname'])) && !(empty($set['pay']['app_wechat'])) && !(empty($sec['app_wechat']['appid'])) && !(empty($sec['app_wechat']['appsecret'])) && !(empty($sec['app_wechat']['merchid'])) && !(empty($sec['app_wechat']['apikey'])) && (0 < $order['price']) ? true : false), 'alipay' => (!(empty($set['pay']['app_alipay'])) && !(empty($sec['app_alipay']['public_key'])) ? true : false), 'mcname' => $sec['app_wechat']['merchname'], 'aliname' => (empty($_W['shopset']['shop']['name']) ? $sec['app_wechat']['merchname'] : $_W['shopset']['shop']['name']), 'ordersn' => $log['tid'], 'money' => $order['price'], 'attach' => $_W['uniacid'] . ':0', 'type' => 0, 'orderid' => $orderid, 'credit' => $credit, 'cash' => $cash);
 			if (!(empty($order['ordersn2']))) 
 			{
 				$var = sprintf('%02d', $order['ordersn2']);
@@ -759,6 +761,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			}
 			if (!(empty($ispeerpay))) 
 			{
+				m('order')->setOrderPayType($order['id'], 21);
 				m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => trim($_GPC['peerpaymessage']), 'price' => $log['fee'], 'createtime' => time(), 'openid' => $member['openid'], 'headimg' => $member['avatar'], 'tid' => $_SESSION['peerpaytid']));
 				unset($_SESSION['peerpaytid']);
 				$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
@@ -1050,7 +1053,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		$member = m('member')->getMember($peerpay['openid'], true);
 		$ordergoods = pdo_fetch('select * from ' . tablename('ewei_shop_order_goods') . ' where orderid=:id and uniacid=:uniacid limit 1', array(':id' => $peerpay['orderid'], ':uniacid' => $uniacid));
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ordergoods['goodsid'], ':uniacid' => $uniacid));
-		$_W['shopshare'] = array('title' => '我想对你说：', 'imgUrl' => tomedia($goods['thumb']), 'desc' => $peerpay['peerpay_message'], 'link' => mobileUrl('order/pay/peerpaydetail', array('id' => $peerid), 1));
+		$_W['shopshare'] = array('title' => '我想对你说：' . $peerpay['peerpay_message'], 'imgUrl' => tomedia($goods['thumb']), 'desc' => $peerpay['peerpay_message'], 'link' => mobileUrl('order/pay/peerpaydetail', array('id' => $peerid), 1));
 		include $this->template();
 	}
 	public function peerpaydetail() 
@@ -1081,7 +1084,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			$message = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_order_peerpay_payinfo') . ' WHERE pid = :pid ORDER BY id DESC LIMIT 3', array(':pid' => $peerpay['id']));
 			$price = (($peerpay['peerpay_selfpay'] < $rate_price ? $peerpay['peerpay_selfpay'] : $rate_price));
 		}
-		$_W['shopshare'] = array('title' => '我想对你说：', 'imgUrl' => tomedia($ordergoods['thumb']), 'desc' => $peerpay['peerpay_message'], 'link' => mobileUrl('order/pay/peerpaydetail', array('id' => $peerid), 1));
+		$_W['shopshare'] = array('title' => '我想对你说：' . $peerpay['peerpay_message'], 'imgUrl' => tomedia($ordergoods['thumb']), 'desc' => $peerpay['peerpay_message'], 'link' => mobileUrl('order/pay/peerpaydetail', array('id' => $peerid), 1));
 		include $this->template();
 	}
 }

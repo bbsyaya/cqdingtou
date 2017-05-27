@@ -290,7 +290,6 @@ class TaskProcessor extends PluginProcessor
 				$this->commission($poster, $member_info, $qrmember);
 				if (!(empty($_SESSION['postercontent']))) 
 				{
-					$this->respond($_SESSION['autoposter']);
 					$this->respond($_SESSION['autoposter'], false);
 				}
 			}
@@ -511,21 +510,9 @@ class TaskProcessor extends PluginProcessor
 					}
 					if (isset($val['bribery']) && (0 < $val['bribery'])) 
 					{
-						$setting = uni_setting($_W['uniacid'], array('payment'));
-						if (!(is_array($setting['payment']))) 
-						{
-							return error(1, '没有设定支付参数');
-						}
-						$sec = m('common')->getSec();
-						$sec = iunserializer($sec['sec']);
-						$certs = $sec;
-						$wechat = $setting['payment']['wechat'];
-						$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-						$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
 						$tid = rand(1, 1000) . time() . rand(1, 10000);
 						$params = array('openid' => $qr['openid'], 'tid' => $tid, 'send_name' => '推荐奖励', 'money' => $val['bribery'], 'wishing' => '推荐奖励', 'act_name' => $poster['title'], 'remark' => '推荐奖励');
-						$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
-						$err = m('common')->sendredpack($params, $wechat);
+						$err = m('common')->sendredpack($params);
 						if (!(is_error($err))) 
 						{
 							$reward = unserialize($reward);
@@ -693,21 +680,9 @@ class TaskProcessor extends PluginProcessor
 					}
 					if (0 < $val['bribery']) 
 					{
-						$setting = uni_setting($_W['uniacid'], array('payment'));
-						if (!(is_array($setting['payment']))) 
-						{
-							return error(1, '没有设定支付参数');
-						}
-						$sec = m('common')->getSec();
-						$sec = iunserializer($sec['sec']);
-						$certs = $sec;
-						$wechat = $setting['payment']['wechat'];
-						$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-						$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
 						$tid = rand(1, 1000) . time() . rand(1, 10000);
 						$params = array('openid' => $openid, 'tid' => $tid, 'send_name' => '推荐奖励', 'money' => $val['bribery'], 'wishing' => '推荐奖励', 'act_name' => $poster['title'], 'remark' => '推荐奖励');
-						$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
-						$err = m('common')->sendredpack($params, $wechat);
+						$err = m('common')->sendredpack($params);
 						logging_run('bribery' . json_encode($err));
 						if (!(is_error($err))) 
 						{
@@ -842,21 +817,9 @@ class TaskProcessor extends PluginProcessor
 					}
 					if (isset($val['bribery']) && (0 < $val['bribery'])) 
 					{
-						$setting = uni_setting($_W['uniacid'], array('payment'));
-						if (!(is_array($setting['payment']))) 
-						{
-							return error(1, '没有设定支付参数');
-						}
-						$sec = m('common')->getSec();
-						$sec = iunserializer($sec['sec']);
-						$certs = $sec;
-						$wechat = $setting['payment']['wechat'];
-						$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-						$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
 						$tid = rand(1, 1000) . time() . rand(1, 10000);
 						$params = array('openid' => $qr['openid'], 'tid' => $tid, 'send_name' => '推荐奖励', 'money' => $val['bribery'], 'wishing' => '推荐奖励', 'act_name' => $poster['title'], 'remark' => '推荐奖励');
-						$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
-						$err = m('common')->sendredpack($params, $wechat);
+						$err = m('common')->sendredpack($params);
 						if (!(is_error($err))) 
 						{
 							$reward = unserialize($reward);
@@ -1024,21 +987,9 @@ class TaskProcessor extends PluginProcessor
 					}
 					if (0 < $val['bribery']) 
 					{
-						$setting = uni_setting($_W['uniacid'], array('payment'));
-						if (!(is_array($setting['payment']))) 
-						{
-							return error(1, '没有设定支付参数');
-						}
-						$sec = m('common')->getSec();
-						$sec = iunserializer($sec['sec']);
-						$certs = $sec;
-						$wechat = $setting['payment']['wechat'];
-						$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-						$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
 						$tid = rand(1, 1000) . time() . rand(1, 10000);
 						$params = array('openid' => $openid, 'tid' => $tid, 'send_name' => '推荐奖励', 'money' => $val['bribery'], 'wishing' => '推荐奖励', 'act_name' => $poster['title'], 'remark' => '推荐奖励');
-						$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
-						$err = m('common')->sendredpack($params, $wechat);
+						$err = m('common')->sendredpack($params);
 						logging_run('bribery' . json_encode($err));
 						if (!(is_error($err))) 
 						{
