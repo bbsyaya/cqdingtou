@@ -67,6 +67,8 @@ class Index_EweiShopV2Page extends ComWebPage
 			$row['usetotal'] = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_coupon_data') . ' where used = 1 and couponid=:couponid and uniacid=:uniacid limit 1', array(':couponid' => $row['id'], ':uniacid' => $_W['uniacid']));
 			$row['pwdjoins'] = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_coupon_guess') . ' where couponid=:couponid and uniacid=:uniacid limit 1', array(':couponid' => $row['id'], ':uniacid' => $_W['uniacid']));
 			$row['pwdoks'] = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_coupon_guess') . ' where couponid=:couponid and uniacid=:uniacid and ok=1 limit 1', array(':couponid' => $row['id'], ':uniacid' => $_W['uniacid']));
+			$url = mobileUrl('sale/coupon/detail', array('id' => $row['id']), true);
+			$row['qrcode'] = m('qrcode')->createQrcode($url);
 		}
 		unset($row);
 		$total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_coupon') . ' where 1 and ' . $condition, $params);

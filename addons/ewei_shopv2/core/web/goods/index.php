@@ -75,7 +75,7 @@ class Index_EweiShopV2Page extends WebPage
 		unset($total_all);
 		if (!(empty($total))) 
 		{
-			$sql = 'SELECT g.* FROM ' . tablename('ewei_shop_goods') . 'g' . $sqlcondition . $condition . $groupcondition . ' ORDER BY g.`status` DESC, g.`displayorder` DESC,' . "\n" . '                g.`id` DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+			$sql = 'SELECT g.* FROM ' . tablename('ewei_shop_goods') . 'g' . $sqlcondition . $condition . $groupcondition . ' ORDER BY g.`status` DESC, g.`displayorder` DESC,' . "\r\n" . '                g.`id` DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 			$list = pdo_fetchall($sql, $params);
 			foreach ($list as $key => &$value ) 
 			{
@@ -330,7 +330,7 @@ class Index_EweiShopV2Page extends WebPage
 			$condition .= ' AND `type` = :type ';
 			$params[':type'] = $type;
 		}
-		$ds = pdo_fetchall('SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,content' . "\n" . '              FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
+		$ds = pdo_fetchall('SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,content, sales' . "\r\n" . '              FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
 		$ds = set_medias($ds, array('thumb', 'share_icon'));
 		if ($_GPC['suggest']) 
 		{
@@ -341,7 +341,7 @@ class Index_EweiShopV2Page extends WebPage
 	public function goodsprice() 
 	{
 		global $_W;
-		$sql = 'update ' . tablename('ewei_shop_goods') . ' g set ' . "\n" . 'g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where g.id = goodsid),' . "\n" . 'g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where g.id = goodsid)' . "\n" . 'where g.hasoption=1 and g.uniacid=' . $_W['uniacid'] . ';' . "\n" . 'update ' . tablename('ewei_shop_goods') . ' set minprice = marketprice,maxprice = marketprice where hasoption=0 and uniacid=' . $_W['uniacid'] . ';';
+		$sql = 'update ' . tablename('ewei_shop_goods') . ' g set ' . "\r\n" . 'g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where g.id = goodsid),' . "\r\n" . 'g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where g.id = goodsid)' . "\r\n" . 'where g.hasoption=1 and g.uniacid=' . $_W['uniacid'] . ';' . "\r\n" . 'update ' . tablename('ewei_shop_goods') . ' set minprice = marketprice,maxprice = marketprice where hasoption=0 and uniacid=' . $_W['uniacid'] . ';';
 		pdo_run($sql);
 		show_json(1);
 	}

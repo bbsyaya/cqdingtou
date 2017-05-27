@@ -10,7 +10,11 @@
 <script language="javascript">
 	require(['init']);
 
-
+	setTimeout(function () {
+		if($(".danmu").length>0){
+			$(".danmu").remove();
+		}
+	}, 500);
 </script>
 
 
@@ -28,6 +32,7 @@
 			modal.initWX();
 			{/if} 
 		});
+
 	</script>
 	{template 'headmenu'}
 {/if}
@@ -37,7 +42,9 @@
 {php $merchid = !empty($goods['merchid'])?$goods['merchid']:$_GPC['merchid']}
 
 {php $this->diyLayer(true, $diypage, $merchid?$merchid:false)}
-{php $this->diyGotop(true, $diypage)}
+{if !$hideGoTop}
+	{php $this->diyGotop(true, $diypage)}
+{/if}
 
 {php $this->wapQrcode()}
 <span style="display:none">{$_W['shopset']['shop']['diycode']}</span>

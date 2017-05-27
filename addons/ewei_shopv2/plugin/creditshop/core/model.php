@@ -109,6 +109,36 @@ if (!(class_exists('CreditshopModel')))
 			}
 			return $dispatch;
 		}
+		public function payResult($logno, $type, $total_fee, $app = false) 
+		{
+			global $_W;
+			$uniacid = $_W['uniacid'];
+			$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_creditshop_log') . "\n\t\t" . '    WHERE `uniacid`=:uniacid AND `logno`=:logno limit 1', array(':uniacid' => $uniacid, ':logno' => $logno));
+			$member = m('member')->getMember($log['openid']);
+			$goods = $this->getGoods($log['goodsid'], $member, $log['optionid']);
+			$goods['dispatch'] = $this->dispatchPrice($log['goodsid'], $log['addressid'], $log['optionid']);
+			if (0 < $log['status']) 
+			{
+				return true;
+			}
+			$record = array();
+			$record['paystatus'] = 1;
+			if ($type == 'wechat') 
+			{
+				$record['paytype'] = 1;
+			}
+			else if ($type == 'alipay') 
+			{
+				$record['paytype'] = 2;
+			}
+			if (!(empty($log)) && ($log['paystatus'] < 1)) 
+			{
+				if (!(empty($goods)) && ($total_fee == $goods['money'] + $goods['dispatch'])) 
+				{
+					pdo_update('ewei_shop_creditshop_log', $record, array('id' => $log['id']));
+				}
+			}
+		}
 		public function dispatchPrice($goodsid, $addressid, $optionid = 0) 
 		{
 			global $_W;
@@ -599,10 +629,10 @@ if (!(class_exists('CreditshopModel')))
 			{
 				if (!(empty($type))) 
 				{
-					if ($log['dispatchstatus'] != 1) 
+					if ($log['status'] == 2) 
 					{
 						$remark = "\r\n" . ' 【' . $shop['name'] . '】期待您再次光顾！';
-						if ($log['dispatchstatus'] != -1) 
+						if (($goods['goodstype'] == 0) && ($goods['isverify'] == 0)) 
 						{
 							if (0 < $goods['dispatch']) 
 							{
@@ -613,7 +643,7 @@ if (!(class_exists('CreditshopModel')))
 								$remark = "\r\n" . ' 请您点击选择邮寄地址后, 我们会尽快发货，【' . $shop['name'] . '】期待您再次光顾！';
 							}
 						}
-						$msg = array( 'first' => array('value' => '恭喜您，您中奖啦~', 'color' => '#4a5077'), 'keyword1' => array('title' => '活动', 'value' => '积分商城抽奖', 'color' => '#4a5077'), 'keyword2' => array('title' => '奖品', 'value' => $goods['title'], 'color' => '#4a5077'), 'remark' => array('value' => $remark, 'color' => '#4a5077') );
+						$msg = array( 'first' => array('value' => '恭喜您，您中奖啦~', 'color' => '#4a5077'), 'keyword1' => array('title' => '消息类型', 'value' => '【' . $shop['name'] . '】抽奖', 'color' => '#4a5077'), 'keyword2' => array('title' => '跟进时间', 'value' => date('Y-m-d H:i', time()), 'color' => '#4a5077'), 'remark' => array('value' => $remark, 'color' => '#4a5077') );
 						if (!(empty($tm['award']))) 
 						{
 							m('message')->sendTplNotice($log['openid'], $tm['award'], $msg, $detailurl);

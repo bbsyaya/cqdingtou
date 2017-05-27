@@ -12,7 +12,7 @@ class Set_EweiShopV2Page extends PluginWebPage
 		$set = $this->model->getSet();
 		if ($_W['ispost']) 
 		{
-			$data = array('showmember' => intval($_GPC['showmember']), 'keyword' => trim($_GPC['keyword']), 'enter_title' => trim($_GPC['enter_title']), 'enter_img' => trim($_GPC['enter_img']), 'enter_desc' => trim($_GPC['enter_desc']), 'share' => intval($_GPC['share']));
+			$data = array('showmember' => intval($_GPC['showmember']), 'showtype' => intval($_GPC['showtype']), 'keyword' => trim($_GPC['keyword']), 'enter_title' => trim($_GPC['enter_title']), 'enter_img' => trim($_GPC['enter_img']), 'enter_desc' => trim($_GPC['enter_desc']), 'share' => intval($_GPC['share']));
 			$keyword = m('common')->keyExist($data['keyword']);
 			if (!(empty($keyword))) 
 			{

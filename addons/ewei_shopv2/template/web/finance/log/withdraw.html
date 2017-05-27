@@ -106,10 +106,10 @@
             <br>
             {ifp 'member.member.view'}
             <a  href="{php echo webUrl('member/list/detail',array('id' => $row['mid']));}" target='_blank'>
-                <img src='{$row['avatar']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' /> {$row['nickname']}
+                <img src='{php echo tomedia($row['avatar'])}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' /> {$row['nickname']}
             </a>
             {else}
-            <img src='{$row['avatar']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' /> {$row['nickname']}
+            <img src='{php echo tomedia($row['avatar'])}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' /> {$row['nickname']}
             {/if}
             <br>
             {$row['realname']}/{$row['mobile']}

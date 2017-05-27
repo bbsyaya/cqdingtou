@@ -65,7 +65,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 	}
 	protected function perm_order() 
 	{
-		return array( 'text' => '订单', 'detail' => array('text' => '订单详情', 'edit' => '编辑'), 'export' => array( 'text' => '自定义导出-log', 'main' => '浏览页面', 'xxx' => array('save' => 'main', 'delete' => 'main', 'gettemplate' => 'main', 'reset' => 'main') ), 'batchsend' => array( 'text' => '批量发货', 'main' => '批量发货-log', 'xxx' => array('import' => 'main') ), 'list' => array('text' => '订单管理', 'main' => '浏览全部订单', 'status_1' => '浏览关闭订单', 'status0' => '浏览待付款订单', 'status1' => '浏览已付款订单', 'status2' => '浏览已发货订单', 'status3' => '浏览完成的订单', 'status4' => '浏览退货申请订单', 'status5' => '浏览已退货订单'), 'op' => array( 'text' => '操作', 'delete' => '订单删除-log', 'pay' => '确认付款-log', 'send' => '发货-log', 'sendcancel' => '取消发货-log', 'finish' => '确认收货(快递单)-log', 'verify' => '确认核销(核销单)-log', 'fetch' => '确认取货(自提单)-log', 'close' => '关闭订单-log', 'changeprice' => '订单改价-log', 'changeaddress' => '修改收货地址-log', 'remarksaler' => '订单备注-log', 'paycancel' => '订单取消付款-log', 'fetchcancel' => '订单取消取货-log', 'xxx' => array('changeexpress' => 'send'), 'refund' => array('text' => '维权', 'main' => '维权信息', 'submit' => '提交维权申请') ) );
+		return array( 'text' => '订单', 'detail' => array('text' => '订单详情', 'edit' => '编辑'), 'export' => array( 'text' => '自定义导出-log', 'main' => '浏览页面', 'xxx' => array('save' => 'main', 'delete' => 'main', 'gettemplate' => 'main', 'reset' => 'main') ), 'batchsend' => array( 'text' => '批量发货', 'main' => '批量发货-log', 'xxx' => array('import' => 'main') ), 'list' => array('text' => '订单管理', 'main' => '浏览全部订单', 'status_1' => '浏览关闭订单', 'status0' => '浏览待付款订单', 'status1' => '浏览已付款订单', 'status2' => '浏览已发货订单', 'status3' => '浏览完成的订单', 'status4' => '浏览退货申请订单', 'status5' => '浏览已退货订单'), 'op' => array( 'text' => '操作', 'delete' => '订单删除-log', 'pay' => '确认付款-log', 'send' => '发货-log', 'sendcancel' => '取消发货-log', 'finish' => '确认收货(快递单)-log', 'verify' => '确认核销(核销单)-log', 'fetch' => '确认取货(自提单)-log', 'close' => '关闭订单-log', 'changeprice' => '订单改价-log', 'changeaddress' => '修改收货地址-log', 'remarksaler' => '订单备注-log', 'paycancel' => '订单取消付款-log', 'fetchcancel' => '订单取消取货-log', 'refund' => array('text' => '维权', 'main' => '维权信息-log', 'submit' => '提交维权申请-log'), 'xxx' => array('changeexpress' => 'send') ) );
 	}
 	protected function perm_sysset() 
 	{
@@ -293,6 +293,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 		}
 		return $check;
 	}
+		
 	private function check($permtype = '') 
 	{
 		global $_W;
@@ -602,8 +603,8 @@ class Perm_EweiShopV2ComModel extends ComModel
 	public function log($type = '', $op = '') 
 	{
 		global $_W;
-		$this->check_xxx($type);
-		if ($is_xxx = $this->check_xxx($type)) 
+		$is_xxx = $this->check_xxx($type);
+		if ($is_xxx) 
 		{
 			$type = $is_xxx;
 		}
@@ -660,7 +661,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 	}
 	protected function perm_sns() 
 	{
-		return ($this->isopen('sns') && $this->is_perm_plugin('sns') ? array( 'text' => m('plugin')->getName('sns'), 'adv' => array( 'text' => '幻灯片', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'view' => '查看详细', 'delete' => '删除-log', 'xxx' => array('displayorder' => 'edit', 'enabled' => 'edit') ), 'category' => array( 'text' => '分类管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit', 'displayorder' => 'edit') ), 'level' => array( 'text' => '等级管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'view' => '查看详细', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'member' => array('text' => '会员管理', 'main' => '查看列表', 'delete' => '删除-log', 'setblack' => '设置黑名单-log'), 'manage' => array('text' => '版主管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log'), 'board' => array( 'text' => '版块管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('status' => 'edit', 'displayorder' => 'edit') ), 'posts' => array('text' => '话题管理', 'main' => '查看', 'delete' => '删除-log', 'delete1' => '彻底删除-log', 'check' => '审核-log', 'best' => '精华-log', 'top' => '置顶-log'), 'replys' => array('text' => '评论管理', 'main' => '查看', 'delete' => '删除-log', 'delete1' => '彻底删除-log', 'check' => '审核-log'), 'cover' => array('text' => '入口设置', 'main' => '查看', 'edit' => '修改-log'), 'notice' => array('text' => '通知设置', 'main' => '查看', 'edit' => '修改-log'), 'set' => array('text' => '基础设置', 'main' => '查看', 'edit' => '修改-log') ) : array());
+		return ($this->isopen('sns') && $this->is_perm_plugin('sns') ? array( 'text' => m('plugin')->getName('sns'), 'adv' => array( 'text' => '幻灯片', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'view' => '查看详细', 'delete' => '删除-log', 'xxx' => array('displayorder' => 'edit', 'enabled' => 'edit') ), 'category' => array( 'text' => '分类管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit', 'displayorder' => 'edit') ), 'level' => array( 'text' => '等级管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'view' => '查看详细', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'member' => array('text' => '会员管理', 'main' => '查看列表', 'delete' => '删除-log', 'setblack' => '设置黑名单-log'), 'manage' => array('text' => '版主管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log'), 'board' => array( 'text' => '版块管理', 'main' => '查看列表', 'view' => '查看详细', 'add' => '添加-log', 'edit' => '修改-log', 'delete' => '删除-log', 'xxx' => array('status' => 'edit', 'displayorder' => 'edit') ), 'posts' => array('text' => '话题管理', 'main' => '查看', 'delete' => '删除-log', 'delete1' => '彻底删除-log', 'check' => '审核-log', 'best' => '精华-log', 'top' => '置顶-log'), 'replys' => array('text' => '评论管理', 'main' => '查看', 'delete' => '删除-log', 'delete1' => '彻底删除-log', 'check' => '审核-log'), 'complain' => array('text' => '投诉管理', 'main' => '查看', 'category' => '投诉类别', 'delete' => '删除-log', 'delete1' => '彻底删除-log', 'check' => '审核-log'), 'cover' => array('text' => '入口设置', 'main' => '查看', 'edit' => '修改-log'), 'notice' => array('text' => '通知设置', 'main' => '查看', 'edit' => '修改-log'), 'set' => array('text' => '基础设置', 'main' => '查看', 'edit' => '修改-log') ) : array());
 	}
 	protected function perm_seckill() 
 	{

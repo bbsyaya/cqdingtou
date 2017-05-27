@@ -39,13 +39,20 @@ class Member_EweiShopV2Model
 		{
 			$info['birthday'] = $info['birthyear'] . '-' . ((strlen($info['birthmonth']) <= 1 ? '0' . $info['birthmonth'] : $info['birthmonth'])) . '-' . ((strlen($info['birthday']) <= 1 ? '0' . $info['birthday'] : $info['birthday']));
 		}
-		if (!(empty($info)) && empty($info['birthday'])) 
+		if (empty($info['birthday'])) 
 		{
 			$info['birthday'] = '';
 		}
-		if (!(empty($info)) && $_W['ishttps']) 
+		if (!(empty($info))) 
 		{
-			$info['avatar'] = str_replace('http://', 'https://', $info['avatar']);
+			if (!(strexists($info['avatar'], 'http://')) && !(strexists($info['avatar'], 'https://'))) 
+			{
+				$info['avatar'] = tomedia($info['avatar']);
+			}
+			if ($_W['ishttps']) 
+			{
+				$info['avatar'] = str_replace('http://', 'https://', $info['avatar']);
+			}
 		}
 		return $info;
 	}
@@ -90,12 +97,16 @@ class Member_EweiShopV2Model
 		{
 			$info = pdo_fetch('select * from ' . tablename('ewei_shop_member') . ' where id=:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $openid));
 		}
-		if (!(empty($info)) && $_W['ishttps']) 
-		{
-			$info['avatar'] = str_replace('http://', 'https://', $info['avatar']);
-		}
 		if (!(empty($info))) 
 		{
+			if (!(strexists($info['avatar'], 'http://')) && !(strexists($info['avatar'], 'https://'))) 
+			{
+				$info['avatar'] = tomedia($info['avatar']);
+			}
+			if ($_W['ishttps']) 
+			{
+				$info['avatar'] = str_replace('http://', 'https://', $info['avatar']);
+			}
 			$info = $this->updateCredits($info);
 		}
 		return $info;
@@ -258,7 +269,7 @@ class Member_EweiShopV2Model
 		$member = array();
 		$shopset = m('common')->getSysset(array('shop', 'wap'));
 		$openid = $_W['openid'];
-		if (($_W['routes'] == 'order.pay_alipay') || ($_W['routes'] == 'creditshop.log.dispatch_complete') || ($_W['routes'] == 'threen.register.threen_complete') || ($_W['routes'] == 'creditshop.detail.creditshop_complete') || ($_W['routes'] == 'order.pay_alipay.recharge_complete') || ($_W['routes'] == 'order.pay_alipay.complete') || ($_W['routes'] == 'newmr.alipay') || ($_W['routes'] == 'newmr.callback.gprs') || ($_W['routes'] == 'newmr.callback.bill') || ($_W['routes'] == 'account.sns')) 
+		if (($_W['routes'] == 'order.pay_alipay') || ($_W['routes'] == 'creditshop.log.dispatch_complete') || ($_W['routes'] == 'threen.register.threen_complete') || ($_W['routes'] == 'creditshop.detail.creditshop_complete') || ($_W['routes'] == 'order.pay_alipay.recharge_complete') || ($_W['routes'] == 'order.pay_alipay.complete') || ($_W['routes'] == 'newmr.alipay') || ($_W['routes'] == 'newmr.callback.gprs') || ($_W['routes'] == 'newmr.callback.bill') || ($_W['routes'] == 'account.sns') || ($_W['plugin'] == 'mmanage')) 
 		{
 			return;
 		}
@@ -312,7 +323,7 @@ class Member_EweiShopV2Model
 		}
 		if (empty($member) && !(empty($openid))) 
 		{
-			$member = array('uniacid' => $_W['uniacid'], 'uid' => $uid, 'openid' => $openid, 'realname' => (!(empty($mc['realname'])) ? $mc['realname'] : ''), 'mobile' => (!(empty($mc['mobile'])) ? $mc['mobile'] : ''), 'nickname' => (!(empty($mc['nickname'])) ? $mc['nickname'] : ''), 'avatar' => (!(empty($mc['avatar'])) ? $mc['avatar'] : ''), 'gender' => (!(empty($mc['gender'])) ? $mc['gender'] : '-1'), 'province' => (!(empty($mc['resideprovince'])) ? $mc['resideprovince'] : ''), 'city' => (!(empty($mc['residecity'])) ? $mc['residecity'] : ''), 'area' => (!(empty($mc['residedist'])) ? $mc['residedist'] : ''), 'createtime' => time(), 'status' => 0);
+			$member = array('uniacid' => $_W['uniacid'], 'uid' => $uid, 'openid' => $openid, 'realname' => (!(empty($mc['realname'])) ? $mc['realname'] : ''), 'mobile' => (!(empty($mc['mobile'])) ? $mc['mobile'] : ''), 'nickname' => (!(empty($mc['nickname'])) ? $mc['nickname'] : ''), 'nickname_wechat' => (!(empty($mc['nickname'])) ? $mc['nickname'] : ''), 'avatar' => (!(empty($mc['avatar'])) ? $mc['avatar'] : ''), 'avatar_wechat' => (!(empty($mc['avatar'])) ? $mc['avatar'] : ''), 'gender' => (!(empty($mc['gender'])) ? $mc['gender'] : '-1'), 'province' => (!(empty($mc['resideprovince'])) ? $mc['resideprovince'] : ''), 'city' => (!(empty($mc['residecity'])) ? $mc['residecity'] : ''), 'area' => (!(empty($mc['residedist'])) ? $mc['residedist'] : ''), 'createtime' => time(), 'status' => 0);
 			pdo_insert('ewei_shop_member', $member);
 			$member['id'] = pdo_insertid();
 		}
@@ -323,11 +334,19 @@ class Member_EweiShopV2Model
 				show_message('暂时无法访问，请稍后再试!');
 			}
 			$upgrade = array('uid' => $uid);
-			if (isset($mc['nickname']) && ($member['nickname'] != $mc['nickname'])) 
+			if (isset($mc['nickname']) && ($member['nickname_wechat'] != $mc['nickname'])) 
+			{
+				$upgrade['nickname_wechat'] = $mc['nickname'];
+			}
+			if (isset($mc['nickname']) && empty($member['nickname'])) 
 			{
 				$upgrade['nickname'] = $mc['nickname'];
 			}
-			if (isset($mc['avatar']) && ($member['avatar'] != $mc['avatar'])) 
+			if (isset($mc['avatar']) && ($member['avatar_wechat'] != $mc['avatar'])) 
+			{
+				$upgrade['avatar_wechat'] = $mc['avatar'];
+			}
+			if (isset($mc['avatar']) && empty($member['avatar'])) 
 			{
 				$upgrade['avatar'] = $mc['avatar'];
 			}
@@ -372,7 +391,7 @@ class Member_EweiShopV2Model
 		{
 			return false;
 		}
-		$member = $this->getMember($openid);
+		$member = m('member')->getMember($openid);
 		if (!(empty($member)) && !(empty($member['level']))) 
 		{
 			$level = pdo_fetch('select * from ' . tablename('ewei_shop_member_level') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $member['level'], ':uniacid' => $_W['uniacid']));
@@ -392,7 +411,7 @@ class Member_EweiShopV2Model
 		}
 		$shopset = m('common')->getSysset('shop');
 		$leveltype = intval($shopset['leveltype']);
-		$member = $this->getMember($openid);
+		$member = m('member')->getMember($openid);
 		if (empty($member)) 
 		{
 			return;
@@ -443,7 +462,7 @@ class Member_EweiShopV2Model
 		{
 			return false;
 		}
-		$member = $this->getMember($openid);
+		$member = m('member')->getMember($openid);
 		return $member['groupid'];
 	}
 	public function setRechargeCredit($openid = '', $money = 0) 

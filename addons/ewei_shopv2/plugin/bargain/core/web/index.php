@@ -515,11 +515,12 @@ class Index_EweiShopV2Page extends PluginWebPage
 			$rule = $_GPC['rule'];
 			$swi = $_GPC['bang_swi'];
 			$partin = intval($_GPC['money_limit']);
+			$follow_swi = intval($_GPC['follow_swi']);
 			if (empty($swi)) 
 			{
 				$partin = -10000;
 			}
-			pdo_update('ewei_shop_bargain_account', array('partin' => $partin, 'rule' => $rule), array('id' => $_W['uniacid']));
+			pdo_update('ewei_shop_bargain_account', array('partin' => $partin, 'rule' => $rule, 'follow_swi' => $follow_swi), array('id' => $_W['uniacid']));
 			show_json(1, '保存成功');
 			return;
 		}

@@ -372,6 +372,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 	{
 		global $_W;
 		global $_GPC;
+		$isFollowed = $this->model->checkFollowed();
 		$id = $_GPC['id'];
 		$ajax = $_GPC['ajax'];
 		$myMid = (int) m('member')->getMid();
@@ -497,6 +498,10 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		}
 		if ($ajax == 151) 
 		{
+			if ($isFollowed !== true) 
+			{
+				exit('请先关注再砍价');
+			}
 			echo $this->cut($id, $time_limit, $min_price, $res2['each_time'], $res2['total_time'], $max_price, $res2['probability']);
 			exit();
 		}
@@ -592,7 +597,6 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		}
 		if (!(empty($res['initiate']))) 
 		{
-			$count = pdo_get('ewei_shop_bargain_actor', array('goods_id' => $goods_id, 'openid' => $_W['openid'], 'status' => 0), 'id');
 			if (!(empty($count['id']))) 
 			{
 				echo '<script>window.location.href = \'' . mobileUrl('bargain/bargain', array('id' => $count['id'])) . '\'</script>';
@@ -630,7 +634,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		}
 		if ($id) 
 		{
-			$url = mobileUrl('bargain/bargain', array(id => $id), true);
+			$url = mobileUrl('bargain/bargain', array('id' => $id), true);
 			header('Location:' . $url);
 			return;
 		}

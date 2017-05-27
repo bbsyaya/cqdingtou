@@ -105,6 +105,15 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			}
 		}
 		$wapset = m('common')->getSysset('wap');
+		$appset = m('common')->getSysset('app');
+		$needbind = false;
+		if (empty($member['mobileverify']) || empty($member['mobile'])) 
+		{
+			if ((empty($_W['shopset']['app']['isclose']) && !(empty($_W['shopset']['app']['openbind']))) || !(empty($_W['shopset']['wap']['open'])) || $hasThreen) 
+			{
+				$needbind = true;
+			}
+		}
 		include $this->template();
 	}
 }

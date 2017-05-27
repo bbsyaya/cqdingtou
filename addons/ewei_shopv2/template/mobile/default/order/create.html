@@ -283,7 +283,7 @@
         <div class="fui-cell-label" >商品小计</div>
         <div class="fui-cell-info"></div>
         <div class="fui-cell-remark noremark">&yen; <span class='{if !$packageid && empty($exchangeOrder)}goodsprice{/if}'>
-            {if !empty($exchangeOrder)}{$exchangeprice}{php echo number_format($goodsprice,2)}{/if}
+            {if !empty($exchangeOrder)}{$exchangeprice}{else}{php echo number_format($goodsprice,2)}{/if}
         </span></div>
     </div>
     {if empty($exchangeOrder)}

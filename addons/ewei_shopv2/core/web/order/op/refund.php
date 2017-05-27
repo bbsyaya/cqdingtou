@@ -160,7 +160,7 @@ class Refund_EweiShopV2Page extends WebPage
 				$realprice = $refund['applyprice'];
 				$goods = pdo_fetchall('SELECT g.id,g.credit, o.total,o.realprice FROM ' . tablename('ewei_shop_order_goods') . ' o left join ' . tablename('ewei_shop_goods') . ' g on o.goodsid=g.id ' . ' WHERE o.orderid=:orderid and o.uniacid=:uniacid', array(':orderid' => $item['id'], ':uniacid' => $uniacid));
 				$refundtype = 0;
-				if (empty($item['transid']) && ($item['paytype'] == 22)) 
+				if (empty($item['transid']) && ($item['paytype'] == 22) && empty($item['apppay'])) 
 				{
 					$item['paytype'] = 23;
 				}
@@ -171,17 +171,24 @@ class Refund_EweiShopV2Page extends WebPage
 				}
 				else if ($item['paytype'] == 21) 
 				{
-					$realprice = round($realprice - $item['deductcredit2'], 2);
-					if (0 < $realprice) 
+					if (empty($item['apppay'])) 
 					{
-						if (empty($item['isborrow'])) 
+						$realprice = round($realprice - $item['deductcredit2'], 2);
+						if (0 < $realprice) 
 						{
-							$result = m('finance')->refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
+							if (empty($item['isborrow'])) 
+							{
+								$result = m('finance')->refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
+							}
+							else 
+							{
+								$result = m('finance')->refundBorrow($item['borrowopenid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['ordersn2'])) ? 1 : 0));
+							}
 						}
-						else 
-						{
-							$result = m('finance')->refundBorrow($item['borrowopenid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['ordersn2'])) ? 1 : 0));
-						}
+					}
+					else if ($item['apppay'] == 2) 
+					{
+						$result = m('finance')->wxapp_refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
 					}
 					$refundtype = 2;
 				}
@@ -284,13 +291,13 @@ class Refund_EweiShopV2Page extends WebPage
 				{
 					$log .= ' 父订单号:' . $ordersn;
 				}
-				plog('order.op.refund', $log);
+				plog('order.op.refund.submit', $log);
 				m('notice')->sendOrderMessage($item['id'], true);
 			}
 			else if ($refundstatus == -1) 
 			{
 				pdo_update('ewei_shop_order_refund', array('reply' => $refundcontent, 'status' => -1, 'endtime' => $time), array('id' => $item['refundid']));
-				plog('order.op.refund', '订单退款拒绝 ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn'] . ' 原因: ' . $refundcontent);
+				plog('order.op.refund.submit', '订单退款拒绝 ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn'] . ' 原因: ' . $refundcontent);
 				pdo_update('ewei_shop_order', array('refundstate' => 0), array('id' => $item['id'], 'uniacid' => $uniacid));
 				m('notice')->sendOrderMessage($item['id'], true);
 			}
@@ -319,6 +326,7 @@ class Refund_EweiShopV2Page extends WebPage
 				pdo_update('ewei_shop_order', array('refundstate' => 0, 'status' => -1, 'refundtime' => $time), array('id' => $item['id'], 'uniacid' => $uniacid));
 				$goods = pdo_fetchall('SELECT g.id,g.credit, o.total,o.realprice FROM ' . tablename('ewei_shop_order_goods') . ' o left join ' . tablename('ewei_shop_goods') . ' g on o.goodsid=g.id ' . ' WHERE o.orderid=:orderid and o.uniacid=:uniacid', array(':orderid' => $item['id'], ':uniacid' => $uniacid));
 				$credits = m('order')->getGoodsCredit($goods);
+				plog('order.op.refund.submit', '订单退款 ID: ' . $item['id'] . ' 订单号: ' . $item['ordersn'] . ' 手动退款!');
 				if (0 < $credits) 
 				{
 				}

@@ -52,6 +52,15 @@
     {php $this->diyGotop(true, false, $page['merch'])}
 {/if}
 
+{if !empty($page['data']['page']['danmu'])}
+    {php $this->diyDanmu(true)}
+{/if}
+
+
+{if !empty($startadv)}
+    {template 'diypage/startadv'}
+{/if}
+
 
 <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=ZQiFErjQB7inrGpx27M1GR5w3TxZ64k7&s=1"></script>
 <script language="javascript">

@@ -93,5 +93,27 @@ class Info_EweiShopV2Page extends MobileLoginPage
 		}
 		show_json(1);
 	}
+	public function face() 
+	{
+		global $_W;
+		global $_GPC;
+		$member = $this->member;
+		if ($_W['ispost']) 
+		{
+			$nickname = trim($_GPC['nickname']);
+			$avatar = trim($_GPC['avatar']);
+			if (empty($nickname)) 
+			{
+				show_json(0, '请填写昵称');
+			}
+			if (empty($avatar)) 
+			{
+				show_json(0, '请上传头像');
+			}
+			pdo_update('ewei_shop_member', array('avatar' => $avatar, 'nickname' => $nickname), array('id' => $member['id'], 'uniacid' => $_W['uniacid']));
+			show_json(1);
+		}
+		include $this->template();
+	}
 }
 ?>

@@ -213,11 +213,11 @@ class Index_EweiShopV2Page extends MobilePage
 		{
 			show_json(0, '参数错误');
 		}
-		if (!(empty($_SESSION['verifycodesendtime'])) && (time() < ($_SESSION['verifycodesendtime'] + 600))) 
+		if (!(empty($_SESSION['verifycodesendtime'])) && (time() < ($_SESSION['verifycodesendtime'] + 60))) 
 		{
 			show_json(0, '请求频繁请稍后重试');
 		}
-		if (!(empty($set['wap']['smsimgcode'])) && (($temp == 'sms_reg') || ($temp == 'sms_forget'))) 
+		if (!(empty($set['wap']['smsimgcode']))) 
 		{
 			if (empty($imgcode)) 
 			{

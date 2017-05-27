@@ -30,6 +30,14 @@ class Receiver extends WeModuleReceiver
 		}
 		$totalagent = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['acid'] . ' and isagent =1');
 		$totalmember = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['acid']);
+		if (empty($totalagent)) 
+		{
+			$totalagent = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['uniacid'] . ' and isagent =1');
+		}
+		if (empty($totalmember)) 
+		{
+			$totalmember = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . $_W['uniacid']);
+		}
 		$member = abs((int) $data['virtual_people']) + (int) $totalmember;
 		$commission = abs((int) $data['virtual_commission']) + (int) $totalagent;
 		$user = m('member')->checkMemberFromPlatform($obj->message['from']);

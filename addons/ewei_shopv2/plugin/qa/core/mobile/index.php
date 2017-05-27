@@ -92,7 +92,7 @@ class Index_EweiShopV2Page extends PluginMobilePage
 		$set = $this->model->getSet();
 		if (!(empty($set['share']))) 
 		{
-			$_W['shopshare'] = array('title' => $item['title'], 'imgUrl' => tomedia($_W['shopset']['shop']['logo']), 'desc' => strip_tags($item['content']), 'link' => mobileUrl('qa/detail', array('id' => $item['id'])));
+			$_W['shopshare'] = array('title' => $item['title'], 'imgUrl' => tomedia($_W['shopset']['shop']['logo']), 'desc' => strip_tags($item['content']), 'link' => mobileUrl('qa/detail', array('id' => $item['id']), true));
 			if (p('commission')) 
 			{
 				$commset = p('commission')->getSet();

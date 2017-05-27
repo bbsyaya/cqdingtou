@@ -9,7 +9,7 @@ class Index_EweiShopV2Page extends MerchWebPage
 	public function main() 
 	{
 		global $_W;
-		$this->model->CheckPlugin('taobao');
+		$this->model->CheckPlugin('creditshop');
 		if (mcv('creditshop')) 
 		{
 			header('location: ' . webUrl('creditshop/goods'));

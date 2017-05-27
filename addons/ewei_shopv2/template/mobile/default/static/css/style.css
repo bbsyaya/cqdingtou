@@ -572,6 +572,10 @@ a {
     white-space: nowrap;
     overflow: hidden;
     padding: 0 .2rem;
+    display: none;
+}
+.page-goods-list .screen.in .cate .item nav{
+    display: block;
 }
 
 .page-goods-list .screen .cate .item nav.on {

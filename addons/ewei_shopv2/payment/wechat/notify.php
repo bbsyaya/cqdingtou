@@ -48,7 +48,8 @@ class EweiShopWechatPay
 		$strs = explode(':', $this->get['attach']);
 		$this->type = intval($strs[1]);
 		$this->total_fee = round($this->get['total_fee'] / 100, 2);
-		$_W['uniacid'] = $_W['weid'] = intval($strs[0]);
+		$GLOBALS['_W']['uniacid'] = intval($strs[0]);
+		$_W['uniacid'] = intval($strs[0]);
 		$this->init();
 	}
 	public function success() 
@@ -125,6 +126,7 @@ class EweiShopWechatPay
 	}
 	public function order() 
 	{
+		global $_W;
 		if (!($this->publicMethod())) 
 		{
 			exit('order');
@@ -164,7 +166,7 @@ class EweiShopWechatPay
 				if (method_exists($site, $method)) 
 				{
 					$ret = array();
-					$ret['weid'] = $log['weid'];
+					$ret['acid'] = $log['acid'];
 					$ret['uniacid'] = $log['uniacid'];
 					$ret['result'] = 'success';
 					$ret['type'] = $log['type'];
@@ -245,14 +247,9 @@ class EweiShopWechatPay
 			exit();
 		}
 		$logno = str_replace('_borrow', '', $logno);
-		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_creditshop_log') . ' WHERE `logno`=:logno and `uniacid`=:uniacid  limit 1', array(':uniacid' => $_W['uniacid'], ':logno' => $logno));
-		if (!(empty($log)) && empty($log['status'])) 
+		if (p('creditshop')) 
 		{
-			$goods = pdo_fetch('SELECT * FROM' . tablename('ewei_shop_creditshop_goods') . 'WHERE id=:id and uniacid=:uniacid limit 1 ', array(':id' => $log['goodsid'], ':uniacid' => $_W['uniacid']));
-			if (!(empty($goods)) && ($this->total_fee == $goods['money'])) 
-			{
-				pdo_update('ewei_shop_creditshop_log', array('paystatus' => 1, 'paytype' => 1), array('id' => $log['id']));
-			}
+			p('creditshop')->payResult($logno, 'wechat', $this->total_fee, ($this->isapp ? true : false));
 		}
 	}
 	public function creditShopFreight() 
@@ -448,7 +445,7 @@ class EweiShopWechatPay
 				if (method_exists($site, $method)) 
 				{
 					$ret = array();
-					$ret['weid'] = $log['weid'];
+					$ret['acid'] = $log['acid'];
 					$ret['uniacid'] = $log['uniacid'];
 					$ret['result'] = 'success';
 					$ret['type'] = $log['type'];

@@ -174,10 +174,10 @@ class Detail_EweiShopV2Page extends MobilePage
 		{
 			$has_city = 0;
 		}
-		$package_goods = pdo_fetch('select pg.id,pg.pid,pg.goodsid,p.displayorder from ' . tablename('ewei_shop_package_goods') . ' as pg' . "\n" . '                        left join ' . tablename('ewei_shop_package') . ' as p on pg.pid = p.id' . "\n" . '                        where pg.uniacid = ' . $uniacid . ' and pg.goodsid = ' . $id . ' ORDER BY p.displayorder desc,pg.id desc limit 1 ');
+		$package_goods = pdo_fetch('select pg.id,pg.pid,pg.goodsid,p.displayorder from ' . tablename('ewei_shop_package_goods') . ' as pg' . "\r\n" . '                        left join ' . tablename('ewei_shop_package') . ' as p on pg.pid = p.id' . "\r\n" . '                        where pg.uniacid = ' . $uniacid . ' and pg.goodsid = ' . $id . ' ORDER BY p.displayorder desc,pg.id desc limit 1 ');
 		if ($package_goods['pid']) 
 		{
-			$packages = pdo_fetchall('SELECT id,title,thumb,packageprice FROM ' . tablename('ewei_shop_package_goods') . "\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $package_goods['pid'] . '  ORDER BY id DESC');
+			$packages = pdo_fetchall('SELECT id,title,thumb,packageprice FROM ' . tablename('ewei_shop_package_goods') . "\r\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $package_goods['pid'] . '  ORDER BY id DESC');
 			$packages = set_medias($packages, array('thumb'));
 		}
 		$goods['dispatchprice'] = $this->getGoodsDispatchPrice($goods);
@@ -367,7 +367,7 @@ class Detail_EweiShopV2Page extends MobilePage
 				{
 					$optionids[] = $val['id'];
 				}
-				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\n" . '        g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\n" . '        g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\n" . '        where g.id = ' . $id . ' and g.hasoption=1';
+				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\r\n" . '        g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '        g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '        where g.id = ' . $id . ' and g.hasoption=1';
 				pdo_query($sql);
 			}
 			else 
@@ -534,20 +534,20 @@ class Detail_EweiShopV2Page extends MobilePage
 			{
 				if (0 < $merchid) 
 				{
-					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_merch_store') . ' where  uniacid=:uniacid and merchid=:merchid and status=1 ', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
+					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_merch_store') . ' where  uniacid=:uniacid and merchid=:merchid and status=1 order by displayorder desc,id desc', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
 				}
 				else 
 				{
-					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where  uniacid=:uniacid and status=1', array(':uniacid' => $_W['uniacid']));
+					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where  uniacid=:uniacid and status=1 order by displayorder desc,id desc', array(':uniacid' => $_W['uniacid']));
 				}
 			}
 			else if (0 < $merchid) 
 			{
-				$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_merch_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and merchid=:merchid and status=1', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
+				$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_merch_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and merchid=:merchid and status=1 order by displayorder desc,id desc', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
 			}
 			else 
 			{
-				$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and status=1', array(':uniacid' => $_W['uniacid']));
+				$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and status=1 order by displayorder desc,id desc', array(':uniacid' => $_W['uniacid']));
 			}
 		}
 		$share = m('common')->getSysset('share');
@@ -614,11 +614,13 @@ class Detail_EweiShopV2Page extends MobilePage
 			include $this->template('ccard/cmember_detail');
 			exit();
 		}
-		if (p('diypage')) 
+		$plugin_diypage = p('diypage');
+		if ($plugin_diypage) 
 		{
-			$diypage = p('diypage')->detailPage($goods['diypage']);
+			$diypage = $plugin_diypage->detailPage($goods['diypage']);
 			if ($diypage) 
 			{
+				$startadv = $plugin_diypage->getStartAdv($diypage['diyadv']);
 				include $this->template('diypage/detail');
 				exit();
 			}

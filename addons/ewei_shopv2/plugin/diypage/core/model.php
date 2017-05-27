@@ -659,7 +659,25 @@ class DiypageModel extends PluginModel
 						}
 						else if (2 < $item['params']['goodsdata']) 
 						{
+						//var_dump($page['merch']);
+						
 							$args = array('pagesize' => $item['params']['goodsnum'], 'page' => 1);
+							$goodssort = $item['params']['goodssort'];
+							if (!(empty($goodssort))) 
+							{
+								if ($goodssort == 1) 
+								{
+									$args['order'] = ' sales desc, displayorder desc';
+								}
+								else if ($goodssort == 2) 
+								{
+									$args['order'] = ' minprice desc, displayorder desc';
+								}
+								else if ($goodssort == 3) 
+								{
+									$args['order'] = ' minprice asc, displayorder desc';
+								}
+							}
 							if ($item['params']['goodsdata'] == 3) 
 							{
 								$args['isnew'] = 1;
@@ -684,22 +702,11 @@ class DiypageModel extends PluginModel
 							{
 								$args['istime'] = 1;
 							}
-							$goodssort = $item['params']['goodssort'];
-							if (!(empty($goodssort))) 
-							{
-								if ($goodssort == 1) 
-								{
-									$args['order'] = ' sales desc, displayorder desc';
-								}
-								else if ($goodssort == 2) 
-								{
-									$args['order'] = ' minprice desc, displayorder desc';
-								}
-								else if ($goodssort == 3) 
-								{
-									$args['order'] = ' minprice asc, displayorder desc';
-								}
+							
+							if($page['merch']>0){
+								$args['merchid'] = $page['merch'];
 							}
+							
 							$goodslist = m('goods')->getList($args);
 							$goods = $goodslist['list'];
 							$item['data'] = array();
@@ -718,7 +725,7 @@ class DiypageModel extends PluginModel
 							}
 						}
 					}
-	else if ($item['id'] == 'notice')
+	else if ($item['id'] == 'notice') 
 					{
 						if ($item['params']['noticedata'] == '0') 
 						{
@@ -990,7 +997,7 @@ class DiypageModel extends PluginModel
 		{
 			$pagedata = $this->saveImg($pagedata);
 		}
-		$diypage = array('data' => base64_encode($pagedata), 'name' => $data['page']['name'], 'keyword' => $data['page']['keyword'], 'type' => $data['page']['type'], 'diymenu' => $data['page']['diymenu']);
+		$diypage = array('data' => base64_encode($pagedata), 'name' => $data['page']['name'], 'keyword' => $data['page']['keyword'], 'type' => $data['page']['type'], 'diymenu' => $data['page']['diymenu'], 'diyadv' => $data['page']['diyadv']);
 		if (!(empty($id))) 
 		{
 			if ($update) 
@@ -1793,6 +1800,80 @@ class DiypageModel extends PluginModel
 		}
 		return $newData;
 	}
+	public function getStartAdvList($id) 
+	{
+		global $_W;
+		$adv = pdo_fetch('SELECT * FROM' . tablename('ewei_shop_diypage_plu') . 'WHERE id=:id AND status=1 AND `type`=1 AND uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		if (empty($adv)) 
+		{
+			return;
+		}
+		$adv['data'] = base64_decode($adv['data']);
+		$adv['data'] = json_decode($adv['data'], true);
+		return $adv['data'];
+	}
+	public function getStartAdv($id) 
+	{
+		global $_W;
+		global $_GPC;
+		if (empty($id)) 
+		{
+			return;
+		}
+		$startadv = p('diypage')->getStartAdvList($id);
+		if (empty($startadv)) 
+		{
+			return;
+		}
+		if ((0 < $startadv['params']['showtype']) && (0 < $startadv['params']['showtime'])) 
+		{
+			$second = $startadv['params']['showtime'] * 60;
+			$key = 'diyadv-' . $_W['uniacid'] . '-' . $id;
+			$cookie = $_GPC[$key];
+			if (!(empty($cookie)) && (time() < ($cookie + $second))) 
+			{
+				return;
+			}
+			isetcookie($key, time(), $second);
+		}
+		return $startadv;
+	}
+	public function getDanmuTime($item) 
+	{
+		if (empty($item) || ($item <= 0)) 
+		{
+			return '刚刚';
+		}
+		if (is_numeric($item)) 
+		{
+			if ($item < 60) 
+			{
+				return $item . '秒前';
+			}
+			$item = round($item / 60);
+			if ($item < 60) 
+			{
+				return $item . '分钟前';
+			}
+			$item = round($item / 60);
+			if ($item < 24) 
+			{
+				return $item . '小时前';
+			}
+			$item = round($item / 24);
+			return $item . '天前';
+		}
+		if (strexists($item, '秒前') || strexists($item, '分钟') || strexists($item, '小时')) 
+		{
+			return $item;
+		}
+		$item = intval($item);
+		if ($item < 60) 
+		{
+			return $item . '秒前';
+		}
+		return round($item / 60) . '分钟前';
+	}
 	public function detailPage($pageid = 0) 
 	{
 		global $_W;
@@ -1903,7 +1984,7 @@ class DiypageModel extends PluginModel
 				}
 			}
 		}
-		return array('background' => $background, 'followbar' => $followbar, 'tab' => $detail_tab, 'navbar' => $detail_navbar, 'diynavbar' => $navbar, 'comment' => $detail_comment, 'seckill' => $detail_seckill, 'diylayer' => $page['data']['page']['diylayer'], 'items' => $pageitems);
+		return array('background' => $background, 'followbar' => $followbar, 'tab' => $detail_tab, 'navbar' => $detail_navbar, 'diynavbar' => $navbar, 'comment' => $detail_comment, 'seckill' => $detail_seckill, 'diylayer' => $page['data']['page']['diylayer'], 'items' => $pageitems, 'diyadv' => $page['data']['page']['diyadv']);
 	}
 	public function seckillPage($pageid = 0) 
 	{
@@ -1934,7 +2015,7 @@ class DiypageModel extends PluginModel
 				break;
 			}
 		}
-		return array('seckill_list' => $seckill_list, 'diylayer' => $page['data']['page']['diylayer'], 'diymenu' => $page['data']['page']['diymenu'], 'items' => $pageitems);
+		return array('seckill_list' => $seckill_list, 'diylayer' => $page['data']['page']['diylayer'], 'diymenu' => $page['data']['page']['diymenu'], 'diyadv' => $page['data']['page']['diyadv'], 'items' => $pageitems);
 	}
 	public function exchangePage($pageid = 0) 
 	{
@@ -1967,7 +2048,7 @@ class DiypageModel extends PluginModel
 				}
 			}
 		}
-		return array('exchange_input' => $exchange_input, 'items' => $pageitems);
+		return array('exchange_input' => $exchange_input, 'diyadv' => $page['data']['page']['diyadv'], 'items' => $pageitems);
 	}
 }
 ?>

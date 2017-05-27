@@ -442,6 +442,126 @@ class Finance_EweiShopV2Model
 			return error(-2, $error);
 		}
 	}
+	public function wxapp_refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney = 0, $app = false, $refund_account = false) 
+	{
+		global $_W;
+		global $_GPC;
+		if (empty($openid)) 
+		{
+			return error(-1, 'openid不能为空');
+		}
+		$member = m('member')->getMember($openid);
+		if (empty($member)) 
+		{
+			return error(-1, '未找到用户');
+		}
+		$data = m('common')->getSysset('app');
+		if (empty($data['appid'])) 
+		{
+			return error(-1, '未设置小程序 APPID');
+		}
+		$sec = m('common')->getSec();
+		$sec = iunserializer($sec['sec']);
+		$certs = array('cert' => $sec['wxapp_cert'], 'key' => $sec['wxapp_key'], 'root' => $sec['wxapp_root']);
+		if (empty($sec['wxapp']['mchid'])) 
+		{
+			return error(-1, '未设置小程序微信支付商户号');
+		}
+		if (empty($sec['wxapp']['apikey'])) 
+		{
+			return error(-1, '未设置小程序微信商户apikey');
+		}
+		$url = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
+		$pars = array();
+		$pars['appid'] = $data['appid'];
+		$pars['mch_id'] = $sec['wxapp']['mchid'];
+		$pars['nonce_str'] = random(32);
+		$pars['out_trade_no'] = $out_trade_no;
+		$pars['out_refund_no'] = $out_refund_no;
+		$pars['total_fee'] = $totalmoney;
+		$pars['refund_fee'] = $refundmoney;
+		$pars['op_user_id'] = $sec['wxapp']['mchid'];
+		if ($refund_account) 
+		{
+			$pars['refund_account'] = $refund_account;
+		}
+		ksort($pars, SORT_STRING);
+		$string1 = '';
+		foreach ($pars as $k => $v ) 
+		{
+			$string1 .= $k . '=' . $v . '&';
+		}
+		$string1 .= 'key=' . $sec['wxapp']['apikey'];
+		$pars['sign'] = strtoupper(md5($string1));
+		$xml = array2xml($pars);
+		$extras = array();
+		$errmsg = '未上传完整的微信支付证书，请到【小程序】->【支付设置】中上传!';
+		if (is_array($certs)) 
+		{
+			if (empty($certs['cert']) || empty($certs['key']) || empty($certs['root'])) 
+			{
+				if ($_W['ispost']) 
+				{
+					show_json(0, array('message' => $errmsg));
+				}
+				show_message($errmsg, '', 'error');
+			}
+			$certfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(64);
+			file_put_contents($certfile, $certs['cert']);
+			$keyfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(64);
+			file_put_contents($keyfile, $certs['key']);
+			$rootfile = IA_ROOT . '/addons/ewei_shopv2/cert/' . random(64);
+			file_put_contents($rootfile, $certs['root']);
+			$extras['CURLOPT_SSLCERT'] = $certfile;
+			$extras['CURLOPT_SSLKEY'] = $keyfile;
+			$extras['CURLOPT_CAINFO'] = $rootfile;
+		}
+		else 
+		{
+			if ($_W['ispost']) 
+			{
+				show_json(0, array('message' => $errmsg));
+			}
+			show_message($errmsg, '', 'error');
+		}
+		load()->func('communication');
+		$resp = ihttp_request($url, $xml, $extras);
+		@unlink($certfile);
+		@unlink($keyfile);
+		@unlink($rootfile);
+		if (is_error($resp)) 
+		{
+			return error(-2, $resp['message']);
+		}
+		if (empty($resp['content'])) 
+		{
+			return error(-2, '网络错误');
+		}
+		$arr = json_decode(json_encode(simplexml_load_string($resp['content'], 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+		if (($arr['return_code'] == 'SUCCESS') && ($arr['result_code'] == 'SUCCESS')) 
+		{
+			return true;
+		}
+		if (($arr['return_code'] == 'SUCCESS') && ($arr['result_code'] == 'FAIL') && ($arr['return_msg'] == 'OK') && !($refund_account)) 
+		{
+			if ($arr['err_code'] == 'NOTENOUGH') 
+			{
+				return $this->refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney, $app, 'REFUND_SOURCE_RECHARGE_FUNDS');
+			}
+		}
+		else 
+		{
+			if ($arr['return_msg'] == $arr['err_code_des']) 
+			{
+				$error = $arr['return_msg'];
+			}
+			else 
+			{
+				$error = $arr['return_msg'] . ' | ' . $arr['err_code_des'];
+			}
+			return error(-2, $error);
+		}
+	}
 	public function refundBorrow($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney = 0, $gaijia = 0, $refund_account = false) 
 	{
 		global $_W;

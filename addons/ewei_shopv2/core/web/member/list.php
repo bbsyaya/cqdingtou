@@ -264,6 +264,11 @@ class List_EweiShopV2Page extends WebPage
 		}
 		$groups = m('member')->getGroups();
 		$levels = m('member')->getLevels();
+		$openbind = false;
+		if ((empty($_W['shopset']['app']['isclose']) && !(empty($_W['shopset']['app']['openbind']))) || !(empty($_W['shopset']['wap']['open']))) 
+		{
+			$openbind = true;
+		}
 		if ($_W['ispost']) 
 		{
 			$data = ((is_array($_GPC['data']) ? $_GPC['data'] : array()));
@@ -271,7 +276,7 @@ class List_EweiShopV2Page extends WebPage
 			{
 				$data['maxcredit'] = 0;
 			}
-			if (!(empty($_W['shopset']['wap']['open']))) 
+			if ($openbind) 
 			{
 				if (!(empty($data['mobileverify']))) 
 				{
@@ -569,8 +574,6 @@ class List_EweiShopV2Page extends WebPage
 				$aafields = iunserializer($member['diyaagentfields']);
 			}
 		}
-		$groups = m('member')->getGroups();
-		$levels = m('member')->getLevels();
 		include $this->template();
 	}
 	public function delete() 

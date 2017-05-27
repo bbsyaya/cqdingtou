@@ -467,17 +467,16 @@ class Notice_EweiShopV2Model
 				{
 					if (($refund['rtype'] == 2) || ($refund['rtype'] == 1)) 
 					{
-						$salerefund = pdo_fetch('select refundaddress  from ' . tablename('ewei_shop_order_refund') . ' where uniacid=:uniacid and orderid = :orderid  and id = :id  limit 1', array(':uniacid' => $_W['uniacid'], ':orderid' => $order['id'], ':id' => $order['refundid']));
-						$salerefundinfo = iunserializer($salerefund['refundaddress']);
-						$datas[] = array('name' => '卖家收货地址', 'value' => $salerefundinfo['province'] . $salerefundinfo['city'] . $salerefundinfo['area'] . ' ' . $salerefundinfo['address']);
-						$datas[] = array('name' => '卖家联系电话', 'value' => $salerefundinfo['mobile']);
-						$datas[] = array('name' => '卖家收货人', 'value' => $salerefundinfo['name']);
+						$salerefund = pdo_fetch('select * from ' . tablename('ewei_shop_refund_address') . ' where uniacid=:uniacid and isdefault=1 limit 1', array(':uniacid' => $_W['uniacid']));
+						$datas[] = array('name' => '卖家收货地址', 'value' => $salerefund['province'] . $salerefund['city'] . $salerefund['area'] . ' ' . $salerefund['address']);
+						$datas[] = array('name' => '卖家联系电话', 'value' => $salerefund['mobile']);
+						$datas[] = array('name' => '卖家收货人', 'value' => $salerefund['name']);
 						if (!(empty($usernotice['refund3']))) 
 						{
 							return;
 						}
 						$text = '您好，您的换货申请已经通过，请您及时发送快递。' . "\n\n" . '申请换货订单号：' . "\n" . '[订单号]' . "\n" . '请将快递发送到以下地址，并随包裹填写您的订单编号以及联系方式，我们将尽快为您处理' . "\n" . '邮寄地址：[卖家收货地址]' . "\n" . '联系电话：[卖家联系电话]' . "\n" . '收货人：[卖家收货人]' . "\n\n" . '感谢您关注，如有疑问请联系在线客服或<a href=\'' . $url . '\'>点击查看详情</a>';
-						$remark2 = '请将快递发送到以下地址，并随包裹填写您的订单编号以及联系方式，我们将尽快为您处理' . "\n\n" . '邮寄地址：' . $salerefundinfo['province'] . $salerefundinfo['city'] . $salerefundinfo['area'] . ' ' . $salerefundinfo['address'] . "\n" . '联系电话：' . $salerefundinfo['mobile'] . "\n" . '收货人：' . $salerefundinfo['name'] . "\n\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情';
+						$remark2 = '请将快递发送到以下地址，并随包裹填写您的订单编号以及联系方式，我们将尽快为您处理' . "\n\n" . '邮寄地址：' . $salerefund['province'] . $salerefund['city'] . $salerefund['area'] . ' ' . $salerefund['address'] . "\n" . '联系电话：' . $salerefund['mobile'] . "\n" . '收货人：' . $salerefund['name'] . "\n\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情';
 						$msg = array( 'first' => array('value' => '您好，您的换货申请已经通过，请您及时发送快递。' . "\n", 'color' => '#ff0000'), 'keyword1' => array('title' => '任务名称', 'value' => '退换货申请', 'color' => '#000000'), 'keyword2' => array('title' => '通知类型', 'value' => '换货通过', 'color' => '#4b9528'), 'remark' => array('value' => $remark2, 'color' => '#000000') );
 						$this->sendNotice(array('openid' => $openid, 'tag' => 'refund3', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
 						com_run('sms::callsms', array('tag' => 'refund3', 'datas' => $datas, 'mobile' => $member['mobile']));
@@ -1262,16 +1261,17 @@ class Notice_EweiShopV2Model
 			$template = pdo_fetch('select * from ' . tablename('ewei_shop_member_message_template') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $templateid, ':uniacid' => $_W['uniacid']));
 			if (!(empty($template))) 
 			{
-				$template_message = array( 'first' => array('value' => $this->replaceTemplate($template['first'], $datas), 'color' => $template['firstcolor']), 'remark' => array('value' => $this->replaceTemplate($template['remark'], $datas), 'color' => $template['remarkcolor']) );
-				$data = iunserializer($template['data']);
-				foreach ($data as $d ) 
-				{
-					$template_message[$d['keywords']] = array('value' => $this->replaceTemplate($d['value'], $datas), 'color' => $d['color']);
-				}
-				$Custom_message = $this->replaceTemplate($template['send_desc'], $datas);
 				$messagetype = $template['messagetype'];
 				if (empty($messagetype)) 
 				{
+					$template_message = array( 'first' => array('value' => $this->replaceTemplate($template['first'], $datas), 'color' => $template['firstcolor']), 'remark' => array('value' => $this->replaceTemplate($template['remark'], $datas), 'color' => $template['remarkcolor']) );
+					$data = iunserializer($template['data']);
+					foreach ($data as $d ) 
+					{
+						$template_message[$d['keywords']] = array('value' => $this->replaceTemplate($d['value'], $datas), 'color' => $d['color']);
+					}
+					$Custom_message = $this->replaceTemplate($template['send_desc'], $datas);
+					$Custom_message = htmlspecialchars_decode($Custom_message, ENT_QUOTES);
 					$ret = m('message')->sendTexts($touser, $Custom_message, $url, $account);
 					if (is_error($ret)) 
 					{
@@ -1280,10 +1280,18 @@ class Notice_EweiShopV2Model
 				}
 				else if ($messagetype == 1) 
 				{
+					$template_message = array( 'first' => array('value' => $this->replaceTemplate($template['first'], $datas), 'color' => $template['firstcolor']), 'remark' => array('value' => $this->replaceTemplate($template['remark'], $datas), 'color' => $template['remarkcolor']) );
+					$data = iunserializer($template['data']);
+					foreach ($data as $d ) 
+					{
+						$template_message[$d['keywords']] = array('value' => $this->replaceTemplate($d['value'], $datas), 'color' => $d['color']);
+					}
 					$ret = m('message')->sendTplNotice($touser, $template['template_id'], $template_message, $url, $account);
 				}
 				else if ($messagetype == 2) 
 				{
+					$Custom_message = $this->replaceTemplate($template['send_desc'], $datas);
+					$Custom_message = htmlspecialchars_decode($Custom_message, ENT_QUOTES);
 					$ret = m('message')->sendTexts($touser, $Custom_message, $url, $account);
 				}
 			}

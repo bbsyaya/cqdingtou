@@ -35,10 +35,8 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$data['buffer'] = '@' . $url;
-		
 		$url = 'https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $data);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $data);
 		return $jsoninfo;
 	}
 	public function wxCardColor() 
@@ -46,8 +44,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/getcolors?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url);
 		return $jsoninfo;
 	}
 	public function createCard($params) 
@@ -98,7 +95,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$promotion_url = $this->checkurl($params['promotion_url']);
 		}
 		$source = '';
-		$can_use_with_other_discount = ((empty($params['can_use_with_other_discount']) ? 'false' : $params['can_use_with_other_discount']));
+		$can_use_with_other_discount = ((empty($params['can_use_with_other_discount']) ? 'false' : 'true'));
 		$setabstract = $params['setabstract'];
 		$abstract = $params['abstract'];
 		$icon_url_list = $params['icon_url_list'];
@@ -231,7 +228,6 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/create?access_token=' . $token;
 		$result = $this->wxHttpsRequest($url, $jsonData);
-		$result = json_decode($result, true);
 		return $result;
 	}
 	public function updateCard($params) 
@@ -326,7 +322,6 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/update?access_token=' . $token;
 		$result = $this->wxHttpsRequest($url, $jsonData);
-		$result = json_decode($result, true);
 		return $result;
 	}
 	public function wxCardGetCardidList($offset = 0, $count = 10, $status_list = NULL) 
@@ -340,8 +335,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/batchget?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function wxCardUpdateQuantity($card_id) 
@@ -398,8 +392,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/get?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function wxCardModifyStock($card_id, $num, $type) 
@@ -418,8 +411,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/modifystock?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function wxCardConsume($code, $card_id = '') 
@@ -433,8 +425,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/code/consume?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function wxCardDelete($card_id) 
@@ -443,8 +434,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/delete?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function wxCardGetUserCardList($openid, $card_id = '') 
@@ -458,8 +448,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/user/getcardlist?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function wxCardGetCodeInfo($code, $card_id, $check_consume = true) 
@@ -478,8 +467,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/code/get?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function consumeWxCardCount($openid, $merch_array, $goods_array) 
@@ -505,7 +493,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		{
 			return 0;
 		}
-		$sql = 'select id,uniacid, card_id,reduce_cost,merchid,limitgoodtype,limitgoodcatetype,limitgoodcateids,limitgoodids  from ' . tablename('ewei_shop_wxcard');
+		$sql = 'select id,uniacid, card_id,least_cost,reduce_cost,merchid,limitgoodtype,limitgoodcatetype,limitgoodcateids,limitgoodids  from ' . tablename('ewei_shop_wxcard');
 		$sql .= '  where uniacid=:uniacid and merchid=0 and card_id in (' . $card_id . ')  order by id desc';
 		$cardlist = pdo_fetchall($sql, $param);
 		if (empty($cardlist)) 
@@ -658,8 +646,8 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		foreach ($list as $key => $row ) 
 		{
 			$pass = 0;
-			$reduce_cost = 0;
-			if (($row['limitgoodcatetype'] == 0) && ($row['limitgoodtype'] == 0) && ($row['reduce_cost'] == 0)) 
+			$least_cost = 0;
+			if (($row['limitgoodcatetype'] == 0) && ($row['limitgoodtype'] == 0) && ($row['least_cost'] == 0)) 
 			{
 				$pass = 1;
 			}
@@ -699,7 +687,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 					{
 						$pass = 1;
 					}
-					if ((0 < $row['reduce_cost']) && ($p == 1)) 
+					if ((0 < $row['least_cost']) && ($p == 1)) 
 					{
 						if (0 < $good['optionid']) 
 						{
@@ -710,16 +698,16 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 							$option = pdo_fetch($sql, $optionparam);
 							if (!(empty($option))) 
 							{
-								$reduce_cost += (double) $option['marketprice'] * $good['saletotal'];
+								$least_cost += (double) $option['marketprice'] * $good['saletotal'];
 							}
 						}
 						else 
 						{
-							$reduce_cost += (double) $good['marketprice'] * $good['saletotal'];
+							$least_cost += (double) $good['marketprice'] * $good['saletotal'];
 						}
 					}
 				}
-				if ((0 < $row['reduce_cost']) && (($reduce_cost * 100) < $row['reduce_cost'])) 
+				if ((0 < $row['least_cost']) && (($least_cost * 100) < $row['least_cost'])) 
 				{
 					$pass = 0;
 				}
@@ -741,8 +729,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/qrcode/create?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 	public function wxJsApiTicket() 
@@ -751,7 +738,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $token;
 		$result = $this->wxHttpsRequest($url);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = @json_decode($result, true);
 		$ticket = $jsoninfo['ticket'];
 		return $ticket;
 	}
@@ -788,20 +775,8 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	}
 	public function wxHttpsRequest($url, $data = NULL) 
 	{
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_SAFE_UPLOAD, false);
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-		if (!(empty($data))) 
-		{
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-		}
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		$output = curl_exec($curl);
-		curl_close($curl);
-		return $output;
+		$result = ihttp_request($url, $data);
+		return @json_decode($result['content'], true);
 	}
 	public function wxSetParam($parameters) 
 	{

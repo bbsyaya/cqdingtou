@@ -276,8 +276,8 @@
 				</div>
 				<div class="frm_controls">
 					<select id="can_use_with_other_discount" name="can_use_with_other_discount" class="input" {ife 'sale.wxcard' $item}{if !empty($id)}disabled{/if}{else}disabled{/if} >
-						<option value="true" {if $item['can_use_with_other_discount']=='true'}selected{/if}>可与其他优惠共享</option>
-						<option value="false" {if $item['can_use_with_other_discount']=='false'}selected{/if}>不与其他优惠共享</option>
+						<option value="1" {if $item['can_use_with_other_discount']=='1'}selected{/if}>可与其他优惠共享</option>
+						<option value="0" {if $item['can_use_with_other_discount']=='0'}selected{/if}>不与其他优惠共享</option>
 					</select>
 				</div>
 				<p class='tip'>使用条件的设置会在券上展示，请务必仔细确认。(仅卡券显示用)</p>

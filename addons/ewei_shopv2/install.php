@@ -34,6 +34,9 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_message_mass_task` (
   `send_agentlevel` int(11) DEFAULT NULL,
   `customertype` tinyint(1) DEFAULT '0',
   `resdesc2` varchar(255) DEFAULT '',
+  `pagecount` int(11) DEFAULT '0',
+  `successnum` int(11) DEFAULT '0',
+  `failnum` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -462,7 +465,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_bargain_account` (
   `message` int(11) DEFAULT '0',
   `partin` int(11) DEFAULT '0',
   `rule` text,
-  `end_message` int(11) DEFAULT '0'
+  `end_message` int(11) DEFAULT '0',
+  `follow_swi` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_bargain_actor`;
@@ -672,7 +676,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_cashier_pay_log` (
   `coupon` int(11) DEFAULT '0',
   `usecoupon` int(11) DEFAULT '0',
   `usecouponprice` decimal(10,2) DEFAULT '0.00',
-  `present_credit1` tinyint(4) DEFAULT '0',
+  `present_credit1` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`) USING BTREE,
   KEY `idx_type` (`paytype`) USING BTREE,
@@ -1596,6 +1600,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_diypage` (
   `keyword` varchar(255) NOT NULL DEFAULT '',
   `diymenu` int(11) NOT NULL DEFAULT '0',
   `merch` int(11) NOT NULL DEFAULT '0',
+  `diyadv` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_type` (`type`),
@@ -1618,6 +1623,23 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_diypage_menu` (
   KEY `idx_createtime` (`createtime`),
   KEY `idx_lastedittime` (`lastedittime`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_diypage_plu`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_diypage_plu` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `type` int(11) NOT NULL DEFAULT '0',
+  `status` tinyint(3) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `data` text NOT NULL,
+  `createtime` int(11) NOT NULL DEFAULT '0',
+  `lastedittime` int(11) NOT NULL DEFAULT '0',
+  `merch` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_createtime` (`createtime`) USING BTREE,
+  KEY `idx_lastedittime` (`lastedittime`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_diypage_template`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_diypage_template` (
@@ -2194,6 +2216,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `unite_total` tinyint(3) NOT NULL DEFAULT '0',
   `buyagain_price` decimal(10,2) DEFAULT '0.00',
   `threen` varchar(255) DEFAULT '',
+  `intervalfloor` tinyint(1) DEFAULT '0',
+  `intervalprice` varchar(512) DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_pcate` (`pcate`),
@@ -2239,6 +2263,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_group` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `goodsids` varchar(255) NOT NULL DEFAULT '',
   `enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `merchid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_enabled` (`enabled`)
@@ -2771,6 +2796,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member` (
   `maxcredit` int(11) DEFAULT '0',
   `datavalue` varchar(50) NOT NULL DEFAULT '',
   `openid_wa` varchar(50) DEFAULT NULL,
+  `nickname_wechat` varchar(255) DEFAULT '',
+  `avatar_wechat` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_shareid` (`agentid`),
@@ -2887,6 +2914,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member_level` (
   `discount` decimal(10,2) DEFAULT '0.00',
   `enabled` tinyint(3) DEFAULT '0',
   `enabledadd` tinyint(1) DEFAULT '0',
+  `buygoods` tinyint(1) NOT NULL DEFAULT '0',
+  `goodsids` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;

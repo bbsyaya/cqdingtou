@@ -467,15 +467,15 @@ class Op_EweiShopV2Page extends WebPage
 					show_json(0, '请选择发货商品！');
 				}
 				$ogoods = array();
-				$ogoods = pdo_fetchall('select sendtype from ' . tablename('ewei_shop_order_goods') . "\r\n" . '                    where orderid = ' . $item['id'] . ' and uniacid = ' . $_W['uniacid'] . ' order by sendtype desc ');
-				$senddata = array('sendtype' => $ogoods[0]['sendtype'] + 1);
+				$ogoods = pdo_fetchall('select sendtype from ' . tablename('ewei_shop_order_goods') . "\n" . '                    where orderid = ' . $item['id'] . ' and uniacid = ' . $_W['uniacid'] . ' order by sendtype desc ');
+				$senddata = array('sendtype' => $ogoods[0]['sendtype'] + 1, 'sendtime' => $data['sendtime']);
 				$data['sendtype'] = $ogoods[0]['sendtype'] + 1;
 				$goodsid = $_GPC['sendgoodsid'];
 				foreach ($goodsid as $key => $value ) 
 				{
 					pdo_update('ewei_shop_order_goods', $data, array('orderid' => $item['id'], 'goodsid' => $value, 'uniacid' => $_W['uniacid']));
 				}
-				$send_goods = pdo_fetch('select * from ' . tablename('ewei_shop_order_goods') . "\r\n" . '                    where orderid = ' . $item['id'] . ' and sendtype = 0 and uniacid = ' . $_W['uniacid'] . ' limit 1 ');
+				$send_goods = pdo_fetch('select * from ' . tablename('ewei_shop_order_goods') . "\n" . '                    where orderid = ' . $item['id'] . ' and sendtype = 0 and uniacid = ' . $_W['uniacid'] . ' limit 1 ');
 				if (empty($send_goods)) 
 				{
 					$senddata['status'] = 2;

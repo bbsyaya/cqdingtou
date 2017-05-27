@@ -42,7 +42,7 @@ class Op_EweiShopV2Page extends MobileLoginPage
 		global $_W;
 		global $_GPC;
 		$orderid = intval($_GPC['id']);
-		$order = pdo_fetch('select id,status,openid,couponid,refundstate,refundid from ' . tablename('ewei_shop_order') . ' where id=:id and uniacid=:uniacid and openid=:openid limit 1', array(':id' => $orderid, ':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
+		$order = pdo_fetch('select id,status,openid,couponid,refundstate,refundid,ordersn,price from ' . tablename('ewei_shop_order') . ' where id=:id and uniacid=:uniacid and openid=:openid limit 1', array(':id' => $orderid, ':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
 		if (empty($order)) 
 		{
 			show_json(0, '订单未找到');
@@ -71,9 +71,21 @@ class Op_EweiShopV2Page extends MobileLoginPage
 		}
 		m('notice')->sendOrderMessage($orderid);
 		com_run('printer::sendOrderMessage', $orderid);
+		if (p('lineup')) 
+		{
+			p('lineup')->checkOrder($order);
+		}
 		if (p('commission')) 
 		{
 			p('commission')->checkOrderFinish($orderid);
+		}
+		if (p('lottery')) 
+		{
+			$res = p('lottery')->getLottery($_W['openid'], 1, array('money' => $order['price'], 'paytype' => 2));
+			if ($res) 
+			{
+				p('lottery')->getLotteryList($_W['openid'], array('lottery_id' => $res));
+			}
 		}
 		show_json(1);
 	}

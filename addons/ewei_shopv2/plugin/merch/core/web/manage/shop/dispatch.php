@@ -76,7 +76,7 @@ class Dispatch_EweiShopV2Page extends MerchWebPage
 			{
 				$_GPC['default_secondnum'] = 1;
 			}
-			$data = array('uniacid' => $_W['uniacid'], 'displayorder' => intval($_GPC['displayorder']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'isdefault' => intval($_GPC['isdefault']), 'dispatchname' => trim($_GPC['dispatchname']), 'express' => trim($_GPC['express']), 'calculatetype' => trim($_GPC['calculatetype']), 'firstprice' => trim($_GPC['default_firstprice']), 'firstweight' => trim($_GPC['default_firstweight']), 'secondprice' => trim($_GPC['default_secondprice']), 'secondweight' => trim($_GPC['default_secondweight']), 'firstnumprice' => trim($_GPC['default_firstnumprice']), 'firstnum' => $_GPC['default_firstnum'], 'secondnumprice' => trim($_GPC['default_secondnumprice']), 'secondnum' => $_GPC['default_secondnum'], 'areas' => iserializer($areas), 'enabled' => intval($_GPC['enabled']), 'merchid' => $_W['merchid']);
+			$data = array('uniacid' => $_W['uniacid'], 'displayorder' => intval($_GPC['displayorder']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'isdefault' => intval($_GPC['isdefault']), 'dispatchname' => trim($_GPC['dispatchname']), 'express' => trim($_GPC['express']), 'calculatetype' => trim($_GPC['calculatetype']), 'firstprice' => trim($_GPC['default_firstprice']), 'firstweight' => trim($_GPC['default_firstweight']), 'secondprice' => trim($_GPC['default_secondprice']), 'secondweight' => trim($_GPC['default_secondweight']), 'firstnumprice' => trim($_GPC['default_firstnumprice']), 'firstnum' => $_GPC['default_firstnum'], 'secondnumprice' => trim($_GPC['default_secondnumprice']), 'secondnum' => $_GPC['default_secondnum'], 'areas' => iserializer($areas), 'nodispatchareas' => iserializer($_GPC['nodispatchareas']), 'nodispatchareas_code' => iserializer($_GPC['nodispatchareas_code']), 'isdispatcharea' => intval($_GPC['isdispatcharea']), 'enabled' => intval($_GPC['enabled']), 'merchid' => $_W['merchid']);
 			if ($data['isdefault']) 
 			{
 				pdo_update('ewei_shop_dispatch', array('isdefault' => 0), array('uniacid' => $_W['uniacid'], 'merchid' => $_W['merchid']));
@@ -99,6 +99,8 @@ class Dispatch_EweiShopV2Page extends MerchWebPage
 		{
 			$dispatch_areas = unserialize($dispatch['areas']);
 			$dispatch_carriers = unserialize($dispatch['carriers']);
+			$dispatch_nodispatchareas = unserialize($dispatch['nodispatchareas']);
+			$dispatch_nodispatchareas_code = unserialize($dispatch['nodispatchareas_code']);
 		}
 		$area_set = m('util')->get_area_config_set();
 		$new_area = intval($area_set['new_area']);

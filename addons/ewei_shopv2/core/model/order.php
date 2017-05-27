@@ -1079,7 +1079,7 @@ class Order_EweiShopV2Model
 							}
 						}
 					}
-					if (!$sendfree  && !$sendfree && ($isnodispatch == 0))
+					if (!$sendfree  && !$sendfree && ($isnodispatch == 0)) 
 					{
 						$areas = unserialize($dispatch_data['areas']);
 						if ($dispatch_data['calculatetype'] == 1) 
@@ -1216,24 +1216,20 @@ class Order_EweiShopV2Model
 						}
 						else 
 						{
-							$areas = explode(';', $saleset['enoughareas']);
-							if (!(empty($address))) 
+							if (empty($new_area)) 
 							{
-								if (!(in_array($address['city'], $areas))) 
+								$areas = explode(';', trim($saleset['enoughareas'], ';'));
+							}
+							else 
+							{
+								$areas = explode(';', trim($saleset['enoughareas_code'], ';'));
+							}
+							if (!(empty($user_city_code))) 
+							{
+								if (!(in_array($user_city_code, $areas))) 
 								{
 									$saleset_free = 1;
 								}
-							}
-							else if (!(empty($member['city']))) 
-							{
-								if (!(in_array($member['city'], $areas))) 
-								{
-									$saleset_free = 1;
-								}
-							}
-							else if (empty($member['city'])) 
-							{
-								$saleset_free = 1;
 							}
 						}
 					}
@@ -1241,12 +1237,14 @@ class Order_EweiShopV2Model
 				if ($saleset_free == 1) 
 				{
 					$is_nofree = 0;
+					$new_goods = array();
 					if (!(empty($saleset['goodsids']))) 
 					{
 						foreach ($goods as $k => $v ) 
 						{
 							if (!(in_array($v['goodsid'], $saleset['goodsids']))) 
 							{
+								$new_goods[$k] = $goods[$k];
 								unset($goods[$k]);
 							}
 							else 
@@ -1257,14 +1255,15 @@ class Order_EweiShopV2Model
 					}
 					if (($is_nofree == 1) && ($loop == 0)) 
 					{
-						$new_data = $this->getOrderDispatchPrice($goods, $member, $address, $saleset, $merch_array, $t, 1);
 						if ($goods_num == 1) 
 						{
-							$dispatch_price = $new_data['dispatch_price'];
+							$new_data1 = $this->getOrderDispatchPrice($goods, $member, $address, $saleset, $merch_array, $t, 1);
+							$dispatch_price = $new_data1['dispatch_price'];
 						}
 						else 
 						{
-							$dispatch_price += $new_data['dispatch_price'];
+							$new_data2 = $this->getOrderDispatchPrice($new_goods, $member, $address, $saleset, $merch_array, $t, 1);
+							$dispatch_price = $dispatch_price - $new_data2['dispatch_price'];
 						}
 					}
 					else if ($saleset_free == 1) 

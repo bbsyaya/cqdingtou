@@ -476,6 +476,55 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		}
 		show_json(1, array('logid' => $logid));
 	}
+	public function wechat_complete() 
+	{
+		global $_W;
+		global $_GPC;
+		$openid = $_GPC['openid'];
+		$logid = intval($_GPC['logid']);
+		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $logid, ':uniacid' => $_W['uniacid']));
+		if (empty($log)) 
+		{
+			$logno = intval($_GPC['logno']);
+			$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where logno=:logno and uniacid=:uniacid limit 1', array(':logno' => $logno, ':uniacid' => $_W['uniacid']));
+		}
+		$member = m('member')->getMember($openid);
+		$goods = $this->model->getGoods($log['goodsid'], $member, $log['optionid']);
+		$goods['dispatch'] = $this->model->dispatchPrice($log['goodsid'], $log['addressid'], $log['optionid']);
+		if (!(empty($log))) 
+		{
+			$payquery = m('finance')->isWeixinPay($log['logno'], $goods['money'] + $goods['dispatch'], (is_h5app() ? true : false));
+			$payqueryborrow = m('finance')->isWeixinPayBorrow($log['logno'], $goods['money'] + $goods['dispatch']);
+			if (!(is_error($payquery)) || !(is_error($payqueryborrow))) 
+			{
+				if ($log['status'] < 1) 
+				{
+					$record = array();
+					$record['paystatus'] = 1;
+					$record['paytype'] = 1;
+					pdo_update('ewei_shop_creditshop_log', $record, array('logno' => $log['logno']));
+					$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where logno=:logno and openid=:openid  and status=0 and paystatus=1 and uniacid=:uniacid limit 1', array(':logno' => $log['logno'], ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
+					if (is_h5app()) 
+					{
+						pdo_update('ewei_shop_creditshop_log', array('apppay' => 1), array('logno' => $log['logno']));
+					}
+				}
+				if (is_h5app()) 
+				{
+					$url = mobileUrl('creditshop/detail/lottery', array('id' => $log['id']), true);
+					exit('<script>top.window.location.href=\'' . $url . '\'</script>');
+				}
+			}
+		}
+		if ($_W['ispost']) 
+		{
+			show_json(0);
+		}
+		else 
+		{
+			header('location: ' . mobileUrl('member'));
+		}
+	}
 	public function creditshop_complete() 
 	{
 		global $_GPC;
@@ -541,7 +590,8 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		if ($lastlog['status'] < 1) 
 		{
 			$record = array();
-			$record['paystatus'] = '1';
+			$record['paystatus'] = 1;
+			$record['paystatus'] = 1;
 			pdo_update('ewei_shop_creditshop_log', $record, array('logno' => $tid));
 			$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where logno=:logno and openid=:openid  and status=0 and paystatus=1 and uniacid=:uniacid limit 1', array(':logno' => $tid, ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
 			if (is_h5app()) 
@@ -592,6 +642,11 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		$member = m('member')->getMember($openid);
 		$goodsid = intval($_GPC['goodsid']);
 		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $logid, ':uniacid' => $uniacid));
+		if (empty($log)) 
+		{
+			$logno = $_GPC['logno'];
+			$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where logno=:logno and uniacid=:uniacid limit 1', array(':logno' => $logno, ':uniacid' => $uniacid));
+		}
 		$optionid = $log['optionid'];
 		$goods = $this->model->getGoods($log['goodsid'], $member, $log['optionid']);
 		$goods['dispatch'] = $this->model->dispatchPrice($log['goodsid'], $log['addressid'], $log['optionid']);
@@ -630,9 +685,15 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			}
 			if ($log['paytype'] == 1) 
 			{
-				if ($log['paystatus'] < 1) 
+				$payquery = m('finance')->isWeixinPay($log['logno'], $goods['money'] + $goods['dispatch'], (is_h5app() ? true : false));
+				$payqueryBorrow = m('finance')->isWeixinPayBorrow($log['logno'], $goods['money'] + $goods['dispatch']);
+				if (!(is_error($payquery)) || !(is_error($payqueryBorrow))) 
 				{
-					show_json(0, array('status' => '-1', 'message' => '未支付成功!'));
+					$this->model->payResult($log['logno'], 'wechat', $goods['money'] + $goods['dispatch'], (is_h5app() ? true : false));
+				}
+				else 
+				{
+					show_json(0, array('status' => '-1', 'message' => '支付出错,请重试(1)!'));
 				}
 			}
 			if ($log['paytype'] == 2) 
@@ -700,6 +761,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			$update['dispatchstatus'] = '1';
 		}
+		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
 		pdo_update('ewei_shop_creditshop_log', $update, array('id' => $logid));
 		if ($status == 2) 
 		{

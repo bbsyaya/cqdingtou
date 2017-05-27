@@ -33,11 +33,11 @@ class MobilePage extends Page
 		{
 			if ($preview && !(is_weixin())) 
 			{
-				$_W['openid'] = 'o6tC-wmZovDTswVba3Kg1oAV_dd0';
+				$_W['openid'] = 'oq_xbwGp2g7-d0-7Ye4oNYOF5exI';
 			}
 			if (EWEI_SHOPV2_DEBUG) 
 			{
-				$_W['openid'] = 'o6tC-wmZovDTswVba3Kg1oAV_dd0';
+				$_W['openid'] = 'oq_xbwGp2g7-d0-7Ye4oNYOF5exI';
 			}
 		}
 		$member = m('member')->checkMember();
@@ -313,6 +313,10 @@ class MobilePage extends Page
 		{
 			include $this->template('seckill/_menu');
 		}
+		else if ($controller == 'mmanage') 
+		{
+			include $this->template('mmanage/_menu');
+		}
 		else 
 		{
 			include $this->template('_menu');
@@ -425,6 +429,7 @@ class MobilePage extends Page
 						}
 						unset($diyitem);
 					}
+					$startadv = p('diypage')->getStartAdv($page['diyadv']);
 					include $this->template('diypage');
 					exit();
 				}
@@ -490,6 +495,61 @@ class MobilePage extends Page
 			}
 			include $this->template('diypage/gotop');
 		}
+	}
+	public function diyDanmu($diy = false) 
+	{
+		global $_W;
+		global $_GPC;
+		if (!(p('diypage'))) 
+		{
+			return;
+		}
+		$diypagedata = m('common')->getPluginset('diypage');
+		$danmu = $diypagedata['danmu'];
+		if (empty($danmu) || (!($diy) && empty($danmu['params']['isopen']))) 
+		{
+			return;
+		}
+		if (empty($danmu['params']['datatype'])) 
+		{
+			$condition = ((!(empty($_W['openid'])) ? ' AND openid!=\'' . $_W['openid'] . '\' ' : ''));
+			$danmu['data'] = pdo_fetchall('SELECT nickname, avatar as imgurl FROM' . tablename('ewei_shop_member') . ' WHERE uniacid=:uniacid AND nickname!=\'\' AND avatar!=\'\' ' . $condition . ' ORDER BY rand() LIMIT 10', array(':uniacid' => $_W['uniacid']));
+			$randstart = ((!(empty($danmu['params']['starttime'])) ? intval($danmu['params']['starttime']) : 0));
+			$randend = ((!(empty($danmu['params']['endtime'])) ? intval($danmu['params']['endtime']) : 0));
+			if ($randend <= $randstart) 
+			{
+				$randend = $randend + rand(100, 999);
+			}
+		}
+		else if ($danmu['params']['datatype'] == 1) 
+		{
+			$danmu['data'] = pdo_fetchall('SELECT m.nickname, m.avatar as imgurl, o.createtime as time FROM' . tablename('ewei_shop_order') . ' o LEFT JOIN ' . tablename('ewei_shop_member') . ' m ON m.openid=o.openid WHERE o.uniacid=:uniacid AND m.nickname!=\'\' AND m.avatar!=\'\' ORDER BY o.createtime DESC LIMIT 10', array(':uniacid' => $_W['uniacid']));
+		}
+		else if ($danmu['params']['datatype'] == 2) 
+		{
+			$danmu['data'] = set_medias($danmu['data'], 'imgurl');
+		}
+		if (empty($danmu['data']) || !(is_array($danmu['data']))) 
+		{
+			return;
+		}
+		foreach ($danmu['data'] as $index => $item ) 
+		{
+			if (empty($danmu['params']['datatype'])) 
+			{
+				$time = rand($randstart, $randend);
+				$danmu['data'][$index]['time'] = p('diypage')->getDanmuTime($time);
+			}
+			else if ($danmu['params']['datatype'] == 1) 
+			{
+				$danmu['data'][$index]['time'] = p('diypage')->getDanmuTime(time() - $item['time']);
+			}
+			else if ($danmu['params']['datatype'] == 2) 
+			{
+				$danmu['data'][$index]['time'] = p('diypage')->getDanmuTime($danmu['data'][$index]['time']);
+			}
+		}
+		include $this->template('diypage/danmu');
 	}
 	public function wapQrcode() 
 	{

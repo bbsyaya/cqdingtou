@@ -38,10 +38,6 @@ class Index_EweiShopV2Page extends ComWebPage
 		$pager = pagination($total, $pindex, $psize);
 		include $this->template();
 	}
-	public function synchro() 
-	{
-		$result = com('wxcard')->wxCardGetCardidList(0, 500);
-	}
 	public function add() 
 	{
 		$this->post();
@@ -171,6 +167,11 @@ class Index_EweiShopV2Page extends ComWebPage
 				if ($item['logo_url'] != $_GPC['logourl']) 
 				{
 					$imgurl = ATTACHMENT_ROOT . $_GPC['logolocalpath'];
+					if (!(is_file($imgurl))) 
+					{
+						$img = tomedia($_GPC['logolocalpath']);
+						file_put_contents($imgurl, file_get_contents($img));
+					}
 					$result = com('wxcard')->wxCardUpdateImg($imgurl);
 					if (is_wxerror($result)) 
 					{
@@ -225,6 +226,11 @@ class Index_EweiShopV2Page extends ComWebPage
 					show_json(0, 'logo图片未上传');
 				}
 				$imgurl = ATTACHMENT_ROOT . $_GPC['logolocalpath'];
+				if (!(is_file($imgurl))) 
+				{
+					$img = tomedia($_GPC['logolocalpath']);
+					file_put_contents($imgurl, file_get_contents($img));
+				}
 				$result = com('wxcard')->wxCardUpdateImg($imgurl);
 				if (is_wxerror($result)) 
 				{
@@ -258,7 +264,7 @@ class Index_EweiShopV2Page extends ComWebPage
 				}
 				$data['quantity'] = ((intval($_GPC['quantity']) <= 1 ? 1 : intval($_GPC['quantity'])));
 				$data['total_quantity'] = ((intval($_GPC['quantity']) <= 1 ? 1 : intval($_GPC['quantity'])));
-				$data['can_use_with_other_discount'] = 'true';
+				$data['can_use_with_other_discount'] = intval($_GPC['can_use_with_other_discount']);
 				$data['setabstract'] = intval($_GPC['setabstract']);
 				if (!(empty($_GPC['setabstract']))) 
 				{
@@ -268,6 +274,11 @@ class Index_EweiShopV2Page extends ComWebPage
 					}
 					$data['abstract'] = $_GPC['abstract'];
 					$imgurl = ATTACHMENT_ROOT . $_GPC['abstractimglocalpath'];
+					if (!(is_file($imgurl))) 
+					{
+						$img = tomedia($_GPC['abstractimglocalpath']);
+						file_put_contents($imgurl, file_get_contents($img));
+					}
 					$result = com('wxcard')->wxCardUpdateImg($imgurl);
 					if (is_wxerror($result)) 
 					{

@@ -11,7 +11,12 @@ class Level_EweiShopV2Page extends WebPage
 		global $_GPC;
 		$set = m('common')->getSysset();
 		$shopset = $set['shop'];
-		$default = array('id' => 'default', 'levelname' => (empty($set['shop']['levelname']) ? '普通等级' : $set['shop']['levelname']), 'discount' => $set['shop']['leveldiscount'], 'ordermoney' => 0, 'ordercount' => 0);
+		if(isset($shopset['leveldiscount'])){
+			$leveldiscount = $shopset['leveldiscount'];
+		}else{
+			$leveldiscount = 0;
+		}
+		$default = array('id' => 'default', 'levelname' => (empty($set['shop']['levelname']) ? '普通等级' : $set['shop']['levelname']), 'discount' => $leveldiscount, 'ordermoney' => 0, 'ordercount' => 0);
 		$condition = ' and uniacid=:uniacid';
 		$params = array(':uniacid' => $_W['uniacid']);
 		if ($_GPC['enabled'] != '') 
@@ -44,9 +49,8 @@ class Level_EweiShopV2Page extends WebPage
 	{
 		global $_W;
 		global $_GPC;
-		global $_S;
 		$id = trim($_GPC['id']);
-		$set = $_S;
+		$set = m('common')->getSysset();
 		$setdata = pdo_fetch('select * from ' . tablename('ewei_shop_sysset') . ' where uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));
 		if ($id == 'default') 
 		{
