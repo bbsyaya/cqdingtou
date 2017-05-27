@@ -18,6 +18,15 @@
         </div>
         {/if}
 
+        {if !empty($quickinfo)}
+        <div class="fui-cell-group">
+            <a class="fui-cell external" href="{php echo mobileUrl('quick', array('id'=>$quickinfo['id']))}">
+                <div class="fui-cell-info">数据来自快速购买: {$quickinfo['title']}</div>
+                <div class="fui-cell-remark"></div>
+            </a>
+        </div>
+        {/if}
+
         {if  !$isverify && !$isvirtual}
         <!--地址选择-->
         <div class="fui-list-group" id='addressInfo' data-addressid="{php echo intval($address['id'])}">
@@ -157,6 +166,20 @@
         </div>
     </div>
     {/loop}
+
+    {if !empty($fullbackgoods)}
+    <div class="fui-cell" id="fullbackgoods" {if $fullbackgoods['minallfullbackallprice']<=0 && $fullbackgoods['minallfullbackallratio']<=0}style="display: none"{/if}>
+        <div class="fui-cell-label" style='width:auto' >全返优惠</div>
+        <div class="fui-cell-info"></div>
+        <span class="fui-cell-remark noremark">
+                {if $fullbackgoods['type']>0}
+                全返 <span class="text-danger">{php echo price_format($fullbackgoods['minallfullbackallratio'],2)}%</span> ，<span class="text-danger">{php echo price_format($fullbackgoods['fullbackratio'],2)}%</span>/天，共 <span class="text-danger">{$fullbackgoods['day']}</span> 天
+                {else}
+                全返 &yen;{php echo price_format($fullbackgoods['minallfullbackallprice'],2)},&yen;{php echo price_format($fullbackgoods['fullbackprice'],2)}/天，共 {$fullbackgoods['day']} 天
+                {/if}
+            </span>
+    </div>
+    {/if}
     {if $hasinvoice}
     <div class="fui-cell">
         <div class="fui-cell-label">发票抬头</div>
@@ -341,8 +364,10 @@
         <div class="fui-cell-remark noremark">-&yen; <span id="seckillprice_money">{php echo number_format($seckill_price,2)}</span></div>
     </div>
 {/if}
+
     {/if}
-    <div class="fui-cell">
+
+<div class="fui-cell">
         <div class="fui-cell-label" >运费</div>
         <div class="fui-cell-info"></div>
         <div class="fui-cell-remark noremark">&yen; <span class='{if !$packageid && empty($exchangeOrder)}dispatchprice{/if}'>{if !empty($exchangeOrder)}{$exchangepostage}{else}{php echo number_format($dispatch_price,2)}{/if}</span></div>

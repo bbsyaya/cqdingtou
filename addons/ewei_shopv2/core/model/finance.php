@@ -429,18 +429,15 @@ class Finance_EweiShopV2Model
 				return $this->refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney, $app, 'REFUND_SOURCE_RECHARGE_FUNDS');
 			}
 		}
+		if ($arr['return_msg'] == $arr['err_code_des']) 
+		{
+			$error = $arr['return_msg'];
+		}
 		else 
 		{
-			if ($arr['return_msg'] == $arr['err_code_des']) 
-			{
-				$error = $arr['return_msg'];
-			}
-			else 
-			{
-				$error = $arr['return_msg'] . ' | ' . $arr['err_code_des'];
-			}
-			return error(-2, $error);
+			$error = $arr['return_msg'] . ' | ' . $arr['err_code_des'];
 		}
+		return error(-2, $error);
 	}
 	public function wxapp_refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney = 0, $app = false, $refund_account = false) 
 	{

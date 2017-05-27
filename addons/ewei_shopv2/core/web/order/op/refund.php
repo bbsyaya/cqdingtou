@@ -171,7 +171,11 @@ class Refund_EweiShopV2Page extends WebPage
 				}
 				else if ($item['paytype'] == 21) 
 				{
-					if (empty($item['apppay'])) 
+					if ($item['apppay'] == 2) 
+					{
+						$result = m('finance')->wxapp_refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
+					}
+					else 
 					{
 						$realprice = round($realprice - $item['deductcredit2'], 2);
 						if (0 < $realprice) 
@@ -186,10 +190,6 @@ class Refund_EweiShopV2Page extends WebPage
 							}
 						}
 					}
-					else if ($item['apppay'] == 2) 
-					{
-						$result = m('finance')->wxapp_refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
-					}
 					$refundtype = 2;
 				}
 				else if ($item['paytype'] == 22) 
@@ -202,7 +202,7 @@ class Refund_EweiShopV2Page extends WebPage
 						{
 							show_json(0, '支付参数错误，私钥为空或者APPID为空!');
 						}
-						$params = array('out_trade_no' => $ordersn, 'refund_amount' => $realprice, 'refund_reason' => $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']);
+						$params = array('out_request_no' => time(), 'out_trade_no' => $ordersn, 'refund_amount' => $realprice, 'refund_reason' => $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']);
 						$config = array('app_id' => $sec['app_alipay']['appid'], 'privatekey' => $sec['app_alipay']['private_key'], 'publickey' => '', 'alipublickey' => '');
 						$result = m('finance')->newAlipayRefund($params, $config);
 					}

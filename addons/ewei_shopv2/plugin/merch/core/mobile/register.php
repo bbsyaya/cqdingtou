@@ -112,6 +112,7 @@ class Register_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			$redirect = 'javascript:WeixinJSBridge.call("closeWindow")';
 		}
+		$buttondisplay = true;
 		include $this->template('_message');
 		exit();
 	}

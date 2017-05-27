@@ -5,6 +5,44 @@ if (!(defined('IN_IA')))
 }
 class Order_EweiShopV2Model 
 {
+	public function fullback($orderid) 
+	{
+		global $_W;
+		$uniacid = $_W['uniacid'];
+		$order = pdo_fetch('select o.id,o.ordersn,o.openid,og.optionid,og.goodsid,og.price from ' . tablename('ewei_shop_order') . ' as o' . "\r\n" . '                left join ' . tablename('ewei_shop_order_goods') . ' as og on og.orderid = o.id' . "\r\n" . '                where  o.id=:id and o.uniacid=:uniacid limit 1', array(':uniacid' => $uniacid, ':id' => $orderid));
+		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid and isfullback = 1 limit 1', array(':id' => $order['goodsid'], ':uniacid' => $uniacid));
+		if (0 < $goods['isfullback']) 
+		{
+			$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\r\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`' . "\r\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $order['goodsid'] . ' limit 1');
+			if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $order['optionid'])) 
+			{
+				$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\r\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $order['goodsid'], ':id' => $order['optionid']));
+				if (!(empty($option))) 
+				{
+					$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
+					$fullbackgoods['minallfullbackallratio'] = $option['allfullbackratio'];
+					$fullbackgoods['fullbackprice'] = $option['fullbackprice'];
+					$fullbackgoods['fullbackratio'] = $option['fullbackratio'];
+					$fullbackgoods['day'] = $option['day'];
+				}
+			}
+			if (!(empty($fullbackgoods))) 
+			{
+				$data = array('uniacid' => $uniacid, 'orderid' => $orderid, 'openid' => $order['openid'], 'day' => $fullbackgoods['day'], 'createtime' => time());
+				if (0 < $fullbackgoods['type']) 
+				{
+					$data['price'] = ($order['price'] * $fullbackgoods['minallfullbackallratio']) / 100;
+					$data['priceevery'] = ($order['price'] * $fullbackgoods['fullbackratio']) / 100;
+				}
+				else 
+				{
+					$data['price'] = $fullbackgoods['minallfullbackallprice'];
+					$data['priceevery'] = $fullbackgoods['fullbackprice'];
+				}
+				pdo_insert('ewei_shop_fullback_log', $data);
+			}
+		}
+	}
 	public function payResult($params) 
 	{
 		global $_W;
@@ -13,6 +51,17 @@ class Order_EweiShopV2Model
 		$ordersn = $params['tid'];
 		$order = pdo_fetch('select id,ordersn, price,openid,dispatchtype,addressid,carrier,status,isverify,deductcredit2,`virtual`,isvirtual,couponid,isvirtualsend,isparent,paytype,merchid,agentid,createtime,buyagainprice from ' . tablename('ewei_shop_order') . ' where  ordersn=:ordersn and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':ordersn' => $ordersn));
 		$orderid = $order['id'];
+		$ispeerpay = $this->checkpeerpay($orderid);
+		if (!(empty($ispeerpay))) 
+		{
+			$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) price from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
+			if ($peerpay_info != $ispeerpay['peerpay_realprice']) 
+			{
+				return;
+			}
+			pdo_update('ewei_shop_order_peerpay', array('status' => 1), array('id' => $ispeerpay['id']));
+			$params['type'] = 'peerpay';
+		}
 		if ($params['from'] == 'return') 
 		{
 			$seckill_result = plugin_run('seckill::setOrderPay', $order['id']);
@@ -79,7 +128,7 @@ class Order_EweiShopV2Model
 				{
 					p('commission')->checkOrderPay($order['id']);
 				}
-				if (p('lottery')) 
+				if (p('lottery') && empty($ispeerpay)) 
 				{
 					$res = p('lottery')->getLottery($order['openid'], 1, array('money' => $order['price'], 'paytype' => 1));
 					if ($res) 
@@ -1079,7 +1128,7 @@ class Order_EweiShopV2Model
 							}
 						}
 					}
-					if (!$sendfree  && !$sendfree && ($isnodispatch == 0)) 
+					if (!$sendfree  && !$sendfree && ($isnodispatch == 0))
 					{
 						$areas = unserialize($dispatch_data['areas']);
 						if ($dispatch_data['calculatetype'] == 1) 
@@ -1435,6 +1484,18 @@ class Order_EweiShopV2Model
 		$data['flag'] = $flag;
 		$data['msg'] = $msg;
 		return $data;
+	}
+	public function checkpeerpay($orderid) 
+	{
+		global $_W;
+		$sql = 'SELECT p.*,o.openid FROM ' . tablename('ewei_shop_order_peerpay') . ' AS p JOIN ' . tablename('ewei_shop_order') . ' AS o ON p.orderid = o.id AND p.status = o.status WHERE p.orderid = :orderid AND p.uniacid = :uniacid AND (p.status = 0 OR p.status=1) AND o.status >= 0 LIMIT 1';
+		$query = pdo_fetch($sql, array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
+		return $query;
+	}
+	public function peerStatus($param) 
+	{
+		global $_W;
+		return pdo_insert('ewei_shop_order_peerpay_payinfo', $param);
 	}
 }
 ?>

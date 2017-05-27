@@ -525,8 +525,11 @@
         </div>
         {if is_mobile()}
         {if $order['paytype']!=3}
+        {if $order['paytype']!=3 && empty($ispeerpay)}
         <a class="btn btn-danger" href="{php echo mobileUrl('order/pay',array('id'=>$order['id']))}">支付订单</a>
-        {/if}
+        {else}
+        <a class="btn btn-danger" href="{php echo mobileUrl('order/pay/peerpayshare',array('id'=>$order['id']))}">代付订单</a>
+        {/if}{/if}
         {/if}
         {/if}
         {if $order['canverify']&&$order['status']!=-1&&$order['status']!=0}

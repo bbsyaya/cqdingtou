@@ -125,7 +125,7 @@ class DiypageModel extends PluginModel
 												{
 													$childid = rand(1000000000, 9999999999);
 													$childid = 'C' . $childid;
-													$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($goods['salesreal']));
+													$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($good['salesreal']));
 												}
 											}
 										}
@@ -1984,7 +1984,7 @@ class DiypageModel extends PluginModel
 				}
 			}
 		}
-		return array('background' => $background, 'followbar' => $followbar, 'tab' => $detail_tab, 'navbar' => $detail_navbar, 'diynavbar' => $navbar, 'comment' => $detail_comment, 'seckill' => $detail_seckill, 'diylayer' => $page['data']['page']['diylayer'], 'items' => $pageitems, 'diyadv' => $page['data']['page']['diyadv']);
+		return array('background' => $background, 'followbar' => $followbar, 'tab' => $detail_tab, 'navbar' => $detail_navbar, 'diynavbar' => $navbar, 'comment' => $detail_comment, 'seckill' => $detail_seckill, 'diylayer' => $page['data']['page']['diylayer'], 'items' => $pageitems, 'diyadv' => $page['data']['page']['diyadv'], 'danmu' => $page['data']['page']['danmu']);
 	}
 	public function seckillPage($pageid = 0) 
 	{

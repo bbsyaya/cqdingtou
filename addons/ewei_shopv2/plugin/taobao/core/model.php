@@ -166,8 +166,7 @@ class TaobaoModel extends PluginModel
 		$url = $this->get_taobao_detail_url($itemid);
 		load()->func('communication');
 		$response = ihttp_get($url);
-		$response = preg_replace('/ (?:width)=(\'|").*?\\1/', ' width="100%"', $response);
-		$response = preg_replace('/ (?:height)=(\'|").*?\\1/', ' ', $response);
+		$response = $this->contentpasswh($response);
 		$item['content'] = $response;
 		return $this->save_taobao_goods($item, $taobaourl);
 	}
@@ -190,7 +189,7 @@ class TaobaoModel extends PluginModel
 		$dom->loadHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $content);
 		$xml = simplexml_import_dom($dom);
 		$prodectNameContent = $xml->xpath('//*[@id="goodName"]');
-		$prodectName = strval($prodectNameContent[0]->attributes()->value);
+		$prodectName = strval( $prodectNameContent[0]->attributes()->value);
 		if ($prodectName == NULL) 
 		{
 			return array('result' => '0', 'error' => '宝贝不存在!');
@@ -236,7 +235,7 @@ class TaobaoModel extends PluginModel
 		$item['total'] = 10;
 		$item['sales'] = 0;
 		$prodectPriceContent = $xml->xpath('//*[@id="jdPrice"]');
-		$prodectPrices = strval($prodectPriceContent[0]->attributes()->value);
+		$prodectPrices = strval( $prodectPriceContent[0]->attributes()->value);
 		$item['marketprice'] = $prodectPrices;
 		$url = $this->get_jingdong_detail_url($itemid);
 		$responseDetail = ihttp_get($url);
@@ -244,8 +243,7 @@ class TaobaoModel extends PluginModel
 		$details = json_decode($contenteDetail, true);
 		$prodectContent = $details['wdis'];
 		$prodectContent = strval($prodectContent);
-		$prodectContent = preg_replace('/ (?:width)=(\'|").*?\\1/', ' width="100%"', $prodectContent);
-		$prodectContent = preg_replace('/ (?:height)=(\'|").*?\\1/', ' ', $prodectContent);
+		$prodectContent = $this->contentpasswh($prodectContent);
 		$item['content'] = $prodectContent;
 		$params = array();
 		$pr = $details['ware']['wi']['code'];
@@ -323,7 +321,7 @@ class TaobaoModel extends PluginModel
 		$item['total'] = 10;
 		$item['sales'] = 0;
 		$prodectPriceContent = $xml->xpath('//*[@property="og:product:price"]');
-		$prodectPrices = strval($prodectPriceContent[0]->attributes()->content);
+		$prodectPrices = strval( $prodectPriceContent[0]->attributes()->content);
 		$item['marketprice'] = $prodectPrices;
 		$prodectContent = $xml->xpath('//*[@id="desc-lazyload-container"]');
 		$Contents = $prodectContent[0]->attributes();
@@ -336,8 +334,7 @@ class TaobaoModel extends PluginModel
 			$contenteDetail = substr($contenteDetail, strpos($contenteDetail, '{'), -1);
 			$details = json_decode($contenteDetail, true);
 			$response = $details['content'];
-			$response = preg_replace('/ (?:width)=(\'|").*?\\1/', ' width="100%"', $response);
-			$response = preg_replace('/ (?:height)=(\'|").*?\\1/', ' ', $response);
+			$response = $this->contentpasswh($response);
 			$item['content'] = $response;
 		}
 		$params = $xml->xpath('//*[@id="mod-detail-attributes"]/div[1]/table/tbody');
@@ -1071,6 +1068,16 @@ class TaobaoModel extends PluginModel
 			return $items[1];
 		}
 		return array();
+	}
+	public function contentpasswh($content) 
+	{
+		$content = preg_replace('/(?:width)=(\'|").*?\\1/', ' width="100%"', $content);
+		$content = preg_replace('/(?:height)=(\'|").*?\\1/', ' ', $content);
+		$content = preg_replace('/(?:max-width:\\d*\\.?\\d*(px|rem|em))/', '', $content);
+		$content = preg_replace('/(?:max-height:\\d*\\.?\\d*(px|rem|em))/', '', $content);
+		$content = preg_replace('/(?:min-width:\\d*\\.?\\d*(px|rem|em))/', ' ', $content);
+		$content = preg_replace('/(?:min-height:\\d*\\.?\\d*(px|rem|em))/', ' ', $content);
+		return $content;
 	}
 }
 ?>

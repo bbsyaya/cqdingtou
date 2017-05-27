@@ -11,12 +11,17 @@ class TaskProcessor extends PluginProcessor
 	{
 		parent::__construct('task');
 	}
-	public function respond($obj = NULL) 
+	public function respond($obj = NULL, $clear = true) 
 	{
 		global $_W;
 		$message = $obj->message;
 		$msgtype = strtolower($message['msgtype']);
 		$event = strtolower($message['event']);
+		if ($clear) 
+		{
+			$_SESSION['autoposter'] = NULL;
+			$_SESSION['postercontent'] = NULL;
+		}
 		$obj->member = $this->model->checkMember($message['from']);
 		if (($msgtype == 'text') || ($event == 'click') || !(empty($_SESSION['autoposter']))) 
 		{
@@ -125,6 +130,7 @@ class TaskProcessor extends PluginProcessor
 				if (!(empty($_SESSION['postercontent']))) 
 				{
 					$this->respond($_SESSION['autoposter']);
+					$this->respond($_SESSION['autoposter'], false);
 				}
 			}
 		}
@@ -285,6 +291,7 @@ class TaskProcessor extends PluginProcessor
 				if (!(empty($_SESSION['postercontent']))) 
 				{
 					$this->respond($_SESSION['autoposter']);
+					$this->respond($_SESSION['autoposter'], false);
 				}
 			}
 		}

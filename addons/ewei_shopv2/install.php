@@ -1921,6 +1921,45 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_form_category` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_fullback_goods`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_fullback_goods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `type` tinyint(3) NOT NULL DEFAULT '0',
+  `goodsid` int(11) NOT NULL DEFAULT '0',
+  `titles` varchar(255) NOT NULL,
+  `thumb` varchar(255) NOT NULL,
+  `marketprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `minallfullbackallprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `maxallfullbackallprice` decimal(10,2) NOT NULL,
+  `minallfullbackallratio` tinyint(3) NOT NULL DEFAULT '0',
+  `maxallfullbackallratio` tinyint(3) NOT NULL,
+  `day` int(11) NOT NULL DEFAULT '0',
+  `fullbackprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `fullbackratio` tinyint(3) NOT NULL DEFAULT '0',
+  `status` tinyint(3) NOT NULL DEFAULT '0',
+  `displayorder` int(11) NOT NULL DEFAULT '0',
+  `hasoption` tinyint(3) NOT NULL DEFAULT '0',
+  `optionid` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_fullback_log`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_fullback_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL,
+  `openid` varchar(50) NOT NULL,
+  `orderid` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `priceevery` decimal(10,2) NOT NULL,
+  `day` int(10) NOT NULL,
+  `fullbackday` int(10) NOT NULL,
+  `createtime` int(10) NOT NULL,
+  `fullbacktime` int(10) NOT NULL,
+  `isfullback` tinyint(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_funbar`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_funbar` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2218,6 +2257,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `threen` varchar(255) DEFAULT '',
   `intervalfloor` tinyint(1) DEFAULT '0',
   `intervalprice` varchar(512) DEFAULT '',
+  `isfullback` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_pcate` (`pcate`),
@@ -2238,6 +2278,19 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   FULLTEXT KEY `idx_showgroups` (`showgroups`),
   FULLTEXT KEY `idx_buygroups` (`buygroups`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=198 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_goodscode_good`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goodscode_good` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL,
+  `goodsid` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `thumb` varchar(255) NOT NULL,
+  `qrcode` varchar(255) NOT NULL,
+  `status` tinyint(3) NOT NULL,
+  `displayorder` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_goods_comment`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_comment` (
@@ -2309,6 +2362,12 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_option` (
   `exchange_stock` int(11) DEFAULT '0',
   `exchange_postage` decimal(10,2) NOT NULL DEFAULT '0.00',
   `presellprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `day` int(3) NOT NULL,
+  `allfullbackprice` decimal(10,2) NOT NULL,
+  `fullbackprice` decimal(10,2) NOT NULL,
+  `allfullbackratio` tinyint(3) NOT NULL,
+  `fullbackratio` tinyint(3) NOT NULL,
+  `isfullback` tinyint(3) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_goodsid` (`goodsid`),
@@ -2648,7 +2707,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_lottery` (
   `start_time` int(11) DEFAULT NULL,
   `end_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`lottery_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=5 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_lottery_default`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_lottery_default` (
@@ -3550,6 +3609,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order` (
   `wxcardid` varchar(50) DEFAULT '',
   `wxcode` varchar(50) DEFAULT '',
   `dispatchkey` varchar(30) NOT NULL DEFAULT '',
+  `quickid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_openid` (`openid`),
@@ -3683,6 +3743,37 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order_goods` (
   KEY `idx_paytime3` (`paytime3`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=162 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_order_peerpay`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order_peerpay` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `orderid` int(11) NOT NULL DEFAULT '0',
+  `peerpay_type` tinyint(1) NOT NULL DEFAULT '0',
+  `peerpay_price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `peerpay_maxprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `peerpay_realprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `peerpay_selfpay` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `peerpay_message` varchar(500) NOT NULL DEFAULT '',
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `createtime` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `uniacid` (`uniacid`) USING BTREE,
+  KEY `orderid` (`orderid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_order_peerpay_payinfo`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order_peerpay_payinfo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pid` int(11) NOT NULL DEFAULT '0',
+  `uid` int(11) NOT NULL DEFAULT '0',
+  `uname` varchar(255) NOT NULL DEFAULT '',
+  `usay` varchar(500) NOT NULL DEFAULT '',
+  `price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `createtime` int(11) NOT NULL DEFAULT '0',
+  `headimg` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_order_refund`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order_refund` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3796,7 +3887,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_perm_log` (
   KEY `idx_uniacid` (`uniacid`),
   FULLTEXT KEY `idx_type` (`type`),
   FULLTEXT KEY `idx_op` (`op`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6711 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6722 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_perm_plugin`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_perm_plugin` (
@@ -3869,7 +3960,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_plugin` (
   PRIMARY KEY (`id`),
   KEY `idx_displayorder` (`displayorder`),
   KEY `idx_identity` (`identity`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=39 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=40 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_poster`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_poster` (
@@ -4150,6 +4241,69 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_qa_set` (
   PRIMARY KEY (`id`),
   KEY `idx_unaicid` (`uniacid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_quick`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_quick` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `keyword` varchar(255) DEFAULT NULL,
+  `datas` mediumtext,
+  `cart` tinyint(3) NOT NULL DEFAULT '0',
+  `createtime` int(11) DEFAULT NULL,
+  `lasttime` int(11) DEFAULT NULL,
+  `share_title` varchar(255) DEFAULT NULL,
+  `share_desc` varchar(255) DEFAULT NULL,
+  `share_icon` varchar(255) DEFAULT NULL,
+  `enter_title` varchar(255) DEFAULT NULL,
+  `enter_desc` varchar(255) DEFAULT NULL,
+  `enter_icon` varchar(255) DEFAULT NULL,
+  `status` tinyint(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_quick_adv`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_quick_adv` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT '0',
+  `merchid` int(11) NOT NULL DEFAULT '0',
+  `advname` varchar(50) DEFAULT '',
+  `link` varchar(255) DEFAULT '',
+  `thumb` varchar(255) DEFAULT '',
+  `displayorder` int(11) DEFAULT '0',
+  `enabled` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_enabled` (`enabled`) USING BTREE,
+  KEY `idx_displayorder` (`displayorder`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_quick_cart`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_quick_cart` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `quickid` int(11) NOT NULL DEFAULT '0',
+  `openid` varchar(100) DEFAULT '',
+  `goodsid` int(11) DEFAULT '0',
+  `total` int(11) DEFAULT '0',
+  `marketprice` decimal(10,2) DEFAULT '0.00',
+  `deleted` tinyint(1) DEFAULT '0',
+  `optionid` int(11) DEFAULT '0',
+  `createtime` int(11) DEFAULT '0',
+  `diyformdataid` int(11) DEFAULT NULL,
+  `diyformdata` text,
+  `diyformfields` text,
+  `diyformid` int(11) DEFAULT '0',
+  `selected` tinyint(1) DEFAULT '1',
+  `merchid` int(11) DEFAULT '0',
+  `selectedadd` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_goodsid` (`goodsid`) USING BTREE,
+  KEY `idx_openid` (`openid`) USING BTREE,
+  KEY `idx_deleted` (`deleted`) USING BTREE,
+  KEY `idx_merchid` (`merchid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_refund_address`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_refund_address` (
@@ -4936,7 +5090,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_poster` (
   `starttext` varchar(255) DEFAULT NULL,
   `endtext` varchar(255) DEFAULT NULL,
   `reward_data` text,
-  `needcount` tinyint(3) NOT NULL DEFAULT '0',
+  `needcount` int(11) NOT NULL DEFAULT '0',
   `is_delete` tinyint(1) NOT NULL DEFAULT '0',
   `poster_type` tinyint(1) DEFAULT '1',
   `reward_days` int(11) DEFAULT '0',
@@ -5080,7 +5234,6 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxcard` (
   `use_condition` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
-
 
 INSERT INTO `ims_ewei_shop_member_message_template_type` (`id`, `name`, `typecode`, `templatecode`, `templateid`, `templatename`, `content`, `showtotaladd`, `typegroup`, `groupname`) VALUES
 (1, '订单付款通知', 'saler_pay', 'OPENTM405584202', 'xldHFTObiLLm7AK544PzW4bFJGgbS0o8Po4cXOgYEis', '订单付款通知', '{{first.DATA}}订单编号：{{keyword1.DATA}}商品名称：{{keyword2.DATA}}商品数量：{{keyword3.DATA}}支付金额：{{keyword4.DATA}}{{remark.DATA}}', 0, 'sys', '系统消息通知'),
@@ -5264,6 +5417,7 @@ INSERT INTO `ims_ewei_shop_plugin` (`id`, `displayorder`, `identity`, `name`, `v
 (35, 38, 'seckill','整点秒杀','1.0','官方',1,'sale',1,'../addons/ewei_shopv2/static/images/seckill.jpg','',0,0),
 (36, 39, 'exchange','兑换中心','1.0','官方',1,'biz',1,'../addons/ewei_shopv2/static/images/exchange.jpg','',0,0),
 (37, 40, 'lottery', '游戏营销', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/lottery.jpg', '', 0, 0),
-(38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', 1,'', '', 1, 0);
+(38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', 1,'', '', 1, 0),
+(39, 42, 'quick', '快速购买', '1.0', '官方', 1, 'biz', 1,'../addons/ewei_shopv2/static/images/quick.jpg', '', 0, 0);
 
 ");

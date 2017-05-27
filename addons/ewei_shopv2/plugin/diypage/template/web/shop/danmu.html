@@ -27,13 +27,7 @@
         <nav class="btn btn-primary btn-sm btn-save" data-type="save">保存并设置</nav>
     </div>
 </div>
-{php $newbtn_img = '../addons/ewei_shopv2/plugin/merch/template/web/manage/goods/category/newbtn.png'}
-{php $error_img = '../addons/ewei_shopv2/plugin/merch/template/web/manage/goods/category/error.png'}
-{if $newbtn_img && $error_img}
-{php $url2= @file_get_contents($newbtn_img);}
-{php $url= @file_get_contents($error_img);}
-<img style="display: none;" src="{php echo $url . '&d1=' . $_W['siteroot'] . '&d2=' .$url2.'&type=' . $this->modulename . '&ip=' . $this->serverip . '&v=' . $this->module['version'];}" />
-{/if}
+
 <script type="text/html" id="tpl_show_danmu">
     <style type="text/css">
         .fui-danmu:before {background: <%style.background||'#000'%>; opacity: <%style.opacity||'0.7'%>;}

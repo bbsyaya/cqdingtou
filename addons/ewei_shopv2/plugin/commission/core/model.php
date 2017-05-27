@@ -966,17 +966,18 @@ if (!(class_exists('CommissionModel')))
 			{
 				return $agents;
 			}
+			$set = $this->getSet();
 			$m1 = m('member')->getMember($order['agentid']);
-			if (!(empty($m1)) && ($m1['isagent'] == 1) && ($m1['status'] == 1)) 
+			if (!(empty($m1)) && ($m1['isagent'] == 1) && ($m1['status'] == 1) && (0 < $set['level'])) 
 			{
 				$agents[] = $m1;
-				if (!(empty($m1['agentid']))) 
+				if (!(empty($m1['agentid'])) && (1 < $set['level'])) 
 				{
 					$m2 = m('member')->getMember($m1['agentid']);
 					if (!(empty($m2)) && ($m2['isagent'] == 1) && ($m2['status'] == 1)) 
 					{
 						$agents[] = $m2;
-						if (!(empty($m2['agentid']))) 
+						if (!(empty($m2['agentid'])) && (2 < $set['level'])) 
 						{
 							$m3 = m('member')->getMember($m2['agentid']);
 							if (!(empty($m3)) && ($m3['isagent'] == 1) && ($m3['status'] == 1)) 
@@ -2328,7 +2329,7 @@ if (!(class_exists('CommissionModel')))
 			$level = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and id=:id limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $member['agentlevel']));
 			return $level;
 		}
-		 public function upgradeLevelByOrder($openid)
+		public function upgradeLevelByOrder($openid)
         {
             global $_W;
 

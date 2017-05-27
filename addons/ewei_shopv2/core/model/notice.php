@@ -1239,7 +1239,7 @@ class Notice_EweiShopV2Model
 		$url = ((isset($params['url']) ? $params['url'] : ''));
 		$account = ((isset($params['account']) ? $params['account'] : m('common')->getAccount()));
 		$is_merch = intval($params['is_merch']);
-		if (empty($is_merch)) 
+		/*if (empty($is_merch)) 
 		{
 			if (!(empty($tm[$tag . '_close_advanced']))) 
 			{
@@ -1255,7 +1255,7 @@ class Notice_EweiShopV2Model
 		{
 			$merch_tm = '';
 			return;
-		}
+		}*/
 		if (!(empty($templateid))) 
 		{
 			$template = pdo_fetch('select * from ' . tablename('ewei_shop_member_message_template') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $templateid, ':uniacid' => $_W['uniacid']));

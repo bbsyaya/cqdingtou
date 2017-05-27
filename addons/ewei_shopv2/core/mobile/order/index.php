@@ -74,7 +74,6 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			{
 				$condition .= ' and userdeleted=0 ';
 				
-				
 			}
 			$com_verify = com('verify');
 			$s_string = '';
@@ -82,7 +81,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			{
 				$s_string = ',ccard';
 			}
-			$list = pdo_fetchall('select id,addressid,ordersn,price,dispatchprice,status,iscomment,isverify,verifyendtime,' . "\n" . 'verified,verifycode,verifytype,iscomment,refundid,expresscom,express,expresssn,finishtime,`virtual`,sendtype,' . "\n" . 'paytype,expresssn,refundstate,dispatchtype,verifyinfo,merchid,isparent,userdeleted' . $s_string . "\n" . ' from ' . tablename('ewei_shop_order') . ' where 1 ' . $condition . ' order by createtime desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+			$list = pdo_fetchall('select id,addressid,ordersn,price,dispatchprice,status,iscomment,isverify,verifyendtime,' . "\r\n" . 'verified,verifycode,verifytype,iscomment,refundid,expresscom,express,expresssn,finishtime,`virtual`,sendtype,' . "\r\n" . 'paytype,expresssn,refundstate,dispatchtype,verifyinfo,merchid,isparent,userdeleted' . $s_string . "\r\n" . ' from ' . tablename('ewei_shop_order') . ' where 1 ' . $condition . ' order by createtime desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 			$total = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where 1 ' . $condition, $params);
 			$refunddays = intval($_W['shopset']['trade']['refunddays']);
 			if ($is_openmerch == 1) 
@@ -103,7 +102,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 					$scondition = ' og.orderid=:orderid';
 					$param[':orderid'] = $row['id'];
 				}
-				$sql = 'SELECT og.goodsid,og.total,g.title,g.thumb,g.status,og.price,og.optionname as optiontitle,og.optionid,op.specs,g.merchid,og.seckill,og.seckill_taskid,' . "\n" . '                og.sendtype,og.expresscom,og.expresssn,og.express,og.sendtime,og.finishtime,og.remarksend' . "\n" . '                FROM ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id ' . ' left join ' . tablename('ewei_shop_goods_option') . ' op on og.optionid = op.id ' . ' where ' . $scondition . ' order by og.id asc';
+				$sql = 'SELECT og.goodsid,og.total,g.title,g.thumb,g.status,og.price,og.optionname as optiontitle,og.optionid,op.specs,g.merchid,og.seckill,og.seckill_taskid,' . "\r\n" . '                og.sendtype,og.expresscom,og.expresssn,og.express,og.sendtime,og.finishtime,og.remarksend' . "\r\n" . '                FROM ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id ' . ' left join ' . tablename('ewei_shop_goods_option') . ' op on og.optionid = op.id ' . ' where ' . $scondition . ' order by og.id asc';
 				$goods = pdo_fetchall($sql, $param);
 				$ismerch = 0;
 				$merch_array = array();
@@ -323,6 +322,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		$uniacid = $_W['uniacid'];
 		$member = m('member')->getMember($openid, true);
 		$orderid = intval($_GPC['id']);
+		$ispeerpay = m('order')->checkpeerpay($orderid);
 		if (empty($orderid)) 
 		{
 			header('location: ' . mobileUrl('order'));
@@ -373,9 +373,25 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			$condition1 .= ',g.ccardexplain,g.ccardtimeexplain';
 		}
 		$goodsid_array = array();
-		$goods = pdo_fetchall('select og.goodsid,og.price,g.title,g.thumb,g.status, g.cannotrefund, og.total,g.credit,og.optionid,og.optionname as optiontitle,g.isverify,g.storeids,og.seckill,og.seckill_taskid' . $diyformfields . $condition1 . '  from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where ' . $scondition . ' and og.uniacid=:uniacid ', $param);
+		$goods = pdo_fetchall('select og.goodsid,og.price,g.title,g.thumb,g.status, g.cannotrefund, og.total,g.credit,og.optionid,' . "\r\n" . '            og.optionname as optiontitle,g.isverify,g.storeids,og.seckill,g.isfullback,' . "\r\n" . '            og.seckill_taskid' . $diyformfields . $condition1 . '  from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where ' . $scondition . ' and og.uniacid=:uniacid ', $param);
 		foreach ($goods as &$g ) 
 		{
+			if ($g['isfullback']) 
+			{
+				$fullbackgoods = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $g['goodsid'] . ' limit 1 ');
+				if ($g['optionid']) 
+				{
+					$option = pdo_fetch('select `day`,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback' . "\r\n" . '                      from ' . tablename('ewei_shop_goods_option') . ' where id = ' . $g['optionid'] . ' and uniacid = ' . $uniacid . ' ');
+					$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
+					$fullbackgoods['fullbackprice'] = $option['fullbackprice'];
+					$fullbackgoods['minallfullbackallratio'] = $option['allfullbackratio'];
+					$fullbackgoods['fullbackratio'] = $option['fullbackratio'];
+					$fullbackgoods['day'] = $option['day'];
+				}
+				$g['fullbackgoods'] = $fullbackgoods;
+				unset($fullbackgoods);
+				unset($option);
+			}
 			$g['seckill_task'] = false;
 			if ($g['seckill']) 
 			{
@@ -591,7 +607,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		}
 		if ((0 < $order['sendtype']) && (1 <= $order['status'])) 
 		{
-			$order_goods = pdo_fetchall('select orderid,goodsid,sendtype,expresscom,expresssn,express,sendtime from ' . tablename('ewei_shop_order_goods') . "\n" . '            where orderid = ' . $orderid . ' and uniacid = ' . $uniacid . ' and sendtype > 0 group by sendtype order by sendtime asc ');
+			$order_goods = pdo_fetchall('select orderid,goodsid,sendtype,expresscom,expresssn,express,sendtime from ' . tablename('ewei_shop_order_goods') . "\r\n" . '            where orderid = ' . $orderid . ' and uniacid = ' . $uniacid . ' and sendtype > 0 group by sendtype order by sendtime asc ');
 			$expresslist = m('util')->getExpressList($order['express'], $order['expresssn']);
 			if (0 < count($expresslist)) 
 			{
@@ -638,7 +654,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			{
 				$bundlelist[$i]['sendtype'] = $i;
 				$bundlelist[$i]['orderid'] = $orderid;
-				$bundlelist[$i]['goods'] = pdo_fetchall('select g.title,g.thumb,og.total,og.optionname as optiontitle,og.expresssn,og.express,' . "\n" . '                    og.sendtype,og.expresscom,og.sendtime from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where og.orderid=:orderid and og.sendtype = ' . $i . ' and og.uniacid=:uniacid ', array(':uniacid' => $uniacid, ':orderid' => $orderid));
+				$bundlelist[$i]['goods'] = pdo_fetchall('select g.title,g.thumb,og.total,og.optionname as optiontitle,og.expresssn,og.express,' . "\r\n" . '                    og.sendtype,og.expresscom,og.sendtime from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where og.orderid=:orderid and og.sendtype = ' . $i . ' and og.uniacid=:uniacid ', array(':uniacid' => $uniacid, ':orderid' => $orderid));
 				if (empty($bundlelist[$i]['goods'])) 
 				{
 					unset($bundlelist[$i]);
@@ -660,7 +676,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		{
 			$condition = ' and og.sendtype = ' . $sendtype;
 		}
-		$goods = pdo_fetchall('select og.goodsid,og.price,g.title,g.thumb,og.total,g.credit,og.optionid,og.optionname as optiontitle,g.isverify,og.expresssn,og.express,' . "\n" . '            og.sendtype,og.expresscom,og.sendtime,g.storeids' . $diyformfields . "\n" . '            from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where og.orderid=:orderid ' . $condition . ' and og.uniacid=:uniacid ', array(':uniacid' => $uniacid, ':orderid' => $orderid));
+		$goods = pdo_fetchall('select og.goodsid,og.price,g.title,g.thumb,og.total,g.credit,og.optionid,og.optionname as optiontitle,g.isverify,og.expresssn,og.express,' . "\r\n" . '            og.sendtype,og.expresscom,og.sendtime,g.storeids' . $diyformfields . "\r\n" . '            from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where og.orderid=:orderid ' . $condition . ' and og.uniacid=:uniacid ', array(':uniacid' => $uniacid, ':orderid' => $orderid));
 		if (0 < $sendtype) 
 		{
 			$order['express'] = $goods[0]['express'];

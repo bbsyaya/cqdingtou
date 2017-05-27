@@ -49,12 +49,12 @@ class Adv_EweiShopV2Page extends PluginWebPage
 			$advsdata = array('name' => $data['name'], 'status' => intval($data['status']), 'data' => base64_encode(json_encode($data)), 'lastedittime' => time(), 'type' => 1, 'merch' => intval($_W['merchid']));
 			if (!(empty($id))) 
 			{
-				plog('diypage.menu.edit', '更新启动广告 id: ' . $id . '  名称:' . $advsdata['name']);
+				plog('diypage.adv.edit', '更新启动广告 id: ' . $id . '  名称:' . $advsdata['name']);
 				pdo_update('ewei_shop_diypage_plu', $advsdata, array('id' => $id, 'uniacid' => $_W['uniacid']));
 			}
 			else 
 			{
-				plog('diypage.menu.add', '添加启动广告 id: ' . $id . '  名称:' . $advsdata['name']);
+				plog('diypage.adv.add', '添加启动广告 id: ' . $id . '  名称:' . $advsdata['name']);
 				$advsdata['uniacid'] = $_W['uniacid'];
 				$advsdata['createtime'] = time();
 				pdo_insert('ewei_shop_diypage_plu', $advsdata);

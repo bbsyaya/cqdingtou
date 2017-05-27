@@ -402,7 +402,56 @@ class Member_EweiShopV2Model
 		}
 		return array('levelname' => (empty($_S['shop']['levelname']) ? '普通会员' : $_S['shop']['levelname']), 'discount' => (empty($_S['shop']['leveldiscount']) ? 10 : $_S['shop']['leveldiscount']));
 	}
-	public function upgradeLevel($openid) 
+	public function getOneGoodsLevel($openid, $goodsid) 
+	{
+		global $_W;
+		$uniacid = $_W['uniacid'];
+		$level_info = $this->getLevel($openid);
+		$level = intval($level_info['level']);
+		$data = array();
+		$levels = pdo_fetchall('select * from ' . tablename('ewei_shop_member_level') . ' where uniacid=:uniacid and buygoods=1 and level and level > :level order by level asc', array(':uniacid' => $uniacid, ':level' => $level));
+		if (!(empty($levels))) 
+		{
+			foreach ($levels as $k => $v ) 
+			{
+				$goodsids = iunserializer($v['goodsids']);
+				if (!(empty($goodsids))) 
+				{
+					if (in_array($goodsid, $goodsids)) 
+					{
+						$data = $v;
+					}
+				}
+			}
+		}
+		return $data;
+	}
+	public function getGoodsLevel($openid, $orderid) 
+	{
+		global $_W;
+		$uniacid = $_W['uniacid'];
+		$order_goods = pdo_fetchall('select goodsid from ' . tablename('ewei_shop_order_goods') . ' where orderid=:orderid and uniacid=:uniacid', array(':uniacid' => $uniacid, ':orderid' => $orderid));
+		$levels = array();
+		$data = array();
+		if (!(empty($order_goods))) 
+		{
+			foreach ($order_goods as $k => $v ) 
+			{
+				$item = $this->getOneGoodsLevel($openid, $v['goodsid']);
+				if (!(empty($item))) 
+				{
+					$levels[$item['level']] = $item;
+				}
+			}
+		}
+		if (!(empty($levels))) 
+		{
+			$level = max(array_keys($levels));
+			$data = $levels[$level];
+		}
+		return $data;
+	}
+	public function upgradeLevel($openid, $orderid = 0) 
 	{
 		global $_W;
 		if (empty($openid)) 
@@ -426,6 +475,21 @@ class Member_EweiShopV2Model
 		{
 			$ordercount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and status=3 and uniacid=:uniacid ', array(':uniacid' => $_W['uniacid'], ':openid' => $member['openid']));
 			$level = pdo_fetch('select * from ' . tablename('ewei_shop_member_level') . ' where uniacid=:uniacid and enabled=1 and ' . $ordercount . ' >= ordercount and ordercount>0  order by level desc limit 1', array(':uniacid' => $_W['uniacid']));
+		}
+		if (!(empty($orderid))) 
+		{
+			$goods_level = $this->getGoodsLevel($openid, $orderid);
+			if (empty($level)) 
+			{
+				$level = $goods_level;
+			}
+			else if (!(empty($goods_level))) 
+			{
+				if ($level['level'] < $goods_level['level']) 
+				{
+					$level = $goods_level;
+				}
+			}
 		}
 		if (empty($level)) 
 		{
@@ -477,16 +541,19 @@ class Member_EweiShopV2Model
 		if ($set['trade']) 
 		{
 			$tmoney = floatval($set['trade']['money']);
-			$tcredit = intval($set['trade']['credit']);
-			if ($tmoney <= $money) 
+			if (!(empty($tmoney))) 
 			{
-				if (($money % $tmoney) == 0) 
+				$tcredit = intval($set['trade']['credit']);
+				if ($tmoney <= $money) 
 				{
-					$credit = intval($money / $tmoney) * $tcredit;
-				}
-				else 
-				{
-					$credit = (intval($money / $tmoney) + 1) * $tcredit;
+					if (($money % $tmoney) == 0) 
+					{
+						$credit = intval($money / $tmoney) * $tcredit;
+					}
+					else 
+					{
+						$credit = (intval($money / $tmoney) + 1) * $tcredit;
+					}
 				}
 			}
 		}

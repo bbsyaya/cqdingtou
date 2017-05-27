@@ -497,4 +497,12 @@
         {php echo $this->diyLayer(false, false, $goods['merchid'])}
 {/if}
 
+{if !empty($diypage['danmu'])}
+    {php $this->diyDanmu(true)}
+{/if}
+
+{if !empty($startadv)}
+    {template 'diypage/startadv'}
+{/if}
+
 {template '_footer'}
