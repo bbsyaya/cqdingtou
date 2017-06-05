@@ -21,12 +21,15 @@ class Index_EweiShopV2Page extends PluginMobilePage
 			$recgoods = set_medias($recgoods, 'thumb');
 			$this->model->groupsShare();
 			include $this->template();
+			return;
 		}
 		catch (Exception $e) 
 		{
 			$content = $e->getMessage();
 			include $this->template('groups/error');
 		}
+		$content = $e->getMessage();
+		include $this->template('groups/error');
 	}
 }
 ?>

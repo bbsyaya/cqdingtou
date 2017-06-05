@@ -159,6 +159,8 @@ class EweiShopWechatPay
 			$tids = explode('GJ', $tid);
 			$tid = $tids[0];
 		}
+		$ispeerpay = 0;
+		$tid2 = 0;
 		if (22 < strlen($tid)) 
 		{
 			$tid2 = $tid;
@@ -171,22 +173,25 @@ class EweiShopWechatPay
 		$params[':tid'] = $tid;
 		$params[':module'] = 'ewei_shopv2';
 		$log = pdo_fetch($sql, $params);
-		if (!(empty($log)) && ($log['status'] == '0') && (($log['fee'] == $this->total_fee) || $ispeerpay)) 
+		if (!(empty($log)) && (($log['status'] == '0') || $ispeerpay) && (($log['fee'] == $this->total_fee) || $ispeerpay)) 
 		{
 			pdo_update('ewei_shop_order', array('paytype' => 21, 'isborrow' => $isborrow, 'borrowopenid' => $borrowopenid, 'apppay' => ($this->isapp ? 1 : 0)), array('ordersn' => $log['tid'], 'uniacid' => $log['uniacid']));
 			$site = WeUtility::createModuleSite($log['module']);
 			if (!(empty($ispeerpay))) 
 			{
 				$ispeerpay = m('order')->checkpeerpay($order['id']);
-				m('order')->setOrderPayType($order['id'], 21);
-				$openid = $this->get['openid'];
-				$member = m('member')->getInfo($openid);
-				m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => '支持一下，么么哒!', 'price' => $log['fee'], 'createtime' => time(), 'openid' => $member['openid'], 'headimg' => $member['avatar'], 'tid' => $tid2));
-				unset($_SESSION['peerpaytid']);
-				$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
-				if ($peerpay_info < $ispeerpay['peerpay_realprice']) 
+				if (!(empty($ispeerpay))) 
 				{
-					$this->success();
+					m('order')->setOrderPayType($order['id'], 21);
+					$openid = $this->get['openid'];
+					$member = m('member')->getMember($openid);
+					m('order')->peerStatus(array('pid' => $ispeerpay['id'], 'uid' => $member['id'], 'uname' => $member['nickname'], 'usay' => '支持一下，么么哒!', 'price' => $this->total_fee, 'createtime' => time(), 'openid' => $openid, 'headimg' => $member['avatar'], 'tid' => $tid2));
+					unset($_SESSION['peerpaytid']);
+					$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
+					if ($peerpay_info < $ispeerpay['peerpay_realprice']) 
+					{
+						$this->success();
+					}
 				}
 			}
 			if (!(is_error($site))) 
@@ -213,6 +218,7 @@ class EweiShopWechatPay
 						$record['status'] = '1';
 						$record['tag'] = iserializer($log['tag']);
 						pdo_update('core_paylog', $record, array('plid' => $log['plid']));
+						return;
 					}
 				}
 			}
@@ -257,8 +263,9 @@ class EweiShopWechatPay
 			com_run('sale::setRechargeActivity', $log);
 			com_run('coupon::useRechargeCoupon', $log);
 			m('notice')->sendMemberLogMessage($log['id']);
+			return;
 		}
-		else if ($log['money'] == $this->total_fee) 
+		if ($log['money'] == $this->total_fee) 
 		{
 			pdo_update('ewei_shop_member_log', array('rechargetype' => 'wechat', 'isborrow' => $isborrow, 'borrowopenid' => $borrowopenid, 'apppay' => ($this->isapp ? 1 : 0)), array('id' => $log['id']));
 		}
@@ -530,6 +537,7 @@ class EweiShopWechatPay
 						$record['status'] = '1';
 						$record['tag'] = iserializer($log['tag']);
 						pdo_update('core_paylog', $record, array('plid' => $log['plid']));
+						return;
 					}
 				}
 			}
@@ -558,8 +566,9 @@ class EweiShopWechatPay
 			com_run('sale::setRechargeActivity', $log);
 			com_run('coupon::useRechargeCoupon', $log);
 			m('notice')->sendMemberLogMessage($log['id']);
+			return;
 		}
-		else if ($log['money'] == $this->total_fee) 
+		if ($log['money'] == $this->total_fee) 
 		{
 			pdo_update('ewei_shop_member_log', array('rechargetype' => 'wechat', 'apppay' => 2), array('id' => $log['id']));
 		}

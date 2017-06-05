@@ -10,8 +10,9 @@ class Cover_EweiShopV2Page extends PluginWebPage
 		if (cv('merch.cover.register')) 
 		{
 			header('location: ' . webUrl('merch/cover/register'));
+			return;
 		}
-		else if (cv('merch.cover.merchlist')) 
+		if (cv('merch.cover.merchlist')) 
 		{
 			header('location: ' . webUrl('merch/cover/merchlist'));
 		}

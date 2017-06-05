@@ -124,7 +124,10 @@
         <div class='fui-list-angle'>
             <span class="price ">&yen; <span class='marketprice'>{if $g['packageprice'] > $g['unitprice']}{$g['packageprice']}{else if $g['marketprice'] > $g['unitprice']}{$g['marketprice']}{else}{$g['unitprice']}{/if}</span></span>
             <span class="total">
-                    {if $changenum && !$isgift}
+                    {if $taskgoodsprice}
+                        {php $total = 1;}
+                        x1<input class="num shownum" type="hidden" name="" value="1"/>
+                    {elseif $changenum && !$isgift}
                     <div class="fui-number small" data-value="{$total}" data-unit="{$g['unit']}" data-maxbuy="{$g['totalmaxbuy']}" data-minbuy="{$g['minbuy']}" data-goodsid="{$g['goodsid']}">
                         <div class="minus">-</div>
                         <input class="num shownum" type="tel" name="" value="{$total}"/>
@@ -229,7 +232,7 @@
     </div>
 </div>
 {/if}
-{if empty($exchangeOrder)}
+{if empty($exchangeOrder) && empty($taskgoodsprice)}
 <div class="fui-cell-group  sm">
 
     <div id='coupondiv' class="fui-cell fui-cell-click" {if $couponcount<=0}style='display:none'{/if}>
@@ -313,10 +316,10 @@
         <div class="fui-cell-label" >商品小计</div>
         <div class="fui-cell-info"></div>
         <div class="fui-cell-remark noremark">&yen; <span class='{if !$packageid && empty($exchangeOrder)}goodsprice{/if}'>
-            {if !empty($exchangeOrder)}{$exchangeprice}{else}{php echo number_format($goodsprice,2)}{/if}
+            {if !empty($exchangeOrder)}{$exchangeprice}{elseif $taskgoodsprice}{$taskgoodsprice}{else}{php echo number_format($goodsprice,2)}{/if}
         </span></div>
     </div>
-    {if empty($exchangeOrder)}
+    {if empty($exchangeOrder) && empty($taskgoodsprice)}
     {if !$packageid}
     {if empty($if_bargain['bargain'])}
     <div class="fui-cell"  style="display: none">
@@ -378,7 +381,7 @@
 <div class="fui-cell">
     <div class="fui-cell-label" >运费</div>
     <div class="fui-cell-info"></div>
-    <div class="fui-cell-remark noremark">&yen; <span class='{if !$packageid && empty($exchangeOrder)}dispatchprice{/if}'>{if !empty($exchangeOrder)}{$exchangepostage}{else}{php echo number_format($dispatch_price,2)}{/if}</span></div>
+    <div class="fui-cell-remark noremark">&yen; <span class='{if !$packageid && empty($exchangeOrder)}dispatchprice{/if}'>{if !empty($exchangeOrder)}{$exchangepostage}{elseif $taskgoodsprice}{$taskgoodsprice}{else}{php echo number_format($dispatch_price,2)}{/if}</span></div>
 </div>
 
 
@@ -439,7 +442,7 @@
     <a href="javascript:;" class="nav-item total">
         <p>{if $packageid}<span class="text-danger" style="font-size: 0.6rem;">(套餐优惠&yen;{php echo number_format($marketprice-$goodsprice,2)})</span>{/if}
             需付：<span class="text-danger ">&yen; <span class="{if !$packageid && empty($exchangeOrder)}totalprice{/if}">
-                {if !empty($exchangeOrder)}{$exchangerealprice}{else}{php echo number_format($realprice,2)}{/if}</span></span>
+                {if !empty($exchangeOrder)}{$exchangerealprice}{elseif $taskgoodsprice}{$taskgoodsprice}{else}{php echo number_format($realprice,2)}{/if}</span></span>
         </p>
     </a>
     <a href="javascript:;" class="nav-item btn btn-danger buybtn">立即支付</a>

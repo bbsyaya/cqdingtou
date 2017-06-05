@@ -256,6 +256,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 	public function testlottery() 
 	{
 		global $_GPC;
+		$_GPC['testreward'];
 		$reward = array();
 		$inforeward = array();
 		$temreward = array();

@@ -719,6 +719,7 @@ class Finance_EweiShopV2Model
 			if ($arr['err_code'] == 'NOTENOUGH') 
 			{
 				$this->refundBorrow($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney, $gaijia, 'REFUND_SOURCE_RECHARGE_FUNDS');
+				return;
 			}
 		}
 		else 

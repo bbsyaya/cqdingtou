@@ -402,6 +402,63 @@ class Common_EweiShopV2Model
 		}
 		return error($result[$key]['code'], $result[$key]['msg'] . ':' . $result[$key]['sub_msg']);
 	}
+	public function ToXml($arr) 
+	{
+		if (!(is_array($arr)) || (count($arr) <= 0)) 
+		{
+			return error(-1, '数组数据异常！');
+		}
+		$xml = '<xml>';
+		foreach ($arr as $key => $val ) 
+		{
+			if (is_numeric($val)) 
+			{
+				$xml .= '<' . $key . '>' . $val . '</' . $key . '>';
+			}
+			else 
+			{
+				$xml .= '<' . $key . '><![CDATA[' . $val . ']]></' . $key . '>';
+			}
+		}
+		$xml .= '</xml>';
+		return $xml;
+	}
+	public function FromXml($xml) 
+	{
+		if (!($xml)) 
+		{
+			return error(-1, 'xml数据异常！');
+		}
+		libxml_disable_entity_loader(true);
+		$arr = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+		return $arr;
+	}
+	public function ToUrlParams($arr) 
+	{
+		$buff = '';
+		foreach ($arr as $k => $v ) 
+		{
+			if (($k != 'sign') && ($v != '') && !(is_array($v))) 
+			{
+				$buff .= $k . '=' . $v . '&';
+			}
+		}
+		$buff = trim($buff, '&');
+		return $buff;
+	}
+	public function changeTitle($title) 
+	{
+		$strlen = strlen($title);
+		if (function_exists('mb_strlen')) 
+		{
+			$mb_strlen = mb_strlen($title, 'UTF-8');
+			if (($mb_strlen * 3) != $strlen) 
+			{
+				$title = mb_substr($title, 1, $mb_strlen, 'UTF-8');
+			}
+		}
+		return $title;
+	}
 	public function public_build($isapp = false) 
 	{
 		global $_W;
@@ -436,6 +493,7 @@ class Common_EweiShopV2Model
 		{
 			return $payment;
 		}
+		$params['title'] = $this->changeTitle($params['title']);
 		if (($payment['is_new'] == 0) && !(empty($payment['weixin_sub']))) 
 		{
 			$wechat = array('appid' => $payment['appid_sub'], 'mch_id' => $payment['mchid_sub'], 'sub_appid' => (!(empty($payment['sub_appid_sub'])) ? $payment['sub_appid_sub'] : ''), 'sub_mch_id' => $payment['sub_mchid_sub'], 'apikey' => $payment['apikey_sub']);

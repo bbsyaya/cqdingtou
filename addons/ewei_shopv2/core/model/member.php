@@ -243,12 +243,10 @@ class Member_EweiShopV2Model
 		{
 			if ($credittype == 'credit1') 
 			{
+				return;
 			}
-			else 
-			{
-				p('task')->checkTaskReward('cost_rechargeenough', $credits, $openid);
-				p('task')->checkTaskReward('cost_rechargetotal', $credits, $openid);
-			}
+			p('task')->checkTaskReward('cost_rechargeenough', $credits, $openid);
+			p('task')->checkTaskReward('cost_rechargetotal', $credits, $openid);
 		}
 	}
 	public function getCredit($openid = '', $credittype = 'credit1') 
@@ -331,7 +329,7 @@ class Member_EweiShopV2Model
 		}
 		if (!(is_error($redis))) 
 		{
-			$redis->set($_W['openid'], 1, 10);
+			$redis->set($_W['openid'], 1, 20);
 		}
 		if (empty($member) && !(empty($openid))) 
 		{
@@ -602,6 +600,15 @@ class Member_EweiShopV2Model
 		$acc = WeiXinAccount::create($_W['acid']);
 		$userinfo = $acc->fansQueryInfo($openid);
 		$userinfo['avatar'] = $userinfo['headimgurl'];
+		$redis = redis();
+		if (!(is_error($redis))) 
+		{
+			$member = $redis->get($openid . '_checkMemberFromPlatform');
+			if (!(empty($member))) 
+			{
+				return json_decode($member, true);
+			}
+		}
 		load()->model('mc');
 		$uid = mc_openid2uid($openid);
 		if (!(empty($uid))) 
@@ -626,6 +633,10 @@ class Member_EweiShopV2Model
 			$member['city'] = $userinfo['city'];
 			pdo_update('ewei_shop_member', $member, array('id' => $member['id']));
 			$member['isnew'] = false;
+		}
+		if (!(is_error($redis))) 
+		{
+			$redis->set($openid . '_checkMemberFromPlatform', json_encode($member), 20);
 		}
 		return $member;
 	}
@@ -695,13 +706,11 @@ class Member_EweiShopV2Model
 			$data['salt'] = m('account')->getSalt();
 			$data['pwd'] = rand(10000, 99999) . $data['salt'];
 			pdo_insert('ewei_shop_member', $data);
+			return;
 		}
-		else 
+		if (empty($member['bindsns']) || ($member['bindsns'] == $sns)) 
 		{
-			if (empty($member['bindsns']) || ($member['bindsns'] == $sns)) 
-			{
-				pdo_update('ewei_shop_member', $data, array('id' => $member['id'], 'uniacid' => $_W['uniacid']));
-			}
+			pdo_update('ewei_shop_member', $data, array('id' => $member['id'], 'uniacid' => $_W['uniacid']));
 		}
 	}
 	public function compareLevel(array $level, array $levels = array()) 

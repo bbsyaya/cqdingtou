@@ -63,11 +63,9 @@ class Category_EweiShopV2Page extends MerchWebPage
 			pdo_update('ewei_shop_diypage_template_category', array('name' => $name), array('id' => $id, 'merch' => intval($_W['merchid'])));
 			plog('diypage.temp.category.edit', '编辑模板分类 id:' . $id . ' 原名称:' . $item['name'] . ' 新名称:' . $name);
 			show_json(1);
+			return;
 		}
-		else 
-		{
-			show_json(0, '分类不存在,请刷新页面重试！');
-		}
+		show_json(0, '分类不存在,请刷新页面重试！');
 	}
 }
 ?>

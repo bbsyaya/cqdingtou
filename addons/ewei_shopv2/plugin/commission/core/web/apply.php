@@ -99,6 +99,10 @@ class Apply_EweiShopV2Page extends PluginWebPage
 			$sql .= '  limit ' . (($pindex - 1) * $psize) . ',' . $psize;
 		}
 		$list = pdo_fetchall($sql, $params);
+		if ($status == 3) 
+		{
+			$realmoney_total = (double) pdo_fetchcolumn('select sum(a.realmoney) from ' . tablename('ewei_shop_commission_apply') . ' a ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.id = a.mid' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = m.agentlevel' . ' where 1 ' . $condition, $params);
+		}
 		foreach ($list as &$row ) 
 		{
 			$row['agentlevel'] = intval($row['agentlevel']);
@@ -414,7 +418,7 @@ class Apply_EweiShopV2Page extends PluginWebPage
 			$columns[] = array('title' => '审核时间', 'field' => 'checktime', 'width' => 24);
 			$columns[] = array('title' => '打款时间', 'field' => 'paytime', 'width' => 24);
 			$columns[] = array('title' => '设置无效时间', 'field' => 'invalidtime', 'width' => 24);
-			m('excel')->export($exportlist, array('title' => $title . '佣金申请数据-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
+			m('excel')->export($exportlist, array('title' => $applytitle . '佣金申请数据-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
 		}
 		$total = pdo_fetchcolumn('select count(a.id) from' . tablename('ewei_shop_commission_apply') . ' a ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.uid = a.mid' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = m.agentlevel' . ' where 1 ' . $condition, $params);
 		$pager = pagination($total, $pindex, $psize);

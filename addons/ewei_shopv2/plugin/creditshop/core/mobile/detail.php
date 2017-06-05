@@ -526,11 +526,9 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		if ($_W['ispost']) 
 		{
 			show_json(0);
+			return;
 		}
-		else 
-		{
-			header('location: ' . mobileUrl('member'));
-		}
+		header('location: ' . mobileUrl('member'));
 	}
 	public function creditshop_complete() 
 	{
@@ -610,15 +608,14 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			$url = mobileUrl('creditshop/detail/lottery', array('id' => $creditlog['id']), true);
 			exit('<script>top.window.location.href=\'' . $url . '\'</script>');
+			return;
 		}
-		else if ($fromwechat) 
+		if ($fromwechat) 
 		{
 			$this->message(array('message' => '请返回微信查看支付状态', 'title' => '支付成功!', 'buttondisplay' => false), NULL, 'success');
+			return;
 		}
-		else 
-		{
-			$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('creditshop/detail/lottery', array('id' => $creditlog['id'])), 'success');
-		}
+		$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('creditshop/detail/lottery', array('id' => $creditlog['id'])), 'success');
 	}
 	public function lottery() 
 	{

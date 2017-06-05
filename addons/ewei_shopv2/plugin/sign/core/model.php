@@ -66,8 +66,9 @@ class SignModel extends PluginModel
 					if (!(empty($member)) && ($member['status'] == 1) && ($member['isagent'] == 1)) 
 					{
 						$_W['shopshare']['link'] = mobileUrl('sign', array('mid' => $member['id']), true);
+						return;
 					}
-					else if (!(empty($_GPC['mid']))) 
+					if (!(empty($_GPC['mid']))) 
 					{
 						$_W['shopshare']['link'] = mobileUrl('sign', array('mid' => $_GPC['mid']), true);
 					}
@@ -377,11 +378,9 @@ class SignModel extends PluginModel
 		{
 			$data['uniacid'] = $_W['uniacid'];
 			pdo_insert('ewei_shop_sign_user', $data);
+			return;
 		}
-		else 
-		{
-			pdo_update('ewei_shop_sign_user', $data, array('id' => $info['id']));
-		}
+		pdo_update('ewei_shop_sign_user', $data, array('id' => $info['id']));
 	}
 }
 ?>

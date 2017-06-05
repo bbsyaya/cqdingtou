@@ -31,8 +31,13 @@
                 <span class="fui-payfor-info-title">{$goods['title']}</span>
                 <div class="fui-list" style="padding:0;">
                     <div class="fui-list-inner">
+                        {if !empty($address)}
                         <span>{$address['realname']} &nbsp;{php echo substr_replace($address['mobile'],'****',-4)}</span>
                         <span>{$address['province']}  {$address['city']}  {$address['area']} ****</span>
+                        {else}
+                        <span></span>
+                        <span></span>
+                        {/if}
                         <span class="fui-payfor-info-price">&yen;{$peerpay['peerpay_realprice']}</span>
                     </div>
                     <div class="fui-list-media">

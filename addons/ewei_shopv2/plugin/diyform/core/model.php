@@ -5,7 +5,7 @@ if (!(defined('IN_IA')))
 }
 class DiyformModel extends PluginModel 
 {
-	public $_data_type_config = array(0 => '单行文本', 1 => '多行文本', 2 => '下拉框', 3 => '多选框', 5 => '图片', 6 => '身份证号码', 7 => '日期', 8 => '日期范围', 9 => '城市', 10 => '确认文本', 11 => '时间', 12 => '时间范围');
+	public $_data_type_config = array(0 => '单行文本', 1 => '多行文本', 2 => '下拉框', 3 => '多选框', 5 => '图片', 6 => '身份证号码', 7 => '日期', 8 => '日期范围', 9 => '城市', 10 => '确认文本', 11 => '时间', 12 => '时间范围', 13 => '提示文本');
 	public $_default_data_config = array('', '自定义', '姓名', '电话', '微信号');
 	public $_default_date_config = array('', '填写当天', '特定日期');
 	public function globalData() 
@@ -110,6 +110,10 @@ class DiyformModel extends PluginModel
 					else if ($temp_tp_type == 10) 
 					{
 						$data[$i]['tp_name2'] = trim($tp_name2[$key]);
+					}
+					else if ($temp_tp_type == 13) 
+					{
+						$data[$i]['tp_text'] = trim($tp_text[$key]);
 					}
 				}
 			}
@@ -237,6 +241,9 @@ class DiyformModel extends PluginModel
 						{
 							$data[$key] = array('name1' => trim($memberdata[$key][0]), 'name2' => trim($memberdata[$key][1]));
 						}
+					}
+					else if ($data_type == 13) 
+					{
 					}
 					else 
 					{
@@ -726,97 +733,100 @@ class DiyformModel extends PluginModel
 						break;
 					}
 				}
-				if ($v['data_type'] == 2) 
+				else 
 				{
-					if (empty($f_data[$k])) 
+					if ($v['data_type'] == 2) 
 					{
-						$f_data[$k] = array(0, $v['tp_text'][0]);
-					}
-					else 
-					{
-						$index = -1;
-						foreach ($v['tp_text'] as $i => $val ) 
-						{
-							if ($val == $f_data[$k]) 
-							{
-								$index = $i;
-							}
-						}
-						if ($index < 0) 
+						if (empty($f_data[$k])) 
 						{
 							$f_data[$k] = array(0, $v['tp_text'][0]);
 						}
 						else 
 						{
-							$f_data[$k] = array($index, $f_data[$k]);
+							$index = -1;
+							foreach ($v['tp_text'] as $i => $val ) 
+							{
+								if ($val == $f_data[$k]) 
+								{
+									$index = $i;
+								}
+							}
+							if ($index < 0) 
+							{
+								$f_data[$k] = array(0, $v['tp_text'][0]);
+							}
+							else 
+							{
+								$f_data[$k] = array($index, $f_data[$k]);
+							}
 						}
 					}
-				}
-				else if (($v['data_type'] == 3) && is_array($f_data[$k])) 
-				{
-					$newdata = array();
-					foreach ($f_data[$k] as $kk => $vv ) 
-					{
-						$newdata[$vv] = 1;
-					}
-					$f_data[$k] = $newdata;
-					unset($newdata);
-				}
-				else if ($v['data_type'] == 5) 
-				{
-					if (!(empty($f_data[$k])) && is_array($f_data[$k])) 
+					else if (($v['data_type'] == 3) && is_array($f_data[$k])) 
 					{
 						$newdata = array();
 						foreach ($f_data[$k] as $kk => $vv ) 
 						{
-							$newdata[] = array('url' => tomedia($vv), 'filename' => $vv);
+							$newdata[$vv] = 1;
 						}
-						$f_data[$k] = array('images' => $newdata, 'count' => count($newdata));
+						$f_data[$k] = $newdata;
+						unset($newdata);
 					}
-					else 
+					else if ($v['data_type'] == 5) 
 					{
-						$f_data[$k] = array( 'images' => array(), 'count' => 0 );
+						if (!(empty($f_data[$k])) && is_array($f_data[$k])) 
+						{
+							$newdata = array();
+							foreach ($f_data[$k] as $kk => $vv ) 
+							{
+								$newdata[] = array('url' => tomedia($vv), 'filename' => $vv);
+							}
+							$f_data[$k] = array('images' => $newdata, 'count' => count($newdata));
+						}
+						else 
+						{
+							$f_data[$k] = array( 'images' => array(), 'count' => 0 );
+						}
 					}
-				}
-				else if ($v['data_type'] == 7) 
-				{
-					switch ($v['default_time_type']) 
+					else if ($v['data_type'] == 7) 
 					{
-						case 0: $f_data[$k] = '';
-						break;
-						case 1: $f_data[$k] = date('Y-m-d');
-						break;
-						case 2: $f_data[$k] = $v['default_time'];
-						break;
+						switch ($v['default_time_type']) 
+						{
+							case 0: $f_data[$k] = '';
+							break;
+							case 1: $f_data[$k] = date('Y-m-d');
+							break;
+							case 2: $f_data[$k] = $v['default_time'];
+							break;
+						}
 					}
-				}
-				else if (($v['data_type'] == 8) && !(is_array($f_data[$k]))) 
-				{
-					$f_data[$k] = array();
-					switch ($v['default_btime_type']) 
+					else if (($v['data_type'] == 8) && !(is_array($f_data[$k]))) 
 					{
-						case 0: $f_data[$k][0] = '';
-						break;
-						case 1: $f_data[$k][0] = date('Y-m-d');
-						break;
-						case 2: $f_data[$k][0] = $v['default_btime'];
-						break;
+						$f_data[$k] = array();
+						switch ($v['default_btime_type']) 
+						{
+							case 0: $f_data[$k][0] = '';
+							break;
+							case 1: $f_data[$k][0] = date('Y-m-d');
+							break;
+							case 2: $f_data[$k][0] = $v['default_btime'];
+							break;
+						}
+						switch ($v['default_etime_type']) 
+						{
+							case 0: $f_data[$k][1] = '';
+							break;
+							case 1: $f_data[$k][1] = date('Y-m-d');
+							break;
+							case 2: $f_data[$k][1] = $v['default_etime'];
+							break;
+						}
 					}
-					switch ($v['default_etime_type']) 
+					else if (($v['data_type'] == 10) && (empty($f_data[$k]) || !(is_array($f_data[$k])))) 
 					{
-						case 0: $f_data[$k][1] = '';
-						break;
-						case 1: $f_data[$k][1] = date('Y-m-d');
-						break;
-						case 2: $f_data[$k][1] = $v['default_etime'];
-						break;
+						$f_data[$k] = array('name1' => '', 'name2' => '');
 					}
+					$newFields[] = $v;
 				}
-				else if (($v['data_type'] == 10) && (empty($f_data[$k]) || !(is_array($f_data[$k])))) 
-				{
-					$f_data[$k] = array('name1' => '', 'name2' => '');
-				}
-				$newFields[] = $v;
 			}
 		}
 		return array('fields' => $newFields, 'f_data' => array_filter($f_data));

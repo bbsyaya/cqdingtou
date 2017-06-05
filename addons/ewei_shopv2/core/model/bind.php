@@ -38,27 +38,9 @@ class Bind_EweiShopV2Model
 		$comparelevel = m('member')->compareLevel(array($a['level'], $b['level']));
 		$level = (($comparelevel ? $b['level'] : $a['level']));
 		$isblack = ((!(empty($a['isblack'])) || !(empty($b['isblack'])) ? 1 : 0));
-		if (!(empty($b['openid_qq'])) && empty($a['openid_qq'])) 
-		{
-		}
-		else 
-		{
-		}
-		$openid_qq = $a['openid_qq'];
-		if (!(empty($b['openid_wx'])) && empty($a['openid_wx'])) 
-		{
-		}
-		else 
-		{
-		}
-		$openid_wx = $a['openid_wx'];
-		if (!(empty($b['openid_wa'])) && empty($a['openid_wa'])) 
-		{
-		}
-		else 
-		{
-		}
-		$openid_wa = $a['openid_wa'];
+		$openid_qq = ((!(empty($b['openid_qq'])) && empty($a['openid_qq']) ? $b['openid_qq'] : $a['openid_qq']));
+		$openid_wx = ((!(empty($b['openid_wx'])) && empty($a['openid_wx']) ? $b['openid_wx'] : $a['openid_wx']));
+		$openid_wa = ((!(empty($b['openid_wa'])) && empty($a['openid_wa']) ? $b['openid_wa'] : $a['openid_wa']));
 		if (!(empty($a['isagent'])) && empty($b['isagent'])) 
 		{
 			$isagent = 1;

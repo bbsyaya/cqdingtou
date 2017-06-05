@@ -12,11 +12,9 @@ class Peerpay_EweiShopV2Page extends ComWebPage
 			if (cv('sale.peerpay')) 
 			{
 				header('location: ' . webUrl('sale/peerpay'));
+				return;
 			}
-			else 
-			{
-				$this->message('你没有相应的权限查看');
-			}
+			$this->message('你没有相应的权限查看');
 		}
 	}
 	public function main() 

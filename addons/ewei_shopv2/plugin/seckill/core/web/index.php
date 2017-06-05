@@ -12,31 +12,34 @@ class Index_EweiShopV2Page extends SeckillWebPage
 		if (cv('seckill.task')) 
 		{
 			header('location: ' . webUrl('seckill/task'));
+			return;
 		}
-		else if (cv('seckill.goods')) 
+		if (cv('seckill.goods')) 
 		{
 			header('location: ' . webUrl('seckill/goods'));
+			return;
 		}
-		else if (cv('seckill.category')) 
+		if (cv('seckill.category')) 
 		{
 			header('location: ' . webUrl('seckill/category'));
+			return;
 		}
-		else if (cv('seckill.adv')) 
+		if (cv('seckill.adv')) 
 		{
 			header('location: ' . webUrl('seckill/adv'));
+			return;
 		}
-		else if (cv('seckill.calendar')) 
+		if (cv('seckill.calendar')) 
 		{
 			header('location: ' . webUrl('seckill/calendar'));
+			return;
 		}
-		else if (cv('seckill.cover')) 
+		if (cv('seckill.cover')) 
 		{
 			header('location: ' . webUrl('seckill/cover'));
+			return;
 		}
-		else 
-		{
-			header('location: ' . webUrl());
-		}
+		header('location: ' . webUrl());
 	}
 }
 ?>

@@ -160,11 +160,9 @@ class MobilePage extends Page
 			if ($showdiyfollowbar) 
 			{
 				include $this->template('diypage/followbar');
+				return;
 			}
-			else 
-			{
-				include $this->template('_followbar');
-			}
+			include $this->template('_followbar');
 		}
 	}
 	public function MemberBar($diypage = false, $merch = false) 
@@ -204,7 +202,7 @@ class MobilePage extends Page
 		$buy_member_url = mobileUrl('goods/detail', array('id' => $goods['id'], 'mid' => $mid));
 		include $this->template('cmember/_memberbar');
 	}
-	public function footerMenus($diymenuid = NULL, $p = NULL) 
+	public function footerMenus($diymenuid = NULL, $ismerch = false) 
 	{
 		global $_W;
 		global $_GPC;
@@ -237,6 +235,10 @@ class MobilePage extends Page
 		{
 			$pageid = ((!(empty($controller)) ? $controller : 'shop'));
 			$pageid = (($pageid == 'index' ? 'shop' : $pageid));
+			if (!(empty($_GPC['merchid'])) && ($_W['routes'] == 'shop.category')) 
+			{
+				$pageid = 'merch';
+			}
 			if (($pageid == 'merch') && !(empty($_GPC['merchid'])) && p('merch')) 
 			{
 				$merchdata = p('merch')->getSet('diypage', $_GPC['merchid']);
@@ -276,51 +278,64 @@ class MobilePage extends Page
 		if ($showdiymenu) 
 		{
 			include $this->template('diypage/menu');
+			return;
 		}
-		else if (($controller == 'commission') && ($routes[1] != 'myshop')) 
+		if (($controller == 'commission') && ($routes[1] != 'myshop')) 
 		{
 			include $this->template('commission/_menu');
+			return;
 		}
-		else if ($controller == 'creditshop') 
+		if ($controller == 'creditshop') 
 		{
 			include $this->template('creditshop/_menu');
+			return;
 		}
-		else if ($controller == 'groups') 
+		if ($controller == 'groups') 
 		{
 			include $this->template('groups/_groups_footer');
+			return;
 		}
-		else if ($controller == 'merch') 
+		if ($controller == 'merch') 
 		{
 			include $this->template('merch/_menu');
+			return;
 		}
-		else if ($controller == 'mr') 
+		if ($controller == 'mr') 
 		{
 			include $this->template('mr/_menu');
+			return;
 		}
-		else if ($controller == 'newmr') 
+		if ($controller == 'newmr') 
 		{
 			include $this->template('newmr/_menu');
+			return;
 		}
-		else if ($controller == 'sign') 
+		if ($controller == 'sign') 
 		{
 			include $this->template('sign/_menu');
+			return;
 		}
-		else if ($controller == 'sns') 
+		if ($controller == 'sns') 
 		{
 			include $this->template('sns/_menu');
+			return;
 		}
-		else if ($controller == 'seckill') 
+		if ($controller == 'seckill') 
 		{
 			include $this->template('seckill/_menu');
+			return;
 		}
-		else if ($controller == 'mmanage') 
+		if ($controller == 'mmanage') 
 		{
 			include $this->template('mmanage/_menu');
+			return;
 		}
-		else 
+		if ($ismerch) 
 		{
-			include $this->template('_menu');
+			include $this->template('merch/_menu');
+			return;
 		}
+		include $this->template('_menu');
 	}
 	public function shopShare() 
 	{

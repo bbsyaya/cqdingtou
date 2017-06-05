@@ -12,11 +12,9 @@ class Index_EweiShopV2Page extends ComWebPage
 			if (cv('sale.coupon')) 
 			{
 				header('location: ' . webUrl('sale/coupon'));
+				return;
 			}
-			else 
-			{
-				$this->message('你没有相应的权限查看');
-			}
+			$this->message('你没有相应的权限查看');
 		}
 	}
 	public function main() 
@@ -24,27 +22,29 @@ class Index_EweiShopV2Page extends ComWebPage
 		if (cv('sale.enough')) 
 		{
 			header('location: ' . webUrl('sale/enough'));
+			return;
 		}
-		else if (cv('sale.enoughfree')) 
+		if (cv('sale.enoughfree')) 
 		{
 			header('location: ' . webUrl('sale/enoughfree'));
+			return;
 		}
-		else if (cv('sale.deduct')) 
+		if (cv('sale.deduct')) 
 		{
 			header('location: ' . webUrl('sale/deduct'));
+			return;
 		}
-		else if (cv('sale.recharge')) 
+		if (cv('sale.recharge')) 
 		{
 			header('location: ' . webUrl('sale/recharge'));
+			return;
 		}
-		else if (cv('sale.coupon')) 
+		if (cv('sale.coupon')) 
 		{
 			header('location: ' . webUrl('sale/coupon'));
+			return;
 		}
-		else 
-		{
-			header('location: ' . webUrl());
-		}
+		header('location: ' . webUrl());
 	}
 	public function deduct() 
 	{

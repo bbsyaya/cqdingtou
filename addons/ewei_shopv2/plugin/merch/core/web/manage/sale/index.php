@@ -15,19 +15,19 @@ class Index_EweiShopV2Page extends MerchWebPage
 		if (mcv('sale.enough')) 
 		{
 			header('location: ' . merchUrl('sale/enough'));
+			return;
 		}
-		else if (mcv('sale.enoughfree')) 
+		if (mcv('sale.enoughfree')) 
 		{
 			header('location: ' . merchUrl('sale/enoughfree'));
+			return;
 		}
-		else if (mcv('sale.coupon')) 
+		if (mcv('sale.coupon')) 
 		{
 			header('location: ' . merchUrl('sale/coupon'));
+			return;
 		}
-		else 
-		{
-			header('location: ' . merchUrl());
-		}
+		header('location: ' . merchUrl());
 	}
 	public function enough() 
 	{

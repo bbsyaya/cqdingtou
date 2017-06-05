@@ -33,9 +33,19 @@ class Recharge_EweiShopV2Page extends MobileLoginPage
 		{
 			if (isset($set['pay']) && ($set['pay']['weixin'] == 1)) 
 			{
-				load()->model('payment');
-				$setting = uni_setting($_W['uniacid'], array('payment'));
-				if (is_array($setting['payment']['wechat']) && $setting['payment']['wechat']['switch']) 
+				list(, $payment) = m('common')->public_build();
+				if ($payment['is_new']) 
+				{
+					if (($payment['type'] == 2) || ($payment['type'] == 3)) 
+					{
+						if (!(empty($payment['sub_appsecret']))) 
+						{
+							$wxuser = m('member')->wxuser($payment['sub_appid'], $payment['sub_appsecret']);
+							$params['openid'] = $wxuser['openid'];
+						}
+					}
+				}
+				if (is_array($payment) && !(is_error($payment))) 
 				{
 					$wechat['success'] = true;
 				}
@@ -259,11 +269,9 @@ class Recharge_EweiShopV2Page extends MobileLoginPage
 		if ($_W['ispost']) 
 		{
 			show_json(0);
+			return;
 		}
-		else 
-		{
-			header('location: ' . mobileUrl('member'));
-		}
+		header('location: ' . mobileUrl('member'));
 	}
 	public function getstatus() 
 	{
@@ -274,11 +282,9 @@ class Recharge_EweiShopV2Page extends MobileLoginPage
 		if (!(empty($log)) && !(empty($log['status']))) 
 		{
 			show_json(1);
+			return;
 		}
-		else 
-		{
-			show_json(0);
-		}
+		show_json(0);
 	}
 }
 ?>

@@ -11,43 +11,49 @@ class Index_EweiShopV2Page extends MerchWebPage
 		if (mcv('statistics.sale.main')) 
 		{
 			header('location: ' . merchUrl('statistics/sale'));
+			return;
 		}
-		else if (mcv('statistics.sale_analysis.main')) 
+		if (mcv('statistics.sale_analysis.main')) 
 		{
 			header('location: ' . merchUrl('statistics/sale_analysis'));
+			return;
 		}
-		else if (mcv('statistics.order.main')) 
+		if (mcv('statistics.order.main')) 
 		{
 			header('location: ' . merchUrl('statistics/order'));
+			return;
 		}
-		else if (mcv('statistics.sale_analysis.main')) 
+		if (mcv('statistics.sale_analysis.main')) 
 		{
 			header('location: ' . merchUrl('statistics/sale_analysis'));
+			return;
 		}
-		else if (mcv('statistics.goods.main')) 
+		if (mcv('statistics.goods.main')) 
 		{
 			header('location: ' . merchUrl('statistics/goods'));
+			return;
 		}
-		else if (mcv('statistics.goods_rank.main')) 
+		if (mcv('statistics.goods_rank.main')) 
 		{
 			header('location: ' . merchUrl('statistics/goods_rank'));
+			return;
 		}
-		else if (mcv('statistics.goods_trans.main')) 
+		if (mcv('statistics.goods_trans.main')) 
 		{
 			header('location: ' . merchUrl('statistics/goods_trans'));
+			return;
 		}
-		else if (mcv('statistics.member_cost.main')) 
+		if (mcv('statistics.member_cost.main')) 
 		{
 			header('location: ' . merchUrl('statistics/member_cost'));
+			return;
 		}
-		else if (mcv('statistics.member_increase.main')) 
+		if (mcv('statistics.member_increase.main')) 
 		{
 			header('location: ' . merchUrl('statistics/member_increase'));
+			return;
 		}
-		else 
-		{
-			header('location: ' . merchUrl());
-		}
+		header('location: ' . merchUrl());
 	}
 }
 ?>

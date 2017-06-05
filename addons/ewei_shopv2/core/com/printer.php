@@ -43,11 +43,11 @@ class Printer_EweiShopV2ComModel extends ComModel
 				break;
 
 			case self::CONTENT_CENTER:
-				$res = '<C>' . trim($str) . '</C>';
+				$res = '<C>' . $str . '</C><BR>';
 				break;
 
 			case self::CONTENT_CENTER_BOLD:
-				$res = '<CB>' . trim($str) . '</CB><BR>';
+				$res = '<CB>' . $str . '</CB><BR>';
 				break;
 
 			case self::CONTENT_CODE:
@@ -71,11 +71,11 @@ class Printer_EweiShopV2ComModel extends ComModel
 				break;
 
 			case self::CONTENT_CENTER:
-				$res = '<center>' . trim($str) . '</center>';
+				$res = '<center>' . $str . '</center>' . "\n";
 				break;
 
 			case self::CONTENT_CENTER_BOLD:
-				$res = '<center>@@2' . trim($str) . '</center>' . "\n";
+				$res = '<center>@@2' . $str . '</center>' . "\n";
 				break;
 
 			case self::CONTENT_CODE:
@@ -107,9 +107,6 @@ class Printer_EweiShopV2ComModel extends ComModel
 			case self::CONTENT_QRCODE:
 				$qrlength = chr(strlen($str));
 				$res = '^Q' . $qrlength . $str . "\n";
-				break;
-			default:
-				$res = $str . "\n";
 				break;
 			}
 		}
@@ -291,9 +288,6 @@ class Printer_EweiShopV2ComModel extends ComModel
 			break;
 			case self::PRINTRT_YILIANYUN_NEW:
 				$res = $this->printerYilianyunNew();
-			break;
-			case self::PRINTRT_365:
-				$res = $this->printer365();
 			break;
 		}
 		return $res;
@@ -477,10 +471,17 @@ class Printer_EweiShopV2ComModel extends ComModel
 		}
 		return $message;
 	}
-	public function getPrinterSet() 
+	public function getPrinterSet($merchid = 0) 
 	{
 		global $_W;
-		$data = m('common')->getSysset('printer');
+		if (!(empty($merchid))) 
+		{
+			$data = p('merch')->getSet('printer', $merchid);
+		}
+		else 
+		{
+			$data = m('common')->getSysset('printer');
+		}
 		if (!(empty($data['order_printer']))) 
 		{
 			$data['order_printer'] = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_member_printer') . ' WHERE uniacid=:uniacid AND id IN (' . $data['order_printer'] . ')', array(':uniacid' => $_W['uniacid']));
@@ -619,13 +620,30 @@ class Printer_EweiShopV2ComModel extends ComModel
 		$params = array('goodsprice' => (double) $order['goodsprice'], 'dispatchprice' => (double) $order['dispatchprice'], 'discountprice' => (double) $order['discountprice'], 'deductprice' => (double) $order['deductprice'], 'deductcredit2' => (double) $order['deductcredit2'], 'deductenough' => (double) $order['deductenough'], 'merchdeductenough' => (double) $order['merchdeductenough'], 'couponprice' => (double) $order['couponprice'], 'isdiscountprice' => (double) $order['isdiscountprice'], 'changeprice' => (double) $order['changeprice'], 'changedispatchprice' => (double) $order['changedispatchprice'], 'price' => (double) $order['price'], 'data' => $goods, 'discount' => (double) $order['goodsprice'] - $order['price'], 'ordersn' => $order['ordersn'], 'remark' => $order['remark'], 'address' => $addressinfo, 'realname' => $buyerinfo_name, 'mobile' => $buyerinfo_mobile, 'expresscom' => $order['expresscom'], 'expresssn' => $order['expresssn'], 'createtime' => date('Y-m-d H:i', $order['createtime']), 'paytime' => date('Y-m-d H:i', $order['paytime']), 'sendtime' => date('Y-m-d H:i', $order['sendtime']), 'finishtime' => date('Y-m-d H:i', $order['finishtime']), 'storename' => (!(empty($store)) ? $store['storename'] : ''), 'storeaddress' => (!(empty($store)) ? $store['address'] : ''), 'storemobile' => (!(empty($store)) ? $store['mobile'] : ''), 'storerealname' => (!(empty($store)) ? $store['realname'] : ''), 'order_time_title' => $order_time_title, 'order_time' => $order_time, 'order_status' => $order_status);
 		$PrinterSet = $this->getPrinterSet();
 		$res = array();
-		if (!(empty($PrinterSet['ordertype'])) && !(empty($PrinterSet['order_printer']))) 
+		if (!(empty($PrinterSet['printer_merch'])) || (empty($PrinterSet['printer_merch']) && ($order['merchid'] == 0))) 
 		{
-			if (in_array($status, $PrinterSet['ordertype'])) 
+			if (!(empty($PrinterSet['ordertype'])) && !(empty($PrinterSet['order_printer']))) 
 			{
-				foreach ($PrinterSet['order_printer'] as $value ) 
+				if (in_array($status, $PrinterSet['ordertype'])) 
 				{
-					$res[] = $this->printer($params, $PrinterSet['order_template'], $value['id'], 0);
+					foreach ($PrinterSet['order_printer'] as $value ) 
+					{
+						$res[] = $this->printer($params, $PrinterSet['order_template'], $value['id'], 0);
+					}
+				}
+			}
+		}
+		if (0 < $order['merchid']) 
+		{
+			$PrinterSet = $this->getPrinterSet($order['merchid']);
+			if (!(empty($PrinterSet['ordertype'])) && !(empty($PrinterSet['order_printer']))) 
+			{
+				if (in_array($status, $PrinterSet['ordertype'])) 
+				{
+					foreach ($PrinterSet['order_printer'] as $value ) 
+					{
+						$res[] = $this->printer($params, $PrinterSet['order_template'], $value['id'], 0);
+					}
 				}
 			}
 		}

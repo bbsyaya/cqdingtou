@@ -26,6 +26,7 @@ class Route_EweiShopV2Model
 		$method = 'main';
 		$root = (($isweb ? EWEI_SHOPV2_CORE_WEB : EWEI_SHOPV2_CORE_MOBILE));
 		$isMerch = false;
+		$isNewstore = false;
 		if (strexists($_W['siteurl'], 'web/merchant.php')) 
 		{
 			if (empty($r)) 
@@ -34,6 +35,16 @@ class Route_EweiShopV2Model
 				$routes = explode('.', $r);
 			}
 			$isMerch = true;
+			$isplugin = true;
+		}
+		else if (strexists($_W['siteurl'], 'web/newstoreant.php')) 
+		{
+			if (empty($r)) 
+			{
+				$r = 'newstore.manage';
+				$routes = explode('.', $r);
+			}
+			$isNewstore = true;
 			$isplugin = true;
 		}
 		else 
@@ -58,6 +69,11 @@ class Route_EweiShopV2Model
 			{
 				$_W['plugin'] = 'merch';
 				$root = EWEI_SHOPV2_PLUGIN . 'merch/core/web/manage/';
+			}
+			else if ($isNewstore) 
+			{
+				$_W['plugin'] = 'newstore';
+				$root = EWEI_SHOPV2_PLUGIN . 'newstore/core/web/manage/';
 			}
 			else 
 			{
@@ -156,8 +172,7 @@ class Route_EweiShopV2Model
 			$class = ucfirst($routes[2]);
 			$file = $root . $routes[0] . '/' . $routes[1] . '/' . $routes[2] . '.php';
 			break;
-		}
-			//default: 
+			}
 			if (!(is_file($file))) 
 			{
 				show_message('未找到控制器 ' . $r);

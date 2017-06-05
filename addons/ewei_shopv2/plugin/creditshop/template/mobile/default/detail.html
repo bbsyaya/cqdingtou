@@ -171,9 +171,7 @@
 
         <div class="detail-block">
             <div class="block block-basic tab-basic" id="basic">
-                <div class="content-block content-images" style="height: auto;">
                 {if $goods['goodsdetail']}{php echo htmlspecialchars_decode($goods['goodsdetail'])}{else}暂无商品详情{/if}
-                </div>
             </div>
             {if $set['isreply']==1}
             <div class="block block-comment tab-basic" id="comment">

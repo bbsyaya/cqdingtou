@@ -79,7 +79,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 			plog('diypage.shop.menu.save', $plog);
 			show_json(1);
 		}
-		$pluginList = array('creditshop' => 0, 'commission' => 0, 'groups' => 0, 'mr' => 0, 'sns' => 0, 'sign' => 0, 'seckill' => 0, 'threen' => 0);
+		$pluginList = array('creditshop' => 0, 'commission' => 0, 'groups' => 0, 'mr' => 0, 'sns' => 0, 'sign' => 0, 'seckill' => 0, 'threen' => 0, 'merch' => 0);
 		$pluginAll = m('plugin')->getAll();
 		if (empty($pluginAll)) 
 		{

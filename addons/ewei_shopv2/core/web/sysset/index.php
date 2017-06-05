@@ -10,79 +10,94 @@ class Index_EweiShopV2Page extends WebPage
 		if (cv('sysset.shop')) 
 		{
 			header('location: ' . webUrl('sysset/shop'));
+			return;
 		}
-		else if (cv('sysset.follow')) 
+		if (cv('sysset.follow')) 
 		{
 			header('location: ' . webUrl('sysset/follow'));
+			return;
 		}
-		else if (cv('sysset.wap')) 
+		if (cv('sysset.wap')) 
 		{
 			header('location: ' . webUrl('sysset/wap'));
+			return;
 		}
-		else if (cv('sysset.pcset')) 
+		if (cv('sysset.pcset')) 
 		{
 			header('location: ' . webUrl('sysset/pcset'));
+			return;
 		}
-		else if (cv('sysset.notice')) 
+		if (cv('sysset.notice')) 
 		{
 			header('location: ' . webUrl('sysset/notice'));
+			return;
 		}
-		else if (cv('sysset.trade')) 
+		if (cv('sysset.trade')) 
 		{
 			header('location: ' . webUrl('sysset/trade'));
+			return;
 		}
-		else if (cv('sysset.payset')) 
+		if (cv('sysset.payset')) 
 		{
 			header('location: ' . webUrl('sysset/payset'));
+			return;
 		}
-		else if (cv('sysset.templat')) 
+		if (cv('sysset.templat')) 
 		{
 			header('location: ' . webUrl('sysset/templat'));
+			return;
 		}
-		else if (cv('sysset.member')) 
+		if (cv('sysset.member')) 
 		{
 			header('location: ' . webUrl('sysset/member'));
+			return;
 		}
-		else if (cv('sysset.category')) 
+		if (cv('sysset.category')) 
 		{
 			header('location: ' . webUrl('sysset/category'));
+			return;
 		}
-		else if (cv('sysset.contact')) 
+		if (cv('sysset.contact')) 
 		{
 			header('location: ' . webUrl('sysset/contact'));
+			return;
 		}
-		else if (cv('sysset.qiniu')) 
+		if (cv('sysset.qiniu')) 
 		{
 			header('location: ' . webUrl('sysset/qiniu'));
+			return;
 		}
-		else if (cv('sysset.sms.set')) 
+		if (cv('sysset.sms.set')) 
 		{
 			header('location: ' . webUrl('sysset/sms/set'));
+			return;
 		}
-		else if (cv('sysset.sms.temp')) 
+		if (cv('sysset.sms.temp')) 
 		{
 			header('location: ' . webUrl('sysset/sms/temp'));
+			return;
 		}
-		else if (cv('sysset.close')) 
+		if (cv('sysset.close')) 
 		{
 			header('location: ' . webUrl('sysset/close'));
+			return;
 		}
-		else if (cv('sysset.tmessage')) 
+		if (cv('sysset.tmessage')) 
 		{
 			header('location: ' . webUrl('sysset/tmessage'));
+			return;
 		}
-		else if (cv('sysset.cover')) 
+		if (cv('sysset.cover')) 
 		{
 			header('location: ' . webUrl('sysset/cover'));
+			return;
 		}
-		else if (cv('sysset.area')) 
+		if (cv('sysset.area')) 
 		{
 			header('location: ' . webUrl('sysset/area'));
+			return;
 		}
-		else 
-		{
-			header('location: ' . webUrl());
-		}
+		header('location: ' . webUrl());
 	}
 	public function shop() 
 	{
@@ -261,6 +276,20 @@ class Index_EweiShopV2Page extends WebPage
 				$salers2 = pdo_fetchall('select id,nickname,avatar,openid from ' . tablename('ewei_shop_member') . ' where openid in (' . implode(',', $openids2) . ') and uniacid=' . $_W['uniacid']);
 			}
 		}
+		$salers3 = array();
+		if (isset($data['openid3'])) 
+		{
+			if (!(empty($data['openid3']))) 
+			{
+				$openids3 = array();
+				$strsopenids3 = explode(',', $data['openid3']);
+				foreach ($strsopenids3 as $openid3 ) 
+				{
+					$openids3[] = '\'' . $openid3 . '\'';
+				}
+				$salers3 = pdo_fetchall('select id,nickname,avatar,openid from ' . tablename('ewei_shop_member') . ' where openid in (' . implode(',', $openids3) . ') and uniacid=' . $_W['uniacid']);
+			}
+		}
 		$opensms = com('sms');
 		if ($_W['ispost']) 
 		{
@@ -281,6 +310,14 @@ class Index_EweiShopV2Page extends WebPage
 			else 
 			{
 				$data['openid2'] = '';
+			}
+			if (is_array($_GPC['openids3'])) 
+			{
+				$data['openid3'] = implode(',', $_GPC['openids3']);
+			}
+			else 
+			{
+				$data['openid3'] = '';
 			}
 			if (empty($data['willcancel_close_advanced'])) 
 			{

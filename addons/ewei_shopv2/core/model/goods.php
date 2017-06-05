@@ -103,6 +103,10 @@ class Goods_EweiShopV2Model
 		{
 			$condition .= ' AND (`title` LIKE :keywords OR `keywords` LIKE :keywords)';
 			$params[':keywords'] = '%' . trim($keywords) . '%';
+			if (empty($merchid)) 
+			{
+				$condition .= ' AND nosearch=0';
+			}
 		}
 		if (!(empty($args['cate']))) 
 		{
@@ -379,11 +383,9 @@ class Goods_EweiShopV2Model
 		{
 			$history = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'goodsid' => $goodsid, 'deleted' => 0, 'createtime' => time(), 'times' => 1);
 			pdo_insert('ewei_shop_member_history', $history);
+			return;
 		}
-		else 
-		{
-			pdo_update('ewei_shop_member_history', array('deleted' => 0, 'times' => $history['times'] + 1), array('id' => $history['id']));
-		}
+		pdo_update('ewei_shop_member_history', array('deleted' => 0, 'times' => $history['times'] + 1), array('id' => $history['id']));
 	}
 	public function getCartCount() 
 	{

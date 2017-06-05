@@ -1,3 +1,13 @@
+.fui-notice {
+    border-top: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.fui-notice:before,
+.fui-notice:after {
+    border: 0;
+}
+
 .fui-line-diy {
     height: auto;
     display: block;

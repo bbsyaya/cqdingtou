@@ -69,13 +69,17 @@ class Picker_EweiShopV2Page extends MobilePage
 		}
 		if (0 < $goods['ispresell']) 
 		{
-			if ((0 < $goods['preselltimestart']) && (time() < $goods['preselltimestart'])) 
+			$times = ($goods['presellovertime'] * 60 * 60 * 24) + $goods['preselltimeend'];
+			if (!((0 < $goods['presellover']) && ($times <= time()))) 
 			{
-				show_json(5, '预售未开始');
-			}
-			if ((0 < $goods['preselltimeend']) && ($goods['preselltimeend'] < time())) 
-			{
-				show_json(5, '预售已结束');
+				if ((0 < $goods['preselltimestart']) && (time() < $goods['preselltimestart'])) 
+				{
+					show_json(5, '预售未开始');
+				}
+				if ((0 < $goods['preselltimeend']) && ($goods['preselltimeend'] < time())) 
+				{
+					show_json(5, '预售已结束');
+				}
 			}
 		}
 		if ($goods['isdiscount'] && (time() <= $goods['isdiscount_time'])) 
@@ -297,6 +301,30 @@ class Picker_EweiShopV2Page extends MobilePage
 		if (($goods['isverify'] == 2) || ($goods['type'] == 2) || ($goods['type'] == 3) || ($goods['type'] == 20) || !(empty($goods['cannotrefund']))) 
 		{
 			$goods['canAddCart'] = false;
+		}
+		if (p('task')) 
+		{
+			$task_id = intval($_SESSION[$id . '_task_id']);
+			if (!(empty($task_id))) 
+			{
+				$rewarded = pdo_fetchcolumn('SELECT `rewarded` FROM ' . tablename('ewei_shop_task_extension_join') . ' WHERE id = :id AND uniacid = :uniacid', array(':id' => $task_id, ':uniacid' => $_W['uniacid']));
+				$taskGoodsInfo = unserialize($rewarded);
+				$taskGoodsInfo = $taskGoodsInfo['goods'][$id];
+				if (empty($taskGoodsInfo['option'])) 
+				{
+					$goods['marketprice'] = $taskGoodsInfo['price'];
+				}
+				else 
+				{
+					foreach ($options as $gk => $gv ) 
+					{
+						if ($options[$gk]['id'] == $taskGoodsInfo) 
+						{
+							$options[$gk]['marketprice'] = $taskGoodsInfo['price'];
+						}
+					}
+				}
+			}
 		}
 		show_json(1, array('goods' => $goods, 'seckillinfo' => $seckillinfo, 'specs' => $specs, 'options' => $options, 'diyformhtml' => $diyformhtml, 'cremind' => $cremind, 'cremindformhtml' => $cremindformhtml));
 	}

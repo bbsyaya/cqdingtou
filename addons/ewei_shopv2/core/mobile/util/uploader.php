@@ -27,22 +27,18 @@ class Uploader_EweiShopV2Page extends MobilePage
 				}
 				$ret = array('status' => 'success', 'files' => $files);
 				exit(json_encode($ret));
+				return;
 			}
-			else 
+			if (strrchr($_FILES[$field]['name'], '.') === false) 
 			{
-				if (strrchr($_FILES[$field]['name'], '.') === false) 
-				{
-					$_FILES[$field]['name'] = $_FILES[$field]['name'] . '.jpg';
-				}
-				$result = $this->upload($_FILES[$field]);
-				exit(json_encode($result));
+				$_FILES[$field]['name'] = $_FILES[$field]['name'] . '.jpg';
 			}
-		}
-		else 
-		{
-			$result['message'] = '请选择要上传的图片！';
+			$result = $this->upload($_FILES[$field]);
 			exit(json_encode($result));
+			return;
 		}
+		$result['message'] = '请选择要上传的图片！';
+		exit(json_encode($result));
 	}
 	protected function upload($uploadfile) 
 	{

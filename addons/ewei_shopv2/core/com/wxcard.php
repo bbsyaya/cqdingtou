@@ -826,6 +826,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		{
 			exit($e->getMessage());
 		}
+		exit($e->getMessage());
 	}
 	public function getWxTicket() 
 	{

@@ -250,8 +250,9 @@ if (!(class_exists('GlobonusModel')))
 				}
 				pdo_update('ewei_shop_member', array('partnerlevel' => $newlevel['id']), array('id' => $m['id']));
 				$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_GLOBONUS_UPGRADE);
+				return;
 			}
-			else if ((0 <= $leveltype) && ($leveltype <= 3)) 
+			if ((0 <= $leveltype) && ($leveltype <= 3)) 
 			{
 				$agents = array();
 				if (!(empty($set['selfbuy']))) 
@@ -526,46 +527,44 @@ if (!(class_exists('GlobonusModel')))
 					pdo_update('ewei_shop_member', array('partnerlevel' => $newlevel['id']), array('id' => $agent['id']));
 					$this->sendMessage($agent['openid'], array('nickname' => $agent['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_GLOBONUS_UPGRADE);
 				}
+				return;
 			}
-			else if (!(empty($m['parnternotupgrade']))) 
+			if (!(empty($m['parnternotupgrade']))) 
 			{
 				return;
 			}
-			else 
+			$oldlevel = $this->getLevel($m['openid']);
+			if (empty($oldlevel['id'])) 
 			{
-				$oldlevel = $this->getLevel($m['openid']);
-				if (empty($oldlevel['id'])) 
-				{
-					$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通股东' : $set['levelname']), 'bonus' => $set['bonus']);
-				}
-				if ($leveltype == 7) 
-				{
-					$downcount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member') . ' where agentid=:agentid and uniacid=:uniacid ', array(':agentid' => $m['id'], ':uniacid' => $_W['uniacid']));
-					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_globonus_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
-				}
-				else if ($leveltype == 9) 
-				{
-					$downcount = $info['level1'];
-					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_globonus_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
-				}
-				if (empty($newlevel)) 
-				{
-					return;
-				}
-				if ($newlevel['id'] == $oldlevel['id']) 
-				{
-					return;
-				}
-				if (!(empty($oldlevel['id']))) 
-				{
-					if ($newlevel['downcount'] < $oldlevel['downcount']) 
-					{
-						return;
-					}
-				}
-				pdo_update('ewei_shop_member', array('partnerlevel' => $newlevel['id']), array('id' => $m['id']));
-				$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_GLOBONUS_UPGRADE);
+				$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通股东' : $set['levelname']), 'bonus' => $set['bonus']);
 			}
+			if ($leveltype == 7) 
+			{
+				$downcount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member') . ' where agentid=:agentid and uniacid=:uniacid ', array(':agentid' => $m['id'], ':uniacid' => $_W['uniacid']));
+				$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_globonus_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
+			}
+			else if ($leveltype == 9) 
+			{
+				$downcount = $info['level1'];
+				$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_globonus_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
+			}
+			if (empty($newlevel)) 
+			{
+				return;
+			}
+			if ($newlevel['id'] == $oldlevel['id']) 
+			{
+				return;
+			}
+			if (!(empty($oldlevel['id']))) 
+			{
+				if ($newlevel['downcount'] < $oldlevel['downcount']) 
+				{
+					return;
+				}
+			}
+			pdo_update('ewei_shop_member', array('partnerlevel' => $newlevel['id']), array('id' => $m['id']));
+			$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_GLOBONUS_UPGRADE);
 		}
 		public function upgradeLevelByCommissionOK($openid) 
 		{

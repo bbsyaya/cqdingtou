@@ -12,6 +12,8 @@ class Register_EweiShopV2Page extends CommissionMobileLoginPage
 		global $_GPC;
 		$openid = $_W['openid'];
 		$set = set_medias($this->set, 'regbg');
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
 		$member = m('member')->getMember($openid);
 		if (($member['isagent'] == 1) && ($member['status'] == 1)) 
 		{
@@ -87,6 +89,15 @@ class Register_EweiShopV2Page extends CommissionMobileLoginPage
 			if ($set['become'] != '1') 
 			{
 				show_json(0, '未开启' . $set['texts']['agent'] . '注册!');
+			}
+			$icode = intval($_GPC['icode']);
+			if (0 < $icode) 
+			{
+				$iagent = m('member')->getMember($icode);
+				if (!(empty($iagent)) && ($iagent['isagent'] == 1)) 
+				{
+					$mid = $icode;
+				}
 			}
 			$become_check = intval($set['become_check']);
 			$ret['status'] = $become_check;

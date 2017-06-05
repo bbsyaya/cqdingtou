@@ -1,5 +1,5 @@
 <?php
-error_reporting(32767 & ~(8));
+error_reporting(30719 & ~(8));
 if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
@@ -504,81 +504,79 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			}
 			echo $this->cut($id, $time_limit, $min_price, $res2['each_time'], $res2['total_time'], $max_price, $res2['probability']);
 			exit();
+			return;
 		}
-		else 
+		$res2['user_set'] = urldecode($res2['user_set']);
+		$share_res = json_decode($res2['user_set'], true);
+		if ($type == 1) 
 		{
-			$res2['user_set'] = urldecode($res2['user_set']);
-			$share_res = json_decode($res2['user_set'], true);
-			if ($type == 1) 
+			if (!(empty($share_res['bargain_title']))) 
 			{
-				if (!(empty($share_res['bargain_title']))) 
-				{
-				}
-				else 
-				{
-					$share['title'] = $res2['title'];
-				}
-				if (!(empty($share_res['bargain_content_f']))) 
-				{
-					$share['content'] = $share_res['goods_content'];
-				}
-				else 
-				{
-					$share['content'] = $res2['title2'];
-				}
-				if (!(empty($share_res['bargain_logo']))) 
-				{
-					$share['logo'] = tomedia($share_res['bargain_logo']);
-				}
-				else 
-				{
-					$tt = json_decode($res2['images']);
-					$share['logo'] = tomedia($tt[0]);
-				}
 			}
-			else if ($type == 0) 
+			else 
 			{
-				if (!(empty($share_res['bargain_title']))) 
-				{
-					$weikan = $res2['start_price'] - $res['bargain_price'];
-					$share_res['bargain_title'] = str_replace('[已砍]', $res['bargain_price'], $share_res['bargain_title']);
-					$share_res['bargain_title'] = str_replace('[未砍]', $weikan, $share_res['bargain_title']);
-					$share_res['bargain_title'] = str_replace('[现价]', $res['now_price'], $share_res['bargain_title']);
-					$share_res['bargain_title'] = str_replace('[原价]', $res2['start_price'], $share_res['bargain_title']);
-					$share['title'] = str_replace('[底价]', $res2['end_price'], $share_res['bargain_title']);
-				}
-				else 
-				{
-					$share['title'] = $res2['title'];
-				}
-				if (!(empty($share_res['bargain_content']))) 
-				{
-					$share['content'] = $share_res['bargain_content'];
-				}
-				else 
-				{
-					$share['content'] = $res2['title2'];
-				}
-				if (!(empty($share_res['bargain_logo']))) 
-				{
-					$share['logo'] = tomedia($share_res['bargain_logo']);
-				}
-				else 
-				{
-					$tt = json_decode($res2['images']);
-					$share['logo'] = tomedia($tt[0]);
-				}
+				$share['title'] = $res2['title'];
 			}
-			$_W['shopshare'] = array('title' => $share['title'], 'desc' => $share['content'], 'link' => mobileUrl('bargain/bargain', array('id' => $id, 'mid' => $mid), true), 'imgUrl' => $share['logo']);
-			$account_set['partin'] *= -1;
-			$myself_swi = 0;
-			$myself_count = pdo_get('ewei_shop_bargain_record', array('openid' => $_W['openid'], 'actor_id' => $res['id']), 'id');
-			if (empty($myself_count['id']) && (0 < $res2['myself'])) 
+			if (!(empty($share_res['bargain_content_f']))) 
 			{
-				$myself_swi = 1;
+				$share['content'] = $share_res['goods_content'];
 			}
-			include $this->template();
+			else 
+			{
+				$share['content'] = $res2['title2'];
+			}
+			if (!(empty($share_res['bargain_logo']))) 
+			{
+				$share['logo'] = tomedia($share_res['bargain_logo']);
+			}
+			else 
+			{
+				$tt = json_decode($res2['images']);
+				$share['logo'] = tomedia($tt[0]);
+			}
 		}
+		else if ($type == 0) 
+		{
+			if (!(empty($share_res['bargain_title']))) 
+			{
+				$weikan = $res2['start_price'] - $res['bargain_price'];
+				$share_res['bargain_title'] = str_replace('[已砍]', $res['bargain_price'], $share_res['bargain_title']);
+				$share_res['bargain_title'] = str_replace('[未砍]', $weikan, $share_res['bargain_title']);
+				$share_res['bargain_title'] = str_replace('[现价]', $res['now_price'], $share_res['bargain_title']);
+				$share_res['bargain_title'] = str_replace('[原价]', $res2['start_price'], $share_res['bargain_title']);
+				$share['title'] = str_replace('[底价]', $res2['end_price'], $share_res['bargain_title']);
+			}
+			else 
+			{
+				$share['title'] = $res2['title'];
+			}
+			if (!(empty($share_res['bargain_content']))) 
+			{
+				$share['content'] = $share_res['bargain_content'];
+			}
+			else 
+			{
+				$share['content'] = $res2['title2'];
+			}
+			if (!(empty($share_res['bargain_logo']))) 
+			{
+				$share['logo'] = tomedia($share_res['bargain_logo']);
+			}
+			else 
+			{
+				$tt = json_decode($res2['images']);
+				$share['logo'] = tomedia($tt[0]);
+			}
+		}
+		$_W['shopshare'] = array('title' => $share['title'], 'desc' => $share['content'], 'link' => mobileUrl('bargain/bargain', array('id' => $id, 'mid' => $mid), true), 'imgUrl' => $share['logo']);
+		$account_set['partin'] *= -1;
+		$myself_swi = 0;
+		$myself_count = pdo_get('ewei_shop_bargain_record', array('openid' => $_W['openid'], 'actor_id' => $res['id']), 'id');
+		if (empty($myself_count['id']) && (0 < $res2['myself'])) 
+		{
+			$myself_swi = 1;
+		}
+		include $this->template();
 	}
 	public function join() 
 	{
@@ -815,15 +813,18 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 					if (is_error($ret)) 
 					{
 						$ret = m('message')->sendTplNotice($touser, $template['template_id'], $template_message, $url, $account);
+						return;
 					}
 				}
 				else if ($messagetype == 1) 
 				{
 					$ret = m('message')->sendTplNotice($touser, $template['template_id'], $template_message, $url, $account);
+					return;
 				}
 				else if ($messagetype == 2) 
 				{
 					$ret = m('message')->sendTexts($touser, $Custom_message, $url, $account);
+					return;
 				}
 			}
 			else 
@@ -835,6 +836,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 					if (!(empty($templatetype['templateid']))) 
 					{
 						$ret = m('message')->sendTplNotice($touser, $templatetype['templateid'], $default_message, $url, $account);
+						return;
 					}
 				}
 			}

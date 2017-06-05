@@ -93,17 +93,16 @@ class WebPage extends Page
 		if ($_W['plugin']) 
 		{
 			include $this->template($_W['plugin'] . '/tabs');
+			return;
 		}
-		else if ($_W['controller'] == 'system') 
+		if ($_W['controller'] == 'system') 
 		{
 			$routes = explode('.', $_W['routes']);
 			$tabs = $routes[0] . ((isset($routes[1]) ? '/' . $routes[1] : '')) . '/tabs';
 			include $this->template($tabs);
+			return;
 		}
-		else 
-		{
-			include $this->template($_W['controller'] . '/tabs');
-		}
+		include $this->template($_W['controller'] . '/tabs');
 	}
 	public function show_funbar() 
 	{

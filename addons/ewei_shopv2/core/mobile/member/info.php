@@ -73,7 +73,7 @@ class Info_EweiShopV2Page extends MobileLoginPage
 			$m_data['diymemberid'] = $diyform_id;
 			$m_data['diymemberfields'] = iserializer($fields);
 			$m_data['diymemberdata'] = $data;
-			unset($m_data['credit1']);
+			unset($mc_data['credit1']);
 			unset($m_data['credit2']);
 			pdo_update('ewei_shop_member', $m_data, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
 			if (!(empty($this->member['uid']))) 
@@ -88,7 +88,11 @@ class Info_EweiShopV2Page extends MobileLoginPage
 		}
 		else 
 		{
-			$arr = array('realname' => trim($memberdata['realname']), 'weixin' => trim($memberdata['weixin']), 'birthyear' => intval($memberdata['birthyear']), 'birthmonth' => intval($memberdata['birthmonth']), 'birthday' => intval($memberdata['birthday']), 'province' => trim($memberdata['province']), 'city' => trim($memberdata['city']), 'datavalue' => trim($memberdata['datavalue']));
+			$arr = array('realname' => trim($memberdata['realname']), 'weixin' => trim($memberdata['weixin']), 'birthyear' => intval($memberdata['birthyear']), 'birthmonth' => intval($memberdata['birthmonth']), 'birthday' => intval($memberdata['birthday']), 'province' => trim($memberdata['province']), 'city' => trim($memberdata['city']), 'datavalue' => trim($memberdata['datavalue']), 'mobile' => trim($memberdata['mobile']));
+			if ((empty($_W['shopset']['app']['isclose']) && !(empty($_W['shopset']['app']['openbind']))) || !(empty($_W['shopset']['wap']['open']))) 
+			{
+				unset($arr['mobile']);
+			}
 			pdo_update('ewei_shop_member', $arr, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
 			if (!(empty($this->member['uid']))) 
 			{

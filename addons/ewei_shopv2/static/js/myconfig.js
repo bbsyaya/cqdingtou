@@ -7,6 +7,7 @@ var myconfig = {
         'jquery.gcjs': 'dist/jquery/jquery.gcjs',
         'jquery.validate': 'dist/jquery/jquery.validate.min',
         'jquery.nestable': 'dist/jquery/nestable/jquery.nestable',
+        'jquery.qrcode':'../dist/jquery/jquery.qrcode.min',
         'bootstrap': 'dist/bootstrap/bootstrap.min',
         'bootstrap.suggest': 'dist/bootstrap/bootstrap-suggest.min',
         'bootbox': 'dist/bootbox/bootbox.min',
@@ -17,6 +18,7 @@ var myconfig = {
         'switchery': 'dist/switchery/switchery',
         'echarts': 'dist/echarts/echarts-all',
         'toast': 'dist/jquery/toastr.min',
+        'clipboard': 'dist/clipboard.min',
         'tpl': 'dist/tmodjs'
     },
     map: {
@@ -43,7 +45,11 @@ var myrequire = function (arr, callback) {
         if (myconfig.css[js]) {
             var css = myconfig.css[js].split(',');
             $.each(css, function () {
-                newarr.push("css!" + myconfig.path + this + myconfig.map['css']);
+                if(parseInt(myrequire.systemVersion[0])>0){
+                    newarr.push("loadcss!" + myconfig.path + this + myconfig.map['css']);
+                }else{
+                    newarr.push("css!" + myconfig.path + this + myconfig.map['css']);
+                }
             });
 
 

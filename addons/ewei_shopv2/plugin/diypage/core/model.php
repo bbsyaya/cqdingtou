@@ -1140,7 +1140,7 @@ class DiypageModel extends PluginModel
 		{
 			show_json(1);
 		}
-		$items = pdo_fetchall('SELECT id,name,keyword FROM ' . tablename('ewei_shop_diypage') . ' WHERE id in( ' . $id . ' ) and uniacid=:uniacid ', array(':uniacid' => $_W['uniacid']));
+		$items = pdo_fetchall('SELECT id,`name`,`type`,keyword FROM ' . tablename('ewei_shop_diypage') . ' WHERE id in( ' . $id . ' ) and uniacid=:uniacid ', array(':uniacid' => $_W['uniacid']));
 		foreach ($items as $item ) 
 		{
 			pdo_delete('ewei_shop_diypage', array('id' => $item['id'], 'uniacid' => $_W['uniacid']));
@@ -1820,12 +1820,14 @@ class DiypageModel extends PluginModel
 			if (($type == 2) && ($page['home'] == $id)) 
 			{
 				header('location: ' . mobileUrl(NULL, array('mid' => $_GPC['mid'])));
+				return;
 			}
-			else if (($type == 3) && ($page['member'] == $id)) 
+			if (($type == 3) && ($page['member'] == $id)) 
 			{
 				header('location: ' . mobileUrl('member', array('mid' => $_GPC['mid'])));
+				return;
 			}
-			else if (($type == 4) && ($page['commission'] == $id)) 
+			if (($type == 4) && ($page['commission'] == $id)) 
 			{
 				header('location: ' . mobileUrl('commission', array('mid' => $_GPC['mid'])));
 			}

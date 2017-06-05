@@ -12,48 +12,57 @@ class Index_EweiShopV2Page extends PluginWebPage
 		{
 			header('location: ' . webUrl('commission/agent'));
 			exit();
+			return;
 		}
-		else if (cv('commission.apply.view1')) 
+		if (cv('commission.apply.view1')) 
 		{
 			header('location: ' . webUrl('commission/apply', array('status' => 1)));
 			exit();
+			return;
 		}
-		else if (cv('commission.apply.view2')) 
+		if (cv('commission.apply.view2')) 
 		{
 			header('location: ' . webUrl('commission/apply', array('status' => 2)));
 			exit();
+			return;
 		}
-		else if (cv('commission.apply.view3')) 
+		if (cv('commission.apply.view3')) 
 		{
 			header('location: ' . webUrl('commission/apply', array('status' => 3)));
 			exit();
+			return;
 		}
-		else if (cv('commission.apply.view_1')) 
+		if (cv('commission.apply.view_1')) 
 		{
 			header('location: ' . webUrl('commission/apply', array('status' => -1)));
 			exit();
+			return;
 		}
-		else if (cv('commission.increase')) 
+		if (cv('commission.increase')) 
 		{
 			header('location: ' . webUrl('commission/increase'));
 			exit();
+			return;
 		}
-		else if (cv('commission.notice')) 
+		if (cv('commission.notice')) 
 		{
 			header('location: ' . webUrl('commission/notice'));
 			exit();
+			return;
 		}
-		else if (cv('commission.cover')) 
+		if (cv('commission.cover')) 
 		{
 			header('location: ' . webUrl('commission/cover'));
 			exit();
+			return;
 		}
-		else if (cv('commission.level')) 
+		if (cv('commission.level')) 
 		{
 			header('location: ' . webUrl('commission/level'));
 			exit();
+			return;
 		}
-		else if (cv('commission.set')) 
+		if (cv('commission.set')) 
 		{
 			header('location: ' . webUrl('commission/set'));
 			exit();

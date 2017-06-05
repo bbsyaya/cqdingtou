@@ -381,12 +381,20 @@ class MerchModel extends PluginModel
 	}
 	public function allPerms() 
 	{
-		if (empty(self::$allPerms)) 
+		if (empty($allPerms)) 
 		{
-			$perms = array('shop' => $this->perm_shop(), 'goods' => $this->perm_goods(), 'order' => $this->perm_order(), 'statistics' => $this->perm_statistics(), 'sale' => $this->perm_sale(), 'creditshop' => $this->perm_creditshop(), 'perm' => $this->perm_perm(), 'apply' => $this->perm_apply(), 'exhelper' => $this->perm_exhelper());
+			$perms = array('shop' => $this->perm_shop(), 'goods' => $this->perm_goods(), 'order' => $this->perm_order(), 'statistics' => $this->perm_statistics(), 'sale' => $this->perm_sale(), 'creditshop' => $this->perm_creditshop(), 'perm' => $this->perm_perm(), 'apply' => $this->perm_apply(), 'exhelper' => $this->perm_exhelper(), 'diypage' => $this->perm_diypage(), 'quick' => $this->perm_quick());
 			self::$allPerms = $perms;
 		}
 		return self::$allPerms;
+	}
+	protected function perm_diypage() 
+	{
+		return array( 'text' => m('plugin')->getName('diypage'), 'page' => array( 'sys' => array('text' => '系统页面', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'savetemp' => '另存为模板-log'), 'plu' => array('text' => '应用页面', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'savetemp' => '另存为模板-log'), 'diy' => array('text' => '自定义页面', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'savetemp' => '另存为模板-log'), 'mod' => array('text' => '公用模块', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log') ), 'menu' => array('text' => '自定义菜单', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log'), 'shop' => array( 'text' => '商城页面设置', 'page' => array('text' => '页面设置', 'main' => '查看', 'save' => '保存-log'), 'menu' => array('text' => '按钮设置', 'main' => '查看', 'save' => '保存-log'), 'layer' => array('text' => '悬浮按钮', 'main' => '编辑-log'), 'followbar' => array('text' => '关注条', 'main' => '编辑-log'), 'danmu' => array('text' => '下单提醒', 'main' => '编辑-log'), 'adv' => array('text' => '启动广告', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log') ), 'temp' => array( 'text' => '模板管理', 'main' => '通过模板创建页面', 'delete' => '删除模板', 'category' => array('text' => '模板分类', 'main' => '查看', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log') ) );
+	}
+	protected function perm_quick() 
+	{
+		return array( 'text' => m('plugin')->getName('quick'), 'adv' => array( 'text' => '幻灯片管理', 'main' => '查看列表', 'view' => '查看', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'xxx' => array('enabled' => 'edit') ), 'pages' => array( 'text' => '页面管理', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'xxx' => array('status' => 'edit') ) );
 	}
 	protected function perm_creditshop() 
 	{
@@ -581,7 +589,7 @@ class MerchModel extends PluginModel
 	}
 	public function getLogTypes($all = false) 
 	{
-		if (empty(self::$getLogTypes)) 
+		if (empty($getLogTypes)) 
 		{
 			$perms = $this->allPerms();
 			$array = array();
@@ -707,7 +715,7 @@ class MerchModel extends PluginModel
 	}
 	public function formatPerms() 
 	{
-		if (empty(self::$formatPerms)) 
+		if (empty($formatPerms)) 
 		{
 			$perms = $this->allPerms();
 			$array = array();
@@ -1211,8 +1219,9 @@ class MerchModel extends PluginModel
 			if ($type == 1) 
 			{
 				plog('merch.exhelper.temp.express.setdefault', '设置默认快递单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
+				return;
 			}
-			else if ($type == 2) 
+			if ($type == 2) 
 			{
 				plog('merch.exhelper.temp.invoice.setdefault', '设置默认发货单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
 			}
@@ -1316,6 +1325,10 @@ class MerchModel extends PluginModel
 		{
 			$has_plugins[] = 'creditshop';
 		}
+		if (p('quick') && $perm->is_perm_plugin('quick')) 
+		{
+			$has_plugins[] = 'quick';
+		}
 		if (!(empty($merchid))) 
 		{
 			$item = $this->getListUserOne($merchid);
@@ -1376,6 +1389,7 @@ class MerchModel extends PluginModel
 			if ($check == 0) 
 			{
 				show_message('您没有该应用的权限!');
+				return;
 			}
 		}
 		else 

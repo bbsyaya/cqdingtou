@@ -60,6 +60,7 @@ class MerchWebPage extends PluginWebPage
 							$this->message('你没有相应的权限查看');
 						}
 					}
+					return;
 				}
 			}
 			else 

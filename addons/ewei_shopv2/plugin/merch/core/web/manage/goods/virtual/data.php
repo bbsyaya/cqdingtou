@@ -281,11 +281,9 @@ class Data_EweiShopV2Page extends MerchWebPage
 		{
 			$tip = '<br>未保存成功的数据：主键=' . $noinsert . '<br>失败原因：已经使用无法更改';
 			$this->message('部分数据保存成功！' . $tip, '', 'warning');
+			return;
 		}
-		else 
-		{
-			$this->message('导入成功！', merchUrl('goods/virtual/data', array('typeid' => $_GPC['typeid'])));
-		}
+		$this->message('导入成功！', merchUrl('goods/virtual/data', array('typeid' => $_GPC['typeid'])));
 	}
 	public function tpl() 
 	{

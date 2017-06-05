@@ -91,6 +91,18 @@
 				</a>
 			</div>
 		</div>
+	{if p('task')}
+	{php $open = pdo_get('ewei_shop_task_default',array('uniacid'=>$_W['uniacid']),array('open'));}
+	{if $open['open']}
+	<div class="fui-cell-group fui-cell-click">
+		<a class="fui-cell"  href="{php echo mobileUrl('task')}">
+			<div class="fui-cell-icon"><i class="icon icon-profile"></i></div>
+			<div class="fui-cell-text"><p>任务中心</p></div>
+			<div class="fui-cell-remark"></div>
+		</a>
+	</div>
+	{/if}
+	{/if}
 	{if $hasThreen}
 	<div class="fui-cell-group fui-cell-click">
 		<a class="fui-cell"  href="{php echo mobileUrl('threen')}">

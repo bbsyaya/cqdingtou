@@ -141,13 +141,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 				$r['credit'] = ((!(empty($value['credit'])) ? '-' . $value['credit'] : 0));
 				$r['creditmoney'] = ((!(empty($value['creditmoney'])) ? '-' . $value['creditmoney'] : 0));
 				$r['goodsprice'] = $value['groupsprice'] * 1;
-				if (($value['status'] == 1) && ($value['status'] == 1)) 
-				{
-				}
-				else 
-				{
-				}
-				$r['status'] = $paystatus['' . $value['status'] . ''];
+				$r['status'] = ((($value['status'] == 1) && ($value['status'] == 1) ? $paystatus[4] : $paystatus['' . $value['status'] . '']));
 				$r['createtime'] = date('Y-m-d H:i:s', $value['createtime']);
 				$r['paytime'] = ((!(empty($value['paytime'])) ? date('Y-m-d H:i:s', $value['paytime']) : ''));
 				$r['sendtime'] = ((!(empty($value['sendtime'])) ? date('Y-m-d H:i:s', $value['sendtime']) : ''));

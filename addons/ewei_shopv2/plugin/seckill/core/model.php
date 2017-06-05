@@ -524,6 +524,21 @@ class SeckillModel extends PluginModel
 		$totalmaxbuy = 0;
 		if (!(empty($timegoods))) 
 		{
+			$opswi = false;
+			if (!(empty($optionid))) 
+			{
+				foreach ($timegoods as $tk => $tv ) 
+				{
+					if ($tv['optionid'] == $optionid) 
+					{
+						$opswi = true;
+					}
+				}
+				if (!($opswi)) 
+				{
+					return false;
+				}
+			}
 			$roomid = $timegoods[0]['roomid'];
 			$total = $timegoods[0]['total'];
 			$price = $timegoods[0]['price'];

@@ -82,17 +82,7 @@ class Level_EweiShopV2Page extends WebPage
 					$updatecontent = '<br/>等级名称: ' . $set['shop']['levelname'] . '->' . $data['levelname'] . '<br/>折扣: ' . $set['shop']['leveldiscount'] . '->' . $data['discount'];
 					$set['shop']['levelname'] = $data['levelname'];
 					$set['shop']['leveldiscount'] = $data['discount'];
-					$data = array('uniacid' => $_W['uniacid'], 'sets' => iserializer($set));
-					if (empty($setdata)) 
-					{
-						pdo_insert('ewei_shop_sysset', $data);
-					}
-					else 
-					{
-						pdo_update('ewei_shop_sysset', $data, array('uniacid' => $_W['uniacid']));
-					}
-					$setdata = pdo_fetch('select * from ' . tablename('ewei_shop_sysset') . ' where uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));
-					m('cache')->set('sysset', $setdata);
+					m('common')->updateSysset($set);
 					plog('member.level.edit', '修改会员默认等级' . $updatecontent);
 				}
 				else 

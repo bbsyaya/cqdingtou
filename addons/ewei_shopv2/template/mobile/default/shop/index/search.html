@@ -17,5 +17,8 @@
 		$("input[name='keywords']").focusout(function () {
 			$(this).attr('placeholder','输入关键字...');
 		});
+		$("form").submit(function () {
+			$(this).find("input[name='keywords']").blur();
+		});
 	});
 </script>

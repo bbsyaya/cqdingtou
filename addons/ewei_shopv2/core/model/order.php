@@ -9,13 +9,13 @@ class Order_EweiShopV2Model
 	{
 		global $_W;
 		$uniacid = $_W['uniacid'];
-		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
+		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\r\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\r\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
 		foreach($order_goods as $value){
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid and isfullback = 1 limit 1', array(':id' => $value['goodsid'], ':uniacid' => $uniacid));
-		$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
+		$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\r\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\r\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
 		if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $value['optionid'])) 
 		{
-			$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $value['goodsid'], ':id' => $value['optionid']));
+			$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\r\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $value['goodsid'], ':id' => $value['optionid']));
 			if (!(empty($option))) 
 			{
 				$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
@@ -154,6 +154,7 @@ class Order_EweiShopV2Model
 						p('task')->checkTaskReward('commission_order', 1);
 					}
 					p('task')->checkTaskReward('cost_total', $order['price']);
+					p('task')->checkTaskReward('cost_enough', $order['price']);
 					p('task')->checkTaskReward('cost_count', 1);
 					$goodslist = pdo_fetchall('SELECT goodsid FROM ' . tablename('ewei_shop_order_goods') . ' WHERE orderid = :orderid AND uniacid = :uniacid', array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
 					foreach ($goodslist as $item ) 
@@ -209,7 +210,7 @@ class Order_EweiShopV2Model
 	public function getChildOrder($orderid) 
 	{
 		global $_W;
-		$list = pdo_fetchall('select id,ordersn,status,finishtime,couponid  from ' . tablename('ewei_shop_order') . ' where  parentid=:parentid and uniacid=:uniacid', array(':parentid' => $orderid, ':uniacid' => $_W['uniacid']));
+		$list = pdo_fetchall('select id,ordersn,status,finishtime,couponid,merchid  from ' . tablename('ewei_shop_order') . ' where  parentid=:parentid and uniacid=:uniacid', array(':parentid' => $orderid, ':uniacid' => $_W['uniacid']));
 		return $list;
 	}
 	public function payVirtualSend($orderid = 0) 
@@ -298,6 +299,7 @@ class Order_EweiShopV2Model
 				if ($order['status'] == 3) 
 				{
 					m('member')->setCredit($order['openid'], 'credit2', $balance, array(0, $shopset['name'] . '购物赠送余额 订单号: ' . $order['ordersn']));
+					return;
 				}
 			}
 			else if ($type == 2) 
@@ -362,6 +364,15 @@ class Order_EweiShopV2Model
 			}
 			if (!(empty($stocktype))) 
 			{
+				$data = m('common')->getSysset('trade');
+				if (!(empty($data['stockwarn']))) 
+				{
+					$stockwarn = intval($data['stockwarn']);
+				}
+				else 
+				{
+					$stockwarn = 5;
+				}
 				if (!(empty($g['optionid']))) 
 				{
 					$option = m('goods')->getOption($g['goodsid'], $g['optionid']);
@@ -376,6 +387,10 @@ class Order_EweiShopV2Model
 						{
 							$stock = $option['stock'] - $g['total'];
 							($stock <= 0) && ($stock = 0);
+							if ($stock <= $stockwarn) 
+							{
+								m('notice')->sendStockWarnMessage($g['goodsid'], $g['optionid']);
+							}
 						}
 						if ($stock != -1) 
 						{
@@ -394,6 +409,10 @@ class Order_EweiShopV2Model
 					{
 						$totalstock = $g['goodstotal'] - $g['total'];
 						($totalstock <= 0) && ($totalstock = 0);
+						if ($totalstock <= $stockwarn) 
+						{
+							m('notice')->sendStockWarnMessage($g['goodsid'], 0);
+						}
 					}
 					if ($totalstock != -1) 
 					{
@@ -440,13 +459,15 @@ class Order_EweiShopV2Model
 			{
 				m('member')->setCredit($order['openid'], 'credit1', $credits, array(0, $shopset['name'] . '购物积分 订单号: ' . $order['ordersn']));
 				m('notice')->sendMemberPointChange($order['openid'], $credits, 0);
+				return;
 			}
-			else if ($type == 2) 
+			if ($type == 2) 
 			{
 				if (1 <= $order['status']) 
 				{
 					m('member')->setCredit($order['openid'], 'credit1', -$credits, array(0, $shopset['name'] . '购物取消订单扣除积分 订单号: ' . $order['ordersn']));
 					m('notice')->sendMemberPointChange($order['openid'], $credits, 1);
+					return;
 				}
 			}
 		}
@@ -456,6 +477,7 @@ class Order_EweiShopV2Model
 			if (0 < $money) 
 			{
 				m('notice')->sendMemberPointChange($order['openid'], $money, 0);
+				return;
 			}
 		}
 		else if ($type == 2) 
@@ -1208,6 +1230,7 @@ class Order_EweiShopV2Model
 		}
 		if (!(empty($dispatch_array))) 
 		{
+			$dispatch_info = array();
 			foreach ($dispatch_array as $k => $v ) 
 			{
 				$dispatch_data = $dispatch_array[$k]['data'];
@@ -1234,6 +1257,22 @@ class Order_EweiShopV2Model
 				else 
 				{
 					$dispatch_price += $dprice;
+				}
+				$dispatch_info[$dispatch_data['id']]['price'] += $dprice;
+				$dispatch_info[$dispatch_data['id']]['freeprice'] = intval($dispatch_data['freeprice']);
+			}
+			if (!(empty($dispatch_info))) 
+			{
+				foreach ($dispatch_info as $k => $v ) 
+				{
+					if ((0 < $v['freeprice']) && ($v['freeprice'] <= $v['price'])) 
+					{
+						$dispatch_price -= $v['price'];
+					}
+				}
+				if ($dispatch_price < 0) 
+				{
+					$dispatch_price = 0;
 				}
 			}
 		}

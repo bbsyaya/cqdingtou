@@ -31,7 +31,7 @@ if ($_W['ispost'])
 	{
 		$goodstype = intval($_GPC['goodstype']);
 	}
-	$data = array('uniacid' => intval($_W['uniacid']), 'merchid' => intval($_W['merchid']), 'displayorder' => intval($_GPC['displayorder']), 'title' => trim($_GPC['goodsname']), 'subtitle' => trim($_GPC['subtitle']), 'keywords' => trim($_GPC['keywords']), 'type' => $goodstype, 'isrecommand' => intval($_GPC['isrecommand']), 'ishot' => intval($_GPC['ishot']), 'isnew' => intval($_GPC['isnew']), 'isdiscount' => intval($_GPC['isdiscount']), 'isdiscount_title' => trim(mb_substr($_GPC['isdiscount_title'], 0, 5, 'UTF-8')), 'isdiscount_time' => strtotime($_GPC['isdiscount_time']), 'issendfree' => intval($_GPC['issendfree']), 'istime' => intval($_GPC['istime']), 'timestart' => strtotime($_GPC['saletime']['start']), 'timeend' => strtotime($_GPC['saletime']['end']), 'description' => trim($_GPC['description']), 'goodssn' => trim($_GPC['goodssn']), 'unit' => trim($_GPC['unit']), 'createtime' => TIMESTAMP, 'total' => intval($_GPC['total']), 'showtotal' => intval($_GPC['showtotal']), 'totalcnf' => intval($_GPC['totalcnf']), 'marketprice' => $_GPC['marketprice'], 'weight' => $_GPC['weight'], 'costprice' => $_GPC['costprice'], 'productprice' => trim($_GPC['productprice']), 'productsn' => trim($_GPC['productsn']), 'maxbuy' => intval($_GPC['maxbuy']), 'minbuy' => intval($_GPC['minbuy']), 'usermaxbuy' => intval($_GPC['usermaxbuy']), 'hasoption' => intval($_GPC['hasoption']), 'sales' => intval($_GPC['sales']), 'share_icon' => trim($_GPC['share_icon']), 'share_title' => trim($_GPC['share_title']), 'status' => intval($_GPC['status']), 'virtualsend' => intval($_GPC['virtualsend']), 'virtualsendcontent' => trim($_GPC['virtualsendcontent']), 'isverify' => intval($_GPC['isverify']), 'verifytype' => intval($_GPC['verifytype']), 'storeids' => (is_array($_GPC['storeids']) ? implode(',', $_GPC['storeids']) : ''), 'noticeopenid' => (is_array($_GPC['noticeopenid']) ? implode(',', $_GPC['noticeopenid']) : ''), 'noticetype' => $_GPC['noticetype'], 'needfollow' => intval($_GPC['needfollow']), 'followurl' => trim($_GPC['followurl']), 'followtip' => trim($_GPC['followtip']), 'virtual' => ($goodstype == 3 ? intval($_GPC['virtual']) : 0), 'ednum' => intval($_GPC['ednum']), 'edareas' => trim($_GPC['edareas']), 'edmoney' => trim($_GPC['edmoney']), 'invoice' => intval($_GPC['invoice']), 'repair' => intval($_GPC['repair']), 'seven' => intval($_GPC['seven']), 'province' => trim($_GPC['province']), 'city' => trim($_GPC['city']), 'quality' => intval($_GPC['quality']), 'cashier' => intval($_GPC['cashier']));
+	$data = array('uniacid' => intval($_W['uniacid']), 'merchid' => intval($_W['merchid']), 'merchdisplayorder' => intval($_GPC['displayorder']), 'title' => trim($_GPC['goodsname']), 'subtitle' => trim($_GPC['subtitle']), 'keywords' => trim($_GPC['keywords']), 'type' => $goodstype, 'isrecommand' => intval($_GPC['isrecommand']), 'ishot' => intval($_GPC['ishot']), 'isnew' => intval($_GPC['isnew']), 'isdiscount' => intval($_GPC['isdiscount']), 'isdiscount_title' => trim(mb_substr($_GPC['isdiscount_title'], 0, 5, 'UTF-8')), 'isdiscount_time' => strtotime($_GPC['isdiscount_time']), 'issendfree' => intval($_GPC['issendfree']), 'istime' => intval($_GPC['istime']), 'timestart' => strtotime($_GPC['saletime']['start']), 'timeend' => strtotime($_GPC['saletime']['end']), 'description' => trim($_GPC['description']), 'goodssn' => trim($_GPC['goodssn']), 'unit' => trim($_GPC['unit']), 'createtime' => TIMESTAMP, 'total' => intval($_GPC['total']), 'showtotal' => intval($_GPC['showtotal']), 'totalcnf' => intval($_GPC['totalcnf']), 'marketprice' => $_GPC['marketprice'], 'weight' => $_GPC['weight'], 'costprice' => $_GPC['costprice'], 'productprice' => trim($_GPC['productprice']), 'productsn' => trim($_GPC['productsn']), 'maxbuy' => intval($_GPC['maxbuy']), 'minbuy' => intval($_GPC['minbuy']), 'usermaxbuy' => intval($_GPC['usermaxbuy']), 'hasoption' => intval($_GPC['hasoption']), 'sales' => intval($_GPC['sales']), 'share_icon' => trim($_GPC['share_icon']), 'share_title' => trim($_GPC['share_title']), 'status' => intval($_GPC['status']), 'virtualsend' => intval($_GPC['virtualsend']), 'virtualsendcontent' => trim($_GPC['virtualsendcontent']), 'isverify' => intval($_GPC['isverify']), 'verifytype' => intval($_GPC['verifytype']), 'storeids' => (is_array($_GPC['storeids']) ? implode(',', $_GPC['storeids']) : ''), 'noticeopenid' => (is_array($_GPC['noticeopenid']) ? implode(',', $_GPC['noticeopenid']) : ''), 'noticetype' => (is_array($_GPC['noticetype']) ? implode(',', $_GPC['noticetype']) : ''), 'needfollow' => intval($_GPC['needfollow']), 'followurl' => trim($_GPC['followurl']), 'followtip' => trim($_GPC['followtip']), 'virtual' => ($goodstype == 3 ? intval($_GPC['virtual']) : 0), 'ednum' => intval($_GPC['ednum']), 'edareas' => trim($_GPC['edareas']), 'edmoney' => trim($_GPC['edmoney']), 'invoice' => intval($_GPC['invoice']), 'repair' => intval($_GPC['repair']), 'seven' => intval($_GPC['seven']), 'province' => trim($_GPC['province']), 'city' => trim($_GPC['city']), 'quality' => intval($_GPC['quality']), 'cashier' => intval($_GPC['cashier']));
 	if ((intval($_GPC['isverify']) == 2) || ($goodstype == 2) || ($goodstype == 3)) 
 	{
 		$data['cash'] = 0;
@@ -674,7 +674,20 @@ if (!(empty($id)))
 	}
 	if (!(empty($item['noticeopenid']))) 
 	{
-		$saler = m('member')->getMember($item['noticeopenid']);
+		$salers = array();
+		if (isset($item['noticeopenid'])) 
+		{
+			if (!(empty($item['noticeopenid']))) 
+			{
+				$openids = array();
+				$strsopenids = explode(',', $item['noticeopenid']);
+				foreach ($strsopenids as $openid ) 
+				{
+					$openids[] = '\'' . $openid . '\'';
+				}
+				$salers = pdo_fetchall('select id,nickname,avatar,openid from ' . tablename('ewei_shop_member') . ' where openid in (' . implode(',', $openids) . ') and uniacid=' . $_W['uniacid']);
+			}
+		}
 	}
 }
 if (p('commission')) 

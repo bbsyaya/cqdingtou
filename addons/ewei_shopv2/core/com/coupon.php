@@ -125,11 +125,15 @@ class Coupon_EweiShopV2ComModel extends ComModel
 			{
 				$goodparam[':uniacid'] = $_W['uniacid'];
 				$goodparam[':id'] = $value['goodsid'];
-				$sql = 'select id,cates,marketprice,merchid   from ' . tablename('ewei_shop_goods');
+				$sql = 'select id,`type`,cates,marketprice,merchid   from ' . tablename('ewei_shop_goods');
 				$sql .= ' where uniacid=:uniacid and id =:id order by id desc LIMIT 1 ';
 				$good = pdo_fetch($sql, $goodparam);
 				$good['saletotal'] = $value['total'];
 				$good['optionid'] = $value['optionid'];
+				if ($good['type'] == 4) 
+				{
+					$good['marketprice'] = $value['wholesaleprice'];
+				}
 				if (!(empty($good))) 
 				{
 					$goodlist[] = $good;
@@ -269,7 +273,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 					}
 					if ((0 < $row['enough']) && ($p == 1)) 
 					{
-						if (0 < $good['optionid']) 
+						if ((0 < $good['optionid']) && ($good['type'] != 4)) 
 						{
 							$optionparam[':uniacid'] = $_W['uniacid'];
 							$optionparam[':id'] = $good['optionid'];
@@ -434,11 +438,9 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		if (!(empty($templateid))) 
 		{
 			m('message')->sendTplNotice($openid, $templateid, $msg, $url);
+			return;
 		}
-		else 
-		{
-			m('message')->sendCustomNotice($openid, $msg, $url);
-		}
+		m('message')->sendCustomNotice($openid, $msg, $url);
 	}
 	public function sendReturnMessage($openid, $coupon) 
 	{
@@ -450,11 +452,9 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		if (!(empty($templateid))) 
 		{
 			m('message')->sendTplNotice($openid, $templateid, $msg, $url);
+			return;
 		}
-		else 
-		{
-			m('message')->sendCustomNotice($openid, $msg, $url);
-		}
+		m('message')->sendCustomNotice($openid, $msg, $url);
 	}
 	public function useRechargeCoupon($log) 
 	{
@@ -535,6 +535,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 			}
 		}
 		pdo_update('ewei_shop_coupon_data', array('used' => 1, 'usetime' => time(), 'ordersn' => $log['logno']), array('id' => $data['id']));
+		$this->posterbyusesendtask($data['couponid'], $_W['openid']);
 		$this->sendBackMessage($log['openid'], $coupon, $gives);
 	}
 	public function consumeCouponCount($openid, $money = 0, $merch_array, $goods_array) 
@@ -578,11 +579,15 @@ class Coupon_EweiShopV2ComModel extends ComModel
 			{
 				$goodparam[':uniacid'] = $_W['uniacid'];
 				$goodparam[':id'] = $value['goodsid'];
-				$sql = 'select id,cates,marketprice,merchid  from ' . tablename('ewei_shop_goods');
+				$sql = 'select id,cates,marketprice,merchid,`type`  from ' . tablename('ewei_shop_goods');
 				$sql .= ' where uniacid=:uniacid and id =:id order by id desc LIMIT 1 ';
 				$good = pdo_fetch($sql, $goodparam);
 				$good['saletotal'] = $value['total'];
 				$good['optionid'] = $value['optionid'];
+				if ($good['type'] == 4) 
+				{
+					$good['marketprice'] = $value['wholesaleprice'];
+				}
 				if (!(empty($good))) 
 				{
 					$goodlist[] = $good;
@@ -623,6 +628,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 			return;
 		}
 		pdo_update('ewei_shop_coupon_data', array('used' => 1, 'usetime' => $order['createtime'], 'ordersn' => $order['ordersn']), array('id' => $order['couponid']));
+		$this->posterbyusesendtask($coupon['id'], $_W['openid']);
 	}
 	public function returnConsumeCoupon($order) 
 	{
@@ -1128,7 +1134,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 				if (!(empty($member)) && ($member['status'] == 1) && ($member['isagent'] == 1)) 
 				{
 					$_W['shopshare']['link'] = $url . '&mid=' . $member['id'];
-					if (empty($pset['become_reg']) && (empty($member['realname']) || empty($member['mobile']))) 
+					if (empty($member['realname']) || empty($member['mobile'])) 
 					{
 						$trigger = true;
 					}
@@ -1156,7 +1162,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		if ($pdata['isopensendtask'] == 1) 
 		{
 			$price = $order['price'];
-			$sendtasks = pdo_fetch('select id,couponid,sendnum,num,sendpoint  from ' . tablename('ewei_shop_coupon_sendtasks') . "\n" . '             where  status =1  and uniacid=:uniacid and starttime< :now and endtime>:now and enough<=:enough   and num>=sendnum' . "\n" . '             order by  enough desc,id  limit 1', array(':now' => time(), ':enough' => $price, ':uniacid' => $_W['uniacid']));
+			$sendtasks = pdo_fetch('select id,couponid,sendnum,num,sendpoint  from ' . tablename('ewei_shop_coupon_sendtasks') . "\r\n" . '             where  status =1  and uniacid=:uniacid and starttime< :now and endtime>:now and enough<=:enough   and num>=sendnum' . "\r\n" . '             order by  enough desc,id  limit 1', array(':now' => time(), ':enough' => $price, ':uniacid' => $_W['uniacid']));
 			if (!(empty($sendtasks))) 
 			{
 				$data = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'taskid' => intval($sendtasks['id']), 'couponid' => intval($sendtasks['couponid']), 'parentorderid' => 0, 'sendnum' => intval($sendtasks['sendnum']), 'tasktype' => 1, 'orderid' => $orderid, 'createtime' => time(), 'status' => 0, 'sendpoint' => intval($sendtasks['sendpoint']));
@@ -1167,7 +1173,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		}
 		if ($pdata['isopengoodssendtask'] == 1) 
 		{
-			$goodssendtasks = pdo_fetchall('select  og.id,og.goodsid,og.orderid,og.parentorderid,og.total,gst.id as taskid,gst.couponid,gst.sendnum,gst.sendpoint,gst.num' . "\n" . '            from ' . tablename('ewei_shop_coupon_goodsendtask') . ' gst' . "\n" . '            inner join ' . tablename('ewei_shop_order_goods') . ' og on og.goodsid =gst.goodsid  and (orderid=:orderid or parentorderid=:orderid)' . "\n" . '            where  og.uniacid=:uniacid and og.openid=:openid and gst.num>=gst.sendnum', array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid'], ':orderid' => $orderid));
+			$goodssendtasks = pdo_fetchall('select  og.id,og.goodsid,og.orderid,og.parentorderid,og.total,gst.id as taskid,gst.couponid,gst.sendnum,gst.sendpoint,gst.num' . "\r\n" . '            from ' . tablename('ewei_shop_coupon_goodsendtask') . ' gst' . "\r\n" . '            inner join ' . tablename('ewei_shop_order_goods') . ' og on og.goodsid =gst.goodsid  and (orderid=:orderid or parentorderid=:orderid)' . "\r\n" . '            where  og.uniacid=:uniacid and og.openid=:openid and gst.num>=gst.sendnum and gst.status = 1', array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid'], ':orderid' => $orderid));
 			foreach ($goodssendtasks as $task ) 
 			{
 				$data = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'taskid' => intval($task['taskid']), 'couponid' => intval($task['couponid']), 'sendnum' => intval($task['total']) * intval($task['sendnum']), 'tasktype' => 2, 'orderid' => intval($task['orderid']), 'parentorderid' => intval($task['parentorderid']), 'createtime' => time(), 'status' => 0, 'sendpoint' => intval($task['sendpoint']));
@@ -1199,7 +1205,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		{
 			if (0 < $parentid) 
 			{
-				$num = pdo_fetchcolumn('select 1 from ' . tablename('ewei_shop_order') . "\n" . '                where parentid =:parentid and uniacid=:uniacid  and openid=:openid  and status<>3', array(':parentid' => intval($parentid), ':uniacid' => $_W['uniacid'], ':openid' => $order['openid']));
+				$num = pdo_fetchcolumn('select 1 from ' . tablename('ewei_shop_order') . "\r\n" . '                where parentid =:parentid and uniacid=:uniacid  and openid=:openid  and status<>3', array(':parentid' => intval($parentid), ':uniacid' => $_W['uniacid'], ':openid' => $order['openid']));
 				if (empty($num)) 
 				{
 					$gosendtask = true;
@@ -1231,11 +1237,11 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		global $_W;
 		if ($sendpoint == 2) 
 		{
-			$taskdata = pdo_fetchall('select id, couponid, sendnum  from ' . tablename('ewei_shop_coupon_taskdata') . "\n" . '            where  status=0  and openid=:openid and uniacid=:uniacid and sendpoint=:sendpoint and tasktype=:tasktype' . "\n" . '            and (orderid=:orderid or parentorderid=:orderid)', array(':openid' => $openid, ':uniacid' => $_W['uniacid'], ':sendpoint' => $sendpoint, ':tasktype' => $tasktype, ':orderid' => $orderid));
+			$taskdata = pdo_fetchall('select id, couponid, sendnum  from ' . tablename('ewei_shop_coupon_taskdata') . "\r\n" . '            where  status=0  and openid=:openid and uniacid=:uniacid and sendpoint=:sendpoint and tasktype=:tasktype' . "\r\n" . '            and (orderid=:orderid or parentorderid=:orderid)', array(':openid' => $openid, ':uniacid' => $_W['uniacid'], ':sendpoint' => $sendpoint, ':tasktype' => $tasktype, ':orderid' => $orderid));
 		}
 		else 
 		{
-			$taskdata = pdo_fetchall('select  id, couponid, sendnum  from ' . tablename('ewei_shop_coupon_taskdata') . "\n" . '            where  status=0  and openid=:openid and uniacid=:uniacid and sendpoint=:sendpoint and tasktype=:tasktype' . "\n" . '            and orderid=:orderid', array(':openid' => $openid, ':uniacid' => $_W['uniacid'], ':sendpoint' => $sendpoint, ':tasktype' => $tasktype, ':orderid' => $orderid));
+			$taskdata = pdo_fetchall('select  id, couponid, sendnum  from ' . tablename('ewei_shop_coupon_taskdata') . "\r\n" . '            where  status=0  and openid=:openid and uniacid=:uniacid and sendpoint=:sendpoint and tasktype=:tasktype' . "\r\n" . '            and orderid=:orderid', array(':openid' => $openid, ':uniacid' => $_W['uniacid'], ':sendpoint' => $sendpoint, ':tasktype' => $tasktype, ':orderid' => $orderid));
 		}
 		return $taskdata;
 	}
@@ -1269,11 +1275,6 @@ class Coupon_EweiShopV2ComModel extends ComModel
 	{
 		global $_W;
 		global $_GPC;
-		$pposter = p('poster');
-		if (!($pposter)) 
-		{
-			return;
-		}
 		$num = 0;
 		$showkey = random(20);
 		$data = m('common')->getPluginset('coupon');
@@ -1303,6 +1304,55 @@ class Coupon_EweiShopV2ComModel extends ComModel
 				++$i;
 			}
 			pdo_update('ewei_shop_coupon_taskdata', array('status' => 1), array('id' => $taskdata['id']));
+		}
+		$msg = '恭喜您获得' . $num . '张优惠券!';
+		$ret = m('message')->sendCustomNotice($openid, $msg, $url);
+	}
+	public function posterbyusesendtask($couponid, $openid) 
+	{
+		global $_W;
+		global $_GPC;
+		$pdata = m('common')->getPluginset('coupon');
+		if ($pdata['isopenusesendtask'] == 0) 
+		{
+			return;
+		}
+		$list = pdo_fetchall('select  *  from ' . tablename('ewei_shop_coupon_usesendtasks') . "\r\n" . '            where  status=1  and  usecouponid= :usecouponid and uniacid=:uniacid and starttime< :now and endtime>:now   and num>=sendnum' . "\r\n" . '             order by  id', array(':usecouponid' => $couponid, ':now' => time(), ':uniacid' => $_W['uniacid']));
+		if (empty($list)) 
+		{
+			return;
+		}
+		$gettype = 6;
+		$num = 0;
+		$showkey = random(20);
+		$data = m('common')->getPluginset('coupon');
+		if (empty($data['showtemplate']) || ($data['showtemplate'] == 2)) 
+		{
+			$url = $this->getUrl('sale/coupon/my/showcoupons3', array('key' => $showkey), true);
+		}
+		else 
+		{
+			$url = $this->getUrl('sale/coupon/my/showcoupons', array('key' => $showkey), true);
+		}
+		foreach ($list as $taskdata ) 
+		{
+			$couponnum = 0;
+			$couponnum = intval($taskdata['sendnum']);
+			$num += $couponnum;
+			$i = 1;
+			while ($i <= $couponnum) 
+			{
+				$couponlog = array('uniacid' => $_W['uniacid'], 'openid' => $openid, 'logno' => m('common')->createNO('coupon_log', 'logno', 'CC'), 'couponid' => $taskdata['couponid'], 'status' => 1, 'paystatus' => -1, 'creditstatus' => -1, 'createtime' => time(), 'getfrom' => intval($gettype));
+				pdo_insert('ewei_shop_coupon_log', $couponlog);
+				$data = array('uniacid' => $_W['uniacid'], 'openid' => $openid, 'couponid' => $taskdata['couponid'], 'gettype' => intval($gettype), 'gettime' => time());
+				pdo_insert('ewei_shop_coupon_data', $data);
+				$coupondataid = pdo_insertid();
+				$data = array('showkey' => $showkey, 'uniacid' => $_W['uniacid'], 'openid' => $openid, 'coupondataid' => $coupondataid);
+				pdo_insert('ewei_shop_coupon_sendshow', $data);
+				++$i;
+			}
+			$num2 = intval($taskdata['num']) - intval($taskdata['sendnum']);
+			pdo_update('ewei_shop_coupon_usesendtasks', array('num' => $num2), array('id' => $taskdata['id']));
 		}
 		$msg = '恭喜您获得' . $num . '张优惠券!';
 		$ret = m('message')->sendCustomNotice($openid, $msg, $url);

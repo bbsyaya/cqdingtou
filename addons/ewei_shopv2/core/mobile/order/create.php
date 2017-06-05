@@ -275,7 +275,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			}
 			else if (!(empty($id)) && !(empty($iswholesale))) 
 			{
-				$sql = 'SELECT id as goodsid,type,title,weight,issendfree,isnodiscount,ispresell,presellprice,' . ' thumb,marketprice,storeids,isverify,deduct,hasoption,preselltimeend,presellsendstatrttime,presellsendtime,,presellsendtype,' . ' manydeduct,`virtual`,maxbuy,usermaxbuy,discounts,total as stock,deduct2,showlevels,' . ' ednum,edmoney,edareas,edareas_code,unite_total,' . ' diyformtype,diyformid,diymode,dispatchtype,dispatchid,dispatchprice,cates,minbuy, ' . ' isdiscount,isdiscount_time,isdiscount_discounts, ' . ' virtualsend,invoice,needfollow,followtip,followurl,merchid,checked,merchsale, ' . ' buyagain,buyagain_islong,buyagain_condition, buyagain_sale ,intervalprice ,intervalfloor ' . ' FROM ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid  limit 1';
+				$sql = 'SELECT id as goodsid,type,title,weight,issendfree,isnodiscount,ispresell,presellprice,' . ' thumb,marketprice,storeids,isverify,deduct,hasoption,preselltimeend,presellsendstatrttime,presellsendtime,presellsendtype,' . ' manydeduct,`virtual`,maxbuy,usermaxbuy,discounts,total as stock,deduct2,showlevels,' . ' ednum,edmoney,edareas,edareas_code,unite_total,' . ' diyformtype,diyformid,diymode,dispatchtype,dispatchid,dispatchprice,cates,minbuy, ' . ' isdiscount,isdiscount_time,isdiscount_discounts, ' . ' virtualsend,invoice,needfollow,followtip,followurl,merchid,checked,merchsale, ' . ' buyagain,buyagain_islong,buyagain_condition, buyagain_sale ,intervalprice ,intervalfloor ' . ' FROM ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid  limit 1';
 				$data = pdo_fetch($sql, array(':uniacid' => $uniacid, ':id' => $id));
 				if (empty($data) || ($data['type'] != 4)) 
 				{
@@ -449,13 +449,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					{
 						$data['optionid'] = $optionid;
 						$data['optiontitle'] = $option['title'];
-						if ((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0))) 
-						{
-						}
-						else 
-						{
-						}
-						$data['marketprice'] = $option['marketprice'];
+						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
 						$data['virtual'] = $option['virtual'];
 						if ($option['isfullback']) 
 						{
@@ -510,6 +504,24 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				}
 				else 
 				{
+					if (p('task')) 
+					{
+						$task_id = intval($_SESSION[$id . '_task_id']);
+						if (!(empty($task_id))) 
+						{
+							$rewarded = pdo_fetchcolumn('SELECT `rewarded` FROM ' . tablename('ewei_shop_task_extension_join') . ' WHERE id = :id AND openid = :openid AND  uniacid = :uniacid', array(':id' => $task_id, ':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
+							$taskGoodsInfo = unserialize($rewarded);
+							$taskGoodsInfo = $taskGoodsInfo['goods'][$id];
+							if (!(empty($optionid)) && !(empty($taskGoodsInfo['option'])) && ($optionid == $taskGoodsInfo['option'])) 
+							{
+								$taskgoodsprice = $taskGoodsInfo['price'];
+							}
+							else if (empty($optionid)) 
+							{
+								$taskgoodsprice = $taskGoodsInfo['price'];
+							}
+						}
+					}
 					$rank = intval($_SESSION[$id . '_rank']);
 					$log_id = intval($_SESSION[$id . '_log_id']);
 					$join_id = intval($_SESSION[$id . '_join_id']);
@@ -1046,19 +1058,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				}
 				$goods_list[0]['goods'] = $goods;
 			}
-			if (!(empty($address)) && !($isverify) && !($isvirtual)) 
-			{
-			}
-			else 
-			{
-			}
-			if (!(empty($carrier_list)) && !($isverify) && !($isvirtual)) 
-			{
-			}
-			else 
-			{
-			}
-			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!empty($address) && !$isverify && !$isvirtual ? $address['id'] : 0), 'storeid' => 0, 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind, 'fromquick' => intval($quickid));
+			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!(empty($address)) && !($isverify) && !($isvirtual) ? $address['id'] : 0), 'storeid' => (!(empty($carrier_list)) && !($isverify) && !($isvirtual) ? $carrier_list[0]['id'] : 0), 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind, 'fromquick' => intval($quickid));
 			$buyagain = $buyagainprice;
 		}
 		else 
@@ -1119,6 +1119,10 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		{
 			$exchangecha = $goodsprice - $exchangeprice;
 		}
+		if ($taskgoodsprice) 
+		{
+			$goodsprice = $taskgoodsprice;
+		}
 		include $this->template();
 	}
 	public function getcouponprice() 
@@ -1137,11 +1141,9 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		if (empty($result)) 
 		{
 			show_json(0);
+			return;
 		}
-		else 
-		{
-			show_json(1, $result);
-		}
+		show_json(1, $result);
 	}
 	public function caculatecoupon($contype, $couponid, $wxid, $wxcardid, $wxcode, $goodsarr, $totalprice, $discountprice, $isdiscountprice, $isSubmit = 0, $discountprice_array = array(), $merchisdiscountprice = 0) 
 	{
@@ -1464,6 +1466,24 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				}
 				else 
 				{
+					if (p('task')) 
+					{
+						$task_id = intval($_SESSION[$goodsid . '_task_id']);
+						if (!(empty($task_id))) 
+						{
+							$rewarded = pdo_fetchcolumn('SELECT `rewarded` FROM ' . tablename('ewei_shop_task_extension_join') . ' WHERE id = :id AND openid = :openid AND uniacid = :uniacid', array(':id' => $task_id, ':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
+							$taskGoodsInfo = unserialize($rewarded);
+							$taskGoodsInfo = $taskGoodsInfo['goods'][$goodsid];
+							if (!(empty($optionid)) && !(empty($taskGoodsInfo['option'])) && ($optionid == $taskGoodsInfo['option'])) 
+							{
+								$taskgoodsprice = $taskGoodsInfo['price'];
+							}
+							else if (empty($optionid)) 
+							{
+								$taskgoodsprice = $taskGoodsInfo['price'];
+							}
+						}
+					}
 					$rank = intval($_SESSION[$goodsid . '_rank']);
 					$log_id = intval($_SESSION[$goodsid . '_log_id']);
 					$join_id = intval($_SESSION[$goodsid . '_join_id']);
@@ -1489,13 +1509,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					{
 						$data['optionid'] = $optionid;
 						$data['optiontitle'] = $option['title'];
-						if ((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0))) 
-						{
-						}
-						else 
-						{
-						}
-						$data['marketprice'] = $option['marketprice'];
+						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
 						if (empty($data['unite_total'])) 
 						{
 							$data['stock'] = $option['stock'];
@@ -2022,6 +2036,24 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			$rank = intval($_SESSION[$goodsid . '_rank']);
 			$log_id = intval($_SESSION[$goodsid . '_log_id']);
 			$join_id = intval($_SESSION[$goodsid . '_join_id']);
+			if (p('task')) 
+			{
+				$task_id = intval($_SESSION[$goodsid . '_task_id']);
+				if (!(empty($task_id))) 
+				{
+					$rewarded = pdo_fetchcolumn('SELECT `rewarded` FROM ' . tablename('ewei_shop_task_extension_join') . ' WHERE id = :id AND openid = :openid AND uniacid = :uniacid', array(':id' => $task_id, ':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
+					$taskGoodsInfo0 = unserialize($rewarded);
+					$taskGoodsInfo = $taskGoodsInfo0['goods'][$goodsid];
+					if (!(empty($optionid)) && !(empty($taskGoodsInfo['option'])) && ($optionid == $taskGoodsInfo['option'])) 
+					{
+						$taskgoodsprice = $taskGoodsInfo['price'];
+					}
+					else if (empty($optionid)) 
+					{
+						$taskgoodsprice = $taskGoodsInfo['price'];
+					}
+				}
+			}
 			if ($data['seckillinfo'] && ($data['seckillinfo']['status'] == 0)) 
 			{
 				$data['is_task_goods'] = 0;
@@ -2220,13 +2252,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					$data['optiontitle'] = $option['title'];
 					if ($data['type'] != 4) 
 					{
-						if ((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0))) 
-						{
-						}
-						else 
-						{
-						}
-						$data['marketprice'] = $option['marketprice'];
+						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
 						$packageoption = array();
 						if ($packageid) 
 						{
@@ -2742,6 +2768,21 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			$dispatch_price = $package['freight'];
 			$totalprice = $packageprice + $package['freight'];
 			$is_package = 1;
+		}
+		if ($taskgoodsprice) 
+		{
+			$totalprice = $taskgoodsprice;
+			$goodsprice = $taskgoodsprice;
+			if ($taskGoodsInfo0['goods'][$goodsid]['num'] <= 1) 
+			{
+				unset($taskGoodsInfo0['goods'][$goodsid]);
+			}
+			else 
+			{
+				--$taskGoodsInfo0['goods'][$goodsid]['num'];
+			}
+			pdo_update('ewei_shop_task_extension_join', array('rewarded' => serialize($taskGoodsInfo0)), array('id' => $task_id, 'uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
+			unset($_SESSION[$goodsid . '_task_id']);
 		}
 		$order = array();
 		$order['ismerch'] = $ismerch;

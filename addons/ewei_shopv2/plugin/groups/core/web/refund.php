@@ -174,11 +174,13 @@ class Refund_EweiShopV2Page extends PluginWebPage
 				m('excel')->export($exportlist, array('title' => '维权订单-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
 			}
 			include $this->template();
+			return;
 		}
 		catch (Exception $e) 
 		{
 			throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 		}
+		throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 	}
 	public function detail() 
 	{
@@ -284,11 +286,13 @@ class Refund_EweiShopV2Page extends PluginWebPage
 				$step_array[3]['time'] = $refund['refundtime'];
 			}
 			include $this->template();
+			return;
 		}
 		catch (Exception $e) 
 		{
 			throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 		}
+		throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 	}
 	public function submit() 
 	{

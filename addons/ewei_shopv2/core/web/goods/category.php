@@ -128,6 +128,7 @@ class Category_EweiShopV2Page extends WebPage
 		if (!(empty($item))) 
 		{
 			$item['url'] = mobileUrl('goods', array('cate' => $item['id']), 1);
+			$item['qrcode'] = m('qrcode')->createQrcode($item['url']);
 		}
 		if ($_W['ispost']) 
 		{

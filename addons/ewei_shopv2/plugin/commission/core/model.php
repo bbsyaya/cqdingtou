@@ -1980,6 +1980,7 @@ if (!(class_exists('CommissionModel')))
 								if ($become_check == 1) 
 								{
 									$plugin_globonus->sendMessage($openid, array('nickname' => $member['nickname'], 'partnertime' => $time), TM_GLOBONUS_BECOME);
+									return;
 								}
 							}
 						}
@@ -2227,6 +2228,7 @@ if (!(class_exists('CommissionModel')))
 								if ($become_check == 1) 
 								{
 									$plugin_globonus->sendMessage($openid, array('nickname' => $member['nickname'], 'partnertime' => $time), TM_GLOBONUS_BECOME);
+									return;
 								}
 							}
 						}
@@ -2339,211 +2341,261 @@ if (!(class_exists('CommissionModel')))
 			$level = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and id=:id limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $member['agentlevel']));
 			return $level;
 		}
-		 public function upgradeLevelByOrder($openid)
-        {
-            global $_W;
-
-            if (empty($openid)) {
-                return false;
-            }
-
-            $set = $this->getSet();
-
-            if (empty($set['level'])) {
-                return false;
-            }
-
-            $m = m('member')->getMember($openid);
-
-            if (empty($m)) {
-                return NULL;
-            }
-
-            $leveltype = intval($set['leveltype']);
-            if (($leveltype == 4) || ($leveltype == 5)) {
-                if (!empty($m['agentnotupgrade'])) {
-                    return NULL;
-                }
-
-                $oldlevel = $this->getLevel($m['openid']);
-
-                if (empty($oldlevel['id'])) {
-                    $oldlevel = array('levelname' => empty($set['levelname']) ? '普通等级' : $set['levelname'], 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
-                }
-
-                $orders = pdo_fetch('select sum(og.realprice) as ordermoney,count(distinct og.orderid) as ordercount from ' . tablename('ewei_shop_order') . ' o ' . ' left join  ' . tablename('ewei_shop_order_goods') . ' og on og.orderid=o.id ' . ' where o.openid=:openid and o.status>=3 and o.uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
-                $ordermoney = $orders['ordermoney'];
-                $ordercount = $orders['ordercount'];
-
-                if ($leveltype == 4) {
-                    $newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordermoney . ' >= ordermoney and ordermoney>0  order by ordermoney desc limit 1', array(':uniacid' => $_W['uniacid']));
-
-                    if (empty($newlevel)) {
-                        return NULL;
-                    }
-
-                    if (!empty($oldlevel['id'])) {
-                        if ($oldlevel['id'] == $newlevel['id']) {
-                            return NULL;
-                        }
-
-                        if ($newlevel['ordermoney'] < $oldlevel['ordermoney']) {
-                            return NULL;
-                        }
-                    }
-                }
-                else {
-                    if ($leveltype == 5) {
-                        $newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
-
-                        if (empty($newlevel)) {
-                            return NULL;
-                        }
-
-                        if (!empty($oldlevel['id'])) {
-                            if ($oldlevel['id'] == $newlevel['id']) {
-                                return NULL;
-                            }
-
-                            if ($newlevel['ordercount'] < $oldlevel['ordercount']) {
-                                return NULL;
-                            }
-                        }
-                    }
-                }
-
-                pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $m['id']));
-                $this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
-                return NULL;
-            }
-
-            if ((0 <= $leveltype) && ($leveltype <= 3)) {
-                $agents = array();
-
-                if (!empty($set['selfbuy'])) {
-                    $agents[] = $m;
-                }
-
-                if (!empty($m['agentid'])) {
-                    $m1 = m('member')->getMember($m['agentid']);
-
-                    if (!empty($m1)) {
-                        $agents[] = $m1;
-                        if (!empty($m1['agentid']) && ($m1['isagent'] == 1) && ($m1['status'] == 1)) {
-                            $m2 = m('member')->getMember($m1['agentid']);
-                            if (!empty($m2) && ($m2['isagent'] == 1) && ($m2['status'] == 1)) {
-                                $agents[] = $m2;
-
-                                if (empty($set['selfbuy'])) {
-                                    if (!empty($m2['agentid']) && ($m2['isagent'] == 1) && ($m2['status'] == 1)) {
-                                        $m3 = m('member')->getMember($m2['agentid']);
-                                        if (!empty($m3) && ($m3['isagent'] == 1) && ($m3['status'] == 1)) {
-                                            $agents[] = $m3;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (empty($agents)) {
-                    return NULL;
-                }
-
-                foreach ($agents as $agent) {
-                    $info = $this->getInfo($agent['id'], array('ordercount3', 'ordermoney3', 'order13money', 'order13'));
-
-                    if (!empty($info['agentnotupgrade'])) {
-                        continue;
-                    }
-
-                    $oldlevel = $this->getLevel($agent['openid']);
-
-                    if (empty($oldlevel['id'])) {
-                        $oldlevel = array('levelname' => empty($set['levelname']) ? '普通等级' : $set['levelname'], 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
-                    }
-
-                    if ($leveltype == 0) {
-                        $ordermoney = $info['ordermoney3'];
-                        $newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and ' . $ordermoney . ' >= ordermoney and ordermoney>0  order by ordermoney desc limit 1', array(':uniacid' => $_W['uniacid']));
-
-                        if (empty($newlevel)) {
-                            continue;
-                        }
-
-                        if (!empty($oldlevel['id'])) {
-                            if ($oldlevel['id'] == $newlevel['id']) {
-                                continue;
-                            }
-
-                            if ($newlevel['ordermoney'] < $oldlevel['ordermoney']) {
-                                continue;
-                            }
-                        }
-                    }
-                    else if ($leveltype == 1) {
-                        $ordermoney = $info['order13money'];
-                        $newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and ' . $ordermoney . ' >= ordermoney and ordermoney>0  order by ordermoney desc limit 1', array(':uniacid' => $_W['uniacid']));
-
-                        if (empty($newlevel)) {
-                            continue;
-                        }
-
-                        if (!empty($oldlevel['id'])) {
-                            if ($oldlevel['id'] == $newlevel['id']) {
-                                continue;
-                            }
-
-                            if ($newlevel['ordermoney'] < $oldlevel['ordermoney']) {
-                                continue;
-                            }
-                        }
-                    }
-                    else if ($leveltype == 2) {
-                        $ordercount = $info['ordercount3'];
-                        $newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
-
-                        if (empty($newlevel)) {
-                            continue;
-                        }
-
-                        if (!empty($oldlevel['id'])) {
-                            if ($oldlevel['id'] == $newlevel['id']) {
-                                continue;
-                            }
-
-                            if ($newlevel['ordercount'] < $oldlevel['ordercount']) {
-                                continue;
-                            }
-                        }
-                    }
-                    else {
-                        if ($leveltype == 3) {
-                            $ordercount = $info['order13'];
-                            $newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
-
-                            if (empty($newlevel)) {
-                                continue;
-                            }
-
-                            if (!empty($oldlevel['id'])) {
-                                if ($oldlevel['id'] == $newlevel['id']) {
-                                    continue;
-                                }
-
-                                if ($newlevel['ordercount'] < $oldlevel['ordercount']) {
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-
-                    pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $agent['id']));
-                    $this->sendMessage($agent['openid'], array('nickname' => $agent['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
-                }
-            }
-        }
+		public function upgradeLevelByOrder($openid) 
+		{
+			global $_W;
+			if (empty($openid)) 
+			{
+				return false;
+			}
+			$set = $this->getSet();
+			if (empty($set['level'])) 
+			{
+				return false;
+			}
+			$m = m('member')->getMember($openid);
+			if (empty($m)) 
+			{
+				return;
+			}
+			$leveltype = intval($set['leveltype']);
+			if (($leveltype == 4) || ($leveltype == 5)) 
+			{
+				if (!(empty($m['agentnotupgrade']))) 
+				{
+					return;
+				}
+				$oldlevel = $this->getLevel($m['openid']);
+				if (empty($oldlevel['id'])) 
+				{
+					$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通等级' : $set['levelname']), 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
+				}
+				$orders = pdo_fetch('select sum(og.realprice) as ordermoney,count(distinct og.orderid) as ordercount from ' . tablename('ewei_shop_order') . ' o ' . ' left join  ' . tablename('ewei_shop_order_goods') . ' og on og.orderid=o.id ' . ' where o.openid=:openid and o.status>=3 and o.uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+				$ordermoney = $orders['ordermoney'];
+				$ordercount = $orders['ordercount'];
+				if ($leveltype == 4) 
+				{
+					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordermoney . ' >= ordermoney and ordermoney>0  order by ordermoney desc limit 1', array(':uniacid' => $_W['uniacid']));
+					if (empty($newlevel)) 
+					{
+						return;
+					}
+					if (!(empty($oldlevel['id']))) 
+					{
+						if ($oldlevel['id'] == $newlevel['id']) 
+						{
+							return;
+						}
+						if ($newlevel['ordermoney'] < $oldlevel['ordermoney']) 
+						{
+							return;
+							if ($leveltype == 5) 
+							{
+								$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+								if (empty($newlevel)) 
+								{
+									return;
+								}
+								if (!(empty($oldlevel['id']))) 
+								{
+									if ($oldlevel['id'] == $newlevel['id']) 
+									{
+										return;
+									}
+									if ($newlevel['ordercount'] < $oldlevel['ordercount']) 
+									{
+										return;
+									}
+								}
+							}
+						}
+					}
+				}
+				else 
+				{
+					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+					return;
+					return;
+					return;
+				}
+				pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $m['id']));
+				$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
+				return;
+			}
+			if ((0 <= $leveltype) && ($leveltype <= 3)) 
+			{
+				$agents = array();
+				if (!(empty($set['selfbuy']))) 
+				{
+					$agents[] = $m;
+				}
+				if (!(empty($m['agentid']))) 
+				{
+					$m1 = m('member')->getMember($m['agentid']);
+					if (!(empty($m1))) 
+					{
+						$agents[] = $m1;
+						if (!(empty($m1['agentid'])) && ($m1['isagent'] == 1) && ($m1['status'] == 1)) 
+						{
+							$m2 = m('member')->getMember($m1['agentid']);
+							if (!(empty($m2)) && ($m2['isagent'] == 1) && ($m2['status'] == 1)) 
+							{
+								$agents[] = $m2;
+								if (empty($set['selfbuy'])) 
+								{
+									if (!(empty($m2['agentid'])) && ($m2['isagent'] == 1) && ($m2['status'] == 1)) 
+									{
+										$m3 = m('member')->getMember($m2['agentid']);
+										if (!(empty($m3)) && ($m3['isagent'] == 1) && ($m3['status'] == 1)) 
+										{
+											$agents[] = $m3;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				if (empty($agents)) 
+				{
+					return;
+				}
+				foreach ($agents as $agent ) 
+				{
+					$info = $this->getInfo($agent['id'], array('ordercount3', 'ordermoney3', 'order13money', 'order13'));
+					if (!(empty($info['agentnotupgrade']))) 
+					{
+						continue;
+					}
+					$oldlevel = $this->getLevel($agent['openid']);
+					if (empty($oldlevel['id'])) 
+					{
+						$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通等级' : $set['levelname']), 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
+					}
+					if ($leveltype == 0) 
+					{
+						$ordermoney = $info['ordermoney3'];
+						$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and ' . $ordermoney . ' >= ordermoney and ordermoney>0  order by ordermoney desc limit 1', array(':uniacid' => $_W['uniacid']));
+						if (empty($newlevel)) 
+						{
+							continue;
+						}
+						if (!(empty($oldlevel['id']))) 
+						{
+							if ($oldlevel['id'] == $newlevel['id']) 
+							{
+								continue;
+							}
+							if ($newlevel['ordermoney'] < $oldlevel['ordermoney']) 
+							{
+								continue;
+								if ($leveltype == 1) 
+								{
+									$ordermoney = $info['order13money'];
+									$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and ' . $ordermoney . ' >= ordermoney and ordermoney>0  order by ordermoney desc limit 1', array(':uniacid' => $_W['uniacid']));
+									if (empty($newlevel)) 
+									{
+										continue;
+									}
+									if (!(empty($oldlevel['id']))) 
+									{
+										if ($oldlevel['id'] == $newlevel['id']) 
+										{
+											continue;
+										}
+										if ($newlevel['ordermoney'] < $oldlevel['ordermoney']) 
+										{
+											continue;
+											if ($leveltype == 2) 
+											{
+												$ordercount = $info['ordercount3'];
+												$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+												if (empty($newlevel)) 
+												{
+													continue;
+												}
+												if (!(empty($oldlevel['id']))) 
+												{
+													if ($oldlevel['id'] == $newlevel['id']) 
+													{
+														continue;
+													}
+													if ($newlevel['ordercount'] < $oldlevel['ordercount']) 
+													{
+														continue;
+														if ($leveltype == 3) 
+														{
+															$ordercount = $info['order13'];
+															$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+															if (empty($newlevel)) 
+															{
+																continue;
+															}
+															if (!(empty($oldlevel['id']))) 
+															{
+																if ($oldlevel['id'] == $newlevel['id']) 
+																{
+																	continue;
+																}
+																if ($newlevel['ordercount'] < $oldlevel['ordercount']) 
+																{
+																	continue;
+																}
+															}
+														}
+													}
+												}
+											}
+											else 
+											{
+												$ordercount = $info['order13'];
+												$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+												continue;
+												continue;
+												continue;
+											}
+										}
+									}
+								}
+								else 
+								{
+									$ordercount = $info['ordercount3'];
+									$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+									continue;
+									continue;
+									continue;
+									$ordercount = $info['order13'];
+									$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+									continue;
+									continue;
+									continue;
+								}
+							}
+						}
+					}
+					else 
+					{
+						$ordermoney = $info['order13money'];
+						$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and ' . $ordermoney . ' >= ordermoney and ordermoney>0  order by ordermoney desc limit 1', array(':uniacid' => $_W['uniacid']));
+						continue;
+						continue;
+						continue;
+						$ordercount = $info['ordercount3'];
+						$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+						continue;
+						continue;
+						continue;
+						$ordercount = $info['order13'];
+						$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $ordercount . ' >= ordercount and ordercount>0  order by ordercount desc limit 1', array(':uniacid' => $_W['uniacid']));
+						continue;
+						continue;
+						continue;
+					}
+					pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $agent['id']));
+					$this->sendMessage($agent['openid'], array('nickname' => $agent['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
+				}
+			}
+		}
 		public function upgradeLevelByAgent($openid) 
 		{
 			global $_W;
@@ -2641,46 +2693,44 @@ if (!(class_exists('CommissionModel')))
 					pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $agent['id']));
 					$this->sendMessage($agent['openid'], array('nickname' => $agent['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
 				}
+				return;
 			}
-			else if (!(empty($m['agentnotupgrade']))) 
+			if (!(empty($m['agentnotupgrade']))) 
 			{
 				return;
 			}
-			else 
+			$oldlevel = $this->getLevel($m['openid']);
+			if (empty($oldlevel['id'])) 
 			{
-				$oldlevel = $this->getLevel($m['openid']);
-				if (empty($oldlevel['id'])) 
-				{
-					$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通等级' : $set['levelname']), 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
-				}
-				if ($leveltype == 7) 
-				{
-					$downcount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member') . ' where agentid=:agentid and uniacid=:uniacid ', array(':agentid' => $m['id'], ':uniacid' => $_W['uniacid']));
-					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
-				}
-				else if ($leveltype == 9) 
-				{
-					$downcount = $info['level1'];
-					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
-				}
-				if (empty($newlevel)) 
-				{
-					return;
-				}
-				if ($newlevel['id'] == $oldlevel['id']) 
-				{
-					return;
-				}
-				if (!(empty($oldlevel['id']))) 
-				{
-					if ($newlevel['downcount'] < $oldlevel['downcount']) 
-					{
-						return;
-					}
-				}
-				pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $m['id']));
-				$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
+				$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通等级' : $set['levelname']), 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
 			}
+			if ($leveltype == 7) 
+			{
+				$downcount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member') . ' where agentid=:agentid and uniacid=:uniacid ', array(':agentid' => $m['id'], ':uniacid' => $_W['uniacid']));
+				$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
+			}
+			else if ($leveltype == 9) 
+			{
+				$downcount = $info['level1'];
+				$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
+			}
+			if (empty($newlevel)) 
+			{
+				return;
+			}
+			if ($newlevel['id'] == $oldlevel['id']) 
+			{
+				return;
+			}
+			if (!(empty($oldlevel['id']))) 
+			{
+				if ($newlevel['downcount'] < $oldlevel['downcount']) 
+				{
+					return;
+				}
+			}
+			pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $m['id']));
+			$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
 		}
 		public function upgradeLevelByCommissionOK($openid) 
 		{

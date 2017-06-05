@@ -15,7 +15,9 @@
     </td>
     <td>
         {ifp 'diyform.temp.edit|diyform.add'}
+        {if $data_type!=13}
         <input type="checkbox" name="tp_must[{php echo $kw}]" value="1" {if $v1['tp_must']==1}checked{/if} >
+        {/if}
         {else}
         {if $v1['tp_must']==1}是{else}否{/if}
         {/if}
@@ -134,6 +136,14 @@
             {else}
             {php echo $v1['tp_name2']}
             {/if}
+        {else if $data_type==13}
+
+            {ifp 'diyform.temp.edit|diyform.add'}
+            <textarea class="form-control" name="tp_text[{php echo $kw}]" placeholder="提示内容" style="height: 120px;">{php echo $v1['tp_text']}</textarea>
+            {else}
+            {if !empty($v1['tp_text'])}{php echo $v1['placeholder']}{/if}
+            {/if}
+
         {/if}
     </td>
 

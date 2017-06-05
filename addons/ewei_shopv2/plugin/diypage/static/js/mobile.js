@@ -4,7 +4,11 @@ define(['core', 'tpl'], function (core, tpl) {
         modal.initNotice();
         modal.initSwiper();
         modal.initLocation();
-        modal.initAudio()
+        modal.initAudio();
+
+        $("form").submit(function () {
+            $(this).find("input[name='keywords']").blur();
+        });
     };
     modal.initNotice = function () {
         if ($(".fui-notice").length > 0) {

@@ -218,6 +218,17 @@ class Detail_EweiShopV2Page extends MobilePage
 			$shopset = m('common')->getSysset();
 			$payinfo = array('wechat' => (!(empty($sec['app_wechat']['merchname'])) && !(empty($shopset['pay']['app_wechat'])) && !(empty($sec['app_wechat']['appid'])) && !(empty($sec['app_wechat']['appsecret'])) && !(empty($sec['app_wechat']['merchid'])) && !(empty($sec['app_wechat']['apikey'])) ? true : false), 'alipay' => false, 'mcname' => $sec['app_wechat']['merchname'], 'logno' => NULL, 'money' => NULL, 'attach' => $_W['uniacid'] . ':4', 'type' => 4);
 		}
+		list(, $payment) = m('common')->public_build();
+		if (!(empty($payment['is_new']))) 
+		{
+			if (($payment['type'] == 2) || ($payment['type'] == 3)) 
+			{
+				if (!(empty($payment['sub_appsecret']))) 
+				{
+					m('member')->wxuser($payment['sub_appid'], $payment['sub_appsecret']);
+				}
+			}
+		}
 		include $this->template();
 	}
 	public function pay($a = array(), $b = array()) 

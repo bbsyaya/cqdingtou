@@ -34,18 +34,21 @@ class Index_EweiShopV2Page extends MerchWebPage
 			$shopset = $set['shop'];
 			load()->func('tpl');
 			include $this->template();
+			return;
 		}
-		else if (mcv('taobao.jingdong')) 
+		if (mcv('taobao.jingdong')) 
 		{
 			header('location: ' . webUrl('taobao/jingdong'));
 			exit();
+			return;
 		}
-		else if (mcv('taobao.one688')) 
+		if (mcv('taobao.one688')) 
 		{
 			header('location: ' . webUrl('taobao/one688'));
 			exit();
+			return;
 		}
-		else if (mcv('taobao.taobaocsv')) 
+		if (mcv('taobao.taobaocsv')) 
 		{
 			header('location: ' . webUrl('taobao/taobaocsv'));
 			exit();

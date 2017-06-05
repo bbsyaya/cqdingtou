@@ -29,11 +29,9 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		if ($is_openmerch == 1) 
 		{
 			include $this->template('merch/order/index');
+			return;
 		}
-		else 
-		{
-			include $this->template();
-		}
+		include $this->template();
 	}
 	public function get_list() 
 	{
@@ -50,13 +48,11 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		$merchdata = $this->merchData();
 		extract($merchdata);
 		$condition .= ' and merchshow=0 ';
-		
-		if($show_status == ""){
+			if($show_status == ""){
 			$show_status = 6;
 		}else{
 			$show_status = intval($show_status);
 		}
-		
 		switch ($show_status) 
 		{
 			case 0: $condition .= ' and status=0 and paytype!=3';
@@ -69,14 +65,12 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			break;
 			case 6: $condition .= ' and userdeleted=0 ';
 			break;
-			
 			default: $condition .= ' and status=' . intval($show_status);
 		}
-			
 			if ($show_status != 5) 
 			{
 				$condition .= ' and userdeleted=0 ';
-				
+			
 			}
 			$com_verify = com('verify');
 			$s_string = '';
@@ -91,7 +85,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			{
 				$merch_user = $merch_plugin->getListUser($list, 'merch_user');
 			}
-			
+		
 			foreach ($list as &$row ) 
 			{
 				$param = array();

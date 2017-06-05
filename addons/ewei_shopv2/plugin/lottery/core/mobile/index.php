@@ -23,10 +23,19 @@ class index_EweiShopV2Page extends PluginMobilePage
 			$page = 1;
 		}
 		$limit = ($page - 1) * 15;
-		$task_sql = 'SELECT j.*,l.lottery_title,l.lottery_type FROM ' . tablename('ewei_shop_lottery_join') . ' as j left join ' . tablename('ewei_shop_lottery') . ' as l on j.lottery_id=l.lottery_id WHERE j.lottery_num>0 and j.uniacid=:uniacid AND j.`join_user`=:join_user AND l.`is_delete`=0 ORDER BY j.addtime DESC LIMIT ' . $limit . ',15';
+		$task_sql = 'SELECT j.*,l.lottery_title,l.lottery_type,l.lottery_days FROM ' . tablename('ewei_shop_lottery_join') . ' as j left join ' . tablename('ewei_shop_lottery') . ' as l on j.lottery_id=l.lottery_id WHERE j.lottery_num>0 and j.uniacid=:uniacid AND j.`join_user`=:join_user AND l.`is_delete`=0 ORDER BY j.addtime DESC LIMIT ' . $limit . ',15';
 		$lottery = pdo_fetchall($task_sql, array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid']));
 		foreach ($lottery as $key => $value ) 
 		{
+			if (!(empty($value['lottery_days']))) 
+			{
+				$effecttime = time() - $value['lottery_days'];
+				if ($value['addtime'] < $effecttime) 
+				{
+					unset($lottery[$key]);
+					continue;
+				}
+			}
 			$lottery[$key]['addtime'] = date('Y-m-d', $value['addtime']);
 			$lottery[$key]['link'] = mobileUrl('lottery/index/lottery_info', array('id' => $value['lottery_id']), true);
 			if ($value['lottery_type'] == 1) 
@@ -62,25 +71,30 @@ class index_EweiShopV2Page extends PluginMobilePage
 				$set = unserialize($set);
 			}
 			$log = pdo_fetchall('SELECT l.*,m.`nickname`,m.`avatar` FROM ' . tablename('ewei_shop_lottery_log') . ' AS l LEFT JOIN ' . tablename('ewei_shop_member') . ' AS m ON m.openid=l.join_user WHERE l.uniacid=:uniacid AND l.lottery_id=:lottery_id AND l.is_reward=1 LIMIT 5', array(':uniacid' => $_W['uniacid'], ':lottery_id' => $id));
-			$has_changes = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_lottery_join') . 'where uniacid=:uniacid AND lottery_id=:lottery_id  AND join_user=:join_user and lottery_num>0', array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid'], ':lottery_id' => $id));
+			if (!(empty($lottery['lottery_days']))) 
+			{
+				$effecttime = time() - $lottery['lottery_days'];
+				$conditon = ' and `addtime` > ' . $effecttime;
+			}
+			$has_changes = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_lottery_join') . 'where uniacid=:uniacid AND lottery_id=:lottery_id  AND join_user=:join_user and lottery_num>0 ' . $conditon, array(':uniacid' => $_W['uniacid'], ':join_user' => $_W['openid'], ':lottery_id' => $id));
 			$member = m('member')->getMember($_W['openid'], true);
 		}
 		if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 1)) 
 		{
 			include $this->template('lottery/indexpan');
+			return;
 		}
-		else if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 2)) 
+		if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 2)) 
 		{
 			include $this->template('lottery/indexgua');
+			return;
 		}
-		else if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 3)) 
+		if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 3)) 
 		{
 			include $this->template('lottery/indexgrid');
+			return;
 		}
-		else 
-		{
-			include $this->template('lottery/indexpan');
-		}
+		include $this->template('lottery/indexpan');
 	}
 	public function lottery_reward() 
 	{
@@ -382,13 +396,11 @@ class index_EweiShopV2Page extends PluginMobilePage
 			$info = array('status' => 1, 'info' => '恭喜您已获得' . $temreward[$reward_id]['title']);
 			echo json_encode($info);
 			exit();
+			return;
 		}
-		else 
-		{
-			$info = array('status' => 0, 'info' => '获取奖励失败');
-			echo json_encode($info);
-			exit();
-		}
+		$info = array('status' => 0, 'info' => '获取奖励失败');
+		echo json_encode($info);
+		exit();
 	}
 	public function mygoods() 
 	{

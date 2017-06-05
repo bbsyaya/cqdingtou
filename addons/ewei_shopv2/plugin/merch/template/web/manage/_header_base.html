@@ -18,7 +18,7 @@
         <script src="./resource/js/app/util.js"></script>
         <script src="{php echo EWEI_SHOPV2_LOCAL}static/js/require.js"></script>
         <script src="./resource/js/app/config.js"></script>
-        <script src="{php echo EWEI_SHOPV2_LOCAL}static/js/myconfig.js"></script>
+        <script src="{php echo EWEI_SHOPV2_LOCAL}static/js/myconfig.js?2017515"></script>
         <script>myconfig.path=  '../addons/ewei_shopv2/static/js/';</script>
         <script type="text/javascript">
                 if (navigator.appName == 'Microsoft Internet Explorer') {
@@ -26,5 +26,6 @@
                         alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
                     }
                 }
+                myrequire.systemVersion = '{php echo IMS_VERSION}';
         </script>
 </head>

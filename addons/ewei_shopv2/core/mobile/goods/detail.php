@@ -15,6 +15,7 @@ class Detail_EweiShopV2Page extends MobilePage
 		$rank = intval($_GPC['rank']);
 		$log_id = intval($_GPC['log_id']);
 		$join_id = intval($_GPC['join_id']);
+		$task_id = intval($_GPC['task_id']);
 		if (!(empty($join_id))) 
 		{
 			$_SESSION[$id . '_rank'] = $rank;
@@ -23,6 +24,23 @@ class Detail_EweiShopV2Page extends MobilePage
 		else if (!(empty($log_id))) 
 		{
 			$_SESSION[$id . '_log_id'] = $log_id;
+		}
+		else if (!(empty($task_id))) 
+		{
+			$_SESSION[$id . '_task_id'] = $task_id;
+		}
+		if (p('task')) 
+		{
+			if (!(empty($task_id))) 
+			{
+				$rewarded = pdo_fetchcolumn('SELECT `rewarded` FROM ' . tablename('ewei_shop_task_extension_join') . ' WHERE id = :id AND uniacid = :uniacid', array(':id' => $task_id, ':uniacid' => $_W['uniacid']));
+				$taskGoodsInfo = unserialize($rewarded);
+				$taskGoodsInfo = $taskGoodsInfo['goods'][$id];
+				if (!(empty($taskGoodsInfo['option']))) 
+				{
+					$taskGoodsInfo = NULL;
+				}
+			}
 		}
 		if (p('threen')) 
 		{
@@ -210,6 +228,7 @@ class Detail_EweiShopV2Page extends MobilePage
 				{
 					$seckillinfo['status'] = 0;
 					unset($_SESSION[$id . '_log_id']);
+					unset($_SESSION[$id . '_task_id']);
 					unset($log_id);
 				}
 				else if ($time < $seckillinfo['starttime']) 
@@ -317,8 +336,10 @@ class Detail_EweiShopV2Page extends MobilePage
 		{
 			$goods['canbuy'] = false;
 		}
+		$ispresell = 0;
 		if (0 < $goods['ispresell']) 
 		{
+			$ispresell = 1;
 			if ((0 < $goods['preselltimestart']) && (time() < $goods['preselltimestart'])) 
 			{
 				$goods['canbuy'] = false;
@@ -328,9 +349,10 @@ class Detail_EweiShopV2Page extends MobilePage
 				$goods['canbuy'] = false;
 			}
 			$times = ($goods['presellovertime'] * 60 * 60 * 24) + $goods['preselltimeend'];
-			if ((0 < $goods['presellover']) && ($times <= time()) && (0 < $goods['preselltimeend'])) 
+			if ((0 < $goods['presellover']) && ($times <= time())) 
 			{
 				$goods['canbuy'] = true;
+				$ispresell = 0;
 			}
 		}
 		if ((0 < $goods['isendtime']) && (0 < $goods['endtime']) && ($goods['endtime'] < time())) 

@@ -117,7 +117,7 @@
     {/if}
 </div>
 
-{if !empty($seckillinfo) }
+{if !empty($seckillinfo)}
 <div class="seckill-container {if $seckillinfo['status']==1}notstart{/if}"
      data-starttime="{php echo $seckillinfo['starttime']-time();}"
      data-endtime="{php echo $seckillinfo['endtime']-time();}"
@@ -127,7 +127,7 @@
             &yen;<span>{$seckillinfo['price']}</span>
         </div>
         <div class="fui-list-inner">
-            <div class="text"><span class="stitle" style="white-space:nowrap; overflow:hidden; width:3.9rem;">{$seckillinfo['tag']}</span></div>
+            <div class="text"><span class="stitle" style="white-space:nowrap; overflow:hidden; max-width:2.6rem;">{$seckillinfo['tag']}</span></div>
             <div class="text"><span class="oldprice">&yen;{$goods['minprice']}</span></div>
         </div>
     </div>
@@ -152,7 +152,7 @@
 <div class="fui-cell-group fui-detail-group" >
     <div class="fui-cell">
         <div class="fui-cell-text name ">
-            {if $goods['ispresell']==1}<i class="fui-tag fui-tag-danger">预</i>{/if}
+            {if $ispresell==1}<i class="fui-tag fui-tag-danger">预</i>{/if}
             {$goods['title']}
         </div>
         {if empty($share['goods_detail_close'])}
@@ -197,8 +197,9 @@
     <div class="fui-cell">
         <div class="fui-cell-text price">
 			<span class="text-danger">
-
-                {if $threen &&(!empty($threenprice['price'])||!empty($threenprice['discount']))}
+                {if !empty($taskGoodsInfo)}
+                    ￥{$taskGoodsInfo['price']}
+                {elseif $threen &&(!empty($threenprice['price'])||!empty($threenprice['discount']))}
                     {if !empty($threenprice['price'])}
                         {php echo $threenprice['price'];}
                     {elseif !empty($threenprice['discount'])}
@@ -293,7 +294,11 @@
         {if $goods['showtotal'] == 1}
         <span>库存:  {$goods['total']}</span>
         {/if}
+
+        {if $goods['showsales'] == 1}
         <span>销量:  {php echo number_format($goods['sales'],0)} {$goods['unit']}</span>
+        {/if}
+
         {else}
         <span></span>
         <span></span>
@@ -976,32 +981,52 @@
 
 
             {if $enoughfree || ($enoughs && count($enoughs)>0)}
-
-            {if $enoughs && count($enoughs)>0}
-            <div class='fui-according'>
-                <div class='fui-according-header'>
-                    <div class="text">
-                        <div class="fui-cell-text">全场满 <span class="text-danger">￥{$enoughs[0]['enough']}</span> 立减 <span class="text-danger">￥{$enoughs[0]['money']}</span></div>
+                {if $enoughs && count($enoughs)>0}
+                <div class='fui-according'>
+                    <div class='fui-according-header'>
+                        <div class="text">
+                            <div class="fui-cell-text">全场满 <span class="text-danger">￥{$enoughs[0]['enough']}</span> 立减 <span class="text-danger">￥{$enoughs[0]['money']}</span></div>
+                        </div>
+                        {if count($enoughs)>1}<span class="remark">更多</span>{/if}
                     </div>
-                    {if count($enoughs)>1}<span class="remark">更多</span>{/if}
-                </div>
-                {if count($enoughs)>1}
-                <div class='fui-according-content'>
-                    {loop $enoughs $key $enough}
-                    {if $key>0}
-                    <div class="fui-cell">
-                        <div class="fui-cell-text">满 <span class="text-danger">￥{$enough['enough']}</span> 立减 <span class="text-danger">￥{$enough['money']}</span></div>
+                    {if count($enoughs)>1}
+                    <div class='fui-according-content'>
+                        {loop $enoughs $key $enough}
+                        {if $key>0}
+                        <div class="fui-cell">
+                            <div class="fui-cell-text">满 <span class="text-danger">￥{$enough['enough']}</span> 立减 <span class="text-danger">￥{$enough['money']}</span></div>
+                        </div>
+                        {/if}
+                        {/loop}
                     </div>
                     {/if}
-                    {/loop}
                 </div>
                 {/if}
-            </div>
+            {/if}
+
+            {if !empty($merch_set['enoughdeduct'])}
+                <div class='fui-according'>
+                    <div class='fui-according-header'>
+                        <div class="text">
+                            <div class="fui-cell-text">商户满 <span class="text-danger">￥{$merch_set['enoughmoney']}</span> 立减 <span class="text-danger">￥{$merch_set['enoughdeduct']}</span></div>
+                        </div>
+                        {if count($merch_set['enoughs'])>0}<span class="remark">更多</span>{/if}
+                    </div>
+                    {if count($merch_set['enoughs'])>0}
+                    <div class='fui-according-content'>
+                        {loop $merch_set['enoughs'] $key $enough}
+                        {if $key>0}
+                        <div class="fui-cell">
+                            <div class="fui-cell-text">满 <span class="text-danger">￥{$enough['enough']}</span> 立减 <span class="text-danger">￥{$enough['give']}</span></div>
+                        </div>
+                        {/if}
+                        {/loop}
+                    </div>
+                    {/if}
+                </div>
             {/if}
 
 
-
-            {/if}
             <div class='btn btn-danger block'>确定</div>
         </div>
     </div>

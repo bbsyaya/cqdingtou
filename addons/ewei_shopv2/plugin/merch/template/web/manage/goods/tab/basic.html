@@ -2,7 +2,7 @@
     <label class="col-sm-2 control-label">排序</label>
     <div class="col-sm-9 col-xs-12">
         {ife 'goods' $item}
-        <input type="text" name="displayorder" id="displayorder" class="form-control" value="{$item['merchdisplayorder']}" />
+        <input type="text" name="displayorder" id="displayorder" class="form-control" maxlength="10" value="{$item['merchdisplayorder']}" />
         <span class='help-block'>数字越大，排名越靠前,如果为空，默认排序方式为创建时间</span>
         {else}
         <div class='form-control-static'>{$item['merchdisplayorder']}</div>

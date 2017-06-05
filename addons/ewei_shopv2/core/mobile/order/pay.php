@@ -18,6 +18,10 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		$ispeerpay = m('order')->checkpeerpay($orderid);
 		if (!(empty($ispeerpay))) 
 		{
+			if (pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_order_peerpay_payinfo') . ' WHERE openid = :openid AND pid = :pid', array(':openid' => $_W['openid'], ':pid' => $ispeerpay['id']))) 
+			{
+				$this->message('每人只能代付一次');
+			}
 			$peerpayMessage = trim($_GPC['peerpaymessage']);
 			$peerpay_info = (double) pdo_fetchcolumn('select SUM(price) from ' . tablename('ewei_shop_order_peerpay_payinfo') . ' where pid=:pid limit 1', array(':pid' => $ispeerpay['id']));
 			$peerprice = floatval($_GPC['peerprice']);
@@ -57,17 +61,14 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			header('location: ' . mobileUrl('order/detail', array('id' => $order['id'])));
 			exit();
 		}
+		$log = pdo_fetch('SELECT * FROM ' . tablename('core_paylog') . ' WHERE `uniacid`=:uniacid AND `module`=:module AND `tid`=:tid limit 1', array(':uniacid' => $uniacid, ':module' => 'ewei_shopv2', ':tid' => $order['ordersn']));
 		if (!(empty($ispeerpay))) 
 		{
 		}
-		else 
+		else if (!(empty($log)) && ($log['status'] != '0')) 
 		{
-			$log = pdo_fetch('SELECT * FROM ' . tablename('core_paylog') . ' WHERE `uniacid`=:uniacid AND `module`=:module AND `tid`=:tid limit 1', array(':uniacid' => $uniacid, ':module' => 'ewei_shopv2', ':tid' => $order['ordersn']));
-			if (!(empty($log)) && ($log['status'] != '0')) 
-			{
-				header('location: ' . mobileUrl('order/detail', array('id' => $order['id'])));
-				exit();
-			}
+			header('location: ' . mobileUrl('order/detail', array('id' => $order['id'])));
+			exit();
 		}
 		$seckill_goods = pdo_fetchall('select goodsid,optionid,seckill from  ' . tablename('ewei_shop_order_goods') . ' where orderid=:orderid and uniacid=:uniacid and seckill=1 ', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 		if (!(empty($log)) && ($log['status'] == '0')) 
@@ -116,7 +117,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			if (!(empty($ispeerpay))) 
 			{
 				$params['fee'] = $peerprice;
-				$params['tid'] = $params['tid'] . $member['id'];
+				$params['tid'] = $params['tid'] . $member['id'] . str_replace('.', '', $params['fee']);
 				@session_start();
 				$_SESSION['peerpaytid'] = $params['tid'];
 			}
@@ -714,13 +715,12 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			if ($_W['ispost']) 
 			{
 				show_json(1, array('result' => $pay_result));
+				return;
 			}
-			else 
-			{
-				header('location:' . mobileUrl('order/pay/success', array('id' => $order['id'], 'result' => $pay_result)));
-			}
+			header('location:' . mobileUrl('order/pay/success', array('id' => $order['id'], 'result' => $pay_result)));
+			return;
 		}
-		else if ($type == 'wechat') 
+		if ($type == 'wechat') 
 		{
 			if (!(is_weixin()) && empty($_W['shopset']['wap']['open'])) 
 			{
@@ -796,11 +796,9 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			if ($_W['ispost']) 
 			{
 				show_json(0, '支付出错,请重试!');
+				return;
 			}
-			else 
-			{
-				$this->message('支付出错,请重试!', mobileUrl('order'));
-			}
+			$this->message('支付出错,请重试!', mobileUrl('order'));
 		}
 	}
 	public function success() 
@@ -1037,7 +1035,7 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 		$rate = round(($peerpay_info / $peerpay['peerpay_realprice']) * 100, 2);
 		$ordergoods = pdo_fetch('select * from ' . tablename('ewei_shop_order_goods') . ' where orderid=:id and uniacid=:uniacid limit 1', array(':id' => $peerpay['orderid'], ':uniacid' => $uniacid));
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ordergoods['goodsid'], ':uniacid' => $uniacid));
-		$address = iunserializer($peerpay['address']);
+		$address = ((!(empty($peerpay['address'])) ? iunserializer($peerpay['address']) : ''));
 		if ($peerpay['peerpay_type'] == 0) 
 		{
 			$price = $peerpay['peerpay_realprice'];

@@ -601,15 +601,14 @@ class Log_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			$url = mobileUrl('creditshop/log/detail', array('id' => $creditlog['id']), true);
 			exit('<script>top.window.location.href=\'' . $url . '\'</script>');
+			return;
 		}
-		else if ($fromwechat) 
+		if ($fromwechat) 
 		{
 			$this->message(array('message' => '请返回微信查看支付状态', 'title' => '支付成功!', 'buttondisplay' => false), NULL, 'success');
+			return;
 		}
-		else 
-		{
-			$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('creditshop/log/detail', array('id' => $creditlog['id'])), 'success');
-		}
+		$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('creditshop/log/detail', array('id' => $creditlog['id'])), 'success');
 	}
 	public function payresult($a = array()) 
 	{

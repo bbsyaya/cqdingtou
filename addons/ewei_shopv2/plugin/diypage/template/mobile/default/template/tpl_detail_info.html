@@ -20,19 +20,19 @@
             <div class="fui-cell-text  flex">
                 {if $goods['intervalfloor']>0}
                 <span>
-                        <p class="price"><small>￥</small>{$goods['intervalprice1']}</p>
+                        <p class="price" style="color: {$diyitem['style']['pricecolor']};"><small>￥</small>{$goods['intervalprice1']}</p>
                         <p>{$goods['intervalnum1']} {if $goods['intervalfloor']>1}-{php echo intval($goods['intervalnum2'])-1}件{else}件以上{/if}</p>
                     </span>
                 {/if}
                 {if $goods['intervalfloor']>1}
                 <span>
-                        <p class="price"><small>￥</small>{$goods['intervalprice2']}</p>
+                        <p class="price" style="color: {$diyitem['style']['pricecolor']};"><small>￥</small>{$goods['intervalprice2']}</p>
                         <p>{$goods['intervalnum2']}{if $goods['intervalfloor']>2}-{php echo intval($goods['intervalnum3'])-1}件{else}件以上{/if}</p>
                     </span>
                 {/if}
                 {if $goods['intervalfloor']>2}
                 <span>
-                        <p class="price"><small>￥</small>{$goods['intervalprice3']}</p>
+                        <p class="price" style="color: {$diyitem['style']['pricecolor']};"><small>￥</small>{$goods['intervalprice3']}</p>
                         <p>>{$goods['intervalnum3']}件</p>
                     </span>
                 {/if}
@@ -43,7 +43,7 @@
     {if empty($seckillinfo) && $goods['type']!=4}
     <div class="fui-cell">
         <div class="fui-cell-text price">
-			<span class="text-danger">
+			<span class="text-danger" style="color: {$diyitem['style']['pricecolor']};">
 			￥{if $goods['ispresell']>0 && ($goods['preselltimeend'] == 0 || $goods['preselltimeend'] > time())}{$goods['presellprice']}
                 {else}
                     {if $goods['minprice']==$goods['maxprice']}{$goods['minprice']}{else}{$goods['minprice']}~{$goods['maxprice']}{/if}

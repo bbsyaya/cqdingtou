@@ -1,7 +1,9 @@
 <script type="text/html" id="tpl_show_notice">
     <div class="drag" data-itemid="<%itemid%>">
-        <div class="fui-notice" style="background: <%style.background%>">
-            <div class="image"><img src="<%imgsrc params.iconurl%>" onerror="this.src='../addons/ewei_shopv2/static/images/hotdot.jpg'"></div>
+        <div class="fui-notice" style="background: <%style.background%>; border-color: <%style.bordercolor%>;">
+            <%if params.iconurl%>
+                <div class="image"><img src="<%imgsrc params.iconurl%>" onerror="this.src='../addons/ewei_shopv2/static/images/hotdot.jpg'"></div>
+            <%/if%>
             <div class="icon"><i class="icon icon-notification1" style="font-size: 0.7rem; color: <%style.iconcolor%>;"></i></div>
             <div class="text" style="color: <%style.color%>;">
                 <%if params.noticedata=='0'%>这里将读取商城的公告进行滚动显示<%/if%>
@@ -1344,7 +1346,7 @@
                     </div>
                 <%/if%>
                 <div class="center <%params.searchstyle%>">
-                    <input value="<%params.placeholder%>" style="opacity: <%style.opacity%>; background: <%style.searchbackground%>; color: <%style.searchtextcolor%>;" />
+                    <input value="<%params.placeholder%>" style="opacity: <%style.opacityinput%>; background: <%style.searchbackground%>; color: <%style.searchtextcolor%>;" />
                 </div>
                 <%if (params.rightnav==1&&params.rightnavicon!='') || (params.rightnav==2&&params.rightnavimg!='')%>
                     <div class="rightnav">
@@ -1474,7 +1476,7 @@
         <div class="fui-tab fui-tab-danger">
             <%define index=0%>
             <%each data as item%>
-                <%if index<3%>
+                <%if index <= style.scrollnum-1%>
                     <a <%if index==0%>class="active" style="color: <%style.activecolor%>; border-color: <%style.activecolor%>; background: <%style.activebackground%>;"<%else%>style="color: <%style.color%>;"<%/if%>><%item.text||'未设置'%></a>
                 <%/if%>
                 <%define index++%>

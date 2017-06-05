@@ -61,7 +61,7 @@ class Index_EweiShopV2Page extends MerchWebPage
 		$list = array();
 		if (!(empty($total))) 
 		{
-			$sql = 'SELECT g.* FROM ' . tablename('ewei_shop_goods') . 'g' . $sqlcondition . $condition . $groupcondition . ' ORDER BY g.`status` DESC, g.`merchdisplayorder` DESC,' . "\n" . '                g.`id` DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+			$sql = 'SELECT g.* FROM ' . tablename('ewei_shop_goods') . 'g' . $sqlcondition . $condition . $groupcondition . ' ORDER BY g.`status` DESC, g.`merchdisplayorder` DESC,' . "\r\n" . '                g.`id` DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 			$list = pdo_fetchall($sql, $params);
 			foreach ($list as $key => &$value ) 
 			{
@@ -247,19 +247,22 @@ class Index_EweiShopV2Page extends MerchWebPage
 		{
 			$tag = random(32);
 			include $this->template('goods/tpl/option');
+			return;
 		}
-		else if ($tpl == 'spec') 
+		if ($tpl == 'spec') 
 		{
 			$spec = array('id' => random(32), 'title' => $_GPC['title']);
 			include $this->template('goods/tpl/spec');
+			return;
 		}
-		else if ($tpl == 'specitem') 
+		if ($tpl == 'specitem') 
 		{
 			$spec = array('id' => $_GPC['specid']);
 			$specitem = array('id' => random(32), 'title' => $_GPC['title'], 'show' => 1);
 			include $this->template('goods/tpl/spec_item');
+			return;
 		}
-		else if ($tpl == 'param') 
+		if ($tpl == 'param') 
 		{
 			$tag = random(32);
 			include $this->template('goods/tpl/param');

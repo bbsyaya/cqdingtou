@@ -89,7 +89,7 @@ class Index_EweiShopV2Page extends WebPage
 				foreach ($fullbackOption as $val ) 
 				{
 					$fullbackgoodsoption = explode(',', $_GPC['fullbackgoodsoption' . $val . '']);
-					$optionData = array('allfullbackprice' => floatval($fullbackgoodsoption[0]), 'fullbackprice' => floatval($fullbackgoodsoption[1]), 'allfullbackratio' => intval($fullbackgoodsoption[2]), 'fullbackratio' => intval($fullbackgoodsoption[3]), 'day' => intval($fullbackgoodsoption[4]), 'isfullback' => 1);
+					$optionData = array('allfullbackprice' => floatval($fullbackgoodsoption[0]), 'fullbackprice' => floatval($fullbackgoodsoption[1]), 'allfullbackratio' => floatval($fullbackgoodsoption[2]), 'fullbackratio' => floatval($fullbackgoodsoption[3]), 'day' => intval($fullbackgoodsoption[4]), 'isfullback' => 1);
 					pdo_update('ewei_shop_goods_option', $optionData, array('uniacid' => $uniacid, 'id' => intval($val)));
 				}
 			}

@@ -15,7 +15,8 @@ foreach ($sets as $set )
 	{
 		continue;
 	}
-	$trade = m('common')->getSysset('trade', $_W['uniacid']);
+	$set = m('cache')->getArray('sysset', $_W['uniacid']);
+	$trade = $set['sets']['trade'];
 	$days = intval($trade['closeorder']);
 	if ($days <= 0) 
 	{
