@@ -2296,6 +2296,10 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `showsales` tinyint(3) NOT NULL DEFAULT '1',
   `islive` int(11) NOT NULL DEFAULT '0',
   `liveprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `opencard` tinyint(1) DEFAULT '0',
+  `cardid` varchar(255) DEFAULT '',
+  `verifygoodsnum` int(11) DEFAULT '1',
+  `verifygoodsdays` int(11) DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_pcate` (`pcate`),
@@ -2327,6 +2331,35 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goodscode_good` (
   `qrcode` varchar(255) NOT NULL,
   `status` tinyint(3) NOT NULL,
   `displayorder` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_goods_cards`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_cards` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT NULL,
+  `card_id` varchar(255) DEFAULT NULL,
+  `card_title` varchar(255) DEFAULT NULL,
+  `card_brand_name` varchar(255) DEFAULT NULL,
+  `card_totalquantity` int(11) DEFAULT NULL,
+  `card_quantity` int(11) DEFAULT NULL,
+  `card_logoimg` varchar(255) DEFAULT NULL,
+  `card_logowxurl` varchar(255) DEFAULT NULL,
+  `card_backgroundtype` tinyint(1) DEFAULT NULL,
+  `color` varchar(255) DEFAULT NULL,
+  `card_backgroundimg` varchar(255) DEFAULT NULL,
+  `card_backgroundwxurl` varchar(255) DEFAULT NULL,
+  `prerogative` varchar(255) DEFAULT NULL,
+  `card_description` varchar(255) DEFAULT NULL,
+  `freewifi` tinyint(1) DEFAULT NULL,
+  `withpet` tinyint(1) DEFAULT NULL,
+  `freepark` tinyint(1) DEFAULT NULL,
+  `deliver` tinyint(1) DEFAULT NULL,
+  `custom_cell1` tinyint(1) DEFAULT NULL,
+  `custom_cell1_name` varchar(255) DEFAULT NULL,
+  `custom_cell1_tips` varchar(255) DEFAULT NULL,
+  `custom_cell1_url` varchar(255) DEFAULT NULL,
+  `color2` varchar(20) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -2764,6 +2797,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live` (
   `video` varchar(1000) NOT NULL DEFAULT '',
   `covertype` tinyint(3) NOT NULL DEFAULT '0',
   `cover` varchar(1000) NOT NULL DEFAULT '',
+  `iscoupon` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`) USING BTREE,
   KEY `idx_merchid` (`merchid`) USING BTREE,
@@ -3091,6 +3125,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member_cart` (
   `selected` tinyint(1) DEFAULT '1',
   `selectedadd` tinyint(1) DEFAULT '1',
   `merchid` int(11) DEFAULT '0',
+  `isnewstore` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_goodsid` (`goodsid`),
@@ -4465,8 +4500,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_poster_qr` (
   `createtime` int(10) unsigned NOT NULL,
   `goodsid` int(11) DEFAULT '0',
   `qrimg` varchar(1000) DEFAULT '',
-  `posterid` int(11) DEFAULT '0',
   `scenestr` varchar(255) DEFAULT '',
+  `posterid` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_acid` (`acid`),
   KEY `idx_sceneid` (`sceneid`),
@@ -4649,6 +4684,16 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_saler` (
   `openid` varchar(255) DEFAULT '',
   `status` tinyint(3) DEFAULT '0',
   `salername` varchar(255) DEFAULT '',
+  `username` varchar(50) DEFAULT '',
+  `pwd` varchar(255) DEFAULT '',
+  `salt` varchar(255) DEFAULT '',
+  `lastvisit` varchar(255) DEFAULT '',
+  `lastip` varchar(255) DEFAULT '',
+  `isfounder` tinyint(3) DEFAULT '0',
+  `mobile` varchar(255) DEFAULT '',
+  `getmessage` tinyint(1) DEFAULT '0',
+  `getnotice` tinyint(1) DEFAULT '0',
+  `roleid` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_storeid` (`storeid`),
   KEY `idx_uniacid` (`uniacid`)
@@ -5587,6 +5632,41 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_poster_qr` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_verifygoods`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_verifygoods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT NULL,
+  `openid` varchar(255) DEFAULT NULL,
+  `orderid` int(11) DEFAULT NULL,
+  `ordergoodsid` int(11) DEFAULT NULL,
+  `storeid` int(11) DEFAULT NULL,
+  `starttime` int(11) DEFAULT NULL,
+  `limitdays` int(11) DEFAULT NULL,
+  `limitnum` int(11) DEFAULT NULL,
+  `used` tinyint(1) DEFAULT '0',
+  `verifycode` varchar(20) DEFAULT NULL,
+  `codeinvalidtime` int(11) DEFAULT NULL,
+  `invalid` tinyint(1) DEFAULT '0',
+  `getcard` tinyint(1) DEFAULT '0',
+  `activecard` tinyint(1) DEFAULT '0',
+  `cardcode` varchar(255) DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `verifycode` (`verifycode`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_verifygoods_log`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_verifygoods_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT NULL,
+  `verifygoodsid` int(11) DEFAULT NULL,
+  `salerid` int(11) DEFAULT NULL,
+  `storeid` int(11) DEFAULT NULL,
+  `verifynum` int(11) DEFAULT NULL,
+  `verifydate` int(11) DEFAULT NULL,
+  `remarks` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_virtual_category`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_virtual_category` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5702,6 +5782,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxcard` (
   `use_condition` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 INSERT INTO `ims_ewei_shop_member_message_template_type` (`id`, `name`, `typecode`, `templatecode`, `templateid`, `templatename`, `content`, `showtotaladd`, `typegroup`, `groupname`) VALUES
 (1, '订单付款通知', 'saler_pay', 'OPENTM405584202', 'xldHFTObiLLm7AK544PzW4bFJGgbS0o8Po4cXOgYEis', '订单付款通知', '{{first.DATA}}订单编号：{{keyword1.DATA}}商品名称：{{keyword2.DATA}}商品数量：{{keyword3.DATA}}支付金额：{{keyword4.DATA}}{{remark.DATA}}', 0, 'sys', '系统消息通知'),
 (2, '自提订单提交成功通知', 'carrier', 'OPENTM201594720', 'W6-XbT9l2Wb9FUUISss9yVZdPU8iEmEes9IZfvNZnbc', '订单付款通知', '{{first.DATA}}自提码：{{keyword1.DATA}}商品详情：{{keyword2.DATA}}提货地址：{{keyword3.DATA}}提货时间：{{keyword4.DATA}}{{remark.DATA}}', 0, 'sys', '系统消息通知'),

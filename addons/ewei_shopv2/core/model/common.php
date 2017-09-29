@@ -119,6 +119,43 @@ class Common_EweiShopV2Model
 		$this->setGlobalSet($uniacid);
 	}
 
+	public function deleteSysset($key, $uniacid = 0)
+	{
+		global $_W;
+		global $_GPC;
+
+		if (empty($uniacid)) {
+			$uniacid = $_W['uniacid'];
+		}
+
+
+		$setdata = pdo_fetch('select id, sets from ' . tablename('ewei_shop_sysset') . ' where uniacid=:uniacid limit 1', array(':uniacid' => $uniacid));
+
+		if (!(empty($setdata))) {
+			$sets = iunserializer($setdata['sets']);
+			$sets = ((is_array($sets) ? $sets : array()));
+
+			if (!(empty($key))) {
+				if (is_array($key)) {
+					foreach ($key as $k ) {
+						unset($sets[$k]);
+					}
+				}
+				 else {
+					unset($sets[$key]);
+				}
+			}
+
+
+			pdo_update('ewei_shop_sysset', array('sets' => iserializer($sets)), array('id' => $setdata['id']));
+		}
+
+
+		$setdata = pdo_fetch('select * from ' . tablename('ewei_shop_sysset') . ' where uniacid=:uniacid limit 1', array(':uniacid' => $uniacid));
+		m('cache')->set('sysset', $setdata, $uniacid);
+		$this->setGlobalSet($uniacid);
+	}
+
 	public function updatePluginset($values, $uniacid = 0)
 	{
 		global $_W;

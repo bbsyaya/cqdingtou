@@ -387,7 +387,7 @@ class Log_EweiShopV2Page extends PluginWebPage
 		}
 
 
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template('creditshop/log/index');
 	}
 
@@ -462,6 +462,7 @@ class Log_EweiShopV2Page extends PluginWebPage
 		$verifynum = intval($_GPC['verifynum']);
 		$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$verifytotal = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_creditshop_verify') . ' where logid=:logid and uniacid=:uniacid', array(':logid' => $id, ':uniacid' => $_W['uniacid']));
+		$set = m('common')->getPluginset('creditshop');
 
 		if (empty($log)) {
 			show_json(0, '兑换记录不存在!');
@@ -565,34 +566,33 @@ class Log_EweiShopV2Page extends PluginWebPage
 				}
 			}
 			 else if ($goods['goodstype'] == 3) {
-				$money = abs($goods['grant2']);
-				$setting = uni_setting($_W['uniacid'], array('payment'));
+				$packet = $this->model->packetmoney($log['goodsid']);
 
-				if (!(is_array($setting['payment']))) {
-					show_json(0, '没有设定支付参数!');
+				if (!($packet['status'])) {
+					show_json(0, $packet['message']);
 				}
 
 
-				$sec = m('common')->getSec();
-				$sec = iunserializer($sec['sec']);
-				$certs = $sec;
-				$wechat = $setting['payment']['wechat'];
-				$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
-				$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
-				$params = array('openid' => $log['openid'], 'tid' => $log['logno'] . rand(1, 100), 'send_name' => '积分商城红包兑换', 'money' => $money, 'wishing' => '红包领到手抽筋，别人加班你加薪!', 'act_name' => '积分商城红包兑换', 'remark' => '积分商城红包兑换');
-				$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
-				$err = m('common')->sendredpack($params, $wechat);
+				$money = abs($packet['money']);
+				$params = array('openid' => $log['openid'], 'tid' => $log['logno'], 'send_name' => ($set['sendname'] ? $set['sendname'] : $_W['shopset']['shop']['name']), 'money' => $money, 'wishing' => ($set['wishing'] ? $set['wishing'] : '红包领到手抽筋，别人加班你加薪!'), 'act_name' => '积分兑换红包', 'remark' => '积分兑换红包');
+				$goods = pdo_fetch('select surplusmoney from ' . tablename('ewei_shop_creditshop_goods') . ' where id = ' . $log['goodsid'] . ' ');
+				if (($goods['surplusmoney'] <= 0) || (($goods['surplusmoney'] - $money) < 0)) {
+					show_json(0, array('message' => '剩余金额不足，请联系管理员!'));
+				}
+
+
+				$err = m('common')->sendredpack($params);
 
 				if (is_error($err)) {
-					show_json(0, $err['message']);
+					show_json(0, array('message' => '红包发放出错，请联系管理员!'));
 				}
 				 else {
-					$status = 3;
 					$update['time_finish'] = time();
+					$update['status'] = 3;
+					pdo_update('ewei_shop_creditshop_log', $update, array('id' => $log['id']));
+					$updategoods['surplusmoney'] = $goods['surplusmoney'] - $money;
+					pdo_update('ewei_shop_creditshop_goods', $updategoods, array('id' => $log['goodsid']));
 				}
-
-				$update['status'] = $status;
-				pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
 			}
 
 

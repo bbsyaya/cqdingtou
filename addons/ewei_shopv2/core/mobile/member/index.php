@@ -103,6 +103,25 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		}
 
 
+		$card = m('common')->getSysset('membercard');
+		$actionset = m('common')->getSysset('memberCardActivation');
+		$showcard = 0;
+
+		if (!(empty($card))) {
+			$membercardid = $member['membercardid'];
+
+			if (!(empty($membercardid)) && ($card['card_id'] == $membercardid)) {
+				$cardtag = '查看微信会员卡信息';
+				$showcard = 1;
+			}
+			 else if (!(empty($actionset['centerget']))) {
+				$showcard = 1;
+				$cardtag = '领取微信会员卡';
+			}
+
+		}
+
+
 		$hasqa = false;
 		$plugin_qa = p('qa');
 

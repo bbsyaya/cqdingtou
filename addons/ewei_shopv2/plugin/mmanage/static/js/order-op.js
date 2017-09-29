@@ -104,6 +104,8 @@ define(['core'], function (core) {
     modal.initSend = function (params) {
         modal.orderid = params.orderid;
         modal.flag = params.flag;
+        modal.bundles = params.bundles;
+
         $("#btn-qrcode").unbind('click').click(function () {
             wx.scanQRCode({
                 needResult: 1, scanType: ["barCode"], success: function (res) {
@@ -182,12 +184,16 @@ define(['core'], function (core) {
             var confirm_text = "确定要为此订单发货吗？";
             var route = "send";
             if (modal.flag == 1) {
-                obj.bundles = modal.checkVals(".check-group input", true);
-                if (obj.bundles == '') {
-                    FoxUI.toast.show("请选择修改物流的包裹");
-                    return
+                if(params.bundles==1){
+                    obj.bundles = modal.checkVals(".check-group input", true);
+                    if (obj.bundles == '') {
+                        FoxUI.toast.show("请选择修改物流的包裹");
+                        return
+                    }
+                    confirm_text = "确定修改选定包裹物流吗？";
+                }else{
+                    confirm_text = "确定修改物流吗？";
                 }
-                confirm_text = "确定修改选定包裹物流吗？";
                 route = "changeexpress"
             }
             FoxUI.confirm(confirm_text, function () {

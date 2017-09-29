@@ -420,7 +420,7 @@ class Goods_EweiShopV2Model
 	public function getTotals()
 	{
 		global $_W;
-		return array('sale' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where status > 0 and checked=0 and deleted=0 and total>0 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])), 'out' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where status > 0 and deleted=0 and total=0 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])), 'stock' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where (status=0 or checked=1) and deleted=0 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])), 'cycle' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where deleted=1 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])));
+		return array('sale' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where status > 0 and checked=0 and deleted=0 and total>0 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])), 'out' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where status > 0 and deleted=0 and total=0 and type!=30 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])), 'stock' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where (status=0 or checked=1) and deleted=0 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])), 'cycle' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_goods') . ' where deleted=1 and uniacid=:uniacid', array(':uniacid' => $_W['uniacid'])));
 	}
 
 	/**
@@ -468,11 +468,11 @@ class Goods_EweiShopV2Model
 		}
 	}
 
-	public function getCartCount()
+	public function getCartCount($isnewstore = 0)
 	{
 		global $_W;
 		global $_GPC;
-		$count = pdo_fetchcolumn('select sum(total) from ' . tablename('ewei_shop_member_cart') . ' where uniacid=:uniacid and openid=:openid and deleted=0 limit 1', array(':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
+		$count = pdo_fetchcolumn('select sum(total) from ' . tablename('ewei_shop_member_cart') . ' where uniacid=:uniacid and openid=:openid and isnewstore=:isnewstore and deleted=0 limit 1', array(':openid' => $_W['openid'], ':uniacid' => $_W['uniacid'], ':isnewstore' => $isnewstore));
 		return $count;
 	}
 
@@ -578,9 +578,22 @@ class Goods_EweiShopV2Model
 	public function getMemberPrice($goods, $level)
 	{
 		global $_W;
+		global $_GPC;
 
 		if (!(empty($goods['isnodiscount']))) {
 			return;
+		}
+
+
+		$liveid = intval($_GPC['liveid']);
+
+		if (!(empty($liveid))) {
+			$isliving = p('live')->isLiving($liveid);
+
+			if (!($isliving)) {
+				$liveid = 0;
+			}
+
 		}
 
 
@@ -595,6 +608,14 @@ class Goods_EweiShopV2Model
 		if (is_array($discounts)) {
 			$key = ((!(empty($level['id'])) ? 'level' . $level['id'] : 'default'));
 			if (!(isset($discounts['type'])) || empty($discounts['type'])) {
+				if (!(empty($liveid)) && !(empty($goods['islive']))) {
+					if ((0 < $goods['liveprice']) && ($goods['liveprice'] < $goods['minprice'])) {
+						$goods['minprice'] = $goods['maxprice'] = $goods['liveprice'];
+					}
+
+				}
+
+
 				$memberprice = $goods['minprice'];
 
 				if (!(empty($discounts[$key]))) {
@@ -618,6 +639,11 @@ class Goods_EweiShopV2Model
 
 				}
 
+				if ($memberprice == $goods['minprice']) {
+					return false;
+				}
+
+
 				return $memberprice;
 			}
 
@@ -630,6 +656,14 @@ class Goods_EweiShopV2Model
 
 				if ($discount == '') {
 					$discount = round(floatval($level['discount']) * 10, 2) . '%';
+				}
+
+
+				if (!(empty($liveid)) && !(empty($option['islive']))) {
+					if ((0 < $option['liveprice']) && ($option['liveprice'] < $option['marketprice'])) {
+						$option['marketprice'] = $option['liveprice'];
+					}
+
 				}
 
 
@@ -647,6 +681,11 @@ class Goods_EweiShopV2Model
 			 else {
 				$memberprice = $memberprice['minprice'];
 			}
+
+			if ($memberprice == $goods['minprice']) {
+				return false;
+			}
+
 
 			return $memberprice;
 		}

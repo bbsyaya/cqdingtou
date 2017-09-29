@@ -103,7 +103,7 @@
 						cardList: [
 							{
 								cardId: card_id,
-								cardExt: '{"code":"", "openid": "{$openid}","timestamp": "' + data.result.timestamp + '", "nonce_str":"' + data.result.nonce_str + '", "signature":"' + data.result.signature + '"}'
+								cardExt: data.result.cardExt
 							}
 						],
 						success: function (res) {

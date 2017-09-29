@@ -348,7 +348,19 @@
 {/if}
 
 
+
 {if empty($seckillinfo)}
+
+{if $liveprice}
+<div class="fui-cell-group  fui-sale-group" style="margin-top:0">
+    <div class="fui-cell">
+        <div class="fui-cell-text" style="white-space: normal;">您通过直播间<span class="text-danger">{$liveprice['name']}</span>进入 可享受 <span class="text-danger">￥{$liveprice['price']}</span>的价格</div>
+        <input type="hidden" id="liveid" value="{$liveprice['id']}">
+    </div>
+</div>
+{/if}
+
+
 {if floatval($goods['buyagain'])>0}
 <div class="fui-cell-group  fui-sale-group" style="margin-top:0">
     <div class="fui-cell">
@@ -369,15 +381,6 @@
     </div>
 </div>
 {/if}
-{/if}
-
-{if $liveprice}
-<div class="fui-cell-group  fui-sale-group" style="margin-top:0">
-    <div class="fui-cell">
-        <div class="fui-cell-text" style="white-space: normal;">您通过直播间<span class="text-danger">{$liveprice['name']}</span>进入 可享受 <span class="text-danger">￥{$liveprice['price']}</span>的价格</div>
-        <input type="hidden" id="liveid" value="{$liveprice['id']}">
-    </div>
-</div>
 {/if}
 
 {/if}

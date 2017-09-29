@@ -182,7 +182,7 @@ class Refund_EweiShopV2Page extends WebPage
 				}
 
 
-				$ispeerpay = m('order')->checkpeerpay($id);
+				$ispeerpay = m('order')->checkpeerpay($item['id']);
 
 				if (!(empty($ispeerpay))) {
 					$item['paytype'] = 21;
@@ -201,13 +201,12 @@ class Refund_EweiShopV2Page extends WebPage
 						$realprice = round($realprice - $item['deductcredit2'], 2);
 
 						if (!(empty($ispeerpay))) {
-							$pid = 'SELECT id,peerpay_realprice FROM ' . tablename('ewei_shop_order_peerpay') . ' WHERE orderid = :id AND uniacid = :uniacid';
-							$pid = pdo_fetch($pid, array(':id' => $id, ':uniacid' => $_W['uniacid']));
+							$pid = $ispeerpay['id'];
 							$peerpaysql = 'SELECT * FROM ' . tablename('ewei_shop_order_peerpay_payinfo') . ' WHERE pid = :pid';
-							$peerpaylist = pdo_fetchall($peerpaysql, array(':pid' => $pid['id']));
+							$peerpaylist = pdo_fetchall($peerpaysql, array(':pid' => $pid));
 
 							if (empty($peerpaylist)) {
-								show_json(0, '没有这个代付订单');
+								show_json(0, '没有人帮他代付过,无需退款');
 							}
 
 
@@ -219,7 +218,7 @@ class Refund_EweiShopV2Page extends WebPage
 								}
 
 
-								$result = m('finance')->refund($v['openid'], $v['tid'], $refund['refundno'] . $v['id'], $pid['peerpay_realprice'] * 100, $v['price'] * 100, (!(empty($item['apppay'])) ? true : false));
+								$result = m('finance')->refund($v['openid'], $v['tid'], $refund['refundno'] . $v['id'], $v['price'] * 100, $v['price'] * 100, (!(empty($item['apppay'])) ? true : false));
 							}
 						}
 						 else if (0 < $realprice) {

@@ -325,11 +325,14 @@ class Member_EweiShopV2Model
 			}
 		}
 
+
+		com_run('wxcard::updateMemberCardByOpenid', $openid);
 	}
 
 	public function getCredit($openid = '', $credittype = 'credit1')
 	{
 		global $_W;
+		$openid = str_replace('sns_wa_', '', $openid);
 		load()->model('mc');
 		$uid = mc_openid2uid($openid);
 
@@ -338,12 +341,13 @@ class Member_EweiShopV2Model
 		}
 
 
-		return pdo_fetchcolumn('SELECT ' . $credittype . ' FROM ' . tablename('ewei_shop_member') . ' WHERE  openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+		return pdo_fetchcolumn('SELECT ' . $credittype . ' FROM ' . tablename('ewei_shop_member') . ' WHERE (openid=:openid or openid_wa=:openid) and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 	}
 
 	public function getCredits($openid = '', $credittypes = array('credit1', 'credit2'))
 	{
 		global $_W;
+		$openid = str_replace('sns_wa_', '', $openid);
 		load()->model('mc');
 		$uid = mc_openid2uid($openid);
 		$types = implode(',', $credittypes);
@@ -353,7 +357,7 @@ class Member_EweiShopV2Model
 		}
 
 
-		return pdo_fetch('SELECT ' . $types . ' FROM ' . tablename('ewei_shop_member') . ' WHERE  openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+		return pdo_fetch('SELECT ' . $types . ' FROM ' . tablename('ewei_shop_member') . ' WHERE  (openid=:openid or openid_wa=:openid) and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 	}
 
 	/**
@@ -658,6 +662,56 @@ class Member_EweiShopV2Model
 		}
 		if ($canupgrade) {
 			pdo_update('ewei_shop_member', array('level' => $level['id']), array('id' => $member['id']));
+			com_run('wxcard::updateMemberCardByOpenid', $openid);
+			m('notice')->sendMemberUpgradeMessage($openid, $oldlevel, $level);
+		}
+
+	}
+
+	/**
+     * 根据会员等级ID升级会员
+     * @param type $mid
+     */
+	public function upgradeLevelByLevelId($openid, $LevelID)
+	{
+		global $_W;
+
+		if (empty($openid)) {
+			return;
+		}
+
+
+		$member = m('member')->getMember($openid);
+
+		if (empty($member)) {
+			return;
+		}
+
+
+		$level = pdo_fetch('select *  from ' . tablename('ewei_shop_member_level') . ' where uniacid=:uniacid and enabled=1 and id=:id', array(':uniacid' => $_W['uniacid'], ':id' => $LevelID));
+
+		if (empty($level)) {
+			return;
+		}
+
+
+		if ($level['id'] == $member['level']) {
+			return;
+		}
+
+
+		$oldlevel = $this->getLevel($openid);
+		$canupgrade = false;
+
+		if (empty($oldlevel['id'])) {
+			$canupgrade = true;
+		}
+		 else if ($oldlevel['level'] < $level['level']) {
+			$canupgrade = true;
+		}
+		if ($canupgrade) {
+			pdo_update('ewei_shop_member', array('level' => $level['id']), array('id' => $member['id']));
+			com_run('wxcard::updateMemberCardByOpenid', $openid);
 			m('notice')->sendMemberUpgradeMessage($openid, $oldlevel, $level);
 		}
 

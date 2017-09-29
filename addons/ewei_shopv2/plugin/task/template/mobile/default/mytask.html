@@ -58,10 +58,10 @@
 
         <div id="detailp{$v['join_id']}" style="display: none">
             {if $v['poster_type'] != 2}
-            {php $thisreward = unserialize($poster[0][0]['reward_data']);}
+            {php $thisreward = unserialize($v['poster_reward']);}
             <div class="my-require">
                 <div class="my-require-title">
-                    目标：邀请{$poster[0][0]['needcount']}人
+                    目标：邀请{$v['needcount']}人
                 </div>
                 {loop $thisreward['rec'] $rk $rv}
                 <div class="my-reward">

@@ -1412,7 +1412,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		return $taskdata;
 	}
 
-	public function poster($member, $couponid, $couponnum)
+	public function poster($member, $couponid, $couponnum, $gettype = 0)
 	{
 		global $_W;
 		global $_GPC;
@@ -1435,7 +1435,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		while ($i <= $couponnum) {
 			$couponlog = array('uniacid' => $_W['uniacid'], 'openid' => $member['openid'], 'logno' => m('common')->createNO('coupon_log', 'logno', 'CC'), 'couponid' => $couponid, 'status' => 1, 'paystatus' => -1, 'creditstatus' => -1, 'createtime' => time(), 'getfrom' => 3);
 			pdo_insert('ewei_shop_coupon_log', $couponlog);
-			$data = array('uniacid' => $_W['uniacid'], 'openid' => $member['openid'], 'couponid' => $couponid, 'gettype' => 3, 'gettime' => time());
+			$data = array('uniacid' => $_W['uniacid'], 'openid' => $member['openid'], 'couponid' => $couponid, 'gettype' => $gettype, 'gettime' => time());
 			pdo_insert('ewei_shop_coupon_data', $data);
 			++$i;
 		}

@@ -1037,7 +1037,7 @@ class Detail_EweiShopV2Page extends MobilePage
 		$time = time();
 		$param = array();
 		$param[':uniacid'] = $_W['uniacid'];
-		$sql = 'select id,timelimit,coupontype,timedays,timestart,timeend,thumb,couponname,enough,backtype,deduct,discount,backmoney,backcredit,backredpack,bgcolor,thumb,credit,money,getmax,merchid,total as t,limitmemberlevels,limitagentlevels,limitpartnerlevels,limitaagentlevels,limitgoodcatetype,limitgoodcateids,limitgoodtype,limitgoodids,tagtitle,settitlecolor,titlecolor from ' . tablename('ewei_shop_coupon') . ' c ';
+		$sql = 'select id,timelimit,coupontype,timedays,timestart,timeend,thumb,couponname,enough,backtype,deduct,discount,backmoney,backcredit,backredpack,bgcolor,thumb,credit,money,getmax,merchid,total as t,islimitlevel,limitmemberlevels,limitagentlevels,limitpartnerlevels,limitaagentlevels,limitgoodcatetype,limitgoodcateids,limitgoodtype,limitgoodids,tagtitle,settitlecolor,titlecolor from ' . tablename('ewei_shop_coupon') . ' c ';
 		$sql .= ' where uniacid=:uniacid and money=0 and credit = 0 and coupontype=0';
 
 		if ($is_openmerch == 0) {
@@ -1191,7 +1191,7 @@ class Detail_EweiShopV2Page extends MobilePage
 					$openid = trim($_W['openid']);
 					$member = m('member')->getMember($openid);
 					if (!(empty($row['limitmemberlevels'])) || ($row['limitmemberlevels'] == '0')) {
-						$level1 = pdo_fetchall('select * from ' . tablename('ewei_shop_member_level') . ' where uniacid=:uniacid and  id in (' . $coupon['limitmemberlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
+						$level1 = pdo_fetchall('select * from ' . tablename('ewei_shop_member_level') . ' where uniacid=:uniacid and  id in (' . $row['limitmemberlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
 
 						if (in_array($member['level'], $limitmemberlevels)) {
 							$p = 1;
@@ -1200,8 +1200,8 @@ class Detail_EweiShopV2Page extends MobilePage
 					}
 
 
-					if ((!(empty($coupon['limitagentlevels'])) || ($coupon['limitagentlevels'] == '0')) && $hascommission) {
-						$level2 = pdo_fetchall('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and id  in (' . $coupon['limitagentlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
+					if ((!(empty($row['limitagentlevels'])) || ($row['limitagentlevels'] == '0')) && $hascommission) {
+						$level2 = pdo_fetchall('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid and id  in (' . $row['limitagentlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
 
 						if (($member['isagent'] == '1') && ($member['status'] == '1')) {
 							if (in_array($member['agentlevel'], $limitagentlevels)) {
@@ -1213,8 +1213,8 @@ class Detail_EweiShopV2Page extends MobilePage
 					}
 
 
-					if ((!(empty($coupon['limitpartnerlevels'])) || ($coupon['limitpartnerlevels'] == '0')) && $hasglobonus) {
-						$level3 = pdo_fetchall('select * from ' . tablename('ewei_shop_globonus_level') . ' where uniacid=:uniacid and  id in(' . $coupon['limitpartnerlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
+					if ((!(empty($row['limitpartnerlevels'])) || ($row['limitpartnerlevels'] == '0')) && $hasglobonus) {
+						$level3 = pdo_fetchall('select * from ' . tablename('ewei_shop_globonus_level') . ' where uniacid=:uniacid and  id in(' . $row['limitpartnerlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
 
 						if (($member['ispartner'] == '1') && ($member['partnerstatus'] == '1')) {
 							if (in_array($member['partnerlevel'], $limitpartnerlevels)) {
@@ -1226,8 +1226,8 @@ class Detail_EweiShopV2Page extends MobilePage
 					}
 
 
-					if ((!(empty($coupon['limitaagentlevels'])) || ($coupon['limitaagentlevels'] == '0')) && $hasabonus) {
-						$level4 = pdo_fetchall('select * from ' . tablename('ewei_shop_abonus_level') . ' where uniacid=:uniacid and  id in (' . $coupon['limitaagentlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
+					if ((!(empty($row['limitaagentlevels'])) || ($row['limitaagentlevels'] == '0')) && $hasabonus) {
+						$level4 = pdo_fetchall('select * from ' . tablename('ewei_shop_abonus_level') . ' where uniacid=:uniacid and  id in (' . $row['limitaagentlevels'] . ') ', array(':uniacid' => $_W['uniacid']));
 
 						if (($member['isaagent'] == '1') && ($member['aagentstatus'] == '1')) {
 							if (in_array($member['aagentlevel'], $limitaagentlevels)) {

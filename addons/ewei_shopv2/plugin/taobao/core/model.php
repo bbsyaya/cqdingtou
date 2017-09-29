@@ -97,7 +97,12 @@ class TaobaoModel extends PluginModel
 		$item['pcate'] = $pcateid;
 		$item['ccate'] = $ccateid;
 		$item['tcate'] = $tcateid;
-		$item['cates'] = implode(',', $cates);
+
+		if (!(empty($cates))) {
+			$item['cates'] = implode(',', $cates);
+		}
+
+
 		$item['pcates'] = implode(',', $pcates);
 		$item['ccates'] = implode(',', $ccates);
 		$item['tcates'] = implode(',', $tcates);
@@ -257,7 +262,7 @@ class TaobaoModel extends PluginModel
 		$dom->loadHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $content);
 		$xml = simplexml_import_dom($dom);
 		$prodectNameContent = $xml->xpath('//*[@id="goodName"]');
-		$prodectName = strval($prodectNameContent[0]->attributes()->value);
+		$prodectName = strval( $prodectNameContent[0]->attributes()->value);
 
 		if ($prodectName == NULL) {
 			return array('result' => '0', 'error' => '宝贝不存在!');
@@ -326,7 +331,12 @@ class TaobaoModel extends PluginModel
 		$item['pcate'] = $pcateid;
 		$item['ccate'] = $ccateid;
 		$item['tcate'] = $tcateid;
-		$item['cates'] = implode(',', $cates);
+
+		if (!(empty($cates))) {
+			$item['cates'] = implode(',', $cates);
+		}
+
+
 		$item['pcates'] = implode(',', $pcates);
 		$item['ccates'] = implode(',', $ccates);
 		$item['tcates'] = implode(',', $tcates);
@@ -366,7 +376,7 @@ class TaobaoModel extends PluginModel
 		$item['total'] = 10;
 		$item['sales'] = 0;
 		$prodectPriceContent = $xml->xpath('//*[@id="jdPrice"]');
-		$prodectPrices = strval($prodectPriceContent[0]->attributes()->value);
+		$prodectPrices = strval( $prodectPriceContent[0]->attributes()->value);
 		$item['marketprice'] = $prodectPrices;
 		$url = $this->get_jingdong_detail_url($itemid);
 		$responseDetail = ihttp_get($url);
@@ -486,7 +496,12 @@ class TaobaoModel extends PluginModel
 		$item['pcate'] = $pcateid;
 		$item['ccate'] = $ccateid;
 		$item['tcate'] = $tcateid;
-		$item['cates'] = implode(',', $cates);
+
+		if (!(empty($cates))) {
+			$item['cates'] = implode(',', $cates);
+		}
+
+
 		$item['pcates'] = implode(',', $pcates);
 		$item['ccates'] = implode(',', $ccates);
 		$item['tcates'] = implode(',', $tcates);
@@ -509,7 +524,7 @@ class TaobaoModel extends PluginModel
 		$item['total'] = 10;
 		$item['sales'] = 0;
 		$prodectPriceContent = $xml->xpath('//*[@property="og:product:price"]');
-		$prodectPrices = strval($prodectPriceContent[0]->attributes()->content);
+		$prodectPrices = strval( $prodectPriceContent[0]->attributes()->content);
 		$item['marketprice'] = $prodectPrices;
 		$prodectContent = $xml->xpath('//*[@id="desc-lazyload-container"]');
 		$Contents = $prodectContent[0]->attributes();

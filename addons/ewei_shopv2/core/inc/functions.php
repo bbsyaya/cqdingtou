@@ -738,7 +738,7 @@ if (!(function_exists('tpl_selector'))) {
 
 		foreach ($options['items'] as $item ) {
 			if ($options['type'] == 'image') {
-				$html .= '<div class=\'multi-item\' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\' data-name=\'' . $name . '\'>' . "\r\n" . '                                      <img class=\'img-responsive img-thumbnail\' src=\'' . tomedia($item[$options['thumb']]) . '\'>' . "\r\n" . '                                      <div class=\'img-nickname\'>' . $item[$options['text']] . '</div>' . "\r\n" . '                                     <input type=\'hidden\' value=\'' . $item[$options['key']] . '\' name=\'' . $id . '\'>' . "\r\n" . '                                     <em onclick=\'biz.selector.remove(this,"' . $name . '")\'  class=\'close\'>×</em>' . "\r\n" . '                            <div style=\'clear:both;\'></div>' . "\r\n" . '                         </div>';
+				$html .= '<div class=\'multi-item\' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\' data-name=\'' . $name . '\'>' . "\r\n" . '                                      <img class=\'img-responsive img-thumbnail\' src=\'' . tomedia($item[$options['thumb']]) . '\' onerror=\'this.src="../addons/ewei_shopv2/static/images/nopic.png"\'>' . "\r\n" . '                                      <div class=\'img-nickname\'>' . $item[$options['text']] . '</div>' . "\r\n" . '                                     <input type=\'hidden\' value=\'' . $item[$options['key']] . '\' name=\'' . $id . '\'>' . "\r\n" . '                                     <em onclick=\'biz.selector.remove(this,"' . $name . '")\'  class=\'close\'>×</em>' . "\r\n" . '                            <div style=\'clear:both;\'></div>' . "\r\n" . '                         </div>';
 			}
 			 else if ($options['type'] == 'coupon') {
 				$html .= "\r\n" . '                <tr class=\'multi-product-item\' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\'>' . "\r\n" . '                    <input type=\'hidden\' class=\'form-control img-textname\' readonly=\'\' value=\'' . $item[$options['text']] . '\'>' . "\r\n" . '                    <input type=\'hidden\' value=\'' . $item[$options['key']] . '\' name=\'couponid[]\'>' . "\r\n" . '                    <td style=\'width:80px;\'>' . "\r\n" . '                        <img src=\'' . tomedia($item[$options['thumb']]) . '\' style=\'width:70px;border:1px solid #ccc;padding:1px\'>' . "\r\n" . '                    </td>' . "\r\n" . '                    <td style=\'width:220px;\'>' . $item[$options['text']] . '</td>' . "\r\n" . '                    <td>' . "\r\n" . '                        <input class=\'form-control valid\' type=\'text\' value=\'' . $item['coupontotal'] . '\' name=\'coupontotal' . $item[$options['key']] . '\'>' . "\r\n" . '                    </td>' . "\r\n" . '                    <td>' . "\r\n" . '                        <input class=\'form-control valid\' type=\'text\' value=\'' . $item['couponlimit'] . '\' name=\'couponlimit' . $item[$options['key']] . '\'>' . "\r\n" . '                    </td>' . "\r\n" . '                    <td>' . "\r\n" . '                        <button class=\'btn btn-default\' onclick=\'biz.selector.remove(this,"' . $name . '")\' type=\'button\'><i class=\'fa fa-remove\'></i></button>' . "\r\n" . '                    </td>' . "\r\n" . '                </tr>' . "\r\n" . '                ';
@@ -851,7 +851,7 @@ if (!(function_exists('tpl_selector_new'))) {
 					$optiontitle = '&yen;' . $item['packageprice'];
 				}
 
-				$html .= "\r\n" . '                    <tr class=\'multi-product-item\' data-' . $options['key'] . '=\'' . $item['goodsid'] . '\' >' . "\r\n" . '                        <input type=\'hidden\' class=\'form-control img-textname\' readonly=\'\' value=\'' . $item[$options['text']] . '\'>' . "\r\n" . '                       <input type=\'hidden\'  value=\'' . $item['goodsid'] . '\' name=\'' . $id . '\'>' . "\r\n" . '                        <td style=\'width:80px;\'>' . "\r\n" . '                            <img src=\'' . tomedia($item[$options['thumb']]) . '\' style=\'width:70px;border:1px solid #ccc;padding:1px\'>' . "\r\n" . '                        </td>' . "\r\n" . '                        <td style=\'width:220px;\'>' . $item[$options['text']] . '</td>' . "\r\n" . '                        <td>';
+				$html .= "\r\n" . '                    <tr class=\'multi-product-item\' data-' . $options['key'] . '=\'' . $item['goodsid'] . '\' >' . "\r\n" . '                        <input type=\'hidden\' class=\'form-control img-textname\' readonly=\'\' value=\'' . $item[$options['text']] . '\'>' . "\r\n" . '                       <input type=\'hidden\'  value=\'' . $item['goodsid'] . '\' name=\'' . $id . '\'>' . "\r\n" . '                        <td style=\'width:80px;\'>' . "\r\n" . '                            <img src=\'' . tomedia($item[$options['thumb']]) . '\' style=\'width:70px;border:1px solid #ccc;padding:1px\' onerror="this.src=\'../addons/ewei_shopv2/static/images/nopic.png\'">' . "\r\n" . '                        </td>' . "\r\n" . '                        <td style=\'width:220px;\'>' . $item[$options['text']] . '</td>' . "\r\n" . '                        <td>';
 				$optionurl = ((empty($options['optionurl']) ? 'sale/package/hasoption' : str_replace('.', '/', $options['optionurl'])));
 
 				if ($item['optiontitle']) {
@@ -947,13 +947,13 @@ if (!(function_exists('tpl_daterange'))) {
 		$s = '';
 
 		if (empty($time) && !(defined('TPL_INIT_DATERANGE_DATE'))) {
-			$s = "\r\n" . '<script type="text/javascript">' . "\r\n\t" . 'require(["daterangepicker"], function(){' . "\r\n\t\t" . '$(function(){' . "\r\n\t\t\t" . '$(".daterange.daterange-date").each(function(){' . "\r\n" . '         ' . "\r\n\t\t\t\t" . 'var elm = this;' . "\r\n" . '                                        var container =$(elm).parent().prev(); ' . "\r\n\t\t\t\t" . '$(this).daterangepicker({' . "\r\n\t\t\t\t\t" . ' ' . "\r\n\t\t\t\t\t" . 'format: "YYYY-MM-DD"' . "\r\n\t\t\t\t" . '}, function(start, end){' . "\r\n\t\t\t\t\t" . '$(elm).find(".date-title").html(start.toDateStr() + " 至 " + end.toDateStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:first").val(start.toDateTimeStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:last").val(end.toDateTimeStr());' . "\r\n\t\t\t\t" . '});' . "\r\n\t\t\t" . '});' . "\r\n\t\t" . '});' . "\r\n\t" . '});' . "\r\n" . '</script> ' . "\r\n";
+			$s = "\r\n" . '<script type="text/javascript">' . "\r\n\t" . 'require(["daterangepicker"], function(){' . "\r\n\t\t" . '$(function(){' . "\r\n\t\t\t" . '$(".daterange.daterange-date").each(function(){' . "\r\n\t\t\t\t" . 'var elm = this;' . "\r\n" . '                var container =$(elm).parent().prev();' . "\r\n\t\t\t\t" . '$(this).daterangepicker({' . "\r\n\t\t\t\t\t" . 'format: "YYYY-MM-DD"' . "\r\n\t\t\t\t" . '}, function(start, end){' . "\r\n\t\t\t\t\t" . '$(elm).find(".date-title").html(start.toDateStr() + " 至 " + end.toDateStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:first").val(start.toDateTimeStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:last").val(end.toDateTimeStr());' . "\r\n\t\t\t\t" . '});' . "\r\n\t\t\t" . '});' . "\r\n\t\t" . '});' . "\r\n\t" . '});' . "\r\n" . '</script> ' . "\r\n";
 			define('TPL_INIT_DATERANGE_DATE', true);
 		}
 
 
 		if (!(empty($time)) && !(defined('TPL_INIT_DATERANGE_TIME'))) {
-			$s = "\r\n" . '<script type="text/javascript">' . "\r\n\t" . 'require(["daterangepicker"], function(){' . "\r\n\t\t" . '$(function(){' . "\r\n\t\t\t" . '$(".daterange.daterange-time").each(function(){' . "\r\n" . '               ' . "\r\n\t\t\t\t" . 'var elm = this;' . "\r\n" . '                                       var container =$(elm).parent().prev(); ' . "\r\n\t\t\t\t" . '$(this).daterangepicker({' . "\r\n\t\t\t\t\r\n\t\t\t\t\t" . 'format: "YYYY-MM-DD HH:mm",' . "\r\n\t\t\t\t\t" . 'timePicker: true,' . "\r\n\t\t\t\t\t" . 'timePicker12Hour : false,' . "\r\n\t\t\t\t\t" . 'timePickerIncrement: 1,' . "\r\n\t\t\t\t\t" . 'minuteStep: 1' . "\r\n\t\t\t\t" . '}, function(start, end){' . "\r\n\t\t\t\t\t" . '$(elm).find(".date-title").html(start.toDateTimeStr() + " 至 " + end.toDateTimeStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:first").val(start.toDateTimeStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:last").val(end.toDateTimeStr());' . "\r\n\t\t\t\t" . '});' . "\r\n\t\t\t" . '});' . "\r\n\t\t" . '});' . "\r\n\t" . '});' . "\r\n" . '     function clearTime(obj){' . "\r\n" . '         ' . "\r\n" . '              $(obj).prev().html("<span class=date-title>" + $(obj).attr("placeholder") + "</span>");' . "\r\n" . '              $(obj).parent().prev().find("input").val("");' . "\r\n" . '    }' . "\r\n" . '</script>' . "\r\n";
+			$s = "\r\n" . '<script type="text/javascript">' . "\r\n\t" . 'require(["daterangepicker"], function(){' . "\r\n\t\t" . '$(function(){' . "\r\n\t\t\t" . '$(".daterange.daterange-time").each(function(){' . "\r\n\t\t\t\t" . 'var elm = this;' . "\r\n" . '                 var container =$(elm).parent().prev();' . "\r\n\t\t\t\t" . '$(this).daterangepicker({' . "\r\n\t\t\t\t\t" . 'format: "YYYY-MM-DD HH:mm",' . "\r\n\t\t\t\t\t" . 'timePicker: true,' . "\r\n\t\t\t\t\t" . 'timePicker12Hour : false,' . "\r\n\t\t\t\t\t" . 'timePickerIncrement: 1,' . "\r\n\t\t\t\t\t" . 'minuteStep: 1' . "\r\n\t\t\t\t" . '}, function(start, end){' . "\r\n\t\t\t\t\t" . '$(elm).find(".date-title").html(start.toDateTimeStr() + " 至 " + end.toDateTimeStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:first").val(start.toDateTimeStr());' . "\r\n\t\t\t\t\t" . 'container.find(":input:last").val(end.toDateTimeStr());' . "\r\n\t\t\t\t" . '});' . "\r\n\t\t\t" . '});' . "\r\n\t\t" . '});' . "\r\n\t" . '});' . "\r\n" . '     function clearTime(obj){' . "\r\n" . '              $(obj).prev().html("<span class=date-title>" + $(obj).attr("placeholder") + "</span>");' . "\r\n" . '              $(obj).parent().prev().find("input").val("");' . "\r\n" . '    }' . "\r\n" . '</script>' . "\r\n";
 			define('TPL_INIT_DATERANGE_TIME', true);
 		}
 
@@ -1479,7 +1479,22 @@ if (!(function_exists('redis'))) {
 
 			$redis = $redis_temp;
 		}
+		 else {
+			try {
+				$ping = $redis->ping();
+			}
+			catch (ErrorException $e) {
+				$redis = NULL;
+				$redis = redis();
+				$ping = $redis->ping();
+			}
 
+			if ($ping != '+PONG') {
+				$redis = NULL;
+				$redis = redis();
+			}
+
+		}
 
 		return $redis;
 	}
@@ -1524,17 +1539,313 @@ if (!(function_exists('set_wxerrmsg'))) {
 
 		return $data;
 	}
+}
+
+
+if (!(function_exists('tpl_form_field_image2'))) {
+	function tpl_form_field_image2($name, $value = '', $default = '', $options = array())
+	{
+		global $_W;
+
+		if (empty($default)) {
+			$default = '../addons/ewei_shopv2/static/images/nopic.png';
+		}
+
+
+		$val = $default;
+
+		if (!(empty($value))) {
+			$val = tomedia($value);
+		}
+		 else {
+			$val = '../addons/ewei_shopv2/static/images/default-pic.jpg';
+		}
+
+		if (!(empty($options['global']))) {
+			$options['global'] = true;
+		}
+		 else {
+			$options['global'] = false;
+		}
+
+		if (empty($options['class_extra'])) {
+			$options['class_extra'] = '';
+		}
+
+
+		if (isset($options['dest_dir']) && !(empty($options['dest_dir']))) {
+			if (!(preg_match('/^\\w+([\\/]\\w+)?$/i', $options['dest_dir']))) {
+				exit('图片上传目录错误,只能指定最多两级目录,如: "we7_store","we7_store/d1"');
+			}
+
+		}
+
+
+		$options['direct'] = true;
+		$options['multiple'] = false;
+
+		if (isset($options['thumb'])) {
+			$options['thumb'] = !(empty($options['thumb']));
+		}
+
+
+		$options['fileSizeLimit'] = intval($GLOBALS['_W']['setting']['upload']['image']['limit']) * 1024;
+		$s = '';
+
+		if (!(defined('TPL_INIT_IMAGE'))) {
+			$s = "\r\n\t\t" . '<script type="text/javascript">' . "\r\n\t\t\t" . 'function showImageDialog(elm, opts, options) {' . "\r\n\t\t\t\t" . 'require(["util"], function(util){' . "\r\n\t\t\t\t\t" . 'var btn = $(elm);' . "\r\n\t\t\t\t\t" . 'var ipt = btn.parent().prev();' . "\r\n\t\t\t\t\t" . 'var val = ipt.val();' . "\r\n\t\t\t\t\t" . 'var img = ipt.parent().next().children();' . "\r\n\t\t\t\t\t" . 'options = ' . str_replace('"', '\'', json_encode($options)) . ';' . "\r\n\t\t\t\t\t" . 'util.image(val, function(url){' . "\r\n\t\t\t\t\t\t" . 'if(url.url){' . "\r\n\t\t\t\t\t\t\t" . 'if(img.length > 0){' . "\r\n\t\t\t\t\t\t\t\t" . 'img.get(0).src = url.url;' . "\r\n\t\t\t\t\t\t\t\t" . 'img.closest(".input-group").show();' . "\r\n\t\t\t\t\t\t\t" . '}' . "\r\n\t\t\t\t\t\t\t" . 'ipt.val(url.attachment);' . "\r\n\t\t\t\t\t\t\t" . 'ipt.attr("filename",url.filename);' . "\r\n\t\t\t\t\t\t\t" . 'ipt.attr("url",url.url);' . "\r\n\t\t\t\t\t\t" . '}' . "\r\n\t\t\t\t\t\t" . 'if(url.media_id){' . "\r\n\t\t\t\t\t\t\t" . 'if(img.length > 0){' . "\r\n\t\t\t\t\t\t\t\t" . 'img.get(0).src = "";' . "\r\n\t\t\t\t\t\t\t" . '}' . "\r\n\t\t\t\t\t\t\t" . 'ipt.val(url.media_id);' . "\r\n\t\t\t\t\t\t" . '}' . "\r\n\t\t\t\t\t" . '}, options);' . "\r\n\t\t\t\t" . '});' . "\r\n\t\t\t" . '}' . "\r\n\t\t\t" . 'function deleteImage(elm){' . "\r\n\t\t\t\t" . 'require(["jquery"], function($){' . "\r\n\t\t\t\t\t" . '$(elm).prev().attr("src", "../addons/ewei_shopv2/static/images/default-pic.jpg");' . "\r\n\t\t\t\t\t" . '$(elm).parent().prev().find("input").val("");' . "\r\n\t\t\t\t" . '});' . "\r\n\t\t\t" . '}' . "\r\n\t\t" . '</script>';
+			define('TPL_INIT_IMAGE', true);
+		}
+
+
+		$s .= "\r\n\t\t" . '<div class="input-group ' . $options['class_extra'] . '">' . "\r\n\t\t\t" . '<input type="text" name="' . $name . '" value="' . $value . '"' . (($options['extras']['text'] ? $options['extras']['text'] : '')) . ' class="form-control" autocomplete="off">' . "\r\n\t\t\t" . '<span class="input-group-btn">' . "\r\n\t\t\t\t" . '<button class="btn btn-default" type="button" onclick="showImageDialog(this);">选择图片</button>' . "\r\n\t\t\t" . '</span>' . "\r\n\t\t" . '</div>';
+		$s .= '<div class="input-group ' . $options['class_extra'] . '" style="margin-top:.5em;"><img src="' . $val . '" onerror="this.src=\'' . $default . '\'; this.title=\'图片未找到.\'" class="img-responsive img-thumbnail" ' . (($options['extras']['image'] ? $options['extras']['image'] : '')) . ' width="150" />' . "\r\n" . '                <em class="close" style="position:absolute; top: 0px; right: -14px;" title="删除这张图片" onclick="deleteImage(this)">×</em>' . "\r\n" . '            </div>';
+		return $s;
+	}
+}
+
+
+if (!(function_exists('tpl_form_field_multi_image2'))) {
+	function tpl_form_field_multi_image2($name, $value = array(), $options = array())
+	{
+		global $_W;
+		$options['multiple'] = true;
+		$options['direct'] = false;
+		$options['fileSizeLimit'] = intval($GLOBALS['_W']['setting']['upload']['image']['limit']) * 1024;
+
+		if (isset($options['dest_dir']) && !(empty($options['dest_dir']))) {
+			if (!(preg_match('/^\\w+([\\/]\\w+)?$/i', $options['dest_dir']))) {
+				exit('图片上传目录错误,只能指定最多两级目录,如: "we7_store","we7_store/d1"');
+			}
+
+		}
+
+
+		$s = '';
+
+		if (!(defined('TPL_INIT_MULTI_IMAGE'))) {
+			$s = "\r\n" . '<script type="text/javascript">' . "\r\n\t" . 'function uploadMultiImage(elm) {' . "\r\n\t\t" . 'var name = $(elm).next().val();' . "\r\n\t\t" . 'util.image( "", function(urls){' . "\r\n\t\t\t" . '$.each(urls, function(idx, url){' . "\r\n\t\t\t\t" . '$(elm).parent().parent().next().append(\'<div class="multi-item"><img onerror="this.src=\\\'../addons/ewei_shopv2/static/images/nopic.png\\\'; this.title=\\\'图片未找到.\\\'" src="\'+url.url+\'" class="img-responsive img-thumbnail"><input type="hidden" name="\'+name+\'[]" value="\'+url.attachment+\'"><em class="close" title="删除这张图片" onclick="deleteMultiImage(this)">×</em></div>\');' . "\r\n\t\t\t" . '});' . "\r\n\t\t" . '}, ' . json_encode($options) . ');' . "\r\n\t" . '}' . "\r\n\t" . 'function deleteMultiImage(elm){' . "\r\n\t\t" . 'require(["jquery"], function($){' . "\r\n\t\t\t" . '$(elm).parent().remove();' . "\r\n\t\t" . '});' . "\r\n\t" . '}' . "\r\n" . '</script>';
+			define('TPL_INIT_MULTI_IMAGE', true);
+		}
+
+
+		$s .= '<div class="input-group">' . "\r\n\t" . '<input type="text" class="form-control" readonly="readonly" value="" placeholder="批量上传图片" autocomplete="off">' . "\r\n\t" . '<span class="input-group-btn">' . "\r\n\t\t" . '<button class="btn btn-default" type="button" onclick="uploadMultiImage(this);">选择图片</button>' . "\r\n\t\t" . '<input type="hidden" value="' . $name . '" />' . "\r\n\t" . '</span>' . "\r\n" . '</div>' . "\r\n" . '<div class="input-group multi-img-details">';
+		if (is_array($value) && (0 < count($value))) {
+			foreach ($value as $row ) {
+				$s .= "\r\n" . '<div class="multi-item">' . "\r\n\t" . '<img src="' . tomedia($row) . '" onerror="this.src=\'../addons/ewei_shopv2/static/images/nopic.png\'; this.title=\'图片未找到.\'" class="img-responsive img-thumbnail">' . "\r\n\t" . '<input type="hidden" name="' . $name . '[]" value="' . $row . '" >' . "\r\n\t" . '<em class="close" title="删除这张图片" onclick="deleteMultiImage(this)">×</em>' . "\r\n" . '</div>';
+			}
+		}
+
+
+		$s .= '</div>';
+		return $s;
+	}
+}
+
+
+if (!(function_exists('pagination2'))) {
+	function pagination2($total, $pageIndex, $pageSize = 15, $url = '', $context = array('before' => 5, 'after' => 4, 'ajaxcallback' => '', 'callbackfuncname' => ''))
+	{
+		global $_W;
+		$pdata = array('tcount' => 0, 'tpage' => 0, 'cindex' => 0, 'findex' => 0, 'pindex' => 0, 'nindex' => 0, 'lindex' => 0, 'options' => '');
+
+		if ($context['ajaxcallback']) {
+			$context['isajax'] = true;
+		}
+
+
+		if ($context['callbackfuncname']) {
+			$callbackfunc = $context['callbackfuncname'];
+		}
+
+
+		$html = '<div><ul class="pagination pagination-centered"><li><span class="nobg">共' . $total . '条记录</span></li></ul>';
+
+		if (empty($_W['shopset']['template']['style_v3'])) {
+			$html = '';
+		}
+
+
+		if (!(empty($total))) {
+			$pdata['tcount'] = $total;
+			$pdata['tpage'] = ((empty($pageSize) || ($pageSize < 0) ? 1 : ceil($total / $pageSize)));
+
+			if (1 < $pdata['tpage']) {
+				$html .= '<ul class="pagination pagination-centered">';
+				$cindex = $pageIndex;
+				$cindex = min($cindex, $pdata['tpage']);
+				$cindex = max($cindex, 1);
+				$pdata['cindex'] = $cindex;
+				$pdata['findex'] = 1;
+				$pdata['pindex'] = ((1 < $cindex ? $cindex - 1 : 1));
+				$pdata['nindex'] = (($cindex < $pdata['tpage'] ? $cindex + 1 : $pdata['tpage']));
+				$pdata['lindex'] = $pdata['tpage'];
+
+				if ($context['isajax']) {
+					if (empty($url)) {
+						$url = $_W['script_name'] . '?' . http_build_query($_GET);
+					}
+
+
+					$pdata['faa'] = 'href="javascript:;" page="' . $pdata['findex'] . '" ' . (($callbackfunc ? 'onclick="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['findex'] . '\', this);return false;"' : ''));
+					$pdata['paa'] = 'href="javascript:;" page="' . $pdata['pindex'] . '" ' . (($callbackfunc ? 'onclick="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['pindex'] . '\', this);return false;"' : ''));
+					$pdata['naa'] = 'href="javascript:;" page="' . $pdata['nindex'] . '" ' . (($callbackfunc ? 'onclick="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['nindex'] . '\', this);return false;"' : ''));
+					$pdata['laa'] = 'href="javascript:;" page="' . $pdata['lindex'] . '" ' . (($callbackfunc ? 'onclick="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['lindex'] . '\', this);return false;"' : ''));
+				}
+				 else if ($url) {
+					$pdata['jump'] = 'href="?' . str_replace('*', $pdata['lindex'], $url) . '"';
+					$pdata['faa'] = 'href="?' . str_replace('*', $pdata['findex'], $url) . '"';
+					$pdata['paa'] = 'href="?' . str_replace('*', $pdata['pindex'], $url) . '"';
+					$pdata['naa'] = 'href="?' . str_replace('*', $pdata['nindex'], $url) . '"';
+					$pdata['laa'] = 'href="?' . str_replace('*', $pdata['lindex'], $url) . '"';
+				}
+				 else {
+					$jump_get = $_GET;
+					$jump_get['page'] = '';
+					$pdata['jump'] = 'href="' . $_W['script_name'] . '?' . http_build_query($jump_get) . $pdata['cindex'] . '" data-href="' . $_W['script_name'] . '?' . http_build_query($jump_get) . '"';
+					$_GET['page'] = $pdata['findex'];
+					$pdata['faa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
+					$_GET['page'] = $pdata['pindex'];
+					$pdata['paa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
+					$_GET['page'] = $pdata['nindex'];
+					$pdata['naa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
+					$_GET['page'] = $pdata['lindex'];
+					$pdata['laa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
+				}
+
+				if (1 < $pdata['cindex']) {
+					$html .= '<li><a ' . $pdata['faa'] . ' class="pager-nav">首页</a></li>';
+					$html .= '<li><a ' . $pdata['paa'] . ' class="pager-nav">&laquo;上一页</a></li>';
+				}
+
+
+				if (!($context['before']) && ($context['before'] != 0)) {
+					$context['before'] = 5;
+				}
+
+
+				if (!($context['after']) && ($context['after'] != 0)) {
+					$context['after'] = 4;
+				}
+
+
+				if (($context['after'] != 0) && ($context['before'] != 0)) {
+					$range = array();
+					$range['start'] = max(1, $pdata['cindex'] - $context['before']);
+					$range['end'] = min($pdata['tpage'], $pdata['cindex'] + $context['after']);
+
+					if (($range['end'] - $range['start']) < ($context['before'] + $context['after'])) {
+						$range['end'] = min($pdata['tpage'], $range['start'] + $context['before'] + $context['after']);
+						$range['start'] = max(1, $range['end'] - $context['before'] - $context['after']);
+					}
+
+
+					$i = $range['start'];
+
+					while ($i <= $range['end']) {
+						if ($context['isajax']) {
+							$aa = 'href="javascript:;" page="' . $i . '" ' . (($callbackfunc ? 'onclick="' . $callbackfunc . '(\'' . $url . '\', \'' . $i . '\', this);return false;"' : ''));
+						}
+						 else if ($url) {
+							$aa = 'href="?' . str_replace('*', $i, $url) . '"';
+						}
+						 else {
+							$_GET['page'] = $i;
+							$aa = 'href="?' . http_build_query($_GET) . '"';
+						}
+
+						$html .= (($i == $pdata['cindex'] ? '<li class="active"><a href="javascript:;">' . $i . '</a></li>' : '<li><a ' . $aa . '>' . $i . '</a></li>'));
+						++$i;
+					}
+				}
+
+
+				if ($pdata['cindex'] < $pdata['tpage']) {
+					$html .= '<li><a ' . $pdata['naa'] . ' class="pager-nav">下一页&raquo;</a></li>';
+					$html .= '<li><a ' . $pdata['laa'] . ' class="pager-nav">尾页</a></li>';
+				}
+
+
+				$html .= '</ul>';
+
+				if (5 < $pdata['tpage']) {
+					$html .= '<ul class="pagination pagination-centered">';
+					$html .= '<li><span class=\'input\' style=\'margin-right: 0;\'><input value=\'' . $pdata['cindex'] . '\' type=\'tel\'/></span></li>';
+					$html .= '<li><a ' . $pdata['jump'] . ' class="pager-nav pager-nav-jump">跳转</a></li>';
+					$html .= '</ul>';
+					$html .= '<script>$(function() {$(".pagination .input input").bind("input propertychange", function() {var val=$(this).val(),elm=$(this).closest("ul").find(".pager-nav-jump"),href=elm.data("href");elm.attr("href", href+val)}).on("keydown", function(e) {if (e.keyCode == "13") {var val=$(this).val(),elm=$(this).closest("ul").find(".pager-nav-jump"),href=elm.data("href"); location.href=href+val;}});})</script>';
+				}
+
+			}
+
+		}
+
+
+		$html .= '</div>';
+		return $html;
+	}
+}
+
+
+if (!(function_exists('tpl_form_field_editor'))) {
+	function tpl_form_field_editor($params = array(), $callback = NULL)
+	{
+		$html = '<span class="form-editor-group">';
+		$html .= '<span class="form-control-static form-editor-show">';
+		$html .= '<a class="form-editor-text">' . $params['value'] . '</a>';
+		$html .= '<a class="text-primary form-editor-btn">修改</a>';
+		$html .= '</span>';
+		$html .= '<span class="input-group form-editor-edit">';
+		$html .= '<input class="form-control form-editor-input" value="' . $params['value'] . '" name="' . $params['name'] . '"';
+
+		if (!(empty($params['placeholder']))) {
+			$html .= 'placeholder="' . $params['placeholder'] . '"';
+		}
+
+
+		if (!(empty($params['id']))) {
+			$html .= 'id="' . $params['id'] . '"';
+		}
+
+
+		if (!(empty($params['data-rule-required'])) || !(empty($params['required']))) {
+			$html .= ' data-rule-required="true"';
+		}
+
+
+		if (!(empty($params['data-msg-required']))) {
+			$html .= ' data-msg-required="' . $params['data-msg-required'] . '"';
+		}
+
+
+		$html .= ' /><span class="input-group-btn">';
+		$html .= '<span class="btn btn-default form-editor-finish"';
+
+		if ($callback) {
+			$html .= 'data-callback="' . $callback . '"';
+		}
+
+
+		$html .= '><i class="icow icow-wancheng"></i></span>';
+		$html .= '</span>';
+		$html .= '</span>';
+		return $html;
+	}
+}
+
+
+if (!(function_exists('tpl_form_field_position'))) {
 	function tpl_form_field_position($field, $value = array())
 	{
 		$s = '';
 
 		if (!(defined('TPL_INIT_COORDINATE'))) {
-			$s .= '<script type="text/javascript">' . "\r\n\t\t\t\t" . 'function showCoordinate(elm) {' . "\r\n\t\t\t\t\t\r\n\t\t\t\t\t\t" . 'var val = {};' . "\r\n\t\t\t\t\t\t" . 'val.lng = parseFloat($(elm).parent().prev().prev().find(":text").val());' . "\r\n\t\t\t\t\t\t" . 'val.lat = parseFloat($(elm).parent().prev().find(":text").val());' . "\r\n\t\t\t\t\t\t" . 'val = biz.BdMapToTxMap(val.lat,val.lng);' . "\r\n\t\t\t\t\t\t" . 'biz.map(val, function(r){' . "\r\n\t\t\t\t\t\t" . '    r = biz.TxMapToBdMap(r.lat,r.lng);' . "\r\n\t\t\t\t\t\t\t" . '$(elm).parent().prev().prev().find(":text").val(r.lng);' . "\r\n\t\t\t\t\t\t\t" . '$(elm).parent().prev().find(":text").val(r.lat);' . "\r\n" . '//' . "\t\t\t\t\t\t\t" . '$("#address").val(r.label);' . "\r\n\t\t\t\t\t\t" . '},"' . EWEI_SHOPV2_URL . 'template/web/util/area/map.html' . '");' . "\r\n" . '}' . "\r\n\r\n\t\t\t" . '</script>';
+			$s .= '<script type="text/javascript">' . "\r\n" . '                    function showCoordinate(elm) {' . "\r\n" . '                        ' . "\r\n" . '                            var val = {};' . "\r\n" . '                            val.lng = parseFloat($(elm).parent().prev().prev().find(":text").val());' . "\r\n" . '                            val.lat = parseFloat($(elm).parent().prev().find(":text").val());' . "\r\n" . '                            val = biz.BdMapToTxMap(val.lat,val.lng);' . "\r\n" . '                            biz.map(val, function(r){' . "\r\n" . '                                r = biz.TxMapToBdMap(r.lat,r.lng);' . "\r\n" . '                                $(elm).parent().prev().prev().find(":text").val(r.lng);' . "\r\n" . '                                $(elm).parent().prev().find(":text").val(r.lat);' . "\r\n" . '    //' . "\t\t\t\t\t\t\t" . '$("#address").val(r.label);' . "\r\n" . '                            },"' . EWEI_SHOPV2_URL . 'template/web/util/area/map.html' . '");' . "\r\n" . '    }' . "\r\n" . '    ' . "\r\n" . '                </script>';
 			define('TPL_INIT_COORDINATE', true);
 		}
 
 
-		$s .= "\r\n\t\t" . '<div class="row row-fix">' . "\r\n\t\t\t" . '<div class="col-xs-4 col-sm-4">' . "\r\n\t\t\t\t" . '<input type="text" name="' . $field . '[lng]" value="' . $value['lng'] . '" placeholder="地理经度"  class="form-control" />' . "\r\n\t\t\t" . '</div>' . "\r\n\t\t\t" . '<div class="col-xs-4 col-sm-4">' . "\r\n\t\t\t\t" . '<input type="text" name="' . $field . '[lat]" value="' . $value['lat'] . '" placeholder="地理纬度"  class="form-control" />' . "\r\n\t\t\t" . '</div>' . "\r\n\t\t\t" . '<div class="col-xs-4 col-sm-4">' . "\r\n\t\t\t\t" . '<button onclick="showCoordinate(this);" class="btn btn-default" type="button">选择坐标</button>' . "\r\n\t\t\t" . '</div>' . "\r\n\t\t" . '</div>';
+		$s .= "\r\n" . '            <div class="row row-fix">' . "\r\n" . '                <div class="col-xs-4 col-sm-4">' . "\r\n" . '                    <input type="text" name="' . $field . '[lng]" value="' . $value['lng'] . '" placeholder="地理经度"  class="form-control" />' . "\r\n" . '                </div>' . "\r\n" . '                <div class="col-xs-4 col-sm-4">' . "\r\n" . '                    <input type="text" name="' . $field . '[lat]" value="' . $value['lat'] . '" placeholder="地理纬度"  class="form-control" />' . "\r\n" . '                </div>' . "\r\n" . '                <div class="col-xs-4 col-sm-4">' . "\r\n" . '                    <button onclick="showCoordinate(this);" class="btn btn-default" type="button">选择坐标</button>' . "\r\n" . '                </div>' . "\r\n" . '            </div>';
 		return $s;
 	}
 }

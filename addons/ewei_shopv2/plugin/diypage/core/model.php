@@ -48,7 +48,7 @@ class DiypageModel extends PluginModel
 
 		$list = pdo_fetchall('select id, `name`, `type`, createtime, lastedittime, keyword from ' . tablename('ewei_shop_diypage') . ' where merch=:merch ' . $c . ' and uniacid=:uniacid order by `type` desc, id desc ' . $limit, array(':merch' => intval($_W['merchid']), ':uniacid' => $_W['uniacid']));
 		$total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_diypage') . ' where merch=:merch and uniacid=:uniacid ' . $c, array(':merch' => intval($_W['merchid']), ':uniacid' => $_W['uniacid']));
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 
 		if (!(empty($list))) {
 			$allpagetype = $this->getPageType();
@@ -89,7 +89,7 @@ class DiypageModel extends PluginModel
 
 			if ($mobile) {
 				$memberpage = (($page['type'] == 3 ? true : false));
-				$this->calculate($page['data'], $memberpage);
+				$this->calculate($page['data'], $page['type']);
 				$this->verifymobile($page['id'], $page['type']);
 			}
 
@@ -751,7 +751,7 @@ class DiypageModel extends PluginModel
 							}
 						}
 					}
-	else if ($item['id'] == 'notice'){
+	else if ($item['id'] == 'notice')  {
 						if ($item['params']['noticedata'] == '0') {
 							$limit = ((!(empty($item['params']['noticenum'])) ? $item['params']['noticenum'] : 5));
 
@@ -997,6 +997,25 @@ class DiypageModel extends PluginModel
 						}
 
 						unset($itemstyle, $itemstyleactive);
+					}
+					 else if ($item['id'] == 'wxcard') {
+						$wxcard = m('common')->getSysset('membercard');
+
+						if (empty($wxcard)) {
+							unset($page['data']['items'][$itemid]);
+						}
+						 else {
+							$membercardid = $this->member['membercardid'];
+
+							if (!(empty($membercardid)) && ($wxcard['card_id'] == $membercardid)) {
+								$item['params']['text'] = '查看会员卡信息';
+							}
+							 else {
+								$item['params']['text'] = '领取会员卡';
+							}
+
+							$item['params']['cardid'] = $wxcard['card_id'];
+						}
 					}
 
 				}
@@ -1399,7 +1418,7 @@ class DiypageModel extends PluginModel
 		$_W['shopshare']['link'] = mobileUrl($urlpage, $urlparm, true);
 	}
 
-	public function calculate($str = NULL, $member = false)
+	public function calculate($str = NULL, $pagetype = false)
 	{
 		global $_W;
 
@@ -1493,14 +1512,13 @@ class DiypageModel extends PluginModel
 
 		if (strexists($str, 'r=creditshop')) {
 			$plugins['creditshop'] = true;
-
-			if ($member) {
+			if (($pagetype == 3) || ($pagetype == 4)) {
 				$plugin_creditshop = p('creditshop');
 
 				if ($plugin_creditshop) {
 					$plugin_creditshop_set = $plugin_creditshop->getSet();
 
-					if (empty($plugin_creditshop_set['centeropen'])) {
+					if (($pagetype == 3) && empty($plugin_creditshop_set['centeropen'])) {
 						$plugins['creditshop'] = false;
 					}
 
@@ -1528,8 +1546,17 @@ class DiypageModel extends PluginModel
 				}
 
 
-				if ($member && empty($plugin_globonus_set['openmembercenter'])) {
-					$plugins['globonus'] = false;
+				if ($pagetype == 3) {
+					if (empty($plugin_globonus_set['openmembercenter'])) {
+						$plugins['globonus'] = false;
+					}
+
+				}
+				 else if ($pagetype == 4) {
+					if (!(empty($plugin_globonus_set['closecommissioncenter']))) {
+						$plugins['globonus'] = false;
+					}
+
 				}
 
 			}
@@ -1549,8 +1576,17 @@ class DiypageModel extends PluginModel
 				}
 
 
-				if ($member && empty($plugin_abonus_set['openmembercenter'])) {
-					$plugins['abonus'] = false;
+				if ($pagetype == 3) {
+					if (empty($plugin_abonus_set['openmembercenter'])) {
+						$plugins['abonus'] = false;
+					}
+
+				}
+				 else if ($pagetype == 4) {
+					if (!(empty($plugin_abonus_set['closecommissioncenter']))) {
+						$plugins['abonus'] = false;
+					}
+
 				}
 
 			}
@@ -1570,8 +1606,17 @@ class DiypageModel extends PluginModel
 				}
 
 
-				if ($member && empty($plugin_author_set['openmembercenter'])) {
-					$plugins['author'] = false;
+				if ($pagetype == 3) {
+					if (empty($plugin_author_set['openmembercenter'])) {
+						$plugins['author'] = false;
+					}
+
+				}
+				 else if ($pagetype == 4) {
+					if (!(empty($plugin_author_set['closecommissioncenter']))) {
+						$plugins['author'] = false;
+					}
+
 				}
 
 			}
@@ -1596,7 +1641,7 @@ class DiypageModel extends PluginModel
 				}
 
 
-				if ($member && empty($plugin_sign_set['iscenter'])) {
+				if (($pagetype == 3) && empty($plugin_sign_set['iscenter'])) {
 					$plugins['sign'] = false;
 				}
 
@@ -1608,7 +1653,7 @@ class DiypageModel extends PluginModel
 		if (strexists($str, 'r=qa')) {
 			$plugins['qa'] = true;
 
-			if ($member) {
+			if ($pagetype == 3) {
 				$plugin_qa = p('qa');
 
 				if ($plugin_qa) {
@@ -1634,7 +1679,7 @@ class DiypageModel extends PluginModel
 			}
 
 
-			if ($member && empty($plugin_coupon_set['closecenter'])) {
+			if (($pagetype == 3) && empty($plugin_coupon_set['closecenter'])) {
 				$plugins['coupon'] = false;
 			}
 

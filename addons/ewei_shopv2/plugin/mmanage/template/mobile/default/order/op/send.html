@@ -174,7 +174,7 @@
 
     <script language="javascript">
         require(['../addons/ewei_shopv2/plugin/mmanage/static/js/order-op.js'],function(modal){
-            modal.initSend({orderid: "{$orderid}", flag: "{php echo intval($edit_flag)}"});
+            modal.initSend({orderid: "{$orderid}", flag: "{php echo intval($edit_flag)}", bundles:"{php echo $bundles? 1: 0}"});
         });
     </script>
 </div>

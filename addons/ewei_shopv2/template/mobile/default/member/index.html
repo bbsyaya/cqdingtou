@@ -9,8 +9,6 @@
 	</div>
 
 	<div class='fui-content member-page navbar'>
-
-
 		<div class="headinfo" >
 			<a class="setbtn" href="{php echo mobileUrl('member/info')}" data-nocache='true'><i class="icon icon-settings"></i></a>
 			<div class="child">
@@ -195,6 +193,15 @@
 	</div>
 	{/if}
 
+	{if !empty($showcard)}
+	<div class="fui-cell-group fui-cell-click">
+		<a class="fui-cell" href="javascript:;" onclick="addCard('{$card['card_id']}')">
+			<div class="fui-cell-icon"><i class="icon icon-same"></i></div>
+			<div class="fui-cell-text"><p>{$cardtag}</p></div>
+			<div class="fui-cell-remark"></div>
+		</a>
+	</div>
+	{/if}
 
 	{if $hascoupon}
 			<div class="fui-cell-group fui-cell-click">
@@ -212,6 +219,7 @@
 				</a>
 			</div>
 		{/if}
+
 
 		{if $hasLineUp}
 		<div class="fui-cell-group fui-cell-click">
@@ -258,11 +266,11 @@
 				<div class="fui-cell-text"><p>我的足迹</p></div>
 				<div class="fui-cell-remark"></div>
 			</a>
-			<a class="fui-cell" href="{php echo mobileUrl('member/notice');}" data-nocache="true">
+			<!--<a class="fui-cell" href="{php echo mobileUrl('member/notice');}" data-nocache="true">
 				<div class="fui-cell-icon"><i class="icon icon-notice"></i></div>
 				<div class="fui-cell-text"><p>消息提醒设置</p></div>
 				<div class="fui-cell-remark"></div>
-			</a>
+			</a>-->
 			<a class="fui-cell external" href="{php echo mobileUrl('member/fullback');}" data-nocache="true">
 				<div class="fui-cell-icon"><i class="icon icon-countdown"></i></div>
 				<div class="fui-cell-text"><p>我的全返</p></div>
@@ -336,6 +344,45 @@
 		});
 	</script>
 </div>
+
+<script  language='javascript'>
+	require(['biz/sale/coupon/common'], function (modal) {modal.init();});
+
+
+	function addCard(card_id) {
+
+		var data = {'openid': '{php echo $_W["openid"]}', 'card_id': card_id};
+		$.ajax({
+			url: "{php echo mobileUrl('sale/coupon/getsignature')}",
+			data: data,
+			cache: false
+		}).done(function (result) {
+			var data = jQuery.parseJSON(result);
+			if (data.status == 1) {
+				wx.addCard({
+					cardList: [
+						{
+							cardId: card_id,
+							cardExt: data.result.cardExt
+						}
+					],
+					success: function (res) {
+
+						//alert(JSON.stringify(res))
+						//alert('已添加卡券：' + JSON.stringify(res.cardList));
+					},
+					cancel: function (res) {
+						//alert(JSON.stringify(res))
+					}
+				});
+			} else {
+				alert("微信接口繁忙,请稍后再试!");
+				alert(data.result.message);
+			}
+		});
+	}
+
+</script>
 
 {php $this->footerMenus()}
 {template '_footer'}
