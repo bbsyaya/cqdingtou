@@ -432,6 +432,14 @@ class Perm_EweiShopV2ComModel extends ComModel
 						$allow = false;
 					}
 				}
+				else if (p('grant')) 
+				{
+					$check = p('grant')->checkplugin($pluginname);
+					if (!($check)) 
+					{
+						$allow = false;
+					}
+				}
 				else 
 				{
 					$allow = false;
@@ -450,6 +458,18 @@ class Perm_EweiShopV2ComModel extends ComModel
 				{
 					$allow = m('grant')->checkplugin($pluginname);
 				}
+				else if (p('grant')) 
+				{
+					$allow = p('grant')->checkplugin($pluginname);
+				}
+				else 
+				{
+					$allow = false;
+				}
+			}
+			else if (p('grant')) 
+			{
+				$allow = p('grant')->checkplugin($pluginname);
 			}
 			else 
 			{
@@ -504,11 +524,11 @@ class Perm_EweiShopV2ComModel extends ComModel
 					$filename = '../addons/ewei_shopv2/core/model/grant.php';
 					if (file_exists($filename)) 
 					{
-						$check = m('grant')->checkplugin($comname);
-						if (!($check)) 
-						{
-							$allow = false;
-						}
+						$allow = m('grant')->checkplugin($comname);
+					}
+					else if (p('grant')) 
+					{
+						$allow = p('grant')->checkplugin($comname);
 					}
 					else 
 					{
@@ -529,6 +549,14 @@ class Perm_EweiShopV2ComModel extends ComModel
 				{
 					$allow = m('grant')->checkplugin($comname);
 				}
+				else if (p('grant')) 
+				{
+					$allow = p('grant')->checkplugin($comname);
+				}
+			}
+			else if (p('grant')) 
+			{
+				$allow = p('grant')->checkplugin($comname);
 			}
 			else 
 			{

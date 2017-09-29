@@ -139,13 +139,11 @@ class Orders_EweiShopV2Page extends PluginMobileLoginPage
 			pdo_update('ewei_shop_groups_order', array('status' => -1, 'canceltime' => time()), array('id' => $order['id'], 'uniacid' => $_W['uniacid']));
 			p('groups')->sendTeamMessage($orderid);
 			show_json(1);
-			return;
 		}
 		catch (Exception $e) 
 		{
 			throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 		}
-		throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 	}
 	public function delete() 
 	{
@@ -249,6 +247,8 @@ class Orders_EweiShopV2Page extends PluginMobileLoginPage
 				$statuscss = 'text-success';
 				break;
 			}
+			$orders[$key]['statusstr'] = $status;
+			$orders[$key]['statuscss'] = $statuscss;
 		}
 		$orders = set_medias($orders, 'thumb');
 		show_json(1, array('list' => $orders, 'pagesize' => $psize, 'total' => $total));
@@ -532,15 +532,12 @@ class Orders_EweiShopV2Page extends PluginMobileLoginPage
 			}
 			$this->model->groupsShare();
 			include $this->template();
-			return;
 		}
 		catch (Exception $e) 
 		{
 			$content = $e->getMessage();
 			include $this->template('groups/error');
 		}
-		$content = $e->getMessage();
-		include $this->template('groups/error');
 	}
 	public function finish() 
 	{

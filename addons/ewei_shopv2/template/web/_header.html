@@ -17,6 +17,7 @@
         {ifp 'goods'}<li {if $_W['controller']=='goods'} class="active"{/if}><a href="{php echo webUrl('goods')}"> 商品</a></li>{/if}
         {ifp 'member'}<li {if $_W['controller']=='member'} class="active"{/if}><a href="{php echo webUrl('member')}"> 会员</a></li>{/if}
         {ifp 'order'}<li {if $_W['controller']=='order'} class="active"{/if}><a href="{php echo webUrl('order')}"> 订单</a></li>{/if}
+
         {if com('sale') || com('coupon')}
         {ifp 'sale'}<li {if $_W['controller']=='sale'} class="active"{/if}><a href="{php echo webUrl('sale')}">营销</a></li>{/if}
         {/if}
@@ -50,6 +51,9 @@
      {if $_W['role'] == 'founder'}
 		<li class="divider"></li>  
 	
+    {if p("grant")}
+        <li><a href="{php echo webUrl('system/plugin/pluginmanage')}"><i class="icon icon-assessedbadge"></i> 应用授权</a></li>
+    {/if}
 	<li><a href="{php echo webUrl('system')}"><i class="icon icon-settings"></i> 系统管理</a></li>
 	<li><a href="{php echo webUrl('system/auth/upgrade')}"><i class="icon icon-down"></i> 系统更新</a></li>
 	{/if}

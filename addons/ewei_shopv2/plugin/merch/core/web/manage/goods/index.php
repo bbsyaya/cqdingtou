@@ -247,22 +247,19 @@ class Index_EweiShopV2Page extends MerchWebPage
 		{
 			$tag = random(32);
 			include $this->template('goods/tpl/option');
-			return;
 		}
-		if ($tpl == 'spec') 
+		else if ($tpl == 'spec') 
 		{
 			$spec = array('id' => random(32), 'title' => $_GPC['title']);
 			include $this->template('goods/tpl/spec');
-			return;
 		}
-		if ($tpl == 'specitem') 
+		else if ($tpl == 'specitem') 
 		{
 			$spec = array('id' => $_GPC['specid']);
 			$specitem = array('id' => random(32), 'title' => $_GPC['title'], 'show' => 1);
 			include $this->template('goods/tpl/spec_item');
-			return;
 		}
-		if ($tpl == 'param') 
+		else if ($tpl == 'param') 
 		{
 			$tag = random(32);
 			include $this->template('goods/tpl/param');

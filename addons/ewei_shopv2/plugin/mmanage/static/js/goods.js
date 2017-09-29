@@ -1,12 +1,11 @@
 define(['core'], function (core) {
-    var modal = {page: 1, status: 'sale', offset: 0, keywords: '', jumped: false,};
+    var modal = {page: 1, status: 'sale', offset: 0, keywords: ''};
     modal.initList = function () {
         modal.initClick();
-        if (!modal.jumped) {
+        var leng = $.trim($('.container').html());
+        if (leng == '') {
             modal.page = 1;
-            modal.getList()
-        } else {
-            modal.jumped = false
+            modal.getList();
         }
         $('.fui-content').infinite({
             onLoading: function () {
@@ -63,7 +62,6 @@ define(['core'], function (core) {
                 var goodsid = $(this).closest('.fui-list').data('id');
                 var canJump = $(this).closest('.fui-list').data('can');
                 if (goodsid && canJump) {
-                    modal.jumped = true;
                     $.router.load(core.getUrl('mmanage/goods/edit', {id: goodsid}), true)
                 }
             }
@@ -100,11 +98,9 @@ define(['core'], function (core) {
             var obj = {id: goodsid};
             var action = _this.data('action');
             if (action == 'view') {
-                modal.jumped = true;
                 $.router.load(core.getUrl('goods/detail', {id: goodsid}), true);
                 return
             } else if (action == 'edit') {
-                modal.jumped = true;
                 $.router.load(core.getUrl('mmanage/goods/edit', {id: goodsid}), true);
                 return
             } else if (action == 'delete') {

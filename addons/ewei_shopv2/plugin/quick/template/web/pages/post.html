@@ -36,7 +36,13 @@
 <script type="text/javascript">
     var path = '../../plugin/quick/static/js/web';
     myrequire([path,'tpl','web/biz'],function(modal,tpl) {
-        modal.init({tpl: tpl, page: {$datas}, attachurl: "{$_W['attachurl']}",})
+        modal.init({
+            tpl: tpl,
+            page: {$datas},
+            attachurl: "{$_W['attachurl']}",
+            merchid: {$merchid},
+            diymenu: {php echo json_encode($diymenu)}
+        });
     })
     function callbackGoods(ret) {
         myrequire([path],function(modal) {

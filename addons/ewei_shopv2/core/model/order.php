@@ -67,6 +67,8 @@ class Order_EweiShopV2Model
 			{
 				return;
 			}
+			pdo_update('ewei_shop_order', array('status' => 0), array('id' => $order['id']));
+			$order['status'] = 0;
 			pdo_update('ewei_shop_order_peerpay', array('status' => 1), array('id' => $ispeerpay['id']));
 			$params['type'] = 'peerpay';
 		}
@@ -283,11 +285,11 @@ class Order_EweiShopV2Model
 			{
 				if (strexists($gbalance, '%')) 
 				{
-					$balance += intval((floatval(str_replace('%', '', $gbalance)) / 100) * $g['realprice']);
+					$balance += round((floatval(str_replace('%', '', $gbalance)) / 100) * $g['realprice'], 2);
 				}
 				else 
 				{
-					$balance += intval($g['money']) * $g['total'];
+					$balance += round($g['money'], 2) * $g['total'];
 				}
 			}
 		}
@@ -299,7 +301,6 @@ class Order_EweiShopV2Model
 				if ($order['status'] == 3) 
 				{
 					m('member')->setCredit($order['openid'], 'credit2', $balance, array(0, $shopset['name'] . '购物赠送余额 订单号: ' . $order['ordersn']));
-					return;
 				}
 			}
 			else if ($type == 2) 
@@ -459,15 +460,13 @@ class Order_EweiShopV2Model
 			{
 				m('member')->setCredit($order['openid'], 'credit1', $credits, array(0, $shopset['name'] . '购物积分 订单号: ' . $order['ordersn']));
 				m('notice')->sendMemberPointChange($order['openid'], $credits, 0);
-				return;
 			}
-			if ($type == 2) 
+			else if ($type == 2) 
 			{
 				if (1 <= $order['status']) 
 				{
 					m('member')->setCredit($order['openid'], 'credit1', -$credits, array(0, $shopset['name'] . '购物取消订单扣除积分 订单号: ' . $order['ordersn']));
 					m('notice')->sendMemberPointChange($order['openid'], $credits, 1);
-					return;
 				}
 			}
 		}
@@ -477,7 +476,6 @@ class Order_EweiShopV2Model
 			if (0 < $money) 
 			{
 				m('notice')->sendMemberPointChange($order['openid'], $money, 0);
-				return;
 			}
 		}
 		else if ($type == 2) 
@@ -721,7 +719,7 @@ class Order_EweiShopV2Model
 						{
 							$price2 = round($dd, 2);
 						}
-						else if (0 < $md)
+						else if (0 < $md) 
 						{
 							$price2 = round(($md / 10) * $gprice, 2);
 						}

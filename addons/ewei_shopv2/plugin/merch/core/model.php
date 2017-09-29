@@ -381,7 +381,7 @@ class MerchModel extends PluginModel
 	}
 	public function allPerms() 
 	{
-		if (empty($allPerms)) 
+		if (empty(self::$allPerms)) 
 		{
 			$perms = array('shop' => $this->perm_shop(), 'goods' => $this->perm_goods(), 'order' => $this->perm_order(), 'statistics' => $this->perm_statistics(), 'sale' => $this->perm_sale(), 'creditshop' => $this->perm_creditshop(), 'perm' => $this->perm_perm(), 'apply' => $this->perm_apply(), 'exhelper' => $this->perm_exhelper(), 'diypage' => $this->perm_diypage(), 'quick' => $this->perm_quick());
 			self::$allPerms = $perms;
@@ -589,7 +589,7 @@ class MerchModel extends PluginModel
 	}
 	public function getLogTypes($all = false) 
 	{
-		if (empty($getLogTypes)) 
+		if (empty(self::$getLogTypes)) 
 		{
 			$perms = $this->allPerms();
 			$array = array();
@@ -715,7 +715,7 @@ class MerchModel extends PluginModel
 	}
 	public function formatPerms() 
 	{
-		if (empty($formatPerms)) 
+		if (empty(self::$formatPerms)) 
 		{
 			$perms = $this->allPerms();
 			$array = array();
@@ -1219,9 +1219,8 @@ class MerchModel extends PluginModel
 			if ($type == 1) 
 			{
 				plog('merch.exhelper.temp.express.setdefault', '设置默认快递单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
-				return;
 			}
-			if ($type == 2) 
+			else if ($type == 2) 
 			{
 				plog('merch.exhelper.temp.invoice.setdefault', '设置默认发货单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
 			}
@@ -1389,7 +1388,6 @@ class MerchModel extends PluginModel
 			if ($check == 0) 
 			{
 				show_message('您没有该应用的权限!');
-				return;
 			}
 		}
 		else 

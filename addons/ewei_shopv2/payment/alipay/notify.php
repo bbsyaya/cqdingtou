@@ -47,7 +47,10 @@ class aliApy
 		}
 		if ($this->post['trade_status'] != 'TRADE_SUCCESS') 
 		{
-			exit('fail');
+			if ($this->post['trade_status'] != 'TRADE_FINISHED') 
+			{
+				exit('fail');
+			}
 		}
 		$this->strs = explode(':', $this->body);
 		$this->type = intval($this->strs[1]);

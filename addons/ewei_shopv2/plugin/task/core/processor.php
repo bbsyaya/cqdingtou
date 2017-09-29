@@ -11,32 +11,19 @@ class TaskProcessor extends PluginProcessor
 	{
 		parent::__construct('task');
 	}
-	public function respond($obj = NULL, $clear = true) 
+	public function respond($obj = NULL) 
 	{
 		global $_W;
 		$message = $obj->message;
 		$msgtype = strtolower($message['msgtype']);
 		$event = strtolower($message['event']);
-		if ($clear) 
-		{
-			$_SESSION['autoposter'] = NULL;
-			$_SESSION['postercontent'] = NULL;
-		}
 		$obj->member = $this->model->checkMember($message['from']);
-		if (($msgtype == 'text') || ($event == 'click') || !(empty($_SESSION['autoposter']))) 
+		if (($msgtype == 'text') || ($event == 'click')) 
 		{
-			unset($_SESSION['autoposter']);
-			if (!(empty($_SESSION['postercontent']))) 
-			{
-				$obj->message['content'] = $_SESSION['postercontent'];
-				unset($_SESSION['postercontent']);
-			}
 			return $this->responseText($obj);
 		}
 		if ($msgtype == 'event') 
 		{
-			@session_start();
-			$_SESSION['autoposter'] = $obj;
 			if ($event == 'scan') 
 			{
 				return $this->responseScan($obj);
@@ -54,6 +41,7 @@ class TaskProcessor extends PluginProcessor
 		load()->func('communication');
 		$url = mobileUrl('task/build', array('timestamp' => TIMESTAMP), true);
 		ihttp_request($url, array('openid' => $obj->message['from'], 'content' => urlencode($obj->message['content'])), array(), $timeout);
+		unset($_SESSION['postercontent']);
 		return $this->responseEmpty();
 	}
 	private function responseEmpty() 
@@ -113,7 +101,7 @@ class TaskProcessor extends PluginProcessor
 			return m('message')->sendCustomNotice($openid, '扫描自己的海报是不会增加人气值的,快快把你的海报发送给你的小伙伴吧~');
 		}
 		load()->func('logging');
-		if ($member_info['isnew']) 
+		if ($member_info['isnew'] || $_SESSION['postercontent']) 
 		{
 			load()->func('logging');
 			if (!(empty($join_info))) 
@@ -129,8 +117,12 @@ class TaskProcessor extends PluginProcessor
 				$this->commission($poster, $member_info, $qrmember);
 				if (!(empty($_SESSION['postercontent']))) 
 				{
-					$this->respond($_SESSION['autoposter']);
-					$this->respond($_SESSION['autoposter'], false);
+					$content = trim($_SESSION['postercontent']);
+					$timeout = 10;
+					$url = mobileUrl('task/build', array('timestamp' => TIMESTAMP), true);
+					ihttp_request($url, array('openid' => $_W['openid'], 'content' => urlencode($content)), array(), $timeout);
+					unset($_SESSION['postercontent']);
+					exit();
 				}
 			}
 		}
@@ -138,7 +130,7 @@ class TaskProcessor extends PluginProcessor
 		{
 			$params = array(':uniacid' => $_W['uniacid'], ':task_user' => $qr['openid'], ':joiner_id' => $openid, ':join_id' => $join_info['join_id']);
 			$scan_count = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_task_joiner') . ' where uniacid=:uniacid and task_user=:task_user and joiner_id=:joiner_id and join_id=:join_id ', $params);
-			if (!(empty($join_info)) && $scan_count) 
+			if (!(empty($join_info)) && $scan_count && empty($_SESSION['postercontent'])) 
 			{
 				$default_text = pdo_fetchcolumn('SELECT `data` FROM ' . tablename('ewei_shop_task_default') . ' WHERE uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));
 				if (!(empty($default_text))) 
@@ -275,7 +267,7 @@ class TaskProcessor extends PluginProcessor
 			}
 			return m('message')->sendCustomNotice($openid, '扫描自己的海报是不会增加人气值的,快快把你的海报发送给你的小伙伴吧~');
 		}
-		if ($member_info['isnew']) 
+		if ($member_info['isnew'] || $_SESSION['postercontent']) 
 		{
 			if (!(empty($join_info))) 
 			{
@@ -290,7 +282,12 @@ class TaskProcessor extends PluginProcessor
 				$this->commission($poster, $member_info, $qrmember);
 				if (!(empty($_SESSION['postercontent']))) 
 				{
-					$this->respond($_SESSION['autoposter'], false);
+					$content = trim($_SESSION['postercontent']);
+					$timeout = 10;
+					$url = mobileUrl('task/build', array('timestamp' => TIMESTAMP), true);
+					ihttp_request($url, array('openid' => $_W['openid'], 'content' => urlencode($content)), array(), $timeout);
+					unset($_SESSION['postercontent']);
+					exit();
 				}
 			}
 		}
@@ -298,36 +295,13 @@ class TaskProcessor extends PluginProcessor
 		{
 			$params = array(':uniacid' => $_W['uniacid'], ':task_user' => $qr['openid'], ':joiner_id' => $openid, ':join_id' => $join_info['join_id']);
 			$scan_count = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_task_joiner') . ' where uniacid=:uniacid and task_user=:task_user and joiner_id=:joiner_id and join_id=:join_id ', $params);
-			if (!(empty($join_info)) && $scan_count) 
+			if (!(empty($join_info)) && $scan_count && empty($_SESSION['postercontent'])) 
 			{
-				$default_text = pdo_fetchcolumn('SELECT `data` FROM ' . tablename('ewei_shop_task_default') . ' WHERE uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));
-				if (!(empty($default_text))) 
-				{
-					$default_text = unserialize($default_text);
-					if (!(empty($default_text['fail'])) && !(empty($default_text['templateid']))) 
-					{
-						$poster['okdays'] = $join_info['failtime'];
-						$poster['completecount'] = $join_info['completecount'];
-						foreach ($default_text['fail'] as $key => $val ) 
-						{
-							$default_text['fail'][$key]['value'] = $this->model->notice_complain($val['value'], $qrmember, $poster, $member_info, 1);
-						}
-						m('message')->sendTplNotice($openid, $default_text['templateid'], $default_text['fail'], '');
-					}
-					else 
-					{
-						m('message')->sendCustomNotice($openid, '您之前已经参加过此任务');
-					}
-				}
-				else 
-				{
-					m('message')->sendCustomNotice($openid, '您之前已经参加过此任务');
-				}
 			}
 			else if (empty($join_info)) 
 			{
 				$default_text = pdo_fetchcolumn('SELECT `data` FROM ' . tablename('ewei_shop_task_default') . ' WHERE uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));
-				if (!(empty($default_text))) 
+				if (!(empty($default_text)) && $_SESSION['postercontent']) 
 				{
 					$default_text = unserialize($default_text);
 					if (!(empty($default_text['fail'])) && !(empty($default_text['templateid']))) 
@@ -353,7 +327,7 @@ class TaskProcessor extends PluginProcessor
 			else 
 			{
 				$default_text = pdo_fetchcolumn('SELECT `data` FROM ' . tablename('ewei_shop_task_default') . ' WHERE uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid']));
-				if (!(empty($default_text))) 
+				if (!(empty($default_text)) && $_SESSION['postercontent']) 
 				{
 					$default_text = unserialize($default_text);
 					if (!(empty($default_text['fail'])) && !(empty($default_text['templateid']))) 
@@ -566,7 +540,7 @@ class TaskProcessor extends PluginProcessor
 							logging_run($res['message']);
 						}
 					}
-					if (isset($val['coupon']) && isset($val['coupon']) && !(empty($val['coupon']))) 
+					if (isset($val['coupon']) && !(empty($val['coupon']))) 
 					{
 						$cansendreccoupon = false;
 						$plugin_coupon = com('coupon');
@@ -873,7 +847,7 @@ class TaskProcessor extends PluginProcessor
 							logging_run($res['message']);
 						}
 					}
-					if (isset($val['coupon']) && isset($val['coupon']) && !(empty($val['coupon']))) 
+					if (isset($val['coupon']) && !(empty($val['coupon']))) 
 					{
 						$cansendreccoupon = false;
 						$plugin_coupon = com('coupon');

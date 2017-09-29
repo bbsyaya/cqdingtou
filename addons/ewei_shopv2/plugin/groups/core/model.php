@@ -204,20 +204,17 @@ class GroupsModel extends PluginModel
 					{
 						$this->sendGroupsNotice(array('openid' => $value, 'tag' => 'groups_teamsend', 'default' => $msgteam, 'datas' => $datas));
 					}
-					return;
 				}
 			}
 			else if ($order_refund['refundstatus'] == -1) 
 			{
 				$msg = array( 'first' => array('value' => '您的退款订单已经被驳回', 'color' => '#4a5077'), 'keyword1' => array('title' => '订单编号', 'value' => $order['orderno'], 'color' => '#4a5077'), 'keyword2' => array('title' => '维权编号', 'value' => $order_refund['refundno'], 'color' => '#4a5077'), 'keyword3' => array('title' => '驳回原因', 'value' => $order_refund['reply'], 'color' => '#4a5077') );
 				$this->sendGroupsNotice(array('openid' => $openid, 'tag' => 'groups_refund', 'default' => $msg, 'datas' => $datas));
-				return;
 			}
 			else if ($order_refund['refundstatus'] == 1) 
 			{
 				$msg = array( 'first' => array('value' => '您的订单已经完成退款！', 'color' => '#4a5077'), 'keyword1' => array('title' => '退款金额', 'value' => '¥' . $applyprice . '元', 'color' => '#4a5077'), 'keyword2' => array('title' => '商品详情', 'value' => $goods2, 'color' => '#4a5077'), 'keyword3' => array('title' => '订单编号', 'value' => $order['orderno'], 'color' => '#4a5077'), 'remark' => array('value' => '退款金额 ¥' . $applyprice . $refundtype . "\r\n" . ' 期待您再次购物！', 'color' => '#4a5077') );
 				$this->sendGroupsNotice(array('openid' => $openid, 'tag' => 'groups_refund', 'default' => $msg, 'datas' => $datas));
-				return;
 			}
 		}
 		else if ($order['status'] == 1) 
@@ -241,7 +238,6 @@ class GroupsModel extends PluginModel
 					{
 						$this->sendGroupsNotice(array('openid' => $value, 'tag' => 'groups_teamsend', 'default' => $msgteam, 'datas' => $datas));
 					}
-					return;
 				}
 			}
 			else if ($order['success'] == -1) 
@@ -253,7 +249,6 @@ class GroupsModel extends PluginModel
 					$msg = array( 'first' => array('value' => '您参加的拼团组团失败！', 'color' => '#4a5077'), 'keyword1' => array('title' => '订单编号', 'value' => $value['orderno'], 'color' => '#4a5077'), 'keyword2' => array('title' => '通知时间', 'value' => date('Y-m-d H:i:s', time()), 'color' => '#4a5077'), 'remark' => array('value' => $remark, 'color' => '#4a5077') );
 					$this->sendGroupsNotice(array('openid' => $value['openid'], 'tag' => 'groups_error', 'default' => $msg, 'datas' => $datas));
 				}
-				return;
 			}
 			else if ($order['success'] == 0) 
 			{
@@ -280,7 +275,6 @@ class GroupsModel extends PluginModel
 					{
 						$this->sendGroupsNotice(array('openid' => $value, 'tag' => 'groups_teamsend', 'default' => $msgteam, 'datas' => $datas));
 					}
-					return;
 				}
 			}
 		}
@@ -292,7 +286,6 @@ class GroupsModel extends PluginModel
 			}
 			$msg = array( 'first' => array('value' => '您的订单已发货！', 'color' => '#4a5077'), 'keyword1' => array('title' => '订单编号', 'value' => $order['orderno'], 'color' => '#4a5077'), 'keyword2' => array('title' => '物流公司', 'value' => $order['expresscom'], 'color' => '#4a5077'), 'keyword3' => array('title' => '物流单号', 'value' => $order['expresssn'], 'color' => '#4a5077'), 'remark' => array('value' => $remark, 'color' => '#4a5077') );
 			$this->sendGroupsNotice(array('openid' => $openid, 'tag' => 'groups_send', 'default' => $msg, 'datas' => $datas));
-			return;
 		}
 		else if ($order['status'] == 3) 
 		{
@@ -302,7 +295,6 @@ class GroupsModel extends PluginModel
 			}
 			$msg = array( 'first' => array('value' => '订单已收货！', 'color' => '#4a5077'), 'keyword1' => array('title' => '订单编号', 'value' => $order['orderno'], 'color' => '#4a5077'), 'keyword2' => array('title' => '物流公司', 'value' => $order['expresscom'], 'color' => '#4a5077'), 'keyword3' => array('title' => '物流单号', 'value' => $order['expresssn'], 'color' => '#4a5077'), 'remark' => array('value' => $remark, 'color' => '#4a5077') );
 			$this->sendGroupsNotice(array('openid' => $openid, 'tag' => 'groups_send', 'default' => $msg, 'datas' => $datas));
-			return;
 		}
 		else if ($order['status'] == -1) 
 		{
@@ -359,20 +351,17 @@ class GroupsModel extends PluginModel
 						if (is_error($ret)) 
 						{
 							$ret = m('message')->sendCustomNotice($touser, $advanced_message, $url, $account);
-							return;
 						}
 					}
 				}
 				else 
 				{
 					m('message')->sendCustomNotice($touser, $default_message, $url, $account);
-					return;
 				}
 			}
 			else 
 			{
 				m('message')->sendCustomNotice($touser, $default_message, $url, $account);
-				return;
 			}
 		}
 		else if (!(empty($tm[$tag . '_close_normal']))) 
@@ -578,9 +567,8 @@ class GroupsModel extends PluginModel
 			if ($type == 1) 
 			{
 				plog('exhelper.temp.express.setdefault', '设置默认快递单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
-				return;
 			}
-			if ($type == 2) 
+			else if ($type == 2) 
 			{
 				plog('exhelper.temp.invoice.setdefault', '设置默认发货单 ID: ' . $item['id'] . '， 模板名称: ' . $item['expressname'] . ' ');
 			}

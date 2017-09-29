@@ -1,5 +1,5 @@
 define(['core', './order-base.js'], function (core, obase) {
-    var modal = {page: 1, status: 0, offset: 0, keywords: '', jumped: false,};
+    var modal = {page: 1, status: 0, offset: 0, keywords: ''};
     modal.initList = function (params) {
         modal.status = params.status;
         modal.keywords = params.keywords;
@@ -13,11 +13,10 @@ define(['core', './order-base.js'], function (core, obase) {
                 elm.find(".icon-pin").hide()
             }
         }
-        if (!modal.jumped) {
+        var leng = $.trim($('.container').html());
+        if (leng == '') {
             modal.page = 1;
-            modal.getList()
-        } else {
-            modal.jumped = false
+            modal.getList();
         }
         $('.fui-content').infinite({
             onLoading: function () {

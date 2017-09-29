@@ -1,11 +1,12 @@
 <?php
+set_time_limit(0);
 if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
 class TaobaoModel extends PluginModel 
 {
-	public function get_item_taobao($itemid = '', $taobaourl = '', $pcate = 0, $ccate = 0, $tcate = 0, $merchid = 0) 
+	public function get_item_taobao($itemid = '', $taobaourl = '', $cates, $merchid = 0) 
 	{
 		global $_W;
 		$g = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where uniacid=:uniacid and merchid=:merchid and catch_id=:catch_id and catch_source=\'taobao\' limit 1', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid, ':catch_id' => $itemid));
@@ -41,10 +42,59 @@ class TaobaoModel extends PluginModel
 				$item['checked'] = 0;
 			}
 		}
-		$item['pcate'] = $pcate;
-		$item['ccate'] = $ccate;
-		$item['tcate'] = $tcate;
-		$item['cates'] = $pcate . ',' . $ccate . ',' . $tcate;
+		$pcates = array();
+		$ccates = array();
+		$tcates = array();
+		$pcateid = 0;
+		$ccateid = 0;
+		$tcateid = 0;
+		if (is_array($cates)) 
+		{
+			foreach ($cates as $key => $cid ) 
+			{
+				$c = pdo_fetch('select level from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+				if ($c['level'] == 1) 
+				{
+					$pcates[] = $cid;
+				}
+				else if ($c['level'] == 2) 
+				{
+					$ccates[] = $cid;
+				}
+				else if ($c['level'] == 3) 
+				{
+					$tcates[] = $cid;
+				}
+				if ($key == 0) 
+				{
+					if ($c['level'] == 1) 
+					{
+						$pcateid = $cid;
+					}
+					else if ($c['level'] == 2) 
+					{
+						$crow = pdo_fetch('select parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+						$pcateid = $crow['parentid'];
+						$ccateid = $cid;
+					}
+					else if ($c['level'] == 3) 
+					{
+						$tcateid = $cid;
+						$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+						$ccateid = $tcate['parentid'];
+						$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
+						$pcateid = $ccate['parentid'];
+					}
+				}
+			}
+		}
+		$item['pcate'] = $pcateid;
+		$item['ccate'] = $ccateid;
+		$item['tcate'] = $tcateid;
+		$item['cates'] = implode(',', $cates);
+		$item['pcates'] = implode(',', $pcates);
+		$item['ccates'] = implode(',', $ccates);
+		$item['tcates'] = implode(',', $tcates);
 		$item['itemId'] = $itemInfoModel['itemId'];
 		$item['title'] = $itemInfoModel['title'];
 		$item['pics'] = $itemInfoModel['picsPath'];
@@ -170,7 +220,7 @@ class TaobaoModel extends PluginModel
 		$item['content'] = $response;
 		return $this->save_taobao_goods($item, $taobaourl);
 	}
-	public function get_item_jingdong($itemid = '', $jingdongurl = '', $pcate = 0, $ccate = 0, $tcate = 0, $merchid = 0) 
+	public function get_item_jingdong($itemid = '', $jingdongurl = '', $cates, $merchid = 0) 
 	{
 		error_reporting(0);
 		global $_W;
@@ -208,10 +258,59 @@ class TaobaoModel extends PluginModel
 				$item['checked'] = 0;
 			}
 		}
-		$item['pcate'] = $pcate;
-		$item['ccate'] = $ccate;
-		$item['tcate'] = $tcate;
-		$item['cates'] = $pcate . ',' . $ccate . ',' . $tcate;
+		$pcates = array();
+		$ccates = array();
+		$tcates = array();
+		$pcateid = 0;
+		$ccateid = 0;
+		$tcateid = 0;
+		if (is_array($cates)) 
+		{
+			foreach ($cates as $key => $cid ) 
+			{
+				$c = pdo_fetch('select level from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+				if ($c['level'] == 1) 
+				{
+					$pcates[] = $cid;
+				}
+				else if ($c['level'] == 2) 
+				{
+					$ccates[] = $cid;
+				}
+				else if ($c['level'] == 3) 
+				{
+					$tcates[] = $cid;
+				}
+				if ($key == 0) 
+				{
+					if ($c['level'] == 1) 
+					{
+						$pcateid = $cid;
+					}
+					else if ($c['level'] == 2) 
+					{
+						$crow = pdo_fetch('select parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+						$pcateid = $crow['parentid'];
+						$ccateid = $cid;
+					}
+					else if ($c['level'] == 3) 
+					{
+						$tcateid = $cid;
+						$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+						$ccateid = $tcate['parentid'];
+						$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
+						$pcateid = $ccate['parentid'];
+					}
+				}
+			}
+		}
+		$item['pcate'] = $pcateid;
+		$item['ccate'] = $ccateid;
+		$item['tcate'] = $tcateid;
+		$item['cates'] = implode(',', $cates);
+		$item['pcates'] = implode(',', $pcates);
+		$item['ccates'] = implode(',', $ccates);
+		$item['tcates'] = implode(',', $tcates);
 		$item['itemId'] = $itemid;
 		$item['title'] = $prodectName;
 		$pics = array();
@@ -263,7 +362,7 @@ class TaobaoModel extends PluginModel
 		$item['params'] = $params;
 		return $this->save_jingdong_goods($item, $jingdongurl);
 	}
-	public function get_item_one688($itemid = '', $one688url = '', $pcate = 0, $ccate = 0, $tcate = 0, $merchid = 0) 
+	public function get_item_one688($itemid = '', $one688url = '', $cates, $merchid = 0) 
 	{
 		error_reporting(0);
 		global $_W;
@@ -300,10 +399,59 @@ class TaobaoModel extends PluginModel
 				$item['checked'] = 0;
 			}
 		}
-		$item['pcate'] = $pcate;
-		$item['ccate'] = $ccate;
-		$item['tcate'] = $tcate;
-		$item['cates'] = $pcate . ',' . $ccate . ',' . $tcate;
+		$pcates = array();
+		$ccates = array();
+		$tcates = array();
+		$pcateid = 0;
+		$ccateid = 0;
+		$tcateid = 0;
+		if (is_array($cates)) 
+		{
+			foreach ($cates as $key => $cid ) 
+			{
+				$c = pdo_fetch('select level from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+				if ($c['level'] == 1) 
+				{
+					$pcates[] = $cid;
+				}
+				else if ($c['level'] == 2) 
+				{
+					$ccates[] = $cid;
+				}
+				else if ($c['level'] == 3) 
+				{
+					$tcates[] = $cid;
+				}
+				if ($key == 0) 
+				{
+					if ($c['level'] == 1) 
+					{
+						$pcateid = $cid;
+					}
+					else if ($c['level'] == 2) 
+					{
+						$crow = pdo_fetch('select parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+						$pcateid = $crow['parentid'];
+						$ccateid = $cid;
+					}
+					else if ($c['level'] == 3) 
+					{
+						$tcateid = $cid;
+						$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+						$ccateid = $tcate['parentid'];
+						$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
+						$pcateid = $ccate['parentid'];
+					}
+				}
+			}
+		}
+		$item['pcate'] = $pcateid;
+		$item['ccate'] = $ccateid;
+		$item['tcate'] = $tcateid;
+		$item['cates'] = implode(',', $cates);
+		$item['pcates'] = implode(',', $pcates);
+		$item['ccates'] = implode(',', $ccates);
+		$item['tcates'] = implode(',', $tcates);
 		$item['itemId'] = $itemid;
 		$item['title'] = $prodectName;
 		$pics = array();

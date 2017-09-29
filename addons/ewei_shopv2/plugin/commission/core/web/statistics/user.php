@@ -13,13 +13,17 @@ class User_EweiShopV2Page extends PluginWebPage
 		$params = array();
 		$level = intval($_GPC['level']);
 		$searchstart = intval($_GPC['searchstart']);
-		$sql = 'select dm.id,dm.diycommissionfields,diycommissionfields,diymemberfields,diymemberdata,dm.nickname,dm.realname,dm.avatar,l.levelname from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . ' and dm.isagent =1  ' . $condition . ' ORDER BY dm.agenttime desc';
+		$pindex = max(1, intval($_GPC['page']));
+		$psize = 100;
+		$sql = 'select dm.id,dm.diycommissionfields,dm.diycommissionfields,dm.diymemberfields,dm.diymemberdata,dm.nickname,dm.realname,dm.avatar,l.levelname from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' lm on lm.agentid = dm.id' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . ' and dm.isagent =1 and lm.isagent =1 and dm.status=1 and lm.status=1 ' . $condition . ' ORDER BY dm.agenttime desc';
+		$sql .= ' LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		if (!(empty($searchstart))) 
 		{
 			$userlist = pdo_fetchall($sql, $params);
+			$total_sql = 'select COUNT(1) from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' lm on lm.agentid = dm.id' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . ' and dm.isagent =1 and lm.isagent =1 and dm.status=1 and lm.status=1 ' . $condition;
+			$total = pdo_fetchcolumn($total_sql, $params);
+			$pager = pagination($total, $pindex, $psize);
 		}
-		$pindex = max(1, intval($_GPC['page']));
-		$psize = 30;
 		$list = array();
 		if (!(empty($userlist))) 
 		{
@@ -116,11 +120,10 @@ class User_EweiShopV2Page extends PluginWebPage
 				}
 				if ($_GPC['isagent'] != '') 
 				{
-					$condition .= ' and dm.isagent=' . intval($_GPC['isagent']);
 				}
+				$condition .= ' and dm.isagent=1 and dm.status=1';
 				if ($_GPC['status'] != '') 
 				{
-					$condition .= ' and dm.status=' . intval($_GPC['status']);
 				}
 				if (!(empty($has_createtime))) 
 				{
@@ -196,7 +199,7 @@ class User_EweiShopV2Page extends PluginWebPage
 				unset($row);
 			}
 		}
-		$total = count($list);
+		$list_total = count($list);
 		if ($_GPC['export'] == 1) 
 		{
 			foreach ($list as &$row ) 
@@ -249,15 +252,6 @@ class User_EweiShopV2Page extends PluginWebPage
 				$columns[] = array('title' => '推荐人分销商申请自定义信息', 'field' => 'pagent_diyformdata', 'width' => 36);
 			}
 			m('excel')->export($list, array('title' => '推广下线-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
-		}
-		else if (0 < $total) 
-		{
-			$pager = pagination($total, $pindex, $psize);
-			$start = ($pindex - 1) * $psize;
-			if (!(empty($list))) 
-			{
-				$list = array_slice($list, $start, $psize);
-			}
 		}
 		load()->func('tpl');
 		include $this->template();

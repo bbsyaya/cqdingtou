@@ -74,8 +74,7 @@
                 {ifp 'sysset.payment.edit'}
                 <a class='btn btn-default  btn-sm' href="{php echo webUrl('sysset/payment/edit', array('id' => $row['id']))}"><i class='fa fa-edit'></i>
                     {ifp 'sysset.payment.edit'}编辑{else}查看{/if}</a>{/if}
-                {ifp
-                'sysset.payment.delete'}<a class='btn btn-default  btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('sysset/payment/delete', array('id' => $row['id']))}" data-confirm="确认删除此模板吗？"><i class='fa fa-trash'></i>
+                {ifp 'sysset.payment.delete'}<a class='btn btn-default  btn-sm' data-toggle='ajaxRemove' href="{php echo webUrl('sysset/payment/delete', array('id' => $row['id']))}" data-confirm="确认删除此模板吗？"><i class='fa fa-trash'></i>
                 删除</a>{/if}
 
         </tr>

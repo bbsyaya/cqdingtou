@@ -117,17 +117,23 @@
     <div class="fui-shop style<%style.shopstyle%>">
         <div class="shop-info">
             <img class="background" src="<%imgsrc style.shopbg%>" />
-            <div class="inner">
-                <div class="logo <%style.logostyle%>">
-                    <img src="{php echo tomedia($_W['shopset']['shop']['logo'])}">
+            <%if style.hidelogo!='1'%>
+                <div class="inner">
+                    <div class="logo <%style.logostyle%>">
+                        <%if style.shoplogo%>
+                            <img src="<%imgsrc(style.shoplogo)%>" />
+                        <%else%>
+                            <img src="{$shopset['logo']}" />
+                        <%/if%>
+                    </div>
+                    <div class="right">
+                        <div class="name"><%style.shopname||"{$shopset['name']}"%></div>
+                        <%if style.notice>0%>
+                            <div class="notice"><i class="icon icon-notification"></i> 商城公告商城公告</div>
+                        <%/if%>
+                    </div>
                 </div>
-                <div class="right">
-                    <div class="name">{$_W['shopset']['shop']['name']}</div>
-                    <%if style.notice>0%>
-                        <div class="notice"><i class="icon icon-notification"></i> 商城公告商城公告</div>
-                    <%/if%>
-                </div>
-            </div>
+            <%/if%>
         </div>
         <%if count(shopmenu)>0%>
             <div class="shop-menu" style="background: <%style.menubg%>;">
@@ -242,6 +248,19 @@
                         <label class="radio-inline"><input class="bind" data-bind-parent="style" data-bind="shopstyle" data-bind-init="true" type="radio" name="shopstyle" value="3" <%if style.shopstyle=='3'%>checked<%/if%>> 样式三</label>
                     </div>
                 </div>
+                {if p('diypage')}
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">自定义菜单</div>
+                        <div class="col-sm-10">
+                            <select class="form-control input-sm bind" data-bind="diymenu">
+                                <option value="0">默认菜单</option>
+                                <%each diymenu_data as menu%>
+                                    <option value="<%menu.id%>" <%if diymenu==menu.id%>selected="selected"<%/if%>><%menu.name%></option>
+                                <%/each%>
+                            </select>
+                        </div>
+                    </div>
+                {/if}
             <%else%>
                 <div class="form-group">
                     <div class="col-sm-2 control-label">购物车数据</div>
@@ -325,6 +344,14 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <div class="col-sm-2 control-label">隐藏信息</div>
+                    <div class="col-sm-10">
+                        <label class="radio-inline"><input class="bind" data-bind-parent="style" data-bind="hidelogo" data-bind-init="true" type="radio" name="hidelogo" value="" <%if style.hidelogo!='1'%>checked<%/if%>> 显示logo、名称</label>
+                        <label class="radio-inline"><input class="bind" data-bind-parent="style" data-bind="hidelogo" data-bind-init="true" type="radio" name="hidelogo" value="1" <%if style.hidelogo=='1'%>checked<%/if%>>隐藏logo、名称</label>
+                    </div>
+                </div>
+                <%if style.hidelogo!='1'%>
+                <div class="form-group">
                     <div class="col-sm-2 control-label">logo样式</div>
                     <div class="col-sm-10">
                         <label class="radio-inline"><input class="bind" data-bind-parent="style" data-bind="logostyle" type="radio" name="logostyle" value="" <%if style.logostyle==''||!style.logostyle%>checked<%/if%>> 方形</label>
@@ -332,7 +359,22 @@
                         <label class="radio-inline"><input class="bind" data-bind-parent="style" data-bind="logostyle" type="radio" name="logostyle" value="circle" <%if style.logostyle=='circle'%>checked<%/if%>> 圆形</label>
                     </div>
                 </div>
-
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">商城名称</div>
+                    <div class="col-sm-10">
+                        <input class="form-control input-sm bind" data-bind-parent="style" data-bind="shopname" value="<%style.shopname%>" placeholder="不填则默认读取商城设置" maxlength="10" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2 control-label">商城logo</div>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input class="form-control input-sm bind" data-bind-parent="style" data-bind="shoplogo" value="<%style.shoplogo%>" placeholder="不填则默认读取商城设置" id="shoplogo" />
+                            <span class="input-group-addon btn btn-default" data-toggle="selectImg" data-input="#shoplogo">选择图片</span>
+                        </div>
+                    </div>
+                </div>
+                <%/if%>
                 <div class="line"></div>
 
                 <div class="form-items" data-max="4" data-type="shopmenu">
@@ -669,7 +711,7 @@
             </div>
             <%if datas[dataIndex].datatype==0%>
                 <div class="form-items" data-type="datas">
-                    <div class="inner" id="form-items">
+                    <div class="inner" id="form-items-datas">
                         <%each datas[dataIndex].data as g index%>
                         <div class="item" data-index="<%index%>">
                             <span class="btn-del-child" title="删除"></span>

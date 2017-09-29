@@ -88,7 +88,7 @@ class TaskModel extends PluginModel
 			$barcode = $result['barcode'];
 			$ticket = $result['ticket'];
 			$qrimg = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . $ticket;
-			$ims_qrcode = array('uniacid' => $_W['uniacid'], 'acid' => $_W['acid'], 'qrcid' => $scene_id, 'model' => 0, 'name' => 'EWEI_SHOPV2_TASK_QRCODE', 'keyword' => 'EWEI_SHOPV2_TASK', 'expire' => $expire, 'createtime' => time(), 'status' => 1, 'url' => $result['url'], 'ticket' => $result['ticket']);
+			$ims_qrcode = array('uniacid' => $_W['uniacid'], 'acid' => $_W['acid'], 'qrcid' => $scene_id, 'model' => 0, 'name' => 'EWEI_SHOPV2_TASK_QRCODE', 'keyword' => $poster['keyword'], 'expire' => $expire, 'createtime' => time(), 'status' => 1, 'url' => $result['url'], 'ticket' => $result['ticket']);
 			pdo_insert('qrcode', $ims_qrcode);
 			$qr = array('acid' => $acid, 'openid' => $member['openid'], 'sceneid' => $scene_id, 'type' => 1, 'ticket' => $result['ticket'], 'qrimg' => $qrimg, 'posterid' => $poster['id'], 'expire' => $expire, 'url' => $result['url'], 'endtime' => $posterendtime);
 			pdo_insert('ewei_shop_task_poster_qr', $qr);
@@ -399,6 +399,7 @@ class TaskModel extends PluginModel
 	}
 	public function notice_complain($templete, $member, $poster, $scaner = '', $type = 1) 
 	{
+		global $_W;
 		$reward_type = 'sub';
 		$openid = $scaner['openid'];
 		if ($type == 2) 
@@ -755,7 +756,6 @@ class TaskModel extends PluginModel
 		{
 			return false;
 		}
-		logg('task.txt', json_encode($poster));
 		global $_W;
 		if (empty($poster['autoposter'])) 
 		{
@@ -871,7 +871,7 @@ class TaskModel extends PluginModel
 							logging_run($res['message']);
 						}
 					}
-					if (isset($val['coupon']) && isset($val['coupon']) && !(empty($val['coupon']))) 
+					if (isset($val['coupon']) && !(empty($val['coupon']))) 
 					{
 						$cansendreccoupon = false;
 						$plugin_coupon = com('coupon');
@@ -1258,7 +1258,7 @@ class TaskModel extends PluginModel
 						logging_run($res['message']);
 					}
 				}
-				if (isset($val['coupon']) && isset($val['coupon']) && !(empty($val['coupon']))) 
+				if (isset($val['coupon']) && !(empty($val['coupon']))) 
 				{
 					$cansendreccoupon = false;
 					$plugin_coupon = com('coupon');
@@ -1320,22 +1320,22 @@ class TaskModel extends PluginModel
 				}
 				if ($default_text['templateid']) 
 				{
-					m('message')->sendTplNotice($qrmember['openid'], $default_text['templateid'], $default_text['rankcomplete'], mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
+					m('message')->sendTplNotice($qrmember['openid'], $default_text['templateid'], $default_text['rankcomplete'], mobileUrl('task/mytask', array('id' => $join_info['join_id']), true));
 				}
 				else 
 				{
-					m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
+					m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/mytask', array('id' => $join_info['join_id']), true));
 				}
 			}
 			else 
 			{
-				m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
+				m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/mytask', array('id' => $join_info['join_id']), true));
 			}
 		}
 		else 
 		{
 			m('message')->sendCustomNotice($openid, '感谢您的关注，恭喜您获得关注奖励');
-			m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/getcompleteinfo', array('id' => $join_info['join_id']), true));
+			m('message')->sendCustomNotice($qrmember['openid'], '亲爱的' . $qrmember['nickname'] . '恭喜您完成任务获得奖励', mobileUrl('task/mytask', array('id' => $join_info['join_id']), true));
 		}
 		if (p('lottery')) 
 		{
@@ -1540,8 +1540,6 @@ class TaskModel extends PluginModel
 		if (empty($openid)) 
 		{
 			$openid = $_W['openid'];
-		}else{
-			$_W['openid'] = $openid;
 		}
 		if (empty($taskclass)) 
 		{
@@ -1580,8 +1578,8 @@ class TaskModel extends PluginModel
 			if ($isreward) 
 			{
 				$reward_data = unserialize($tv['reward_data']);
-				pdo_update('ewei_shop_task_extension_join', array('openid' => $_W['openid'],'completetime' => time()), array('uniacid' => $_W['uniacid'], 'id' => $tv['id']));
-				$this->sendReward($reward_data);
+				pdo_update('ewei_shop_task_extension_join', array('completetime' => time()), array('uniacid' => $_W['uniacid'], 'id' => $tv['id']));
+				$this->sendReward($reward_data, 0, $openid);
 			}
 		}
 		return true;
@@ -1606,9 +1604,18 @@ class TaskModel extends PluginModel
 		}
 		return true;
 	}
-	public function sendReward($reward_data = array()) 
+	public function sendReward($reward_data = array(), $btn = 0, $openid = NULL) 
 	{
 		global $_W;
+		if (empty($openid)) 
+		{
+			$openid = $_W['openid'];
+		}
+		if (!($btn)) 
+		{
+			$data = array('balance' => $reward_data['balance'], 'score' => $reward_data['score'], 'coupon' => count($reward_data['coupon']));
+			$this->sendmessage($data);
+		}
 		if (empty($reward_data)) 
 		{
 			return false;
@@ -1616,14 +1623,26 @@ class TaskModel extends PluginModel
 		$rewarded = array();
 		if (!(empty($reward_data['balance']))) 
 		{
-			m('member')->setCredit($_W['openid'], 'credit2', $reward_data['balance'], array(0, '完成任务余额+' . $reward_data['balance']));
+			m('member')->setCredit($openid, 'credit2', $reward_data['balance'], array(0, '完成任务余额+' . $reward_data['balance']));
+		}
+		if (!(empty($reward_data['score']))) 
+		{
+			m('member')->setCredit($openid, 'credit1', $reward_data['score'], array(0, '完成任务积分+' . $reward_data['score']));
 		}
 		if (!(empty($reward_data['redpacket']))) 
 		{
-			$tid = rand(1, 1000) . time() . rand(1, 10000);
-			$params = array('openid' => $_W['openid'], 'tid' => $tid, 'send_name' => '任务完成奖励', 'money' => $reward_data['redpacket'], 'wishing' => '任务完成奖励', 'act_name' => '任务完成奖励', 'remark' => '任务完成奖励');
-			$err = m('common')->sendredpack($params);
-			if (!(is_error($err))) 
+			if ($btn) 
+			{
+				$tid = rand(1, 1000) . time() . rand(1, 10000);
+				$params = array('openid' => $openid, 'tid' => $tid, 'send_name' => '任务完成奖励', 'money' => floatval($reward_data['redpacket']), 'wishing' => '任务完成奖励', 'act_name' => '任务完成奖励', 'remark' => '任务完成奖励');
+				$err = m('common')->sendredpack($params);
+				if (is_error($err)) 
+				{
+					$rewarded['redpacket'] = $reward_data['redpacket'];
+					show_json(0, $err['message']);
+				}
+			}
+			else 
 			{
 				$rewarded['redpacket'] = $reward_data['redpacket'];
 			}
@@ -1632,13 +1651,9 @@ class TaskModel extends PluginModel
 		{
 			foreach ($reward_data['coupon'] as $k => $v ) 
 			{
-				$data = array('uniacid' => $_W['uniacid'], 'merchid' => 0, 'openid' => $_W['openid'], 'couponid' => $v['id'], 'gettype' => 7, 'gettime' => time(), 'senduid' => $_W['uid']);
+				$data = array('uniacid' => $_W['uniacid'], 'merchid' => 0, 'openid' => $openid, 'couponid' => $v['id'], 'gettype' => 7, 'gettime' => time(), 'senduid' => $_W['uid']);
 				pdo_insert('ewei_shop_coupon_data', $data);
 			}
-		}
-		if (!(empty($reward_data['score']))) 
-		{
-			m('member')->setCredit($_W['openid'], 'credit1', $reward_data['score'], array(0, '完成任务积分+' . $reward_data['score']));
 		}
 		if (!(empty($reward_data['goods']))) 
 		{
@@ -1681,6 +1696,10 @@ class TaskModel extends PluginModel
 		$data['reward_data'] = $task['reward_data'];
 		$data['pickuptime'] = time();
 		$data['endtime'] = $task['endtime'];
+		if (0 < $task['timelimit']) 
+		{
+			$data['endtime'] = $data['pickuptime'] + intval($task['timelimit'] * 3600);
+		}
 		$data['dotime'] = $task['dotime'];
 		$data['logo'] = $task['logo'];
 		pdo_insert('ewei_shop_task_extension_join', $data);
@@ -1701,8 +1720,7 @@ class TaskModel extends PluginModel
 			break;
 			case 'point': $type = 5;
 			break;
-			default:
-			return false;
+			default: return false;
 		}
 		$psize = 20;
 		$pstart = ($page - 1) * $psize;
@@ -1759,6 +1777,7 @@ class TaskModel extends PluginModel
 			break;
 			case 4: return '周期任务可由重复任务替代';
 			case 5: return '目标任务暂不开放';
+			default: return '任务类型不存在';
 		}
 	}
 	public function getRecordsList($page, $taskid) 
@@ -1815,6 +1834,36 @@ class TaskModel extends PluginModel
 		}
 		$sql = 'SELECT taskname FROM ' . tablename('ewei_shop_task_extension') . ' WHERE taskclass = :taskclass';
 		return pdo_fetchcolumn($sql, array(':taskclass' => $taskclass));
+	}
+	public function returnGoodsName($id) 
+	{
+		global $_W;
+		$sql = 'SELECT title FROM ' . tablename('ewei_shop_goods') . ' WHERE id = :id AND uniacid = :uniacid';
+		$res = pdo_fetchcolumn($sql, array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		return $res;
+	}
+	public function returnTaskname($taskclass) 
+	{
+		$sql = 'SELECT taskname FROM ' . tablename('ewei_shop_task_extension') . ' WHERE taskclass = :taskclass';
+		return pdo_fetchcolumn($sql, array(':taskclass' => $taskclass));
+	}
+	public function sendmessage($data) 
+	{
+		global $_W;
+		if ($data['score']) 
+		{
+			$score = '已发放' . $data['score'] . '积分，';
+		}
+		if ($data['balance']) 
+		{
+			$balance = $data['balance'] . '余额，';
+		}
+		if ($data['coupon']) 
+		{
+			$coupon = $data['coupon'] . '种优惠券，';
+		}
+		$message = '任务完成通知' . "\n\r\n\r" . '任务已完成，' . $score . $balance . $coupon . '剩余未发放奖励请到我的任务中领取' . "\n\r\n\r" . '<a href=\'' . mobileUrl('task.mytask', NULL, 1) . '\'>点击查看详情</a>';
+		m('message')->sendCustomNotice($_W['openid'], $message);
 	}
 }
 ?>

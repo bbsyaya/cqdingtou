@@ -278,7 +278,10 @@ class Check_EweiShopV2Page extends PluginWebPage
 		$type = intval($_GPC['type']);
 		if (empty($bpid)) 
 		{
-			show_json(0, '参数错误!');
+			if ($type == 1) 
+			{
+				show_json(0, '参数错误!');
+			}
 		}
 		else 
 		{

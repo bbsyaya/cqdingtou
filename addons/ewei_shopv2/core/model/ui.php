@@ -11,6 +11,10 @@ class Ui_EweiShopV2Model
 		$html = preg_replace_callback('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg|\\.png|\\.jpeg]?))[\\\\\'|\\"].*?[\\/]?>/', function($matches) use($_W) 
 		{
 			$images = $matches[0];
+			if (strexists($images, 'http://') || strexists($images, 'https://')) 
+			{
+				return preg_replace('/src=/', 'data-lazy=', $images);
+			}
 			$attachurl = str_replace(array('https://', 'http://'), '', $_W['attachurl_local']);
 			if (strexists($images, $attachurl)) 
 			{

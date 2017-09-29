@@ -368,9 +368,11 @@ class Bonus_EweiShopV2Page extends PluginWebPage
 		if (is_error($result)) 
 		{
 			show_json(0, array('message' => $result['message'], 'partnercount' => $partnercount, 'full' => $full));
-			return;
 		}
-		show_json(1, array('partnercount' => $partnercount, 'full' => $full));
+		else 
+		{
+			show_json(1, array('partnercount' => $partnercount, 'full' => $full));
+		}
 	}
 	public function paymoney() 
 	{

@@ -174,13 +174,11 @@ class Refund_EweiShopV2Page extends PluginWebPage
 				m('excel')->export($exportlist, array('title' => '维权订单-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
 			}
 			include $this->template();
-			return;
 		}
 		catch (Exception $e) 
 		{
 			throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 		}
-		throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 	}
 	public function detail() 
 	{
@@ -286,13 +284,11 @@ class Refund_EweiShopV2Page extends PluginWebPage
 				$step_array[3]['time'] = $refund['refundtime'];
 			}
 			include $this->template();
-			return;
 		}
 		catch (Exception $e) 
 		{
 			throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 		}
-		throw _obfuscate_bmV3ICRlLT5nZXRNZXNzYWdl();
 	}
 	public function submit() 
 	{
@@ -400,6 +396,7 @@ class Refund_EweiShopV2Page extends PluginWebPage
 				$order = pdo_fetch('SELECT id,orderno,credit,creditmoney,price,freight,status,pay_type,is_team,apppay FROM ' . tablename('ewei_shop_groups_order') . "\n" . '                    WHERE id = :orderid and uniacid=:uniacid', array(':orderid' => $item['id'], ':uniacid' => $uniacid));
 				$credits = $refund['applycredit'];
 				$refundtype = 0;
+				$totalmoney = $order['price'] + $order['freight'];
 				if ($order['pay_type'] == 'credit') 
 				{
 					m('member')->setCredit($item['openid'], 'credit2', $realprice, array(0, $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['orderno']));
@@ -410,11 +407,11 @@ class Refund_EweiShopV2Page extends PluginWebPage
 					$realprice = round($realprice, 2);
 					if (empty($item['isborrow'])) 
 					{
-						$result = m('finance')->refund($item['openid'], $ordersn, $refund['refundno'], $realprice * 100, $realprice * 100, (!(empty($order['apppay'])) ? true : false));
+						$result = m('finance')->refund($item['openid'], $ordersn, $refund['refundno'], $totalmoney * 100, $realprice * 100, (!(empty($order['apppay'])) ? true : false));
 					}
 					else 
 					{
-						$result = m('finance')->refundBorrow($item['borrowopenid'], $ordersn, $refund['refundno'], $realprice * 100, $realprice * 100, (!(empty($order['apppay'])) ? true : false));
+						$result = m('finance')->refundBorrow($item['borrowopenid'], $ordersn, $refund['refundno'], $totalmoney * 100, $realprice * 100, (!(empty($order['apppay'])) ? true : false));
 					}
 					$refundtype = 2;
 				}

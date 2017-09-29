@@ -70,9 +70,10 @@ class Index_EweiShopV2Page extends PcMobileLoginPage
 			break;
 			case 5: $condition .= ' and userdeleted=1 ';
 			break;
+			default:
 			$condition .= ' and status=' . intval($show_status);
-			goto label85;
-			label85: if ($_GPC['mk'] == 'recycle') 
+		}
+			if ($_GPC['mk'] == 'recycle') 
 			{
 				$condition .= ' and userdeleted=1 ';
 			}
@@ -244,7 +245,7 @@ class Index_EweiShopV2Page extends PcMobileLoginPage
 					$row['merchname'] = (($merch_user[$row['merchid']]['merchname'] ? $merch_user[$row['merchid']]['merchname'] : $_W['shopset']['shop']['name']));
 				}
 			}
-		}
+		
 		unset($row);
 		return array("list" => $list, 'total' => $total, 'psize' => $psize);
 	}

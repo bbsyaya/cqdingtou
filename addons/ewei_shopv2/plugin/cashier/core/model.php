@@ -387,7 +387,7 @@ class CashierModel extends PluginModel
 		if (($data['money'] <= 0) || ($data['paytype'] == 3)) 
 		{
 			$data['status'] = 1;
-			$data['paytype'] = (($data['paytype'] == 3 ? $data['paytype'] : 2));
+			(($data['paytype'] == 3 ? $data['paytype'] : 2));
 			$data['deduction'] -= $data['randommoney'];
 			$data['paytime'] = time();
 			pdo_update('ewei_shop_cashier_pay_log', $data, array('id' => $data['id']));
@@ -930,7 +930,7 @@ class CashierModel extends PluginModel
 		$discount = $this->getDiscount($enoughs['new_price']);
 		return array('randommoney' => $randommoney, 'enough' => $enoughs, 'discount' => $discount, 'money' => $discount['new_price']);
 	}
-	public function createGoodsOrder($goods, $openid = '') 
+	public function createGoodsOrder($goods, $openid = '', $setmoney = NULL) 
 	{
 		global $_W;
 		global $_GPC;
@@ -1025,7 +1025,7 @@ class CashierModel extends PluginModel
 		$order['uniacid'] = $_W['uniacid'];
 		$order['openid'] = $openid;
 		$order['ordersn'] = $ordersn;
-		$order['price'] = $realmoney;
+		$order['price'] = (($setmoney === NULL ? $realmoney : (double) $setmoney));
 		$order['oldprice'] = $goodsprice;
 		$order['grprice'] = $goodsprice;
 		$order['cash'] = 0;
@@ -1096,7 +1096,12 @@ class CashierModel extends PluginModel
 			{
 				$goods[] = array('goodsid' => $val['goodsid'], 'optionid' => $val['optionid'], 'price' => $val['price'], 'total' => $val['total'], 'marketprice' => (isset($val['marketprice']) ? $val['marketprice'] : NULL));
 			}
-			$goodsOrder = $this->createGoodsOrder($shopgoods, $params['openid']);
+			$setmoney = $order['money'] + $order['deduction'];
+			if (($params['paytype'] == 3) && !(empty($_W['cashieruser']['merchid']))) 
+			{
+				$setmoney = 0;
+			}
+			$goodsOrder = $this->createGoodsOrder($shopgoods, $params['openid'], $setmoney);
 			$order['orderid'] = $goodsOrder['id'];
 			$order['orderprice'] = $goodsOrder['price'];
 		}

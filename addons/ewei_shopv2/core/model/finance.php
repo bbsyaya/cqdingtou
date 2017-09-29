@@ -303,7 +303,7 @@ class Finance_EweiShopV2Model
 		$url = 'https://mapi.alipay.com/gateway.do?' . http_build_query($set, '', '&');
 		return $url;
 	}
-	public function refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney = 0, $app = false, $refund_account = false) 
+	public function refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney = 0, $app = false, $refund_account = false, $normal = false) 
 	{
 		global $_W;
 		global $_GPC;
@@ -339,6 +339,10 @@ class Finance_EweiShopV2Model
 		}
 		if (($payment['is_new'] == 1) && !($app)) 
 		{
+			if ($normal) 
+			{
+				$payment = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid AND `type`=\'0\'', array(':uniacid' => $_W['uniacid']));
+			}
 			$wechat = array('appid' => $payment['sub_appid'], 'mchid' => $payment['sub_mch_id'], 'apikey' => $payment['apikey']);
 			$sub_wechat = array('appid' => $payment['appid'], 'mchid' => $payment['mch_id'], 'sub_appid' => (!(empty($payment['sub_appid'])) ? $payment['sub_appid'] : ''), 'sub_mch_id' => $payment['sub_mch_id'], 'apikey' => $payment['apikey']);
 			switch ($payment['type']) 
@@ -463,6 +467,10 @@ class Finance_EweiShopV2Model
 			{
 				return $this->refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney, $app, 'REFUND_SOURCE_RECHARGE_FUNDS');
 			}
+		}
+		if (!($normal)) 
+		{
+			return $this->refund($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney, $app, 'REFUND_SOURCE_RECHARGE_FUNDS', true);
 		}
 		if ($arr['return_msg'] == $arr['err_code_des']) 
 		{
@@ -719,7 +727,6 @@ class Finance_EweiShopV2Model
 			if ($arr['err_code'] == 'NOTENOUGH') 
 			{
 				$this->refundBorrow($openid, $out_trade_no, $out_refund_no, $totalmoney, $refundmoney, $gaijia, 'REFUND_SOURCE_RECHARGE_FUNDS');
-				return;
 			}
 		}
 		else 

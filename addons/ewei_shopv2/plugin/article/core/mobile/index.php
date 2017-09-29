@@ -182,11 +182,13 @@ class Index_EweiShopV2Page extends PluginMobilePage
 				pdo_update('ewei_shop_article', 'article_likenum=article_likenum+1', array('id' => $aid));
 				pdo_update('ewei_shop_article_log', array('like' => $state['like'] + 1), array('id' => $state['id']));
 				show_json(0, array('status' => 1));
-				return;
 			}
-			pdo_update('ewei_shop_article', 'article_likenum=article_likenum-1', array('id' => $aid));
-			pdo_update('ewei_shop_article_log', array('like' => $state['like'] - 1), array('id' => $state['id']));
-			show_json(0, array('status' => 0));
+			else 
+			{
+				pdo_update('ewei_shop_article', 'article_likenum=article_likenum-1', array('id' => $aid));
+				pdo_update('ewei_shop_article_log', array('like' => $state['like'] - 1), array('id' => $state['id']));
+				show_json(0, array('status' => 0));
+			}
 		}
 	}
 }

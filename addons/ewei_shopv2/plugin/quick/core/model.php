@@ -56,21 +56,21 @@ class QuickModel extends PluginModel
 				}
 			}
 		}
+		$goodsids = array_filter($goodsids);
 		if (!(empty($goodsids))) 
 		{
-			$goodsids = array_filter($goodsids);
 			$goodsids = implode(',', $goodsids);
 			$allGoods = pdo_fetchall('SELECT id, title, subtitle, minprice, total, sales FROM' . tablename('ewei_shop_goods') . ' WHERE uniacid=:uniacid AND id in(' . $goodsids . ') AND `deleted`=0 AND `status`=1', array(':uniacid' => $_W['uniacid']), 'id');
 		}
+		$cateids = array_filter($cateids);
 		if (!(empty($cateids))) 
 		{
-			$cateids = array_filter($cateids);
 			$cateids = implode(',', $cateids);
 			$allCates = pdo_fetchall('SELECT * FROM' . tablename('ewei_shop_category') . ' WHERE uniacid=:uniacid AND id in(' . $cateids . ') AND enabled=1', array(':uniacid' => $_W['uniacid']), 'id');
 		}
+		$groupids = array_filter($groupids);
 		if (!(empty($groupids))) 
 		{
-			$groupids = array_filter($groupids);
 			$groupids = implode(',', $groupids);
 			$allGroups = pdo_fetchall('SELECT * FROM' . tablename('ewei_shop_goods_group') . ' WHERE uniacid=:uniacid AND id in(' . $groupids . ') AND enabled=1', array(':uniacid' => $_W['uniacid']), 'id');
 		}
@@ -108,7 +108,7 @@ class QuickModel extends PluginModel
 		unset($item);
 		return json_encode($data);
 	}
-	public function mobile($data) 
+	public function mobile($data, $merchid = 0) 
 	{
 		global $_W;
 		if (empty($data)) 
@@ -165,9 +165,16 @@ class QuickModel extends PluginModel
 			$returnData['datas'] = json_encode($data['datas']);
 			if ($data['showadv'] == 1) 
 			{
-				$returnData['advs'] = pdo_fetchall('SELECT * FROM' . tablename('ewei_shop_quick_adv') . 'WHERE uniacid=:uniacid AND enabled=1', array(':uniacid' => $_W['uniacid']));
+				if (0 < $merchid) 
+				{
+					$returnData['advs'] = pdo_fetchall('SELECT * FROM' . tablename('ewei_shop_quick_adv') . 'WHERE uniacid=:uniacid AND merchid=:merchid AND enabled=1', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
+				}
+				else 
+				{
+					$returnData['advs'] = pdo_fetchall('SELECT * FROM' . tablename('ewei_shop_quick_adv') . 'WHERE uniacid=:uniacid AND enabled=1', array(':uniacid' => $_W['uniacid']));
+				}
 			}
-			else if (($data['showadv'] == 2) && !(empty($data['advs']))) 
+			else
 			{
 				$returnData['advs'] = array();
 				foreach ($data['advs'] as $advitem ) 
@@ -222,13 +229,21 @@ class QuickModel extends PluginModel
 			if ($returnData['style']['notice'] == 1) 
 			{
 				$limit = ((!(empty($returnData['style']['noticenum'])) ? $returnData['style']['noticenum'] : 5));
-				$returnData['notices'] = pdo_fetchall('SELECT id, title FROM' . tablename('ewei_shop_notice') . 'WHERE uniacid=:uniacid AND status=1 AND iswxapp=0 LIMIT ' . $limit, array(':uniacid' => $_W['uniacid']));
+				if (0 < $merchid) 
+				{
+					$returnData['notices'] = pdo_fetchall('SELECT id, title FROM' . tablename('ewei_shop_merch_notice') . 'WHERE uniacid=:uniacid AND status=1 AND merchid=:merchid LIMIT ' . $limit, array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
+				}
+				else 
+				{
+					$returnData['notices'] = pdo_fetchall('SELECT id, title FROM' . tablename('ewei_shop_notice') . 'WHERE uniacid=:uniacid AND status=1 AND iswxapp=0 LIMIT ' . $limit, array(':uniacid' => $_W['uniacid']));
+				}
 			}
 			else if (($returnData['style']['notice'] == 2) && !(empty($data['notices']))) 
 			{
 				$returnData['notices'] = $data['notices'];
 			}
 			$returnData['shopmenu'] = $data['shopmenu'];
+			$returnData['diymenu'] = $data['diymenu'];
 		}
 		return $returnData;
 	}
@@ -241,10 +256,17 @@ class QuickModel extends PluginModel
 		}
 		return pdo_fetch('SELECT * FROM' . tablename('ewei_shop_quick') . 'WHERE id=:id AND uniacid=:uniacid AND status=1 LIMIT 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 	}
-	public function getPageList() 
+	public function getPageList($merch = false) 
 	{
 		global $_W;
-		return pdo_fetchall('SELECT id, title, status FROM' . tablename('ewei_shop_quick') . 'WHERE uniacid=:uniacid ORDER BY createtime DESC', array(':uniacid' => $_W['uniacid']));
+		$condition = ' uniacid=:uniacid ';
+		$params = array(':uniacid' => $_W['uniacid']);
+		if (!(empty($merch))) 
+		{
+			$condition .= ' AND merchid=:merchid ';
+			$params[':merchid'] = $merch;
+		}
+		return pdo_fetchall('SELECT id, title, status FROM' . tablename('ewei_shop_quick') . 'WHERE ' . $condition . ' ORDER BY createtime DESC', $params);
 	}
 	public function getList($args) 
 	{
@@ -330,7 +352,7 @@ class QuickModel extends PluginModel
 			$condition .= ' and ifnull(showlevels,\'\')=\'\' ';
 			$condition .= ' and   ifnull(showgroups,\'\')=\'\' ';
 		}
-		$sql = 'SELECT id,title,subtitle,thumb,minprice,marketprice,sales,salesreal,total,bargain,`type`,ispresell,presellend,preselltimeend,hasoption,total,maxbuy,minbuy,usermaxbuy,isverify,cannotrefund,diyformtype FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY ' . $order . ' ' . $orderby . ' LIMIT ' . (($page - 1) * $pagesize) . ',' . $pagesize;
+		$sql = 'SELECT id,title,subtitle,thumb,minprice,marketprice,sales,salesreal,total,bargain,`type`,ispresell,presellend,preselltimeend,hasoption,total,maxbuy,minbuy,usermaxbuy,isverify,cannotrefund,diyformtype,diyformid FROM ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ORDER BY ' . $order . ' ' . $orderby . ' LIMIT ' . (($page - 1) * $pagesize) . ',' . $pagesize;
 		$total = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_goods') . ' where 1 ' . $condition . ' ', $params);
 		$list = pdo_fetchall($sql, $params);
 		$list = set_medias($list, 'thumb');

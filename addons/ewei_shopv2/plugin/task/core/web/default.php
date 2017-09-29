@@ -161,7 +161,7 @@ class Default_EweiShopV2Page extends PluginWebPage
 					pdo_update('cover_reply', $cover_data, array('id' => $cover['id']));
 				}
 				$default = serialize($default);
-				$update_data = array('data' => $default);
+				$update_data = array('data' => $default, 'bgimg' => trim($_GPC['bgimg']), 'open' => intval($_GPC['open']));
 				pdo_update('ewei_shop_task_default', $update_data, array('uniacid' => $_W['uniacid']));
 				plog('task.set.edit', '修改入口设置');
 				show_json(1);
@@ -226,6 +226,7 @@ class Default_EweiShopV2Page extends PluginWebPage
 			}
 		}
 		$set = unserialize($default);
+		$bgimg = pdo_get('ewei_shop_task_default', array('uniacid' => $_W['uniacid']), array('bgimg', 'open'));
 		$url = mobileUrl('task', NULL, true);
 		$qrcode = m('qrcode')->createQrcode($url);
 		include $this->template();

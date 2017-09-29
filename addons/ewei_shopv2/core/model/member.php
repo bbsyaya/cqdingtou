@@ -12,6 +12,35 @@ class Member_EweiShopV2Model
 		if ($uid == 0) 
 		{
 			$info = pdo_fetch('select * from ' . tablename('ewei_shop_member') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+			if (empty($info)) 
+			{
+				if (strexists($openid, 'sns_qq_')) 
+				{
+					$openid = str_replace('sns_qq_', '', $openid);
+					$condition = ' openid_qq=:openid ';
+					$bindsns = 'qq';
+				}
+				else if (strexists($openid, 'sns_wx_')) 
+				{
+					$openid = str_replace('sns_wx_', '', $openid);
+					$condition = ' openid_wx=:openid ';
+					$bindsns = 'wx';
+				}
+				else if (strexists($openid, 'sns_wa_')) 
+				{
+					$openid = str_replace('sns_wa_', '', $openid);
+					$condition = ' openid_wa=:openid ';
+					$bindsns = 'wa';
+				}
+				if (!(empty($condition))) 
+				{
+					$info = pdo_fetch('select * from ' . tablename('ewei_shop_member') . ' where ' . $condition . '  and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+					if (!(empty($info))) 
+					{
+						$info['bindsns'] = $bindsns;
+					}
+				}
+			}
 		}
 		else 
 		{
@@ -243,10 +272,12 @@ class Member_EweiShopV2Model
 		{
 			if ($credittype == 'credit1') 
 			{
-				return;
 			}
-			p('task')->checkTaskReward('cost_rechargeenough', $credits, $openid);
-			p('task')->checkTaskReward('cost_rechargetotal', $credits, $openid);
+			else 
+			{
+				p('task')->checkTaskReward('cost_rechargeenough', $credits, $openid);
+				p('task')->checkTaskReward('cost_rechargetotal', $credits, $openid);
+			}
 		}
 	}
 	public function getCredit($openid = '', $credittype = 'credit1') 
@@ -668,12 +699,36 @@ class Member_EweiShopV2Model
 		{
 			return;
 		}
-		if (($sns == 'wx') && !(empty($_GPC['token']))) 
+		if ($sns == 'wx') 
 		{
 			load()->func('communication');
-			$snsurl = 'https://api.weixin.qq.com/sns/userinfo?access_token=' . $_GPC['token'] . '&openid=' . $_GPC['openid'] . '&lang=zh_CN';
+			$token = trim($_GPC['token']);
+			$openid = trim($_GPC['openid']);
+			$appid = 'wxc3d9d8efae0ae858';
+			$secret = '93d4f6085f301c405b5812217e6d5025';
+			if (empty($token) && !(empty($_GPC['code']))) 
+			{
+				$codeurl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . $appid . '&secret=' . $secret . '&code=' . trim($_GPC['code']) . '&grant_type=authorization_code';
+				$coderesult = $userinfo = ihttp_request($codeurl);
+				$coderesult = json_decode($coderesult['content'], true);
+				if (empty($coderesult['access_token']) || empty($coderesult['openid'])) 
+				{
+					return;
+				}
+				$token = $coderesult['access_token'];
+				$openid = $coderesult['openid'];
+			}
+			if (empty($token) || empty($openid)) 
+			{
+				return;
+			}
+			$snsurl = 'https://api.weixin.qq.com/sns/userinfo?access_token=' . $token . '&openid=' . $openid . '&lang=zh_CN';
 			$userinfo = ihttp_request($snsurl);
 			$userinfo = json_decode($userinfo['content'], true);
+			if (empty($userinfo['openid'])) 
+			{
+				return;
+			}
 			$userinfo['openid'] = 'sns_wx_' . $userinfo['openid'];
 		}
 		else if ($sns == 'qq') 
@@ -682,7 +737,7 @@ class Member_EweiShopV2Model
 			$userinfo = json_decode($userinfo, true);
 			$userinfo['openid'] = 'sns_qq_' . $_GPC['openid'];
 			$userinfo['headimgurl'] = $userinfo['figureurl_qq_2'];
-			$userinfo['gender'] = (($userinfo['gender'] == '男' ? 1 : 2));
+			(($userinfo['gender'] == '男' ? 1 : 2));
 		}
 		$data = array('nickname' => $userinfo['nickname'], 'avatar' => $userinfo['headimgurl'], 'province' => $userinfo['province'], 'city' => $userinfo['city'], 'gender' => $userinfo['sex'], 'comefrom' => 'h5app_sns_' . $sns);
 		$openid = trim($_GPC['openid']);
@@ -706,11 +761,12 @@ class Member_EweiShopV2Model
 			$data['salt'] = m('account')->getSalt();
 			$data['pwd'] = rand(10000, 99999) . $data['salt'];
 			pdo_insert('ewei_shop_member', $data);
-			return;
+			return pdo_insertid();
 		}
 		if (empty($member['bindsns']) || ($member['bindsns'] == $sns)) 
 		{
 			pdo_update('ewei_shop_member', $data, array('id' => $member['id'], 'uniacid' => $_W['uniacid']));
+			return $member['id'];
 		}
 	}
 	public function compareLevel(array $level, array $levels = array()) 

@@ -449,7 +449,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					{
 						$data['optionid'] = $optionid;
 						$data['optiontitle'] = $option['title'];
-						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
+						if ((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0))) 
+						{
+						}
+						else 
+						{
+						}
+						$data['marketprice'] = $option['marketprice'];
 						$data['virtual'] = $option['virtual'];
 						if ($option['isfullback']) 
 						{
@@ -1058,7 +1064,19 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				}
 				$goods_list[0]['goods'] = $goods;
 			}
-			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!(empty($address)) && !($isverify) && !($isvirtual) ? $address['id'] : 0), 'storeid' => (!(empty($carrier_list)) && !($isverify) && !($isvirtual) ? $carrier_list[0]['id'] : 0), 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind, 'fromquick' => intval($quickid));
+			if (!(empty($address)) && !($isverify) && !($isvirtual)) 
+			{
+			}
+			else 
+			{
+			}
+			if (!(empty($carrier_list)) && !($isverify) && !($isvirtual)) 
+			{
+			}
+			else 
+			{
+			}
+			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!empty($address) && !$isverify && !$isvirtual ? $address['id'] : 0), 'storeid' => 0, 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind, 'fromquick' => intval($quickid));
 			$buyagain = $buyagainprice;
 		}
 		else 
@@ -1141,9 +1159,11 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		if (empty($result)) 
 		{
 			show_json(0);
-			return;
 		}
-		show_json(1, $result);
+		else 
+		{
+			show_json(1, $result);
+		}
 	}
 	public function caculatecoupon($contype, $couponid, $wxid, $wxcardid, $wxcode, $goodsarr, $totalprice, $discountprice, $isdiscountprice, $isSubmit = 0, $discountprice_array = array(), $merchisdiscountprice = 0) 
 	{
@@ -1509,7 +1529,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					{
 						$data['optionid'] = $optionid;
 						$data['optiontitle'] = $option['title'];
-						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
+						if ((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0))) 
+						{
+						}
+						else 
+						{
+						}
+						$data['marketprice'] = $option['marketprice'];
 						if (empty($data['unite_total'])) 
 						{
 							$data['stock'] = $option['stock'];
@@ -2252,7 +2278,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					$data['optiontitle'] = $option['title'];
 					if ($data['type'] != 4) 
 					{
-						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
+						if ((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0))) 
+						{
+						}
+						else 
+						{
+						}
+						$data['marketprice'] = $option['marketprice'];
 						$packageoption = array();
 						if ($packageid) 
 						{

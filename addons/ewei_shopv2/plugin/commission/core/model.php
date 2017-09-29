@@ -18,7 +18,7 @@ if (!(class_exists('CommissionModel')))
 		public function getSet($uniacid = 0) 
 		{
 			$set = parent::getSet($uniacid);
-			$set['texts'] = array('agent' => (empty($set['texts']['agent']) ? '分销商' : $set['texts']['agent']), 'shop' => (empty($set['texts']['shop']) ? '小店' : $set['texts']['shop']), 'myshop' => (empty($set['texts']['myshop']) ? '我的小店' : $set['texts']['myshop']), 'center' => (empty($set['texts']['center']) ? '分销中心' : $set['texts']['center']), 'become' => (empty($set['texts']['become']) ? '成为分销商' : $set['texts']['become']), 'withdraw' => (empty($set['texts']['withdraw']) ? '提现' : $set['texts']['withdraw']), 'commission' => (empty($set['texts']['commission']) ? '佣金' : $set['texts']['commission']), 'commission1' => (empty($set['texts']['commission1']) ? '分销佣金' : $set['texts']['commission1']), 'commission_total' => (empty($set['texts']['commission_total']) ? '累计佣金' : $set['texts']['commission_total']), 'commission_ok' => (empty($set['texts']['commission_ok']) ? '可提现佣金' : $set['texts']['commission_ok']), 'commission_apply' => (empty($set['texts']['commission_apply']) ? '已申请佣金' : $set['texts']['commission_apply']), 'commission_check' => (empty($set['texts']['commission_check']) ? '待打款佣金' : $set['texts']['commission_check']), 'commission_lock' => (empty($set['texts']['commission_lock']) ? '未结算佣金' : $set['texts']['commission_lock']), 'commission_detail' => (empty($set['texts']['commission_detail']) ? '提现明细' : (($set['texts']['commission_detail'] == '佣金明细' ? '提现明细' : $set['texts']['commission_detail']))), 'commission_pay' => (empty($set['texts']['commission_pay']) ? '成功提现佣金' : $set['texts']['commission_pay']), 'commission_wait' => (empty($set['texts']['commission_wait']) ? '待收货佣金' : $set['texts']['commission_wait']), 'commission_fail' => (empty($set['texts']['commission_fail']) ? '无效佣金' : $set['texts']['commission_fail']), 'commission_charge' => (empty($set['texts']['commission_charge']) ? '扣除个人所得税' : $set['texts']['commission_charge']), 'order' => (empty($set['texts']['order']) ? '分销订单' : $set['texts']['order']), 'c1' => (empty($set['texts']['c1']) ? '一级' : $set['texts']['c1']), 'c2' => (empty($set['texts']['c2']) ? '二级' : $set['texts']['c2']), 'c3' => (empty($set['texts']['c3']) ? '三级' : $set['texts']['c3']), 'mydown' => (empty($set['texts']['mydown']) ? '我的下线' : $set['texts']['mydown']), 'down' => (empty($set['texts']['down']) ? '下线' : $set['texts']['down']), 'up' => (empty($set['texts']['up']) ? '推荐人' : $set['texts']['up']), 'yuan' => (empty($set['texts']['yuan']) ? '元' : $set['texts']['yuan']));
+			$set['texts'] = array('agent' => (empty($set['texts']['agent']) ? '分销商' : $set['texts']['agent']), 'shop' => (empty($set['texts']['shop']) ? '小店' : $set['texts']['shop']), 'myshop' => (empty($set['texts']['myshop']) ? '我的小店' : $set['texts']['myshop']), 'center' => (empty($set['texts']['center']) ? '分销中心' : $set['texts']['center']), 'become' => (empty($set['texts']['become']) ? '成为分销商' : $set['texts']['become']), 'withdraw' => (empty($set['texts']['withdraw']) ? '提现' : $set['texts']['withdraw']), 'commission' => (empty($set['texts']['commission']) ? '佣金' : $set['texts']['commission']), 'commission1' => (empty($set['texts']['commission1']) ? '分销佣金' : $set['texts']['commission1']), 'commission_total' => (empty($set['texts']['commission_total']) ? '累计佣金' : $set['texts']['commission_total']), 'commission_ok' => (empty($set['texts']['commission_ok']) ? '可提现佣金' : $set['texts']['commission_ok']), 'commission_apply' => (empty($set['texts']['commission_apply']) ? '已申请佣金' : $set['texts']['commission_apply']), 'commission_check' => (empty($set['texts']['commission_check']) ? '待打款佣金' : $set['texts']['commission_check']), 'commission_lock' => (empty($set['texts']['commission_lock']) ? '未结算佣金' : $set['texts']['commission_lock']), 'commission_detail' => (empty($set['texts']['commission_detail']) ? '提现明细' : (($set['texts']['commission_detail'] == '佣金明细' ? '提现明细' : $set['texts']['commission_detail']))), 'commission_pay' => (empty($set['texts']['commission_pay']) ? '成功提现佣金' : $set['texts']['commission_pay']), 'commission_wait' => (empty($set['texts']['commission_wait']) ? '待收货佣金' : $set['texts']['commission_wait']), 'commission_fail' => (empty($set['texts']['commission_fail']) ? '无效佣金' : $set['texts']['commission_fail']), 'commission_charge' => (empty($set['texts']['commission_charge']) ? '扣除个人所得税' : $set['texts']['commission_charge']), 'order' => (empty($set['texts']['order']) ? '分销订单' : $set['texts']['order']), 'c1' => (empty($set['texts']['c1']) ? '一级' : $set['texts']['c1']), 'c2' => (empty($set['texts']['c2']) ? '二级' : $set['texts']['c2']), 'c3' => (empty($set['texts']['c3']) ? '三级' : $set['texts']['c3']), 'mydown' => (empty($set['texts']['mydown']) ? '我的下线' : $set['texts']['mydown']), 'down' => (empty($set['texts']['down']) ? '下线' : $set['texts']['down']), 'up' => (empty($set['texts']['up']) ? '推荐人' : $set['texts']['up']), 'yuan' => (empty($set['texts']['yuan']) ? '元' : $set['texts']['yuan']), 'icode' => (empty($set['texts']['icode']) ? '邀请码' : $set['texts']['icode']));
 			return $set;
 		}
 		public function calculate($orderid = 0, $update = true) 
@@ -1980,7 +1980,6 @@ if (!(class_exists('CommissionModel')))
 								if ($become_check == 1) 
 								{
 									$plugin_globonus->sendMessage($openid, array('nickname' => $member['nickname'], 'partnertime' => $time), TM_GLOBONUS_BECOME);
-									return;
 								}
 							}
 						}
@@ -2228,7 +2227,6 @@ if (!(class_exists('CommissionModel')))
 								if ($become_check == 1) 
 								{
 									$plugin_globonus->sendMessage($openid, array('nickname' => $member['nickname'], 'partnertime' => $time), TM_GLOBONUS_BECOME);
-									return;
 								}
 							}
 						}
@@ -2420,9 +2418,8 @@ if (!(class_exists('CommissionModel')))
 				}
 				pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $m['id']));
 				$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
-				return;
 			}
-			if ((0 <= $leveltype) && ($leveltype <= 3)) 
+			else if ((0 <= $leveltype) && ($leveltype <= 3)) 
 			{
 				$agents = array();
 				if (!(empty($set['selfbuy']))) 
@@ -2693,44 +2690,46 @@ if (!(class_exists('CommissionModel')))
 					pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $agent['id']));
 					$this->sendMessage($agent['openid'], array('nickname' => $agent['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
 				}
-				return;
 			}
-			if (!(empty($m['agentnotupgrade']))) 
+			else if (!(empty($m['agentnotupgrade']))) 
 			{
 				return;
 			}
-			$oldlevel = $this->getLevel($m['openid']);
-			if (empty($oldlevel['id'])) 
+			else 
 			{
-				$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通等级' : $set['levelname']), 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
-			}
-			if ($leveltype == 7) 
-			{
-				$downcount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member') . ' where agentid=:agentid and uniacid=:uniacid ', array(':agentid' => $m['id'], ':uniacid' => $_W['uniacid']));
-				$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
-			}
-			else if ($leveltype == 9) 
-			{
-				$downcount = $info['level1'];
-				$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
-			}
-			if (empty($newlevel)) 
-			{
-				return;
-			}
-			if ($newlevel['id'] == $oldlevel['id']) 
-			{
-				return;
-			}
-			if (!(empty($oldlevel['id']))) 
-			{
-				if ($newlevel['downcount'] < $oldlevel['downcount']) 
+				$oldlevel = $this->getLevel($m['openid']);
+				if (empty($oldlevel['id'])) 
+				{
+					$oldlevel = array('levelname' => (empty($set['levelname']) ? '普通等级' : $set['levelname']), 'commission1' => $set['commission1'], 'commission2' => $set['commission2'], 'commission3' => $set['commission3']);
+				}
+				if ($leveltype == 7) 
+				{
+					$downcount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member') . ' where agentid=:agentid and uniacid=:uniacid ', array(':agentid' => $m['id'], ':uniacid' => $_W['uniacid']));
+					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
+				}
+				else if ($leveltype == 9) 
+				{
+					$downcount = $info['level1'];
+					$newlevel = pdo_fetch('select * from ' . tablename('ewei_shop_commission_level') . ' where uniacid=:uniacid  and ' . $downcount . ' >= downcount and downcount>0  order by downcount desc limit 1', array(':uniacid' => $_W['uniacid']));
+				}
+				if (empty($newlevel)) 
 				{
 					return;
 				}
+				if ($newlevel['id'] == $oldlevel['id']) 
+				{
+					return;
+				}
+				if (!(empty($oldlevel['id']))) 
+				{
+					if ($newlevel['downcount'] < $oldlevel['downcount']) 
+					{
+						return;
+					}
+				}
+				pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $m['id']));
+				$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
 			}
-			pdo_update('ewei_shop_member', array('agentlevel' => $newlevel['id']), array('id' => $m['id']));
-			$this->sendMessage($m['openid'], array('nickname' => $m['nickname'], 'oldlevel' => $oldlevel, 'newlevel' => $newlevel), TM_COMMISSION_UPGRADE);
 		}
 		public function upgradeLevelByCommissionOK($openid) 
 		{

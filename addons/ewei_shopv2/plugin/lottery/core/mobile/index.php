@@ -82,19 +82,19 @@ class index_EweiShopV2Page extends PluginMobilePage
 		if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 1)) 
 		{
 			include $this->template('lottery/indexpan');
-			return;
 		}
-		if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 2)) 
+		else if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 2)) 
 		{
 			include $this->template('lottery/indexgua');
-			return;
 		}
-		if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 3)) 
+		else if (isset($lottery['lottery_type']) && ($lottery['lottery_type'] == 3)) 
 		{
 			include $this->template('lottery/indexgrid');
-			return;
 		}
-		include $this->template('lottery/indexpan');
+		else 
+		{
+			include $this->template('lottery/indexpan');
+		}
 	}
 	public function lottery_reward() 
 	{
@@ -396,11 +396,13 @@ class index_EweiShopV2Page extends PluginMobilePage
 			$info = array('status' => 1, 'info' => '恭喜您已获得' . $temreward[$reward_id]['title']);
 			echo json_encode($info);
 			exit();
-			return;
 		}
-		$info = array('status' => 0, 'info' => '获取奖励失败');
-		echo json_encode($info);
-		exit();
+		else 
+		{
+			$info = array('status' => 0, 'info' => '获取奖励失败');
+			echo json_encode($info);
+			exit();
+		}
 	}
 	public function mygoods() 
 	{

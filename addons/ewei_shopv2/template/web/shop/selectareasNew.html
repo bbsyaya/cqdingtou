@@ -20,7 +20,7 @@
     input[type=checkbox] {cursor: pointer}
 </style>
 <div id="modal-areas"  class="modal fade" tabindex="-1">
-    <div class="modal-dialog" style='width: 600px;'>
+    <div class="modal-dialog" style='width: 800px;'>
         <div class="modal-content">
             <div class="modal-header"><button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button><h3>选择区域</h3></div>
             <div class="modal-body">
@@ -81,9 +81,15 @@
 
     $(function(){
 
-        $(".child:not(.a-group)").unbind('click').click(function () {
-            $(this).addClass('active').siblings().removeClass('active');
-        });
+//        $(".child:not(.a-group)").unbind('click').click(function () {
+//
+//        });
+        $(document).on("click", '.child:not(.a-group)',
+            function (e) {
+                $(this).addClass('active').siblings().removeClass('active');
+            }
+        );
+
 
         $('.province').mouseover(function(){
             $(this).find('ul').show();
@@ -97,10 +103,16 @@
             load_city(2, province_code, 0, 0);
         });
 
-        $('.c-group').click(function(){
-            var city_code = $(this).find('input').attr('data-value');
-            load_city(2, 0, city_code, 0);
-        });
+        $(document).on("click", '.c-group',
+            function (e) {
+                var city_code = $(this).find('input').attr('data-value');
+                load_city(2, 0, city_code, 0);
+            }
+        );
+//        document.('.c-group').click(function(){
+//            var city_code = $(this).find('input').attr('data-value');
+//            load_city(2, 0, city_code, 0);
+//        });
 
 //        $('.a-group').click(function(){
 //            var area_code = $(this).find('input').attr('data-value');
@@ -120,17 +132,33 @@
         });
 
 
-        $('.cityall').click(function(){
-            var city_code = $(this).attr('data-value');
-            var checked = $(this).get(0).checked;
-            var flag = 0;
+//        $('.cityall').click(function(){
+//            var city_code = $(this).attr('data-value');
+//            var checked = $(this).get(0).checked;
+//            var flag = 0;
+//
+//            if(checked){
+//                flag = 1;
+//            }
+//
+//            load_city(flag, 0, city_code, 0);
+//        });
 
-            if(checked){
-                flag = 1;
+
+
+        $(document).on("click", '.cityall',
+            function (e) {
+                var city_code = $(this).attr('data-value');
+                var checked = $(this).get(0).checked;
+                var flag = 0;
+
+                if(checked){
+                    flag = 1;
+                }
+
+                load_city(flag, 0, city_code, 0);
             }
-
-            load_city(flag, 0, city_code, 0);
-        });
+        );
 
         $('.areaall').click(function(){
             var area_code = $(this).attr('data-value');
@@ -186,7 +214,7 @@
 
             if($.inArray(province_code, load_list) == -1) {
                 $.ajax({
-                    type: "POST",
+                    type: "GET",
                     url: "{php echo webUrl('util/area/ajax')}",
                     data: {"province_code":province_code},
                     async: false,
@@ -195,23 +223,23 @@
                         var res = data.result;
                         $("#d_item").append(res.stc);
                         $("#a_item").append(res.sta);
-
-                        $('.c-group').click(function(){
-                            var city_code = $(this).find('input').attr('data-value');
-                            load_city(2, 0, city_code, 0);
-                        });
-
-                        $('.cityall').click(function(){
-                            var city_code = $(this).attr('data-value');
-                            var checked = $(this).get(0).checked;
-                            var flag = 0;
-
-                            if(checked){
-                                flag = 1;
-                            }
-
-                            load_city(flag, 0, city_code, 0);
-                        });
+//
+//                        $('.c-group').click(function(){
+//                            var city_code = $(this).find('input').attr('data-value');
+//                            load_city(2, 0, city_code, 0);
+//                        });
+//
+//                        $('.cityall').click(function(){
+//                            var city_code = $(this).attr('data-value');
+//                            var checked = $(this).get(0).checked;
+//                            var flag = 0;
+//
+//                            if(checked){
+//                                flag = 1;
+//                            }
+//
+//                            load_city(flag, 0, city_code, 0);
+//                        });
 
                         select_load(province_code);
                     }

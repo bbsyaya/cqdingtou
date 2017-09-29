@@ -1,4 +1,3 @@
-
 <?php
 if (!(defined('IN_IA'))) 
 {
@@ -39,7 +38,7 @@ class Index_EweiShopV2Page extends SystemPage
 		global $_GPC;
 		$domain = trim(preg_replace('/http(s)?:\\/\\//', '', rtrim($_W['siteroot'], '/')));
 		$setting = setting_load('site');
-		$id = ((isset($setting['site']['key']) ? $setting['site']['key'] : '0'));
+		$id = ((isset($setting['site']['key']) ? $setting['site']['key'] : ((isset($setting['key']) ? $setting['key'] : '0'))));
 		$authcode = get_authcode();
 		$auth = base64_encode(authcode($domain . '|' . $id . '|' . $authcode, 'ENCODE', 'ewei_shopv2_apps'));
 		header('location:http://app.we7shop.com/apps?auth=' . $auth);

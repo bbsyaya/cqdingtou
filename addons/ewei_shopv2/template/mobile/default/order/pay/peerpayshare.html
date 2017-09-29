@@ -4,6 +4,15 @@
 </style>
 <link rel="stylesheet" href="../addons/ewei_shopv2/static/js/app/biz/sale/peerpay.css?v={php echo time();}">
 <div class="fui-page  fui-page-current">
+    {if is_h5app()}
+    <div class="fui-header">
+        <div class="fui-header-left">
+            <a class="back" data-nocache="true"></a>
+        </div>
+        <div class="title">找人代付</div>
+        <div class="fui-header-right"></div>
+    </div>
+    {/if}
     <div class="fui-content">
         <div class="fui-payfor-header">
                 <span class="fui-payfor-header-user">

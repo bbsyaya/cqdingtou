@@ -25,7 +25,7 @@
                 waitSeconds: 0
             });
         </script>
-        <script src="{php echo EWEI_SHOPV2_LOCAL}static/js/myconfig.js"></script>
+        <script src="{php echo EWEI_SHOPV2_LOCAL}static/js/myconfig.js?2017515"></script>
         <script type="text/javascript">
                 if (navigator.appName == 'Microsoft Internet Explorer') {
                     if (navigator.userAgent.indexOf("MSIE 5.0") > 0 || navigator.userAgent.indexOf("MSIE 6.0") > 0 || navigator.userAgent.indexOf("MSIE 7.0") > 0) {
@@ -33,7 +33,7 @@
                     }
                 }
                 myrequire.path = "{$_W['siteroot']}addons/ewei_shopv2/static/js/";
-                
+                myrequire.systemVersion = '{php echo IMS_VERSION}';
             function preview_html(txt)
             {
                 var win = window.open("", "win", "width=300,height=600"); // a window object

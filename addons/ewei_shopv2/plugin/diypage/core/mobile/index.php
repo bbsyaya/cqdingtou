@@ -196,9 +196,5 @@ class Index_EweiShopV2Page extends PluginMobilePage
 		}
 		show_json(0, '错误的请求');
 	}
-	public function uECt2c4xuD5oQ6ZGgym2() 
-	{
-		require __DIR__ . '/menu.php';
-	}
 }
 ?>

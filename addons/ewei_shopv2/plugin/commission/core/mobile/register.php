@@ -12,8 +12,6 @@ class Register_EweiShopV2Page extends CommissionMobileLoginPage
 		global $_GPC;
 		$openid = $_W['openid'];
 		$set = set_medias($this->set, 'regbg');
-		$area_set = m('util')->get_area_config_set();
-		$new_area = intval($area_set['new_area']);
 		$member = m('member')->getMember($openid);
 		if (($member['isagent'] == 1) && ($member['status'] == 1)) 
 		{

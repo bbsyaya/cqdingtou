@@ -8,7 +8,7 @@
     </span>
     <h2>幻灯片管理</h2> </div>
 
-<form action="./index.php" method="get" class="form-horizontal form-search" role="form">
+<form action="{if $_W['plugin']=='merch'}./merchant.php{else}./index.php{/if}" method="get" class="form-horizontal form-search" role="form">
     <input type="hidden" name="c" value="site" />
     <input type="hidden" name="a" value="entry" />
     <input type="hidden" name="m" value="ewei_shopv2" />

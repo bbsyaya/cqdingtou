@@ -715,12 +715,13 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			if ($_W['ispost']) 
 			{
 				show_json(1, array('result' => $pay_result));
-				return;
 			}
-			header('location:' . mobileUrl('order/pay/success', array('id' => $order['id'], 'result' => $pay_result)));
-			return;
+			else 
+			{
+				header('location:' . mobileUrl('order/pay/success', array('id' => $order['id'], 'result' => $pay_result)));
+			}
 		}
-		if ($type == 'wechat') 
+		else if ($type == 'wechat') 
 		{
 			if (!(is_weixin()) && empty($_W['shopset']['wap']['open'])) 
 			{
@@ -796,9 +797,11 @@ class Pay_EweiShopV2Page extends MobileLoginPage
 			if ($_W['ispost']) 
 			{
 				show_json(0, '支付出错,请重试!');
-				return;
 			}
-			$this->message('支付出错,请重试!', mobileUrl('order'));
+			else 
+			{
+				$this->message('支付出错,请重试!', mobileUrl('order'));
+			}
 		}
 	}
 	public function success() 

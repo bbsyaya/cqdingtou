@@ -13,18 +13,19 @@ class Index_EweiShopV2Page extends MerchWebPage
 		{
 			header('location: ' . merchUrl('perm/role'));
 			exit();
-			return;
 		}
-		if (mcv('perm.user') && !(empty($_W['accounttotal']))) 
+		else 
 		{
-			header('location: ' . merchUrl('perm/user'));
-			exit();
-			return;
-		}
-		if (mcv('perm.log')) 
-		{
-			header('location: ' . merchUrl('perm/log'));
-			exit();
+			if (mcv('perm.user') && !(empty($_W['accounttotal']))) 
+			{
+				header('location: ' . merchUrl('perm/user'));
+				exit();
+			}
+			else if (mcv('perm.log')) 
+			{
+				header('location: ' . merchUrl('perm/log'));
+				exit();
+			}
 		}
 	}
 }

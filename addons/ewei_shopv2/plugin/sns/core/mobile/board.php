@@ -260,11 +260,13 @@ class Board_EweiShopV2Page extends SnsMobilePage
 		{
 			pdo_delete('ewei_shop_sns_board_follow', array('id' => $follow['id']));
 			show_json(1, array('isfollow' => false));
-			return;
 		}
-		$follow = array('uniacid' => $_W['uniacid'], 'bid' => $bid, 'openid' => $_W['openid'], 'createtime' => time());
-		pdo_insert('ewei_shop_sns_board_follow', $follow);
-		show_json(1, array('isfollow' => true));
+		else 
+		{
+			$follow = array('uniacid' => $_W['uniacid'], 'bid' => $bid, 'openid' => $_W['openid'], 'createtime' => time());
+			pdo_insert('ewei_shop_sns_board_follow', $follow);
+			show_json(1, array('isfollow' => true));
+		}
 	}
 }
 ?>

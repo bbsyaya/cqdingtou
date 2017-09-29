@@ -25,6 +25,8 @@ class Extension_EweiShopV2Page extends PluginWebPage
 			default:
 			exit('不存在的任务类型');
 		}
+		
+		
 		$func = trim($_GPC['taskfunc']);
 		if (!(empty($func)) && method_exists($this, $func)) 
 		{

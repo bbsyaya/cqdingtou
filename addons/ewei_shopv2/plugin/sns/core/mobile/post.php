@@ -299,7 +299,7 @@ class Post_EweiShopV2Page extends SnsMobilePage
 		{
 			$condition .= ' and `checked`=1';
 		}
-		$sql = 'select id,rpid,title,createtime,content,images ,openid, nickname,avatar,checked from ' . tablename('ewei_shop_sns_post') . '  where 1 ' . $condition . ' ORDER BY createtime desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+		$sql = 'select id,bid,rpid,title,createtime,content,images ,openid, nickname,avatar,checked from ' . tablename('ewei_shop_sns_post') . '  where 1 ' . $condition . ' ORDER BY createtime desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall($sql, $params);
 		$total = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_sns_post') . ' where 1 ' . $condition, $params);
 		foreach ($list as $key => &$row ) 
@@ -344,7 +344,7 @@ class Post_EweiShopV2Page extends SnsMobilePage
 			$row['level'] = $level;
 			$row['floor'] = (($pindex - 1) * $psize) + $key + 2;
 			$row['isAuthor'] = $row['openid'] == $_W['openid'];
-			$row['isManager'] = $this->model->isManager($bid);
+			$row['isManager'] = $this->model->isManager($row['bid'], $row['openid']);
 		}
 		unset($row);
 		show_json(1, array('list' => $list, 'pagesize' => $psize, 'total' => $total));

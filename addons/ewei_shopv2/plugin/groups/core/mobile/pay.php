@@ -274,13 +274,14 @@ class Pay_EweiShopV2Page extends PluginMobileLoginPage
 			if ($_W['ispost']) 
 			{
 				show_json(1);
-				return;
 			}
-			header('location: ' . mobileUrl('groups/team/detail', array('orderid' => $orderid, 'teamid' => $orderid)));
-			exit();
-			return;
+			else 
+			{
+				header('location: ' . mobileUrl('groups/team/detail', array('orderid' => $orderid, 'teamid' => $orderid)));
+				exit();
+			}
 		}
-		if ($type == 'wechat') 
+		else if ($type == 'wechat') 
 		{
 			$orderno = $order['orderno'];
 			if (!(empty($order['ordersn2']))) 
@@ -296,18 +297,21 @@ class Pay_EweiShopV2Page extends PluginMobileLoginPage
 				if ($_W['ispost']) 
 				{
 					show_json(1);
-					return;
 				}
-				header('location: ' . mobileUrl('groups/team/detail', array('orderid' => $orderid, 'teamid' => $orderid)));
-				exit();
-				return;
+				else 
+				{
+					header('location: ' . mobileUrl('groups/team/detail', array('orderid' => $orderid, 'teamid' => $orderid)));
+					exit();
+				}
 			}
-			if ($_W['ispost']) 
+			else if ($_W['ispost']) 
 			{
 				show_json(0, '支付出错,请重试(1)!');
-				return;
 			}
-			$this->message('支付出错,请重试!', mobileUrl('groups/orders'));
+			else 
+			{
+				$this->message('支付出错,请重试!', mobileUrl('groups/orders'));
+			}
 		}
 	}
 	public function orderstatus() 

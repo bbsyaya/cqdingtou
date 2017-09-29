@@ -130,6 +130,10 @@ class EweiShopWechatPay
 		{
 			$this->grant();
 		}
+		else if ($this->type == '18') 
+		{
+			$this->plugingrant();
+		}
 		$this->success();
 	}
 	public function order() 
@@ -218,7 +222,6 @@ class EweiShopWechatPay
 						$record['status'] = '1';
 						$record['tag'] = iserializer($log['tag']);
 						pdo_update('core_paylog', $record, array('plid' => $log['plid']));
-						return;
 					}
 				}
 			}
@@ -263,9 +266,8 @@ class EweiShopWechatPay
 			com_run('sale::setRechargeActivity', $log);
 			com_run('coupon::useRechargeCoupon', $log);
 			m('notice')->sendMemberLogMessage($log['id']);
-			return;
 		}
-		if ($log['money'] == $this->total_fee) 
+		else if ($log['money'] == $this->total_fee) 
 		{
 			pdo_update('ewei_shop_member_log', array('rechargetype' => 'wechat', 'isborrow' => $isborrow, 'borrowopenid' => $borrowopenid, 'apppay' => ($this->isapp ? 1 : 0)), array('id' => $log['id']));
 		}
@@ -302,9 +304,9 @@ class EweiShopWechatPay
 			exit();
 		}
 		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_creditshop_log') . ' WHERE `dispatchno`=:dispatchno and `uniacid`=:uniacid  limit 1', array(':uniacid' => $_W['uniacid'], ':dispatchno' => $dispatchno));
-		if (!(empty($log)) && empty($log['dispatchstatus'])) 
+		if (!(empty($log)) && ($log['dispatchstatus'] < 0)) 
 		{
-			pdo_update('ewei_shop_creditshop_log', array('dispatchstatus' => 1), array('id' => $log['id']));
+			pdo_update('ewei_shop_creditshop_log', array('dispatchstatus' => 1), array('dispatchno' => $dispatchno));
 		}
 	}
 	public function coupon() 
@@ -409,6 +411,44 @@ class EweiShopWechatPay
 					if (m('grant')) 
 					{
 						m('grant')->pluginGrant($id);
+					}
+				}
+			}
+		}
+	}
+	public function plugingrant() 
+	{
+		global $_W;
+		$setting = pdo_fetch('select * from ' . tablename('ewei_shop_system_plugingrant_setting') . ' where 1 = 1 limit 1 ');
+		if (0 < $setting['weixin']) 
+		{
+			ksort($this->get);
+			$string1 = '';
+			foreach ($this->get as $k => $v ) 
+			{
+				if (($v != '') && ($k != 'sign')) 
+				{
+					$string1 .= $k . '=' . $v . '&';
+				}
+			}
+			$this->sign = strtoupper(md5($string1 . 'key=' . $setting['apikey']));
+			if ($this->sign == $this->get['sign']) 
+			{
+				$order = pdo_fetch('select * from ' . tablename('ewei_shop_system_plugingrant_order') . ' where logno = \'' . $this->get['out_trade_no'] . '\'');
+				pdo_update('ewei_shop_system_plugingrant_order', array('paytime' => time(), 'paystatus' => 1), array('logno' => $this->get['out_trade_no']));
+				$plugind = explode(',', $order['pluginid']);
+				$data = array('logno' => $order['logno'], 'uniacid' => $order['uniacid'], 'type' => 'pay', 'month' => $order['month'], 'createtime' => time());
+				foreach ($plugind as $key => $value ) 
+				{
+					$plugin = pdo_fetch('select `identity` from ' . tablename('ewei_shop_plugin') . ' where id = ' . $value . ' ');
+					$data['identity'] = $plugin['identity'];
+					$data['pluginid'] = $value;
+					pdo_query('update ' . tablename('ewei_shop_system_plugingrant_plugin') . ' set sales = sales + 1 where pluginid = ' . $value . ' ');
+					pdo_insert('ewei_shop_system_plugingrant_log', $data);
+					$id = pdo_insertid();
+					if (p('grant')) 
+					{
+						p('grant')->pluginGrant($id);
 					}
 				}
 			}
@@ -537,7 +577,6 @@ class EweiShopWechatPay
 						$record['status'] = '1';
 						$record['tag'] = iserializer($log['tag']);
 						pdo_update('core_paylog', $record, array('plid' => $log['plid']));
-						return;
 					}
 				}
 			}
@@ -566,9 +605,8 @@ class EweiShopWechatPay
 			com_run('sale::setRechargeActivity', $log);
 			com_run('coupon::useRechargeCoupon', $log);
 			m('notice')->sendMemberLogMessage($log['id']);
-			return;
 		}
-		if ($log['money'] == $this->total_fee) 
+		else if ($log['money'] == $this->total_fee) 
 		{
 			pdo_update('ewei_shop_member_log', array('rechargetype' => 'wechat', 'apppay' => 2), array('id' => $log['id']));
 		}

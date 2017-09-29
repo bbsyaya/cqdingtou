@@ -287,9 +287,11 @@ class Index_EweiShopV2Page extends PluginWebPage
 				}
 			}
 			unset($_GPC['end_price']);
-			return;
 		}
-		include $this->template();
+		else 
+		{
+			include $this->template();
+		}
 	}
 	public function react() 
 	{
@@ -369,11 +371,13 @@ class Index_EweiShopV2Page extends PluginWebPage
 			$res = pdo_update('ewei_shop_bargain_goods', $data, array('id' => $actid));
 			show_json(1, '保存成功');
 			unset($_GPC['end_price']);
-			return;
 		}
-		$this_act['custom'] = urldecode($this_act['custom']);
-		$this_act['custom'] = json_decode($this_act['custom'], true);
-		include $this->template();
+		else 
+		{
+			$this_act['custom'] = urldecode($this_act['custom']);
+			$this_act['custom'] = json_decode($this_act['custom'], true);
+			include $this->template();
+		}
 	}
 	public function huishou() 
 	{

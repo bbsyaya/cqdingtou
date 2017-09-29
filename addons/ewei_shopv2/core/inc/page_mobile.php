@@ -160,9 +160,11 @@ class MobilePage extends Page
 			if ($showdiyfollowbar) 
 			{
 				include $this->template('diypage/followbar');
-				return;
 			}
-			include $this->template('_followbar');
+			else 
+			{
+				include $this->template('_followbar');
+			}
 		}
 	}
 	public function MemberBar($diypage = false, $merch = false) 
@@ -234,7 +236,7 @@ class MobilePage extends Page
 		if (empty($diymenuid)) 
 		{
 			$pageid = ((!(empty($controller)) ? $controller : 'shop'));
-			$pageid = (($pageid == 'index' ? 'shop' : $pageid));
+			(($pageid == 'index' ? 'shop' : $pageid));
 			if (!(empty($_GPC['merchid'])) && ($_W['routes'] == 'shop.category')) 
 			{
 				$pageid = 'merch';
@@ -278,64 +280,55 @@ class MobilePage extends Page
 		if ($showdiymenu) 
 		{
 			include $this->template('diypage/menu');
-			return;
 		}
-		if (($controller == 'commission') && ($routes[1] != 'myshop')) 
+		else if (($controller == 'commission') && ($routes[1] != 'myshop')) 
 		{
 			include $this->template('commission/_menu');
-			return;
 		}
-		if ($controller == 'creditshop') 
+		else if ($controller == 'creditshop') 
 		{
 			include $this->template('creditshop/_menu');
-			return;
 		}
-		if ($controller == 'groups') 
+		else if ($controller == 'groups') 
 		{
 			include $this->template('groups/_groups_footer');
-			return;
 		}
-		if ($controller == 'merch') 
+		else if ($controller == 'merch') 
 		{
 			include $this->template('merch/_menu');
-			return;
 		}
-		if ($controller == 'mr') 
+		else if ($controller == 'mr') 
 		{
 			include $this->template('mr/_menu');
-			return;
 		}
-		if ($controller == 'newmr') 
+		else if ($controller == 'newmr') 
 		{
 			include $this->template('newmr/_menu');
-			return;
 		}
-		if ($controller == 'sign') 
+		else if ($controller == 'sign') 
 		{
 			include $this->template('sign/_menu');
-			return;
 		}
-		if ($controller == 'sns') 
+		else if ($controller == 'sns') 
 		{
 			include $this->template('sns/_menu');
-			return;
 		}
-		if ($controller == 'seckill') 
+		else if ($controller == 'seckill') 
 		{
 			include $this->template('seckill/_menu');
-			return;
 		}
-		if ($controller == 'mmanage') 
+		else if ($controller == 'mmanage') 
 		{
 			include $this->template('mmanage/_menu');
-			return;
 		}
-		if ($ismerch) 
+		else if ($ismerch) 
 		{
 			include $this->template('merch/_menu');
-			return;
 		}
-		include $this->template('_menu');
+		else 
+		{
+			include $this->template('_menu');
+		}
 	}
 	public function shopShare() 
 	{

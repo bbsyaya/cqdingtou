@@ -11,7 +11,7 @@ class Pages_EweiShopV2Page extends PluginWebPage
 		global $_GPC;
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 20;
-		$condition = ' WHERE uniacid=:uniacid';
+		$condition = ' WHERE uniacid=:uniacid and merchid=0';
 		$params = array('uniacid' => $_W['uniacid']);
 		$keyword = trim($_GPC['keyword']);
 		if (!(empty($keyword))) 
@@ -53,7 +53,7 @@ class Pages_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 		if (!(empty($id))) 
 		{
-			$item = pdo_fetch('SELECT * FROM' . tablename('ewei_shop_quick') . ' WHERE id=:id AND uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+			$item = pdo_fetch('SELECT * FROM' . tablename('ewei_shop_quick') . ' WHERE id=:id AND uniacid=:uniacid AND merchid=0', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 			if (!(empty($item['datas']))) 
 			{
 				$datas = htmlspecialchars_decode(base64_decode($item['datas']));
@@ -132,6 +132,9 @@ class Pages_EweiShopV2Page extends PluginWebPage
 			$url = mobileUrl('quick', array('id' => $item['id']), true);
 			$qrcode = m('qrcode')->createQrcode($url);
 		}
+		$merchid = 0;
+		$shopset = $_W['shopset']['shop'];
+		$diymenu = pdo_fetchall('select id, `name` from ' . tablename('ewei_shop_diypage_menu') . ' where merch=:merch and uniacid=:uniacid  order by id desc', array(':merch' => intval($_W['merchid']), ':uniacid' => $_W['uniacid']));
 		include $this->template();
 	}
 	public function delete() 
@@ -143,7 +146,7 @@ class Pages_EweiShopV2Page extends PluginWebPage
 		{
 			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
-		$items = pdo_fetchall('SELECT id,title,cart FROM ' . tablename('ewei_shop_quick') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
+		$items = pdo_fetchall('SELECT id,title,cart,keyword FROM ' . tablename('ewei_shop_quick') . ' WHERE id in( ' . $id . ' ) AND uniacid=:uniacid AND merchid=0', array(':uniacid' => $_W['uniacid']));
 		if (!(empty($items))) 
 		{
 			foreach ($items as $item ) 
@@ -153,6 +156,10 @@ class Pages_EweiShopV2Page extends PluginWebPage
 				if (!(empty($item['cart']))) 
 				{
 					pdo_delete('ewei_shop_quick_cart', array('quickid' => $item['id'], 'uniacid' => $_W['uniacid']));
+				}
+				if (!(empty($item['keyword']))) 
+				{
+					$this->delKey($item['keyword']);
 				}
 			}
 		}
@@ -167,7 +174,7 @@ class Pages_EweiShopV2Page extends PluginWebPage
 		{
 			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
-		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_quick') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
+		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_quick') . ' WHERE id in( ' . $id . ' ) AND uniacid=:uniacid AND merchid=0', array(':uniacid' => $_W['uniacid']));
 		if (!(empty($items))) 
 		{
 			foreach ($items as $item ) 

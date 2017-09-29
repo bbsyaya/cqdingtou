@@ -11,7 +11,7 @@ class Adv_EweiShopV2Page extends PluginWebPage
 		global $_GPC;
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 20;
-		$condition = ' and uniacid=:uniacid';
+		$condition = ' and uniacid=:uniacid and merchid=0';
 		$params = array(':uniacid' => $_W['uniacid']);
 		if ($_GPC['enabled'] != '') 
 		{
@@ -57,7 +57,7 @@ class Adv_EweiShopV2Page extends PluginWebPage
 			}
 			show_json(1, array('url' => webUrl('quick/adv')));
 		}
-		$item = pdo_fetch('select * from ' . tablename('ewei_shop_quick_adv') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		$item = pdo_fetch('select * from ' . tablename('ewei_shop_quick_adv') . ' where id=:id and uniacid=:uniacid and merchid=0 limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		include $this->template();
 	}
 	public function delete() 
@@ -69,7 +69,7 @@ class Adv_EweiShopV2Page extends PluginWebPage
 		{
 			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
-		$items = pdo_fetchall('SELECT id,advname FROM ' . tablename('ewei_shop_quick_adv') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
+		$items = pdo_fetchall('SELECT id,advname FROM ' . tablename('ewei_shop_quick_adv') . ' WHERE id in( ' . $id . ' ) AND uniacid=:uniacid AND merchid=0', array(':uniacid' => $_W['uniacid']));
 		foreach ($items as $item ) 
 		{
 			pdo_delete('ewei_shop_quick_adv', array('id' => $item['id']));
@@ -83,7 +83,7 @@ class Adv_EweiShopV2Page extends PluginWebPage
 		global $_GPC;
 		$id = intval($_GPC['id']);
 		$displayorder = intval($_GPC['value']);
-		$item = pdo_fetchall('SELECT id,advname FROM ' . tablename('ewei_shop_quick_adv') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
+		$item = pdo_fetchall('SELECT id,advname FROM ' . tablename('ewei_shop_quick_adv') . ' WHERE id in( ' . $id . ' ) AND uniacid=:uniacid AND merchid=0', array(':uniacid' => $_W['uniacid']));
 		if (!(empty($item))) 
 		{
 			pdo_update('ewei_shop_quick_adv', array('displayorder' => $displayorder), array('id' => $id));
@@ -100,7 +100,7 @@ class Adv_EweiShopV2Page extends PluginWebPage
 		{
 			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
-		$items = pdo_fetchall('SELECT id,advname FROM ' . tablename('ewei_shop_quick_adv') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
+		$items = pdo_fetchall('SELECT id,advname FROM ' . tablename('ewei_shop_quick_adv') . ' WHERE id in( ' . $id . ' ) AND uniacid=:uniacid AND merchid=0', array(':uniacid' => $_W['uniacid']));
 		foreach ($items as $item ) 
 		{
 			pdo_update('ewei_shop_quick_adv', array('enabled' => intval($_GPC['enabled'])), array('id' => $item['id']));

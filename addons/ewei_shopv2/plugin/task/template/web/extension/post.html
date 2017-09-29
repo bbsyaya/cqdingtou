@@ -101,6 +101,7 @@
 
             </div>
         </div>
+	
         <div class="form-group">
             <label class="col-sm-2 control-label">任务状态</label>
             <div class="col-sm-9 col-xs-12">
@@ -145,11 +146,13 @@
             <div class="col-sm-9" id="task-list">
                 {loop $data['require_data'] $dk $dv}
                 {if $dv['classify'] == 'number'}
-                <div id="{$dk}"><div class="input-group"><span class="input-group-addon" style="background: #f8ac59;color: #fff;">推荐人数</span><span class="input-group-addon">{$dv['verb']}</span><input class="form-control" name="data[require_data][{$dk}][num]" value="{$dv['num']}"><input type="hidden" class="form-control" name="data[require_data][{$dk}][classify]" value="number"><input type="hidden" class="form-control" name="data[require_data][{$dk}][verb]" value="{$dv['verb']}"><input type="hidden" class="form-control" name="data[require_data][{$dk}][unit]" value="{$dv['unit']}"><span class="input-group-addon">{$dv['unit']}</span><a class="btn btn-danger input-group-addon" style="background-color: #ec4758;color: #fff" onclick="$('#{$dk}').remove()">X</a></div><br></div>
+                <div id="{$dk}"><div class="input-group"><span class="input-group-addon" style="background: #f8ac59;color: #fff;">
+                    {php echo $this->model->returnTaskname($dk);}
+                </span><span class="input-group-addon">{$dv['verb']}</span><input class="form-control" name="data[require_data][{$dk}][num]" value="{$dv['num']}"><input type="hidden" class="form-control" name="data[require_data][{$dk}][classify]" value="number"><input type="hidden" class="form-control" name="data[require_data][{$dk}][verb]" value="{$dv['verb']}"><input type="hidden" class="form-control" name="data[require_data][{$dk}][unit]" value="{$dv['unit']}"><span class="input-group-addon">{$dv['unit']}</span><a class="btn btn-danger input-group-addon" style="background-color: #ec4758;color: #fff" onclick="$('#{$dk}').remove()">X</a></div><br></div>
                 {else}
                 {if empty($cc)}
                 {php $cc++;}
-                <div id="cost_goods"><div class="input-group"><span class="input-group-addon" style="background: #f8ac59;color: #fff;">指定商品</span><a class="form-control" style="color: #000" data-toggle="ajaxModal" href="http://cx.foxdev.cn/web/index.php?c=site&amp;a=entry&amp;m=ewei_shopv2&amp;do=web&amp;r=task.extension.single&amp;taskfunc=certain&amp;page=1">点击选择指定商品(组)</a><a class="btn btn-danger input-group-addon" style="background-color: #ec4758;color: #fff" onclick="$('#cost_goods').remove()">X</a></div><br></div>
+                <div id="cost_goods"><div class="input-group"><span class="input-group-addon" style="background: #f8ac59;color: #fff;">指定商品</span><a class="form-control" style="color: #000" data-toggle="ajaxModal" href="http://cx.foxdev.cn/web/index.php?c=site&amp;a=entry&amp;m=ewei_shopv2&amp;do=web&amp;r=task.extension.single&amp;taskfunc=certain&amp;page=1">点击选择指定商品(组)</a><a class="btn btn-danger input-group-addon" style="background-color: #ec4758;color: #fff" onclick="$('#cost_goods').remove();;$('.certain').text('')">X</a></div><br></div>
                 {/if}
                 {/if}
                 {/loop}
@@ -157,12 +160,15 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-2 control-label"> 已选商品 </label>
+            <label class="col-sm-2 control-label"></label>
             <div class="col-sm-9">
                 <div class="certain">
                     {loop $data['require_data'] $k $v}
                     {if strpos('1'.$k,'cost_goods')}
-                    <input type="input" id="{$k}" name="data[certain][]" value="{$k}" class="form-control" readonly="" onclick="$(this).remove()">
+                    {php $val = str_replace('cost_goods','',$k);}
+                    <div class="input-group" id="c{$val}">
+                        <input type="input" name="data[certain][]" value="{$val}_{php echo $this->model->returnGoodsName($val)}" class="form-control" readonly=""><a class="btn btn-danger input-group-addon" style="background-color: #ec4758;color: #fff" onclick="$('#c{$val}').remove();$(this).remove()">X</a>
+                    </div>
                     {/if}
                     {/loop}
                 </div>
@@ -250,7 +256,7 @@
     </div>
 </form>
 <div class="alert alert-info">
-    <p>单次任务只允许用户接一次任务，之后不允许再重复接任务。如需完成后再接同一任务，请选择 <a href="{php echo webUrl('task/extension/repeat');}" style="color: #ff4f48">重复任务</a></p>
+    <p>单次任务只允许用户接一次任务，之后不允许再重复接任务。如需完成后再接同一任务，请选择 <a href="{php echo webUrl('task/extension/repeat');}" style="color: #ff4f48">周期任务</a></p>
 </div>
 
 <script>
@@ -330,7 +336,7 @@
                         '<a class="form-control" style="color: #000" data-toggle="ajaxModal" href="{php echo webUrl('task.extension.'.$this->action,array('taskfunc'=>certain,'page'=>1));}">点击选择指定商品(组)</a>' +
                         '<a class="btn btn-danger input-group-addon" ' +
                         'style="background-color: #ec4758;color: #fff" ' +
-                        'onclick="$(\'#'+addval+'\').remove()">X</a>' +
+                        'onclick="$(\'#'+addval+'\').remove();$(\'.certain\').text(\'\')">X</a>' +
                         '</div><br></div>';
             }
             $('#task-list').append(html);
@@ -387,7 +393,7 @@
     function certain(obj) {
         var goodsid = $(obj).attr('data-id');
         var name = $(obj).attr('data-name');
-        var txt = "<input type='input' id='c"+goodsid+"' name='data[certain][]' value='"+goodsid+'_'+name+"' class='form-control' readonly onclick='$(this).remove()'>";
+        var txt = "<div class=\"input-group\" id='c"+goodsid+"'><input type='input' name='data[certain][]' value='"+goodsid+'_'+name+"' class='form-control' readonly><a class=\"btn btn-danger input-group-addon\" style=\"background-color: #ec4758;color: #fff\" onclick=\"$('#c"+goodsid+"').remove();$(this).remove()\">X</a></div>";
         if($("#c"+goodsid).length >0){
             alert('已存在');
         }else{

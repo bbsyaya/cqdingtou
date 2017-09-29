@@ -1476,7 +1476,7 @@
         <div class="fui-tab fui-tab-danger">
             <%define index=0%>
             <%each data as item%>
-                <%if index <= style.scrollnum-1%>
+                <%if index <= style.scrollnum%>
                     <a <%if index==0%>class="active" style="color: <%style.activecolor%>; border-color: <%style.activecolor%>; background: <%style.activebackground%>;"<%else%>style="color: <%style.color%>;"<%/if%>><%item.text||'未设置'%></a>
                 <%/if%>
                 <%define index++%>

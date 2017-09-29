@@ -330,7 +330,7 @@
 
 
 <script>
-    require(['jquery','util'], function($, util){
+    require(['util'], function(util){
         $(function(){
             $('#btn').click(function(){
                 util.emojiBrowser(function(emoji){
@@ -340,13 +340,7 @@
 
                 });
             });
-        });
-
-        $(function(){
             util.emotion($('#emotion'), $('#send_desc'));
-        });
-
-        $(function () {
             $('#link').click(function () {
                 var link='<a href=\\"您要插入的链接\\">链接文字</a>';
                 var content = $('#send_desc').val()+link;

@@ -171,12 +171,7 @@ class build_EweiShopV2Page extends PluginPfMobilePage
 				$end_task_info = pdo_fetch('select `needcount`,`completecount`,`failtime` from ' . tablename('ewei_shop_task_join') . ' where uniacid=:uniacid and join_user=:join_user and task_id=:task_id and task_type=:task_type and (is_reward=1 or failtime<' . time() . ') order by `addtime` DESC limit 1', array(':uniacid' => $_W['uniacid'], ':join_user' => $member['openid'], ':task_id' => $poster['id'], ':task_type' => $poster['poster_type']));
 				$is_waiting = true;
 				$img = $this->join_task($member, $poster);
-				m('message')->sendCustomNotice($openid, '您已经参加过此任务，不能重复参加');
-				return;
-				$is_waiting = true;
-				$img = $this->join_task($member, $poster);
-				$is_waiting = true;
-				$img = $this->join_task($member, $poster);
+				
 			}
 		}
 		if ($is_waiting) 

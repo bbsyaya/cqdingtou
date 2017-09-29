@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -60,8 +60,48 @@ class Plugin_EweiShopV2Model
 	}
 	public function getList($status = '') 
 	{
+		global $_W;
 		$list = $this->getCategory();
 		$plugins = $this->getAll(false, $status);
+		$filename = '../addons/ewei_shopv2/core/model/grant.php';
+		if (file_exists($filename)) 
+		{
+			$item = pdo_fetch('select  plugins from ' . tablename('ewei_shop_perm_plugin') . ' where acid=:acid limit 1', array(':acid' => $_W['uniacid']));
+			$setting = pdo_fetch('select * from ' . tablename('ewei_shop_system_grant_setting') . ' where id = 1 limit 1 ');
+			foreach ($plugins as $key => $value ) 
+			{
+				if (!(strstr($item['plugins'], $value['identity'])) && !(strstr($setting['plugin'], $value['identity'])) && !(strstr($setting['com'], $value['identity']))) 
+				{
+					$plugin = pdo_fetch('SELECT max(permendtime) as permendtime FROM ' . tablename('ewei_shop_system_grant_log') . ' ' . "\n" . '                    WHERE `identity` = \'' . $value['identity'] . '\' and uniacid = ' . $_W['uniacid'] . ' and isperm = 1 ');
+					$plugins[$key]['isgrant'] = 1;
+					$plugins[$key]['permendtime'] = $plugin['permendtime'];
+				}
+			}
+		}
+		else if (p('grant')) 
+		{
+			$item = pdo_fetch('select plugins from ' . tablename('ewei_shop_perm_plugin') . ' where acid=:acid limit 1', array(':acid' => $_W['uniacid']));
+			$setting = pdo_fetch('select * from ' . tablename('ewei_shop_system_plugingrant_setting') . ' where 1 = 1 limit 1 ');
+			foreach ($plugins as $key => $value ) 
+			{
+				if (!(strstr($item['plugins'], $value['identity'])) && !(strstr($setting['plugin'], $value['identity'])) && !(strstr($setting['com'], $value['identity']))) 
+				{
+					$plugin = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_system_plugingrant_log') . "\n" . '                    WHERE `identity` = \'' . $value['identity'] . '\' and uniacid = ' . $_W['uniacid'] . ' and isperm = 1 and `month` = 0 ');
+					if (!($plugin)) 
+					{
+						$plugin = pdo_fetch('SELECT max(permendtime) as permendtime,`month`,isperm FROM ' . tablename('ewei_shop_system_plugingrant_log') . ' ' . "\n" . '                        WHERE `identity` = \'' . $value['identity'] . '\' and uniacid = ' . $_W['uniacid'] . ' and isperm = 1 ');
+					}
+					else 
+					{
+						$plugin = pdo_fetch('SELECT max(permendtime) as permendtime,`month`,isperm FROM ' . tablename('ewei_shop_system_plugingrant_log') . "\n" . '                        WHERE `identity` = \'' . $value['identity'] . '\' and uniacid = ' . $_W['uniacid'] . ' and isperm = 1 and `month` = 0 ');
+					}
+					$plugins[$key]['isplugingrant'] = 1;
+					$plugins[$key]['month'] = $plugin['month'];
+					$plugins[$key]['isperm'] = $plugin['isperm'];
+					$plugins[$key]['permendtime'] = $plugin['permendtime'];
+				}
+			}
+		}
 		foreach ($list as $ck => &$cv ) 
 		{
 			$ps = array();
@@ -82,18 +122,17 @@ class Plugin_EweiShopV2Model
 		$plugins = $this->getAll();
 		foreach ($plugins as $p ) 
 		{
-			if (!($p['identity'] == $identity)) 
+			if ($p['identity'] == $identity) 
 			{
-				continue;
+				return $p['name'];
 			}
-			return $p['name'];
 		}
 		return '';
 	}
 	public function loadModel($pluginname = '') 
 	{
 		static $_model;
-		if (!$_model) 
+		if (!($_model)) 
 		{
 			$modelfile = IA_ROOT . '/addons/ewei_shopv2/plugin/' . $pluginname . '/core/model.php';
 			if (is_file($modelfile)) 

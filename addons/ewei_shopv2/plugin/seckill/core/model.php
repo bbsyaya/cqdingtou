@@ -654,7 +654,20 @@ class SeckillModel extends PluginModel
 				$result = m('finance')->refund($item['openid'], $item['ordersn'], $refundno, $realprice * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
 				if (is_error($result)) 
 				{
-					$result = m('finance')->refundBorrow($item['borrowopenid'], $item['ordersn'], $refundno, $realprice * 100, $realprice * 100, (!(empty($item['ordersn2'])) ? 1 : 0));
+					$result1 = m('finance')->refundBorrow($item['borrowopenid'], $item['ordersn'], $refundno, $realprice * 100, $realprice * 100, (!(empty($item['ordersn2'])) ? 1 : 0));
+					if (is_error($result) && is_error($result1)) 
+					{
+						$data_dir = EWEI_SHOPV2_DATA;
+						if (!(is_dir($data_dir))) 
+						{
+							load()->func('file');
+							mkdirs($data_dir);
+						}
+						$result['ordersn'] = $item['ordersn'];
+						$result1['ordersn'] = $item['ordersn'];
+						file_put_contents($data_dir . date('YmdHis') . '1' . random(4, true), json_encode($result));
+						file_put_contents($data_dir . date('YmdHis') . '2' . random(4, true), json_encode($result1));
+					}
 				}
 			}
 			$refundtype = 2;

@@ -218,6 +218,7 @@ class Sendcoupon_EweiShopV2Page extends ComWebPage
 		$logid = pdo_insertid();
 		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $coupon['merchid'], 'openid' => $openid, 'couponid' => $couponid, 'gettype' => 0, 'gettime' => $time, 'senduid' => $_W['uid']);
 		pdo_insert('ewei_shop_coupon_data', $data);
+		
 		}
 		++$i;
 		show_json(1, array('openids' => $openids));
@@ -233,9 +234,8 @@ class Sendcoupon_EweiShopV2Page extends ComWebPage
 		if (empty($messagetype)) 
 		{
 			exit(json_encode(array('result' => 0)));
-			return;
 		}
-		if ($messagetype == 1) 
+		else if ($messagetype == 1) 
 		{
 			if (empty($data['sendtemplateid'])) 
 			{
@@ -258,9 +258,8 @@ class Sendcoupon_EweiShopV2Page extends ComWebPage
 				exit(json_encode(array('result' => 0, 'message' => $result['message'], 'openid' => $openid)));
 			}
 			exit(json_encode(array('result' => 1)));
-			return;
 		}
-		if ($messagetype == 2) 
+		else if ($messagetype == 2) 
 		{
 			if (empty($openid)) 
 			{
@@ -276,9 +275,11 @@ class Sendcoupon_EweiShopV2Page extends ComWebPage
 				exit(json_encode(array('result' => 0, 'message' => $resp['message'], 'openid' => $openid)));
 			}
 			exit(json_encode(array('result' => 1)));
-			return;
 		}
-		exit(json_encode(array('result' => 0)));
+		else 
+		{
+			exit(json_encode(array('result' => 0)));
+		}
 	}
 	public function sendNews($openid, $title, $desc, $url, $picurl, $account = NULL) 
 	{

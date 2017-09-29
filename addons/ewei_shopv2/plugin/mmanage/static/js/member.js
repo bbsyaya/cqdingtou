@@ -1,12 +1,11 @@
 define(['core'], function (core) {
-    var modal = {page: 1, status: 'sale', offset: 0, keywords: '', jumped: false,};
+    var modal = {page: 1, status: 'sale', offset: 0, keywords: ''};
     modal.initList = function () {
         modal.initClick();
-        if (!modal.jumped) {
+        var leng = $.trim($('.container').html());
+        if (leng == '') {
             modal.page = 1;
-            modal.getList()
-        } else {
-            modal.jumped = false
+            modal.getList();
         }
         $('.fui-content').infinite({
             onLoading: function () {
@@ -20,7 +19,6 @@ define(['core'], function (core) {
             var mid = $(this).closest('.fui-list').data('id');
             var canJump = $(this).closest('.fui-list').data('can');
             if (mid && canJump) {
-                modal.jumped = true;
                 $.router.load(core.getUrl('mmanage/member/detail', {id: mid}), true)
             }
         });

@@ -172,6 +172,11 @@ class Index_EweiShopV2Page extends PluginWebPage
 					$data['resdesc2'] = html_entity_decode($_GPC['send_desc2']);
 				}
 			}
+			$plugin_com = p('commission');
+			if ($plugin_com) 
+			{
+				$plugin_com_set = $plugin_com->getSet();
+			}
 			if (intval($_GPC['sendlimittype']) == 1) 
 			{
 				$data['send_openid'] = trim($_GPC['send_openid1']);
@@ -253,7 +258,12 @@ class Index_EweiShopV2Page extends PluginWebPage
 			}
 			else if (intval($item['sendlimittype']) == 5) 
 			{
-				if (!(empty($item['send_agentlevel']))) 
+				$sql .= ' and  sm.status =1 and sm.isagent=1 ';
+				if ($item['send_agentlevel'] == '-1') 
+				{
+					$sql .= ' and  sm.agentlevel =0';
+				}
+				else if (!(empty($item['send_agentlevel']))) 
 				{
 					$sql .= ' and  sm.agentlevel =:send_agentlevel';
 					$params[':send_agentlevel'] = $item['send_agentlevel'];
@@ -408,7 +418,13 @@ class Index_EweiShopV2Page extends PluginWebPage
 				$msg[$data[$i]['keywords']] = array('value' => $data[$i]['value'], 'color' => $data[$i]['color']);
 				++$i;
 			}
-			$result = m('message')->sendTplNotice($openid, $template['template_id'], $msg, $template['url']);
+			$miniprogram = array();
+			if ($template['miniprogram'] == 1) 
+			{
+				$miniprogram['appid'] = $template['appid'];
+				$miniprogram['pagepath'] = $template['pagepath'];
+			}
+			$result = m('message')->sendTplNotice($openid, $template['template_id'], $msg, $template['url'], NULL, $miniprogram);
 		}
 		return $result;
 	}

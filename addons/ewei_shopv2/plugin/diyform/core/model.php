@@ -733,100 +733,97 @@ class DiyformModel extends PluginModel
 						break;
 					}
 				}
-				else 
+				if ($v['data_type'] == 2) 
 				{
-					if ($v['data_type'] == 2) 
+					if (empty($f_data[$k])) 
 					{
-						if (empty($f_data[$k])) 
+						$f_data[$k] = array(0, $v['tp_text'][0]);
+					}
+					else 
+					{
+						$index = -1;
+						foreach ($v['tp_text'] as $i => $val ) 
+						{
+							if ($val == $f_data[$k]) 
+							{
+								$index = $i;
+							}
+						}
+						if ($index < 0) 
 						{
 							$f_data[$k] = array(0, $v['tp_text'][0]);
 						}
 						else 
 						{
-							$index = -1;
-							foreach ($v['tp_text'] as $i => $val ) 
-							{
-								if ($val == $f_data[$k]) 
-								{
-									$index = $i;
-								}
-							}
-							if ($index < 0) 
-							{
-								$f_data[$k] = array(0, $v['tp_text'][0]);
-							}
-							else 
-							{
-								$f_data[$k] = array($index, $f_data[$k]);
-							}
+							$f_data[$k] = array($index, $f_data[$k]);
 						}
 					}
-					else if (($v['data_type'] == 3) && is_array($f_data[$k])) 
+				}
+				else if (($v['data_type'] == 3) && is_array($f_data[$k])) 
+				{
+					$newdata = array();
+					foreach ($f_data[$k] as $kk => $vv ) 
+					{
+						$newdata[$vv] = 1;
+					}
+					$f_data[$k] = $newdata;
+					unset($newdata);
+				}
+				else if ($v['data_type'] == 5) 
+				{
+					if (!(empty($f_data[$k])) && is_array($f_data[$k])) 
 					{
 						$newdata = array();
 						foreach ($f_data[$k] as $kk => $vv ) 
 						{
-							$newdata[$vv] = 1;
+							$newdata[] = array('url' => tomedia($vv), 'filename' => $vv);
 						}
-						$f_data[$k] = $newdata;
-						unset($newdata);
+						$f_data[$k] = array('images' => $newdata, 'count' => count($newdata));
 					}
-					else if ($v['data_type'] == 5) 
+					else 
 					{
-						if (!(empty($f_data[$k])) && is_array($f_data[$k])) 
-						{
-							$newdata = array();
-							foreach ($f_data[$k] as $kk => $vv ) 
-							{
-								$newdata[] = array('url' => tomedia($vv), 'filename' => $vv);
-							}
-							$f_data[$k] = array('images' => $newdata, 'count' => count($newdata));
-						}
-						else 
-						{
-							$f_data[$k] = array( 'images' => array(), 'count' => 0 );
-						}
+						$f_data[$k] = array( 'images' => array(), 'count' => 0 );
 					}
-					else if ($v['data_type'] == 7) 
-					{
-						switch ($v['default_time_type']) 
-						{
-							case 0: $f_data[$k] = '';
-							break;
-							case 1: $f_data[$k] = date('Y-m-d');
-							break;
-							case 2: $f_data[$k] = $v['default_time'];
-							break;
-						}
-					}
-					else if (($v['data_type'] == 8) && !(is_array($f_data[$k]))) 
-					{
-						$f_data[$k] = array();
-						switch ($v['default_btime_type']) 
-						{
-							case 0: $f_data[$k][0] = '';
-							break;
-							case 1: $f_data[$k][0] = date('Y-m-d');
-							break;
-							case 2: $f_data[$k][0] = $v['default_btime'];
-							break;
-						}
-						switch ($v['default_etime_type']) 
-						{
-							case 0: $f_data[$k][1] = '';
-							break;
-							case 1: $f_data[$k][1] = date('Y-m-d');
-							break;
-							case 2: $f_data[$k][1] = $v['default_etime'];
-							break;
-						}
-					}
-					else if (($v['data_type'] == 10) && (empty($f_data[$k]) || !(is_array($f_data[$k])))) 
-					{
-						$f_data[$k] = array('name1' => '', 'name2' => '');
-					}
-					$newFields[] = $v;
 				}
+				else if ($v['data_type'] == 7) 
+				{
+					switch ($v['default_time_type']) 
+					{
+						case 0: $f_data[$k] = '';
+						break;
+						case 1: $f_data[$k] = date('Y-m-d');
+						break;
+						case 2: $f_data[$k] = $v['default_time'];
+						break;
+					}
+				}
+				else if (($v['data_type'] == 8) && !(is_array($f_data[$k]))) 
+				{
+					$f_data[$k] = array();
+					switch ($v['default_btime_type']) 
+					{
+						case 0: $f_data[$k][0] = '';
+						break;
+						case 1: $f_data[$k][0] = date('Y-m-d');
+						break;
+						case 2: $f_data[$k][0] = $v['default_btime'];
+						break;
+					}
+					switch ($v['default_etime_type']) 
+					{
+						case 0: $f_data[$k][1] = '';
+						break;
+						case 1: $f_data[$k][1] = date('Y-m-d');
+						break;
+						case 2: $f_data[$k][1] = $v['default_etime'];
+						break;
+					}
+				}
+				else if (($v['data_type'] == 10) && (empty($f_data[$k]) || !(is_array($f_data[$k])))) 
+				{
+					$f_data[$k] = array('name1' => '', 'name2' => '');
+				}
+				$newFields[] = $v;
 			}
 		}
 		return array('fields' => $newFields, 'f_data' => array_filter($f_data));

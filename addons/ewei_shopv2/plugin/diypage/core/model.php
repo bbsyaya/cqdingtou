@@ -113,7 +113,7 @@ class DiypageModel extends PluginModel
 									}
 									else 
 									{
-										$goods = pdo_fetchall('select id, title, thumb, productprice, minprice, total, showlevels, showgroups, bargain, merchid, sales, salesreal from ' . tablename('ewei_shop_goods') . ' where id in( ' . $newgoodsids . ' ) and status=1 and deleted=0 and checked=0 and uniacid=:uniacid order by displayorder desc ', array(':uniacid' => $_W['uniacid']));
+										$goods = pdo_fetchall('select id, title, subtitle, thumb, productprice, minprice, total, showlevels, showgroups, bargain, merchid, sales, salesreal from ' . tablename('ewei_shop_goods') . ' where id in( ' . $newgoodsids . ' ) and status=1 and deleted=0 and checked=0 and uniacid=:uniacid order by displayorder desc ', array(':uniacid' => $_W['uniacid']));
 									}
 									if (!(empty($goods)) && is_array($goods)) 
 									{
@@ -125,7 +125,7 @@ class DiypageModel extends PluginModel
 												{
 													$childid = rand(1000000000, 9999999999);
 													$childid = 'C' . $childid;
-													$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($good['salesreal']));
+													$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'subtitle' => $good['subtitle'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($good['salesreal']));
 												}
 											}
 										}
@@ -211,7 +211,7 @@ class DiypageModel extends PluginModel
 											{
 												$childid = rand(1000000000, 9999999999);
 												$childid = 'C' . $childid;
-												$item['data'][$childid] = array('name' => $merch['merchname'], 'desc' => $merch['desc'], 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
+												$item['data'][$childid] = array('name' => $this->replace_quotes($merch['merchname']), 'desc' => $this->replace_quotes($merch['desc']), 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
 											}
 										}
 									}
@@ -247,7 +247,7 @@ class DiypageModel extends PluginModel
 									{
 										$childid = rand(1000000000, 9999999999);
 										$childid = 'C' . $childid;
-										$item['data'][$childid] = array('name' => $merch['merchname'], 'desc' => $merch['desc'], 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
+										$item['data'][$childid] = array('name' => $this->replace_quotes($merch['merchname']), 'desc' => $this->replace_quotes($merch['desc']), 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
 									}
 								}
 							}
@@ -281,7 +281,7 @@ class DiypageModel extends PluginModel
 									{
 										$childid = rand(1000000000, 9999999999);
 										$childid = 'C' . $childid;
-										$item['data'][$childid] = array('name' => $merch['merchname'], 'desc' => $merch['desc'], 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
+										$item['data'][$childid] = array('name' => $this->replace_quotes($merch['merchname']), 'desc' => $this->replace_quotes($merch['desc']), 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
 									}
 								}
 							}
@@ -296,7 +296,7 @@ class DiypageModel extends PluginModel
 								{
 									$childid = rand(1000000000, 9999999999);
 									$childid = 'C' . $childid;
-									$item['data'][$childid] = array('name' => $merch['merchname'], 'desc' => $merch['desc'], 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
+									$item['data'][$childid] = array('name' => $this->replace_quotes($merch['merchname']), 'desc' => $this->replace_quotes($merch['desc']), 'thumb' => $merch['logo'], 'merchid' => $merch['id']);
 								}
 							}
 						}
@@ -615,7 +615,7 @@ class DiypageModel extends PluginModel
 										{
 											$childid = rand(1000000000, 9999999999);
 											$childid = 'C' . $childid;
-											$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($good['salesreal']));
+											$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'subtitle' => $good['subtitle'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($good['salesreal']));
 										}
 									}
 								}
@@ -654,7 +654,7 @@ class DiypageModel extends PluginModel
 									}
 								}
 								$goodsids = $group['goodsids'];
-								$goods = pdo_fetchall('select id, title, thumb, minprice, sales, salesreal, total, showlevels, showgroups, bargain, productprice from ' . tablename('ewei_shop_goods') . ' where id in( ' . $goodsids . ' ) and status=1 and `deleted`=0 and `status`=1 and uniacid=:uniacid ' . $orderby . ' limit ' . $limit, array(':uniacid' => $_W['uniacid']));
+								$goods = pdo_fetchall('select id, title, subtitle, thumb, minprice, sales, salesreal, total, showlevels, showgroups, bargain, productprice from ' . tablename('ewei_shop_goods') . ' where id in( ' . $goodsids . ' ) and status=1 and `deleted`=0 and `status`=1 and uniacid=:uniacid ' . $orderby . ' limit ' . $limit, array(':uniacid' => $_W['uniacid']));
 								if (!(empty($goods)) && is_array($goods)) 
 								{
 									foreach ($goods as $index => $good ) 
@@ -664,7 +664,7 @@ class DiypageModel extends PluginModel
 										{
 											$childid = rand(1000000000, 9999999999);
 											$childid = 'C' . $childid;
-											$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'sales' => $good['sales'] + $good['salesreal']);
+											$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'subtitle' => $good['subtitle'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'sales' => $good['sales'] + $good['salesreal']);
 										}
 									}
 								}
@@ -738,14 +738,14 @@ class DiypageModel extends PluginModel
 							}
 						}
 					}
-	else if ($item['id'] == 'notice') 
+	else if ($item['id'] == 'notice')  
 					{
 						if ($item['params']['noticedata'] == '0') 
 						{
 							$limit = ((!(empty($item['params']['noticenum'])) ? $item['params']['noticenum'] : 5));
 							if (!(empty($page['merch']))) 
 							{
-								$notices = pdo_fetchall('select id, title, link, thumb from ' . tablename('ewei_shop_merch_notice') . ' where uniacid=:uniacid and status=1 order by displayorder desc limit ' . $limit, array(':uniacid' => $_W['uniacid']));
+								$notices = pdo_fetchall('select id, title, link, thumb from ' . tablename('ewei_shop_merch_notice') . ' where uniacid=:uniacid and merchid=:merchid and status=1 order by displayorder desc limit ' . $limit, array(':uniacid' => $_W['uniacid'], ':merchid' => intval($page['merch'])));
 							}
 							else 
 							{
@@ -865,6 +865,7 @@ class DiypageModel extends PluginModel
 					{
 						$member = $this->member;
 						$commission = $this->commission;
+						$item['params']['mid'] = $member['id'];
 						$item['params']['avatar'] = $member['avatar'];
 						$item['params']['nickname'] = $member['nickname'];
 						$item['params']['levelname'] = $member['commissionlevelname'];
@@ -875,6 +876,7 @@ class DiypageModel extends PluginModel
 						$item['params']['canwithdraw'] = number_format($member['commission_ok'], 2);
 						$item['params']['upname'] = $commission['set']['texts']['up'];
 						$item['params']['upmember'] = ((empty($member['up']) ? '总店' : $member['up']['nickname']));
+						$item['params']['texticode'] = $commission['set']['texts']['icode'];
 					}
 					else if ($item['id'] == 'blockgroup') 
 					{
@@ -1749,6 +1751,15 @@ class DiypageModel extends PluginModel
 			}
 		}
 	}
+	public function replace_quotes($str) 
+	{
+		if (!(empty($str))) 
+		{
+			$str = str_replace('"', '', htmlspecialchars_decode($str, ENT_QUOTES));
+			$str = str_replace('\'', '', htmlspecialchars_decode($str, ENT_QUOTES));
+		}
+		return $str;
+	}
 	public function url($str) 
 	{
 		global $_W;
@@ -1820,14 +1831,12 @@ class DiypageModel extends PluginModel
 			if (($type == 2) && ($page['home'] == $id)) 
 			{
 				header('location: ' . mobileUrl(NULL, array('mid' => $_GPC['mid'])));
-				return;
 			}
-			if (($type == 3) && ($page['member'] == $id)) 
+			else if (($type == 3) && ($page['member'] == $id)) 
 			{
 				header('location: ' . mobileUrl('member', array('mid' => $_GPC['mid'])));
-				return;
 			}
-			if (($type == 4) && ($page['commission'] == $id)) 
+			else if (($type == 4) && ($page['commission'] == $id)) 
 			{
 				header('location: ' . mobileUrl('commission', array('mid' => $_GPC['mid'])));
 			}

@@ -129,7 +129,9 @@
             {if $goods['showtotal'] == 1}
             <span style="color: {$diyitem['style']['textcolor']};">库存:  {$goods['total']}</span>
             {/if}
-            <span style="color: {$diyitem['style']['textcolor']};">销量:  {php echo number_format($goods['sales'],0)} {$goods['unit']}</span>
+            {if !empty($goods['showsales'])}
+                <span style="color: {$diyitem['style']['textcolor']};">销量:  {php echo number_format($goods['sales'],0)} {$goods['unit']}</span>
+            {/if}
         {else}
             <span></span>
             <span></span>

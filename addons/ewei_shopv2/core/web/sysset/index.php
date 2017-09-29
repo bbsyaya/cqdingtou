@@ -10,94 +10,79 @@ class Index_EweiShopV2Page extends WebPage
 		if (cv('sysset.shop')) 
 		{
 			header('location: ' . webUrl('sysset/shop'));
-			return;
 		}
-		if (cv('sysset.follow')) 
+		else if (cv('sysset.follow')) 
 		{
 			header('location: ' . webUrl('sysset/follow'));
-			return;
 		}
-		if (cv('sysset.wap')) 
+		else if (cv('sysset.wap')) 
 		{
 			header('location: ' . webUrl('sysset/wap'));
-			return;
 		}
-		if (cv('sysset.pcset')) 
+		else if (cv('sysset.pcset')) 
 		{
 			header('location: ' . webUrl('sysset/pcset'));
-			return;
 		}
-		if (cv('sysset.notice')) 
+		else if (cv('sysset.notice')) 
 		{
 			header('location: ' . webUrl('sysset/notice'));
-			return;
 		}
-		if (cv('sysset.trade')) 
+		else if (cv('sysset.trade')) 
 		{
 			header('location: ' . webUrl('sysset/trade'));
-			return;
 		}
-		if (cv('sysset.payset')) 
+		else if (cv('sysset.payset')) 
 		{
 			header('location: ' . webUrl('sysset/payset'));
-			return;
 		}
-		if (cv('sysset.templat')) 
+		else if (cv('sysset.templat')) 
 		{
 			header('location: ' . webUrl('sysset/templat'));
-			return;
 		}
-		if (cv('sysset.member')) 
+		else if (cv('sysset.member')) 
 		{
 			header('location: ' . webUrl('sysset/member'));
-			return;
 		}
-		if (cv('sysset.category')) 
+		else if (cv('sysset.category')) 
 		{
 			header('location: ' . webUrl('sysset/category'));
-			return;
 		}
-		if (cv('sysset.contact')) 
+		else if (cv('sysset.contact')) 
 		{
 			header('location: ' . webUrl('sysset/contact'));
-			return;
 		}
-		if (cv('sysset.qiniu')) 
+		else if (cv('sysset.qiniu')) 
 		{
 			header('location: ' . webUrl('sysset/qiniu'));
-			return;
 		}
-		if (cv('sysset.sms.set')) 
+		else if (cv('sysset.sms.set')) 
 		{
 			header('location: ' . webUrl('sysset/sms/set'));
-			return;
 		}
-		if (cv('sysset.sms.temp')) 
+		else if (cv('sysset.sms.temp')) 
 		{
 			header('location: ' . webUrl('sysset/sms/temp'));
-			return;
 		}
-		if (cv('sysset.close')) 
+		else if (cv('sysset.close')) 
 		{
 			header('location: ' . webUrl('sysset/close'));
-			return;
 		}
-		if (cv('sysset.tmessage')) 
+		else if (cv('sysset.tmessage')) 
 		{
 			header('location: ' . webUrl('sysset/tmessage'));
-			return;
 		}
-		if (cv('sysset.cover')) 
+		else if (cv('sysset.cover')) 
 		{
 			header('location: ' . webUrl('sysset/cover'));
-			return;
 		}
-		if (cv('sysset.area')) 
+		else if (cv('sysset.area')) 
 		{
 			header('location: ' . webUrl('sysset/area'));
-			return;
 		}
-		header('location: ' . webUrl());
+		else 
+		{
+			header('location: ' . webUrl());
+		}
 	}
 	public function shop() 
 	{

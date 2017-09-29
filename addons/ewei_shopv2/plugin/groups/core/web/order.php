@@ -93,13 +93,13 @@ class Order_EweiShopV2Page extends PluginWebPage
 		{
 			$page = 'LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		}
-		$list = pdo_fetchall('SELECT o.id,o.orderno,o.status,o.expresssn,o.addressid,o.express,o.remark,o.is_team,o.pay_type,o.isverify,o.refundtime,o.price,o.creditmoney,' . "\n\t\t\t\t" . 'o.freight,o.discount,o.creditmoney,o.createtime,o.success,o.deleted,' . "\n\t\t\t\t" . 'g.title,g.category,g.thumb,g.groupsprice,g.singleprice,g.price as gprice,g.goodssn,m.nickname,m.id as mid,m.realname as mrealname,m.mobile as mmobile,' . "\n\t\t\t\t" . 'a.realname as arealname,a.mobile as amobile,a.province as aprovince ,a.city as acity , a.area as aarea,a.address as aaddress' . "\n\t\t\t\t" . 'FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid' . "\n\t\t\t\t" . 'WHERE 1 ' . $condition . ' GROUP BY o.id  ORDER BY o.createtime DESC ' . $page, $params);
+		$list = pdo_fetchall('SELECT o.id,o.orderno,o.status,o.expresssn,o.addressid,o.express,o.remark,o.is_team,o.pay_type,o.isverify,o.refundtime,o.price,o.creditmoney,' . "\n\t\t\t\t" . 'o.freight,o.discount,o.creditmoney,o.createtime,o.success,o.deleted,o.address,o.message,' . "\n\t\t\t\t" . 'g.title,g.category,g.thumb,g.groupsprice,g.singleprice,g.price as gprice,g.goodssn,m.nickname,m.id as mid,m.realname as mrealname,m.mobile as mmobile,' . "\n\t\t\t\t" . 'a.realname as arealname,a.mobile as amobile,a.province as aprovince ,a.city as acity , a.area as aarea,a.address as aaddress' . "\n\t\t\t\t" . 'FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid' . "\n\t\t\t\t" . 'WHERE 1 ' . $condition . ' GROUP BY o.id  ORDER BY o.createtime DESC ' . $page, $params);
 		foreach ($list as $key => $value ) 
 		{
 			if (!(empty($value['address']))) 
 			{
 				$user = unserialize($value['address']);
-				$list[$key]['addressdata'] = array('realname' => $user['realname'], 'mobile' => $user['mobile']);
+				$list[$key]['addressdata'] = array('realname' => $user['realname'], 'mobile' => $user['mobile'], 'province' => $user['province'], 'city' => $user['city'], 'area' => $user['area'], 'street' => $user['street'], 'address' => $user['address']);
 			}
 			else 
 			{
@@ -108,7 +108,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 				{
 					$user = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_address') . ' WHERE id = :id and uniacid=:uniacid', array(':id' => $value['addressid'], ':uniacid' => $_W['uniacid']));
 				}
-				$list[$key]['addressdata'] = array('realname' => $user['realname'], 'mobile' => $user['mobile']);
+				$list[$key]['addressdata'] = array('realname' => $user['realname'], 'mobile' => $user['mobile'], 'province' => $user['province'], 'city' => $user['city'], 'area' => $user['area'], 'street' => $user['street'], 'address' => $user['address']);
 			}
 		}
 		$total = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_groups_order') . ' as o' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_groups_goods') . ' as g on g.id = o.goodid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid' . "\n\t\t\t\t" . 'left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid' . "\n\t\t\t\t" . 'WHERE 1 ' . $condition . ' ', $params);
@@ -118,7 +118,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 		if ($_GPC['export'] == 1) 
 		{
 			plog('groups.order.export', '导出订单');
-			$columns = array( array('title' => '订单编号', 'field' => 'orderno', 'width' => 24), array('title' => '粉丝昵称', 'field' => 'nickname', 'width' => 12), array('title' => '会员姓名', 'field' => 'mrealname', 'width' => 12), array('title' => 'openid', 'field' => 'openid', 'width' => 30), array('title' => '会员手机手机号', 'field' => 'mmobile', 'width' => 15), array('title' => '收货姓名(或自提人)', 'field' => 'arealname', 'width' => 15), array('title' => '联系电话', 'field' => 'amobile', 'width' => 12), array('title' => '收货地址', 'field' => 'aprovince', 'width' => 12), array('title' => '', 'field' => 'acity', 'width' => 12), array('title' => '', 'field' => 'aarea', 'width' => 12), array('title' => '', 'field' => 'aaddress', 'width' => 20), array('title' => '商品名称', 'field' => 'title', 'width' => 30), array('title' => '商品编码', 'field' => 'goodssn', 'width' => 15), array('title' => '团购价', 'field' => 'groupsprice', 'width' => 12), array('title' => '单购价', 'field' => 'singleprice', 'width' => 12), array('title' => '原价', 'field' => 'price', 'width' => 12), array('title' => '商品数量', 'field' => 'goods_total', 'width' => 15), array('title' => '商品小计', 'field' => 'goodsprice', 'width' => 12), array('title' => '积分抵扣', 'field' => 'credit', 'width' => 12), array('title' => '积分抵扣金额', 'field' => 'creditmoney', 'width' => 12), array('title' => '运费', 'field' => 'freight', 'width' => 12), array('title' => '应收款', 'field' => 'amount', 'width' => 12), array('title' => '支付方式', 'field' => 'pay_type', 'width' => 12), array('title' => '状态', 'field' => 'status', 'width' => 12), array('title' => '下单时间', 'field' => 'createtime', 'width' => 24), array('title' => '付款时间', 'field' => 'paytime', 'width' => 24), array('title' => '发货时间', 'field' => 'sendtime', 'width' => 24), array('title' => '完成时间', 'field' => 'finishtime', 'width' => 24), array('title' => '快递公司', 'field' => 'expresscom', 'width' => 24), array('title' => '快递单号', 'field' => 'expresssn', 'width' => 24), array('title' => '订单备注', 'field' => 'remark', 'width' => 36) );
+			$columns = array( array('title' => '订单编号', 'field' => 'orderno', 'width' => 24), array('title' => '粉丝昵称', 'field' => 'nickname', 'width' => 12), array('title' => '会员姓名', 'field' => 'mrealname', 'width' => 12), array('title' => 'openid', 'field' => 'openid', 'width' => 30), array('title' => '会员手机手机号', 'field' => 'mmobile', 'width' => 15), array('title' => '收货姓名(或自提人)', 'field' => 'arealname', 'width' => 15), array('title' => '联系电话', 'field' => 'amobile', 'width' => 12), array('title' => '收货地址', 'field' => 'aprovince', 'width' => 12), array('title' => '', 'field' => 'acity', 'width' => 12), array('title' => '', 'field' => 'aarea', 'width' => 12), array('title' => '', 'field' => 'street', 'width' => 15), array('title' => '', 'field' => 'aaddress', 'width' => 20), array('title' => '商品名称', 'field' => 'title', 'width' => 30), array('title' => '商品编码', 'field' => 'goodssn', 'width' => 15), array('title' => '团购价', 'field' => 'groupsprice', 'width' => 12), array('title' => '单购价', 'field' => 'singleprice', 'width' => 12), array('title' => '原价', 'field' => 'price', 'width' => 12), array('title' => '商品数量', 'field' => 'goods_total', 'width' => 15), array('title' => '商品小计', 'field' => 'goodsprice', 'width' => 12), array('title' => '积分抵扣', 'field' => 'credit', 'width' => 12), array('title' => '积分抵扣金额', 'field' => 'creditmoney', 'width' => 12), array('title' => '运费', 'field' => 'freight', 'width' => 12), array('title' => '应收款', 'field' => 'amount', 'width' => 12), array('title' => '支付方式', 'field' => 'pay_type', 'width' => 12), array('title' => '状态', 'field' => 'status', 'width' => 12), array('title' => '下单时间', 'field' => 'createtime', 'width' => 24), array('title' => '付款时间', 'field' => 'paytime', 'width' => 24), array('title' => '发货时间', 'field' => 'sendtime', 'width' => 24), array('title' => '完成时间', 'field' => 'finishtime', 'width' => 24), array('title' => '快递公司', 'field' => 'expresscom', 'width' => 24), array('title' => '快递单号', 'field' => 'expresssn', 'width' => 24), array('title' => '买家备注', 'field' => 'message', 'width' => 36), array('title' => '卖家备注', 'field' => 'remark', 'width' => 36) );
 			$exportlist = array();
 			foreach ($list as $key => $value ) 
 			{
@@ -127,12 +127,13 @@ class Order_EweiShopV2Page extends PluginWebPage
 				$r['mrealname'] = $value['mrealname'];
 				$r['openid'] = $value['openid'];
 				$r['mmobile'] = $value['mmobile'];
-				$r['arealname'] = $value['arealname'];
-				$r['amobile'] = $value['amobile'];
-				$r['aprovince'] = $value['aprovince'];
-				$r['acity'] = $value['acity'];
-				$r['aarea'] = $value['aarea'];
-				$r['aaddress'] = $value['aaddress'];
+				$r['arealname'] = $value['addressdata']['realname'];
+				$r['amobile'] = $value['addressdata']['mobile'];
+				$r['aprovince'] = $value['addressdata']['province'];
+				$r['acity'] = $value['addressdata']['city'];
+				$r['aarea'] = $value['addressdata']['area'];
+				$r['street'] = $value['addressdata']['street'];
+				$r['aaddress'] = $value['addressdata']['address'];
 				$r['pay_type'] = $paytype['' . $value['pay_type'] . ''];
 				$r['freight'] = $value['freight'];
 				$r['groupsprice'] = $value['groupsprice'];
@@ -141,7 +142,13 @@ class Order_EweiShopV2Page extends PluginWebPage
 				$r['credit'] = ((!(empty($value['credit'])) ? '-' . $value['credit'] : 0));
 				$r['creditmoney'] = ((!(empty($value['creditmoney'])) ? '-' . $value['creditmoney'] : 0));
 				$r['goodsprice'] = $value['groupsprice'] * 1;
-				$r['status'] = ((($value['status'] == 1) && ($value['status'] == 1) ? $paystatus[4] : $paystatus['' . $value['status'] . '']));
+				if (($value['status'] == 1) && ($value['status'] == 1)) 
+				{
+				}
+				else 
+				{
+				}
+				$r['status'] = $paystatus['' . $value['status'] . ''];
 				$r['createtime'] = date('Y-m-d H:i:s', $value['createtime']);
 				$r['paytime'] = ((!(empty($value['paytime'])) ? date('Y-m-d H:i:s', $value['paytime']) : ''));
 				$r['sendtime'] = ((!(empty($value['sendtime'])) ? date('Y-m-d H:i:s', $value['sendtime']) : ''));
@@ -149,6 +156,7 @@ class Order_EweiShopV2Page extends PluginWebPage
 				$r['expresscom'] = $value['expresscom'];
 				$r['expresssn'] = $value['expresssn'];
 				$r['amount'] = (($value['groupsprice'] * 1) - $value['creditmoney']) + $value['freight'];
+				$r['message'] = $value['message'];
 				$r['remark'] = $value['remark'];
 				$r['title'] = $value['title'];
 				$r['goodssn'] = $value['goodssn'];

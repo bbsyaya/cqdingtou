@@ -27,7 +27,7 @@ if (!(empty($ordersn)))
 	}
 	else if ($paytype == 3) 
 	{
-		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=creditshop.detail.wechat_complete&logno=' . $ordersn;
+		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=creditshop.log.wechat_dispatch_complete&logno=' . $ordersn;
 	}
 	else if ($paytype == 4) 
 	{

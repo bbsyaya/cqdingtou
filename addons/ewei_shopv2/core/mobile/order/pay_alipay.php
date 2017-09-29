@@ -117,14 +117,15 @@ class Pay_Alipay_EweiShopV2Page extends MobilePage
 		{
 			$url = mobileUrl('order/detail', array('id' => $orderid), true);
 			exit('<script>top.window.location.href=\'' . $url . '\'</script>');
-			return;
 		}
-		if ($fromwechat) 
+		else if ($fromwechat) 
 		{
 			$this->message(array('message' => '请返回微信查看支付状态', 'title' => '支付成功!', 'buttondisplay' => false), NULL, 'success');
-			return;
 		}
-		$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('order'), 'success');
+		else 
+		{
+			$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('order'), 'success');
+		}
 	}
 	public function recharge_complete() 
 	{
@@ -200,14 +201,15 @@ class Pay_Alipay_EweiShopV2Page extends MobilePage
 		{
 			$url = mobileUrl('member', NULL, true);
 			exit('<script>top.window.location.href=\'' . $url . '\'</script>');
-			return;
 		}
-		if ($fromwechat) 
+		else if ($fromwechat) 
 		{
 			$this->message(array('message' => '请返回微信查看支付状态', 'title' => '支付成功!', 'buttondisplay' => false), NULL, 'success');
-			return;
 		}
-		$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('member'), 'success');
+		else 
+		{
+			$this->message(array('message' => '请返回商城查看支付状态', 'title' => '支付成功!'), mobileUrl('member'), 'success');
+		}
 	}
 	protected function str($str) 
 	{

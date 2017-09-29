@@ -438,9 +438,11 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		if (!(empty($templateid))) 
 		{
 			m('message')->sendTplNotice($openid, $templateid, $msg, $url);
-			return;
 		}
-		m('message')->sendCustomNotice($openid, $msg, $url);
+		else 
+		{
+			m('message')->sendCustomNotice($openid, $msg, $url);
+		}
 	}
 	public function sendReturnMessage($openid, $coupon) 
 	{
@@ -452,9 +454,11 @@ class Coupon_EweiShopV2ComModel extends ComModel
 		if (!(empty($templateid))) 
 		{
 			m('message')->sendTplNotice($openid, $templateid, $msg, $url);
-			return;
 		}
-		m('message')->sendCustomNotice($openid, $msg, $url);
+		else 
+		{
+			m('message')->sendCustomNotice($openid, $msg, $url);
+		}
 	}
 	public function useRechargeCoupon($log) 
 	{
@@ -1134,7 +1138,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 				if (!(empty($member)) && ($member['status'] == 1) && ($member['isagent'] == 1)) 
 				{
 					$_W['shopshare']['link'] = $url . '&mid=' . $member['id'];
-					if (empty($member['realname']) || empty($member['mobile'])) 
+					if (empty($pset['become_reg']) && (empty($member['realname']) || empty($member['mobile']))) 
 					{
 						$trigger = true;
 					}

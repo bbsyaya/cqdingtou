@@ -170,7 +170,9 @@ class Index_EweiShopV2Page extends ComWebPage
 					if (!(is_file($imgurl))) 
 					{
 						$img = tomedia($_GPC['logolocalpath']);
-						file_put_contents($imgurl, file_get_contents($img));
+						load()->func('communication');
+						$resp = ihttp_get($img);
+						file_put_contents($imgurl, $resp['content']);
 					}
 					$result = com('wxcard')->wxCardUpdateImg($imgurl);
 					if (is_wxerror($result)) 
@@ -229,7 +231,9 @@ class Index_EweiShopV2Page extends ComWebPage
 				if (!(is_file($imgurl))) 
 				{
 					$img = tomedia($_GPC['logolocalpath']);
-					file_put_contents($imgurl, file_get_contents($img));
+					load()->func('communication');
+					$resp = ihttp_get($img);
+					file_put_contents($imgurl, $resp['content']);
 				}
 				$result = com('wxcard')->wxCardUpdateImg($imgurl);
 				if (is_wxerror($result)) 
@@ -277,7 +281,9 @@ class Index_EweiShopV2Page extends ComWebPage
 					if (!(is_file($imgurl))) 
 					{
 						$img = tomedia($_GPC['abstractimglocalpath']);
-						file_put_contents($imgurl, file_get_contents($img));
+						load()->func('communication');
+						$resp = ihttp_get($img);
+						file_put_contents($imgurl, $resp['content']);
 					}
 					$result = com('wxcard')->wxCardUpdateImg($imgurl);
 					if (is_wxerror($result)) 

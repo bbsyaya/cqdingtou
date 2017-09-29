@@ -383,9 +383,11 @@ class Goods_EweiShopV2Model
 		{
 			$history = array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'goodsid' => $goodsid, 'deleted' => 0, 'createtime' => time(), 'times' => 1);
 			pdo_insert('ewei_shop_member_history', $history);
-			return;
 		}
-		pdo_update('ewei_shop_member_history', array('deleted' => 0, 'times' => $history['times'] + 1), array('id' => $history['id']));
+		else 
+		{
+			pdo_update('ewei_shop_member_history', array('deleted' => 0, 'times' => $history['times'] + 1), array('id' => $history['id']));
+		}
 	}
 	public function getCartCount() 
 	{

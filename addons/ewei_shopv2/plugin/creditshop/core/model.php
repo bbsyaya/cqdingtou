@@ -709,7 +709,6 @@ if (!(class_exists('CreditshopModel')))
 								m('message')->sendCustomNotice($noticeopenid, $msg);
 							}
 						}
-						return;
 					}
 				}
 			}
@@ -742,9 +741,11 @@ if (!(class_exists('CreditshopModel')))
 				if (!(empty($tm['send']))) 
 				{
 					m('message')->sendTplNotice($log['verifyopenid'], $tm['send'], $msg_saler, $detailurl1);
-					return;
 				}
-				m('message')->sendCustomNotice($log['verifyopenid'], $msg_saler, $detailurl1);
+				else 
+				{
+					m('message')->sendCustomNotice($log['verifyopenid'], $msg_saler, $detailurl1);
+				}
 			}
 		}
 		public function createQrcode($logid = 0) 

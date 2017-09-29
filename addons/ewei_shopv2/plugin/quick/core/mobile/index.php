@@ -24,7 +24,8 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			$this->message('页面数据出错', mobileUrl());
 		}
-		$data = $this->model->mobile($datas);
+		$merchid = ((empty($item['merchid']) ? 0 : intval($item['merchid'])));
+		$data = $this->model->mobile($datas, $merchid);
 		if ($data['template'] == 1) 
 		{
 			$datas = 'null';
@@ -56,6 +57,23 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			$_W['shopshare']['imgUrl'] = tomedia($_W['shopshare']['imgUrl']);
 		}
 		$hideGoTop = 1;
+		if ($data['template'] == 1) 
+		{
+			$shopset = $_W['shopset']['shop'];
+			if (p('merch') && !(empty($merchid))) 
+			{
+				$merchset = p('merch')->getListUserOne($merchid);
+				$shopset = array('name' => $merchset['merchname'], 'logo' => tomedia($merchset['logo']));
+			}
+			if (!(empty($data['style']['shoplogo']))) 
+			{
+				$shopset['logo'] = tomedia($data['style']['shoplogo']);
+			}
+			if (!(empty($data['style']['shopname']))) 
+			{
+				$shopset['name'] = $data['style']['shopname'];
+			}
+		}
 		include $this->template();
 	}
 	public function get_list() 
@@ -65,6 +83,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$pagesize = 10;
 		$page = max(1, intval($_GPC['page']));
 		$datatype = intval($_GPC['datatype']);
+		$merchid = intval($_GPC['merchid']);
 		$goodssort = intval($_GPC['goodssort']);
 		$orderby = '';
 		if ($goodssort == 1) 
@@ -111,7 +130,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			$groupid = intval($_GPC['groupid']);
 			if (!(empty($groupid))) 
 			{
-				$group = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods_group') . ' WHERE id=:id and uniacid=:uniacid and enabled=1 limit 1 ', array(':id' => $groupid, ':uniacid' => $_W['uniacid']));
+				$group = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods_group') . ' WHERE id=:id and uniacid=:uniacid and merchid=:merchid and enabled=1 limit 1 ', array(':id' => $groupid, ':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
 				$goodsids = $group['goodsids'];
 				if (!(empty($goodsids))) 
 				{
@@ -184,10 +203,6 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			show_json(0, '商品未找到');
 		}
-		if (($goods['isverify'] == 2) || ($goods['type'] == 2) || ($goods['type'] == 3) || !(empty($goods['cannotrefund']))) 
-		{
-			show_json(0, '此商品不可加入购物车<br>请返回商城直接购买');
-		}
 		$diyform_plugin = p('diyform');
 		$diyformid = 0;
 		$diyformfields = iserializer(array());
@@ -243,7 +258,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			{
 				show_json(1);
 			}
-			$data = array('uniacid' => $_W['uniacid'], 'merchid' => $goods['merchid'], 'openid' => $_W['openid'], 'goodsid' => $goodsid, 'optionid' => $optionid, 'marketprice' => $goods['marketprice'], 'total' => $total, 'diyformid' => $diyformid, 'diyformdata' => $diyformdata, 'diyformfields' => $diyformfields, 'createtime' => time());
+			$data = array('uniacid' => $_W['uniacid'], 'merchid' => intval($_GPC['merchid']), 'openid' => $_W['openid'], 'goodsid' => $goodsid, 'optionid' => $optionid, 'marketprice' => $goods['marketprice'], 'total' => $total, 'diyformid' => $diyformid, 'diyformdata' => $diyformdata, 'diyformfields' => $diyformfields, 'createtime' => time());
 			if (!(empty($quickid))) 
 			{
 				$data['quickid'] = $quickid;
@@ -270,7 +285,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 				$data['diyformdata'] = $diyformdata;
 				$data['diyformfields'] = $diyformfields;
 			}
-			$arr2 = array('id' => $data['id']);
+			$arr2 = array('id' => $data['id'], 'uniacid' => $_W['uniacid']);
 			if (!(empty($quickid))) 
 			{
 				$arr['quickid'] = $quickid;

@@ -288,6 +288,13 @@
                         </tr>
 
                         {if $item['isverify']==1}
+                            {if !empty($item['verifyendtime'])}
+                            <tr>
+                                <td style='width:80px'>使用期限：</td>
+                                <td>{php echo date('Y-m-d H:i:s', $item['verifyendtime'])}</td>
+                            </tr>
+                            {/if}
+
                             <tr>
                                 <td style='width:80px'>核销方式：</td>
                                 <td>{if $item['verifytype']==0}

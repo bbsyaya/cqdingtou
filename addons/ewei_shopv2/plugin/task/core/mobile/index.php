@@ -9,9 +9,11 @@ class index_EweiShopV2Page extends PluginMobilePage
 	{
 		global $_W;
 		global $_GPC;
+		$member = m('member')->getMember($_W['openid']);
 		$list1 = $this->model->getUserTaskList(1);
 		$list2 = $this->model->getUserTaskList(2);
 		$poster = $this->taskposter();
+		$bgimg = pdo_get('ewei_shop_task_default', array('uniacid' => $_W['uniacid']), array('bgimg'));
 		include $this->template();
 	}
 	public function newtask() 
@@ -65,7 +67,7 @@ class index_EweiShopV2Page extends PluginMobilePage
 		$is_menu = $this->model->getdefault('menu_state');
 		$member = m('member')->getMember($openid);
 		$now_time = time();
-		$task_sql = 'SELECT * FROM ' . tablename('ewei_shop_task_poster') . ' WHERE timestart<=' . $now_time . ' AND timeend>' . $now_time . ' AND uniacid=' . $_W['uniacid'] . ' AND `status`=1 AND `is_delete`=0 ORDER BY `createtime` DESC LIMIT 0,15';
+		$task_sql = 'SELECT * FROM ' . tablename('ewei_shop_task_poster') . ' WHERE timestart<=' . $now_time . ' AND timeend>' . $now_time . ' AND uniacid=' . $_W['uniacid'] . ' AND `status`=1 AND `is_delete`=0 ORDER BY `createtime` DESC';
 		$task_list = pdo_fetchall($task_sql);
 		foreach ($task_list as $key => $val ) 
 		{
@@ -123,7 +125,7 @@ class index_EweiShopV2Page extends PluginMobilePage
 				}
 			}
 		}
-		$running_sql = 'SELECT `join`.*,`task`.title,`task`.reward_data AS `poster_reward`,`task`.titleicon,`task`.poster_type FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.`failtime`>' . $now_time . ' AND `join`.`join_user`="' . $openid . '" AND `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.`is_reward` = 0 ORDER BY `join`.`addtime` DESC LIMIT 0,15';
+		$running_sql = 'SELECT `join`.*,`task`.title,`task`.reward_data AS `poster_reward`,`task`.titleicon,`task`.poster_type FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.`failtime`>' . $now_time . ' AND `join`.`join_user`="' . $openid . '" AND `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.`is_reward` = 0 AND `task`.`is_delete` = 0 ORDER BY `join`.`addtime` DESC LIMIT 0,15';
 		$task_running = pdo_fetchall($running_sql);
 		foreach ($task_running as $key => $val ) 
 		{
@@ -181,7 +183,7 @@ class index_EweiShopV2Page extends PluginMobilePage
 				}
 			}
 		}
-		$complete_sql = 'SELECT `join`.*,`task`.title,`task`.titleicon,`task`.poster_type FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.`join_user`="' . $openid . '" AND `join`.`is_reward`=1 ORDER BY `join`.`addtime` DESC LIMIT 0,15';
+		$complete_sql = 'SELECT `join`.*,`task`.title,`task`.titleicon,`task`.poster_type FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.`join_user`="' . $openid . '" AND `join`.`is_reward`=1 AND `task`.`is_delete` = 0 ORDER BY `join`.`addtime` DESC LIMIT 0,15';
 		$task_complete = pdo_fetchall($complete_sql);
 		foreach ($task_complete as $key => $val ) 
 		{
@@ -240,7 +242,7 @@ class index_EweiShopV2Page extends PluginMobilePage
 				}
 			}
 		}
-		$faile_sql = 'SELECT `join`.*,`task`.title,`task`.reward_data AS `poster_reward`,`task`.titleicon,`task`.poster_type FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.`failtime`<=' . $now_time . ' AND `join`.`join_user`="' . $openid . '" AND `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.`is_reward`=0 ORDER BY `join`.`addtime` DESC LIMIT 0,15';
+		$faile_sql = 'SELECT `join`.*,`task`.title,`task`.reward_data AS `poster_reward`,`task`.titleicon,`task`.poster_type FROM ' . tablename('ewei_shop_task_join') . ' AS `join` LEFT JOIN ' . tablename('ewei_shop_task_poster') . ' AS `task` ON `join`.task_id=`task`.`id` WHERE `join`.`failtime`<=' . $now_time . ' AND `join`.`join_user`="' . $openid . '" AND `join`.uniacid=' . $_W['uniacid'] . ' AND `join`.`is_reward`=0 AND `task`.`is_delete` = 0 ORDER BY `join`.`addtime` DESC LIMIT 0,15';
 		$faile_complete = pdo_fetchall($faile_sql);
 		foreach ($faile_complete as $key => $val ) 
 		{
@@ -316,8 +318,8 @@ class index_EweiShopV2Page extends PluginMobilePage
 		global $_GPC;
 		$id = intval($_GPC['id']);
 		$rewarded = pdo_get('ewei_shop_task_extension_join', array('uniacid' => $_W['uniacid'], 'id' => $_GPC['id']), array('rewarded'));
-		$rewarded = unserialize($rewarded[0]);
-		$this->model->sendReward($rewarded);
+		$rewarded = unserialize($rewarded['rewarded']);
+		$this->model->sendReward($rewarded, 1);
 		show_json(1, '奖励已发放');
 	}
 	private function getpostericon($id) 
@@ -325,6 +327,20 @@ class index_EweiShopV2Page extends PluginMobilePage
 		global $_W;
 		global $_GPC;
 		return pdo_fetchcolumn('SELECT titleicon FROM ' . tablename('ewei_shop_task_poster') . ' WHERE id = :id AND uniacid = :uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+	}
+	private function checkJoined($taskid) 
+	{
+		global $_W;
+		$sql = 'SELECT COUNT(*) FROM ' . tablename('ewei_shop_task_extension_join') . ' WHERE openid = :openid AND taskid = :taskid';
+		return pdo_fetchcolumn($sql, array(':openid' => $_W['openid'], ':taskid' => $taskid));
+	}
+	private function getDesc() 
+	{
+		global $_W;
+		$sql = 'SELECT `data` FROM ' . tablename('ewei_shop_task_default') . ' WHERE uniacid = :uniacid';
+		$data = pdo_fetchcolumn($sql, array(':uniacid' => $_W['uniacid']));
+		$arr = unserialize($data);
+		return unserialize($arr['taskinfo']);
 	}
 }
 ?>

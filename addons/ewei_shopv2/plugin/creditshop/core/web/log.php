@@ -167,7 +167,7 @@ class Log_EweiShopV2Page extends PluginWebPage
 			$params[':starttime'] = $starttime;
 			$params[':endtime'] = $endtime;
 		}
-		$sql = 'select log.*, m.nickname,m.avatar,m.realname as mrealname,m.mobile as mmobile, g.title,g.thumb,g.thumb,g.credit,g.money,g.type as goodstype,g.isverify,' . "\r\n\t\t\t" . 'g.goodstype as iscoupon,s.storename,s.address as storeaddress,g.dispatch,g.goodstype,g.type,g.merchid as gmerchid' . "\r\n\t\t\t" . 'from ' . tablename('ewei_shop_creditshop_log') . ' log ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid = log.openid and m.uniacid=log.uniacid' . ' left join ' . tablename('ewei_shop_member_address') . ' a on a.id = log.addressid' . ' left join ' . tablename('ewei_shop_store') . ' s on s.id = log.storeid' . ' left join ' . tablename('ewei_shop_creditshop_goods') . ' g on g.id = log.goodsid' . ' where 1 ' . $condition . ' ORDER BY log.createtime desc ';
+		$sql = 'select log.*, m.nickname,m.avatar,m.realname as mrealname,m.mobile as mmobile, g.title,g.thumb,g.thumb,g.credit,g.money,g.type as goodstype,g.isverify,' . "\n\t\t\t" . 'g.goodstype as iscoupon,s.storename,s.address as storeaddress,g.dispatch,g.goodstype,g.type,g.merchid as gmerchid' . "\n\t\t\t" . 'from ' . tablename('ewei_shop_creditshop_log') . ' log ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid = log.openid and m.uniacid=log.uniacid' . ' left join ' . tablename('ewei_shop_member_address') . ' a on a.id = log.addressid' . ' left join ' . tablename('ewei_shop_store') . ' s on s.id = log.storeid' . ' left join ' . tablename('ewei_shop_creditshop_goods') . ' g on g.id = log.goodsid' . ' where 1 ' . $condition . ' group by log.id ORDER BY log.createtime desc ';
 		if (empty($_GPC['export'])) 
 		{
 			$sql .= ' limit ' . (($pindex - 1) * $psize) . ',' . $psize;
@@ -260,6 +260,14 @@ class Log_EweiShopV2Page extends PluginWebPage
 				$row['typestr'] = ((empty($row['type']) ? '兑换' : '抽奖'));
 				$row['verifystr'] = ((empty($row['isverify']) ? '快递' : '线下'));
 				$row['createtime'] = date('Y-m-d H:i', $row['createtime']);
+				if (0 < $row['usetime']) 
+				{
+					$row['usetime'] = date('Y-m-d H:i', $row['usetime']);
+				}
+				else 
+				{
+					$row['usetime'] = '';
+				}
 				$row['user1'] = ((empty($row['realname']) ? $row['mrealname'] : $row['realname']));
 				$row['user2'] = ((empty($row['mobile']) ? $row['mmobile'] : $row['mobile']));
 				if (!(empty($row['addressid']))) 
@@ -350,7 +358,7 @@ class Log_EweiShopV2Page extends PluginWebPage
 				}
 			}
 			unset($row);
-			$columns = array( array('title' => 'ID', 'field' => 'id', 'width' => 12), array('title' => '活动编号', 'field' => 'logno', 'width' => 24), array('title' => '商品名称', 'field' => 'title', 'width' => 12), array('title' => '商品规格', 'field' => 'optiontitle', 'width' => 20), array('title' => '活动类型', 'field' => 'typestr', 'width' => 12), array('title' => '兑换方式', 'field' => 'verifystr', 'width' => 12), array('title' => '联系人', 'field' => 'user1', 'width' => 12), array('title' => '联系电话', 'field' => 'user2', 'width' => 12), array('title' => '邮寄地址', 'field' => 'addressinfo_province', 'width' => 12), array('title' => '', 'field' => 'addressinfo_city', 'width' => 12), array('title' => '', 'field' => 'addressinfo_area', 'width' => 12), array('title' => '', 'field' => 'addressinfo_address', 'width' => 24), array('title' => '', 'field' => 'addressinfo_realname', 'width' => 12), array('title' => '', 'field' => 'addressinfo_mobile', 'width' => 12), array('title' => '兑换门店', 'field' => 'storeinfo_storename', 'width' => 12), array('title' => '', 'field' => 'storeinfo_address', 'width' => 24), array('title' => '参与状态', 'field' => 'statusstr', 'width' => 12), array('title' => '支付状态', 'field' => 'paystr', 'width' => 12), array('title' => '快递状态', 'field' => 'dispatchstr', 'width' => 12), array('title' => '参与时间', 'field' => 'createtime', 'width' => 12) );
+			$columns = array( array('title' => 'ID', 'field' => 'id', 'width' => 12), array('title' => '活动编号', 'field' => 'logno', 'width' => 24), array('title' => '商品名称', 'field' => 'title', 'width' => 12), array('title' => '商品规格', 'field' => 'optiontitle', 'width' => 20), array('title' => '活动类型', 'field' => 'typestr', 'width' => 12), array('title' => '兑换方式', 'field' => 'verifystr', 'width' => 12), array('title' => '联系人', 'field' => 'user1', 'width' => 12), array('title' => '联系电话', 'field' => 'user2', 'width' => 12), array('title' => '邮寄地址', 'field' => 'addressinfo_province', 'width' => 12), array('title' => '', 'field' => 'addressinfo_city', 'width' => 12), array('title' => '', 'field' => 'addressinfo_area', 'width' => 12), array('title' => '', 'field' => 'addressinfo_address', 'width' => 24), array('title' => '', 'field' => 'addressinfo_realname', 'width' => 12), array('title' => '', 'field' => 'addressinfo_mobile', 'width' => 12), array('title' => '兑换门店', 'field' => 'storeinfo_storename', 'width' => 12), array('title' => '兑换时间', 'field' => 'usetime', 'width' => 15), array('title' => '', 'field' => 'storeinfo_address', 'width' => 24), array('title' => '参与状态', 'field' => 'statusstr', 'width' => 12), array('title' => '支付状态', 'field' => 'paystr', 'width' => 12), array('title' => '快递状态', 'field' => 'dispatchstr', 'width' => 12), array('title' => '参与时间', 'field' => 'createtime', 'width' => 12) );
 			m('excel')->export($list, array('title' => ((empty($type) ? '兑换' : '抽奖')) . '订单数据-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
 		}
 		$pager = pagination($total, $pindex, $psize);
@@ -510,6 +518,35 @@ class Log_EweiShopV2Page extends PluginWebPage
 				{
 					pdo_update('ewei_shop_creditshop_log', array('status' => 3, 'usetime' => time(), 'time_send' => time(), 'expresscom' => $_GPC['expresscom'], 'expresssn' => $_GPC['expresssn'], 'express' => $_GPC['express']), array('id' => $id));
 				}
+			}
+			else if ($goods['goodstype'] == 3) 
+			{
+				$money = abs($goods['grant2']);
+				$setting = uni_setting($_W['uniacid'], array('payment'));
+				if (!(is_array($setting['payment']))) 
+				{
+					show_json(0, '没有设定支付参数!');
+				}
+				$sec = m('common')->getSec();
+				$sec = iunserializer($sec['sec']);
+				$certs = $sec;
+				$wechat = $setting['payment']['wechat'];
+				$sql = 'SELECT `key`,`secret` FROM ' . tablename('account_wechats') . ' WHERE `uniacid`=:uniacid limit 1';
+				$row = pdo_fetch($sql, array(':uniacid' => $_W['uniacid']));
+				$params = array('openid' => $log['openid'], 'tid' => $log['logno'] . rand(1, 100), 'send_name' => '积分商城红包兑换', 'money' => $money, 'wishing' => '红包领到手抽筋，别人加班你加薪!', 'act_name' => '积分商城红包兑换', 'remark' => '积分商城红包兑换');
+				$wechat = array('appid' => $row['key'], 'mchid' => $wechat['mchid'], 'apikey' => $wechat['apikey'], 'certs' => $certs);
+				$err = m('common')->sendredpack($params, $wechat);
+				if (is_error($err)) 
+				{
+					show_json(0, $err['message']);
+				}
+				else 
+				{
+					$status = 3;
+					$update['time_finish'] = time();
+				}
+				$update['status'] = $status;
+				pdo_update('ewei_shop_creditshop_log', $update, array('id' => $id));
 			}
 			$this->model->sendMessage($id);
 			plog('creditshop.log.doexchange', '积分商城兑换 兑换记录ID: ' . $id);

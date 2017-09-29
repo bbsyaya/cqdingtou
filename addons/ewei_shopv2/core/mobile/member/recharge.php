@@ -269,9 +269,11 @@ class Recharge_EweiShopV2Page extends MobileLoginPage
 		if ($_W['ispost']) 
 		{
 			show_json(0);
-			return;
 		}
-		header('location: ' . mobileUrl('member'));
+		else 
+		{
+			header('location: ' . mobileUrl('member'));
+		}
 	}
 	public function getstatus() 
 	{
@@ -282,9 +284,11 @@ class Recharge_EweiShopV2Page extends MobileLoginPage
 		if (!(empty($log)) && !(empty($log['status']))) 
 		{
 			show_json(1);
-			return;
 		}
-		show_json(0);
+		else 
+		{
+			show_json(0);
+		}
 	}
 }
 ?>
