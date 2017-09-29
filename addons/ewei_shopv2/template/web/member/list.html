@@ -185,7 +185,7 @@
                         	<li><a href="{php echo webUrl('member/list/detail',array('id' => $row['id']));}" title="会员详情"><i class='fa fa-edit'></i> 会员详情</a></li>
                         {/if}
                         {ifp 'order.list'}
-                        	<li><a href="{php echo webUrl('order/list', array('searchfield'=>'member','keyword'=>$row['nickname']))}" title='会员订单'><i class='fa fa-list'></i> 会员订单</a></li>
+                        	<li><a href="{php echo webUrl('order/list', array('searchfield'=>'mid','keyword'=>$row['id']))}" title='会员订单'><i class='fa fa-list'></i> 会员订单</a></li>
                         {/if}
                         {ifp 'finance.recharge.credit1'}<li><a data-toggle="ajaxModal" href="{php echo webUrl('finance/recharge', array('type'=>'credit1','id'=>$row['id']))}" title='充值积分'><i class='fa fa-credit-card'></i> 充值积分</a></li>{/if}
                         {ifp 'finance.recharge.credit2'}<li><a data-toggle="ajaxModal" href="{php echo webUrl('finance/recharge', array('type'=>'credit2','id'=>$row['id']))}" title='充值余额'><i class='fa fa-money'></i> 充值余额 </a></li>{/if}
@@ -202,7 +202,7 @@
            {$pager}
 		   <script language="javascript">
 			     {if $opencommission}
-			require(['bootstrap'],function(){
+			     require(['bootstrap', 'jquery', 'jquery.ui'], function (bs, $, $) {
         $("[rel=pop]").popover({
             trigger:'manual',
             placement : 'left', 

@@ -13,7 +13,7 @@
                 <img src="{php echo empty($item['thumb'])?'../addons/ewei_shopv2/static/images/plugin.png': tomedia($item['thumb'])}" alt="{$item['name']}">
             </div>
             <div class="plugingrant-head-right">
-                <h2>{$item['name']}</h2>
+                <h2>{if !empty($item['name'])}{$item['name']}{else}{$item['pname']}{/if}</h2>
                 {if $type=='plugin'}
                 <ul class="grant-detail-left-ul">
                     <li><span>适用版本：</span><span>{if $item['isv2']>0}V2{else}其他{/if}</span></li>

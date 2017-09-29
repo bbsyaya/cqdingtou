@@ -1002,6 +1002,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_coupon` (
   `settitlecolor` tinyint(1) DEFAULT '0',
   `titlecolor` varchar(10) DEFAULT '',
   `limitdiscounttype` tinyint(1) DEFAULT '1',
+  `quickget` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_coupontype` (`coupontype`),
@@ -2293,6 +2294,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `statustimeend` int(10) NOT NULL DEFAULT '0',
   `nosearch` tinyint(1) NOT NULL DEFAULT '0',
   `showsales` tinyint(3) NOT NULL DEFAULT '1',
+  `islive` int(11) NOT NULL DEFAULT '0',
+  `liveprice` decimal(10,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_pcate` (`pcate`),
@@ -2403,6 +2406,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods_option` (
   `allfullbackratio` decimal(10,2) DEFAULT NULL,
   `fullbackratio` decimal(10,2) DEFAULT NULL,
   `isfullback` tinyint(3) NOT NULL,
+  `islive` int(11) NOT NULL,
+  `liveprice` decimal(10,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_goodsid` (`goodsid`),
@@ -2722,6 +2727,142 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_groups_verify` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_live`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `merchid` int(11) NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL,
+  `livetype` tinyint(3) NOT NULL DEFAULT '0',
+  `liveidentity` varchar(50) NOT NULL,
+  `screen` tinyint(3) NOT NULL DEFAULT '0',
+  `goodsid` varchar(255) NOT NULL,
+  `category` int(11) NOT NULL DEFAULT '0',
+  `url` varchar(1000) NOT NULL,
+  `thumb` varchar(1000) NOT NULL,
+  `hot` tinyint(3) NOT NULL DEFAULT '0',
+  `recommend` tinyint(3) NOT NULL DEFAULT '0',
+  `living` tinyint(3) NOT NULL DEFAULT '0',
+  `status` tinyint(3) NOT NULL DEFAULT '0',
+  `displayorder` int(11) NOT NULL DEFAULT '0',
+  `livetime` int(10) NOT NULL DEFAULT '0',
+  `lastlivetime` int(11) NOT NULL DEFAULT '0',
+  `createtime` int(10) NOT NULL DEFAULT '0',
+  `introduce` text NOT NULL,
+  `packetmoney` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `packettotal` int(11) NOT NULL DEFAULT '0',
+  `packetprice` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `packetdes` varchar(255) NOT NULL,
+  `couponid` varchar(255) NOT NULL,
+  `share_title` varchar(255) NOT NULL,
+  `share_icon` varchar(1000) NOT NULL,
+  `share_desc` text NOT NULL,
+  `share_url` varchar(1000) NOT NULL DEFAULT '',
+  `subscribe` int(11) NOT NULL DEFAULT '0',
+  `subscribenotice` tinyint(3) NOT NULL DEFAULT '0',
+  `visit` int(11) NOT NULL DEFAULT '0',
+  `video` varchar(1000) NOT NULL DEFAULT '',
+  `covertype` tinyint(3) NOT NULL DEFAULT '0',
+  `cover` varchar(1000) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_merchid` (`merchid`) USING BTREE,
+  KEY `idx_category` (`category`) USING BTREE,
+  KEY `idx_hot` (`hot`) USING BTREE,
+  KEY `idx_recommend` (`recommend`) USING BTREE,
+  KEY `idx_living` (`living`) USING BTREE,
+  KEY `idx_status` (`status`) USING BTREE,
+  KEY `idx_livetime` (`livetime`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_live_adv`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live_adv` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT '0',
+  `merchid` int(11) NOT NULL DEFAULT '0',
+  `advname` varchar(50) DEFAULT '',
+  `link` varchar(255) DEFAULT '',
+  `thumb` varchar(255) DEFAULT '',
+  `displayorder` int(11) DEFAULT '0',
+  `enabled` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_enabled` (`enabled`) USING BTREE,
+  KEY `idx_displayorder` (`displayorder`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_live_category`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live_category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT '0',
+  `name` varchar(50) DEFAULT NULL,
+  `thumb` varchar(255) DEFAULT NULL,
+  `displayorder` tinyint(3) unsigned DEFAULT '0',
+  `enabled` tinyint(1) DEFAULT '1',
+  `advimg` varchar(255) DEFAULT '',
+  `advurl` varchar(500) DEFAULT '',
+  `isrecommand` tinyint(3) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_displayorder` (`displayorder`) USING BTREE,
+  KEY `idx_enabled` (`enabled`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_live_coupon`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live_coupon` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `roomid` int(11) NOT NULL DEFAULT '0',
+  `couponid` int(11) NOT NULL DEFAULT '0',
+  `coupontotal` int(11) NOT NULL DEFAULT '0',
+  `couponlimit` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_roomid` (`roomid`) USING BTREE,
+  KEY `idx_couponid` (`couponid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_live_favorite`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live_favorite` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `roomid` int(11) NOT NULL DEFAULT '0',
+  `openid` tinytext NOT NULL,
+  `deleted` tinyint(3) NOT NULL DEFAULT '0',
+  `createtime` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_roomid` (`roomid`) USING BTREE,
+  KEY `idx_deleted` (`deleted`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_live_setting`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live_setting` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `ismember` tinyint(3) NOT NULL DEFAULT '0',
+  `share_title` varchar(255) NOT NULL,
+  `share_icon` varchar(1000) NOT NULL,
+  `share_desc` varchar(255) NOT NULL,
+  `share_url` varchar(255) NOT NULL,
+  `livenoticetime` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_ismember` (`ismember`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_live_view`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_live_view` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `openid` varchar(50) NOT NULL,
+  `roomid` int(11) NOT NULL DEFAULT '0',
+  `viewing` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_roomid` (`roomid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_lottery`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_lottery` (
   `lottery_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2892,6 +3033,10 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_member` (
   `nickname_wechat` varchar(255) DEFAULT '',
   `avatar_wechat` varchar(255) DEFAULT '',
   `updateaddress` tinyint(1) NOT NULL DEFAULT '0',
+  `membercardid` varchar(255) DEFAULT '',
+  `membercardcode` varchar(255) DEFAULT '',
+  `membershipnumber` varchar(255) DEFAULT '',
+  `membercardactive` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_shareid` (`agentid`),
@@ -3500,6 +3645,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_merch_user` (
   `pluginset` text NOT NULL,
   `uname` varchar(50) NOT NULL DEFAULT '',
   `upass` varchar(255) NOT NULL DEFAULT '',
+  `maxgoods` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_status` (`status`),
@@ -3670,6 +3816,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order` (
   `dispatchkey` varchar(30) NOT NULL DEFAULT '',
   `quickid` int(11) NOT NULL DEFAULT '0',
   `istrade` tinyint(3) NOT NULL DEFAULT '0',
+  `isnewstore` tinyint(3) NOT NULL DEFAULT '0',
+  `liveid` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_openid` (`openid`),
@@ -4104,7 +4252,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_plugin` (
   PRIMARY KEY (`id`),
   KEY `idx_displayorder` (`displayorder`),
   KEY `idx_identity` (`identity`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=42 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_polyapi_key`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_polyapi_key` (
@@ -5213,6 +5361,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_system_plugingrant_plugin` (
   `sales` int(11) NOT NULL DEFAULT '0',
   `createtime` int(10) NOT NULL DEFAULT '0',
   `displayorder` int(11) NOT NULL DEFAULT '0',
+  `plugintype` tinyint(3) NOT NULL DEFAULT '0',
+  `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
@@ -5552,7 +5702,6 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxcard` (
   `use_condition` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
-
 INSERT INTO `ims_ewei_shop_member_message_template_type` (`id`, `name`, `typecode`, `templatecode`, `templateid`, `templatename`, `content`, `showtotaladd`, `typegroup`, `groupname`) VALUES
 (1, '订单付款通知', 'saler_pay', 'OPENTM405584202', 'xldHFTObiLLm7AK544PzW4bFJGgbS0o8Po4cXOgYEis', '订单付款通知', '{{first.DATA}}订单编号：{{keyword1.DATA}}商品名称：{{keyword2.DATA}}商品数量：{{keyword3.DATA}}支付金额：{{keyword4.DATA}}{{remark.DATA}}', 0, 'sys', '系统消息通知'),
 (2, '自提订单提交成功通知', 'carrier', 'OPENTM201594720', 'W6-XbT9l2Wb9FUUISss9yVZdPU8iEmEes9IZfvNZnbc', '订单付款通知', '{{first.DATA}}自提码：{{keyword1.DATA}}商品详情：{{keyword2.DATA}}提货地址：{{keyword3.DATA}}提货时间：{{keyword4.DATA}}{{remark.DATA}}', 0, 'sys', '系统消息通知'),
@@ -5698,47 +5847,48 @@ INSERT INTO `ims_ewei_shop_express` (`id`, `name`, `express`, `status`, `display
 (91, '安能物流', 'annengwuliu', 1, 0);
 
 
-INSERT INTO `ims_ewei_shop_plugin` (`id`, `displayorder`, `identity`, `name`, `version`, `author`, `status`, `category`, `isv2`, `thumb`, `desc`, `iscom`, `deprecated`) VALUES
-(1, 1, 'qiniu', '七牛存储', '1.0', '官方', 1, 'tool', 0, '../addons/ewei_shopv2/static/images/qiniu.jpg', NULL, 1, 0),
-(2, 2, 'taobao', '商品助手', '1.0', '官方', 1, 'tool', 0, '../addons/ewei_shopv2/static/images/taobao.jpg', '', 0, 0),
-(3, 3, 'commission', '人人分销', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/commission.jpg', '', 0, 0),
-(4, 4, 'poster', '超级海报', '1.2', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/poster.jpg', '', 0, 0),
-(5, 5, 'verify', 'O2O核销', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/verify.jpg', NULL, 1, 0),
-(6, 6, 'tmessage', '会员群发', '1.0', '官方', 1, 'tool', 0, '../addons/ewei_shopv2/static/images/tmessage.jpg', NULL, 1, 0),
-(7, 7, 'perm', '分权系统', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/perm.jpg', NULL, 1, 0),
-(8, 8, 'sale', '营销宝', '1.0', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/sale.jpg', NULL, 1, 0),
-(9, 9, 'designer', '店铺装修V1', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/designer.jpg', NULL, 0, 1),
-(10, 10, 'creditshop', '积分商城', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/creditshop.jpg', '', 0, 0),
-(11, 11, 'virtual', '虚拟物品', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/virtual.jpg', NULL, 1, 0),
-(12, 11, 'article', '文章营销', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/article.jpg', '', 0, 0),
-(13, 13, 'coupon', '超级券', '1.0', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/coupon.jpg', NULL, 1, 0),
-(14, 14, 'postera', '活动海报', '1.0', '官方', 1, 'sale', 0, '../addons/ewei_shopv2/static/images/postera.jpg', '', 0, 0),
-(15, 16, 'system', '系统工具', '1.0', '官方', 0, 'help', 0, '../addons/ewei_shopv2/static/images/system.jpg', NULL, 0, 1),
-(16, 15, 'diyform', '自定表单', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/diyform.jpg', '', 0, 0),
-(17, 16, 'exhelper', '快递助手', '1.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/exhelper.jpg', '', 0, 0),
-(18, 19, 'groups', '人人拼团', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/groups.jpg', '', 0, 0),
-(19, 20, 'diypage', '店铺装修', '2.0', '官方', 1, 'help', 0, '../addons/ewei_shopv2/static/images/designer.jpg', '', 0, 0),
-(20, 22, 'globonus', '全民股东', '1.0', '官方', 1, 'biz', 0, '../addons/ewei_shopv2/static/images/globonus.jpg', '', 0, 0),
-(21, 23, 'merch', '多商户', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/merch.jpg', '', 0, 0),
-(22, 26, 'qa', '帮助中心', '1.0', '官方', 1, 'help', 1, '../addons/ewei_shopv2/static/images/qa.jpg', '', 0, 0),
-(24, 27, 'sms', '短信提醒', '1.0', '官方', 1, 'tool', 1, '../addons/ewei_shopv2/static/images/sms.jpg', '', 1, 0),
-(25, 29, 'sign', '积分签到', '1.0', '官方', 1, 'tool', 1, '../addons/ewei_shopv2/static/images/sign.jpg', '', 0, 0),
-(26, 30, 'sns', '全民社区', '1.0', '官方', 1, 'sale', 1, '../addons/ewei_shopv2/static/images/sns.jpg', '', 0, 0),
-(27, 33, 'wap', '全网通', '1.0', '官方', 1, 'tool', 1, '', '', 1, 0),
-(28, 34, 'h5app', 'H5APP', '1.0', '官方', 1, 'tool', 1, '', '', 1, 0),
-(29, 26, 'abonus', '区域代理', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/abonus.jpg', '', 0, 0),
-(30, 33, 'printer', '小票打印机', '1.0', '官方', 1, 'tool', 1, '', '', 1, 0),
-(31, 34, 'bargain', '砍价活动', '1.0', '官方', 1, 'tool', 1, '../addons/ewei_shopv2/static/images/bargain.jpg', '', 0, 0),
-(32, 35, 'task','任务中心','1.0','官方',1,'sale',1,'../addons/ewei_shopv2/static/images/task.jpg','',0,0),
-(33, 36, 'cashier','收银台','1.0','官方',1,'biz',1,'../addons/ewei_shopv2/static/images/cashier.jpg','',0,0),
-(34, 37, 'messages', '消息群发', '1.0','官方', 1, 'tool',1,'../addons/ewei_shopv2/static/images/messages.jpg','',0,0),
-(35, 38, 'seckill','整点秒杀','1.0','官方',1,'sale',1,'../addons/ewei_shopv2/static/images/seckill.jpg','',0,0),
-(36, 39, 'exchange','兑换中心','1.0','官方',1,'biz',1,'../addons/ewei_shopv2/static/images/exchange.jpg','',0,0),
-(37, 40, 'lottery', '游戏营销', '1.0', '官方', 1, 'biz', 1, '../addons/ewei_shopv2/static/images/lottery.jpg', '', 0, 0),
-(38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', 1,'', '', 1, 0),
-(39, 42, 'quick', '快速购买', '1.0', '官方', 1, 'biz', 1,'../addons/ewei_shopv2/static/images/quick.jpg', '', 0, 0),
-(40, 43, 'mmanage', '手机端商家管理中心', '1.0', '官方', 1, 'tool',1, '../addons/ewei_shopv2/static/images/mmanage.jpg', '', 0, 0),
-(41, 44, 'pc', 'PC端', '1.0', '二开', '1', 'tool', 0,'../addons/ewei_shopv2/static/images/pc.jpg', '',  0, 0);
+INSERT INTO `ims_ewei_shop_plugin` (`id`, `displayorder`, `identity`, `name`, `version`, `author`, `status`, `category`, `thumb`, `desc`, `iscom`, `deprecated`, `isv2`) VALUES
+(1, 1, 'qiniu', '七牛存储', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/qiniu.jpg', NULL, 1, 0, 0),
+(2, 2, 'taobao', '商品助手', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/taobao.jpg', '', 0, 0, 0),
+(3, 3, 'commission', '人人分销', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/commission.jpg', '', 0, 0, 0),
+(4, 4, 'poster', '超级海报', '1.2', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/poster.jpg', '', 0, 0, 0),
+(5, 5, 'verify', 'O2O核销', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/verify.jpg', NULL, 1, 0, 0),
+(6, 6, 'tmessage', '会员群发', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/tmessage.jpg', NULL, 1, 0, 0),
+(7, 7, 'perm', '分权系统', '1.0', '官方', 1, 'help', '../addons/ewei_shopv2/static/images/perm.jpg', NULL, 1, 0, 0),
+(8, 8, 'sale', '营销宝', '1.0', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/sale.jpg', NULL, 1, 0, 0),
+(9, 9, 'designer', '店铺装修V1', '1.0', '官方', 1, 'help', '../addons/ewei_shopv2/static/images/designer.jpg', NULL, 0, 1, 0),
+(10, 10, 'creditshop', '积分商城', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/creditshop.jpg', '', 0, 0, 0),
+(11, 11, 'virtual', '虚拟物品', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/virtual.jpg', NULL, 1, 0, 0),
+(12, 11, 'article', '文章营销', '1.0', '官方', 1, 'help', '../addons/ewei_shopv2/static/images/article.jpg', '', 0, 0, 0),
+(13, 13, 'coupon', '超级券', '1.0', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/coupon.jpg', NULL, 1, 0, 0),
+(14, 14, 'postera', '活动海报', '1.0', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/postera.jpg', '', 0, 0, 0),
+(15, 16, 'system', '系统工具', '1.0', '官方', 0, 'help', '../addons/ewei_shopv2/static/images/system.jpg', NULL, 0, 1, 0),
+(16, 15, 'diyform', '自定表单', '1.0', '官方', 1, 'help', '../addons/ewei_shopv2/static/images/diyform.jpg', '', 0, 0, 0),
+(17, 16, 'exhelper', '快递助手', '1.0', '官方', 1, 'help', '../addons/ewei_shopv2/static/images/exhelper.jpg', '', 0, 0, 0),
+(18, 19, 'groups', '人人拼团', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/groups.jpg', '', 0, 0, 0),
+(19, 20, 'diypage', '店铺装修', '2.0', '官方', 1, 'help', '../addons/ewei_shopv2/static/images/designer.jpg', '', 0, 0, 0),
+(20, 22, 'globonus', '全民股东', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/globonus.jpg', '', 0, 0, 0),
+(21, 23, 'merch', '多商户', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/merch.jpg', '', 0, 0, 1),
+(22, 26, 'qa', '帮助中心', '1.0', '官方', 1, 'help', '../addons/ewei_shopv2/static/images/qa.jpg', '', 0, 0, 1),
+(24, 27, 'sms', '短信提醒', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/sms.jpg', '', 1, 0, 1),
+(25, 29, 'sign', '积分签到', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/sign.jpg', '', 0, 0, 1),
+(26, 30, 'sns', '全民社区', '1.0', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/sns.jpg', '', 0, 0, 1),
+(27, 33, 'wap', '全网通', '1.0', '官方', 1, 'tool', '', '', 1, 0, 1),
+(28, 34, 'h5app', 'H5APP', '1.0', '官方', 1, 'tool', '', '', 1, 0, 1),
+(29, 26, 'abonus', '区域代理', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/abonus.jpg', '', 0, 0, 1),
+(30, 33, 'printer', '小票打印机', '1.0', '官方', 1, 'tool', '', '', 1, 0, 1),
+(31, 34, 'bargain', '砍价活动', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/bargain.jpg', '', 0, 0, 1),
+(32, 35, 'task', '任务中心', '1.0', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/task.jpg', '', 0, 0, 1),
+(33, 36, 'cashier', '收银台', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/cashier.jpg', '', 0, 0, 1),
+(34, 37, 'messages', '消息群发', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/messages.jpg', '', 0, 0, 1),
+(35, 38, 'seckill', '整点秒杀', '1.0', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/seckill.jpg', '', 0, 0, 1),
+(36, 39, 'exchange', '兑换中心', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/exchange.jpg', '', 0, 0, 1),
+(37, 40, 'lottery', '游戏营销', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/lottery.jpg', '', 0, 0, 1),
+(38, 41, 'wxcard', '微信卡券', '1.0', '官方', 1, 'sale', '', '', 1, 0, 1),
+(39, 42, 'quick', '快速购买', '1.0', '官方', 1, 'biz', '../addons/ewei_shopv2/static/images/quick.jpg', '', 0, 0, 1),
+(40, 43, 'mmanage', '手机端商家管理中心', '1.0', '官方', 1, 'tool', '../addons/ewei_shopv2/static/images/mmanage.jpg', '', 0, 0, 1),
+(41, 44, 'pc', 'PC端', '1.0', '二开', 1, 'tool', '../addons/ewei_shopv2/static/images/pc.jpg', '', 0, 0, 0),
+(42, 45, 'live', '互动直播', '1.0', '官方', 1, 'sale', '../addons/ewei_shopv2/static/images/live.jpg', '', 0, 0, 1);
 
 INSERT INTO `ims_ewei_shop_task_extension` (`id`, `taskname`, `taskclass`, `status`, `classify`, `classify_name`, `verb`, `unit`) VALUES
 (1, '推荐人数', 'commission_member', 1, 'number', 'number', '推荐', '人'),

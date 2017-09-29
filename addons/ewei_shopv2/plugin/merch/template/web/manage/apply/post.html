@@ -174,7 +174,8 @@
             }
         });
 
-        $('form').submit(function(){
+        $(":input[type=submit]").on('click',function (e) {
+            e.preventDefault();
             var html = '';
             var applytype = $('#applytype').find("option:selected").val();
             var typename = $('#applytype').find("option:selected").html();
@@ -239,13 +240,9 @@
             } else {
                 var confirm_msg = '确认要' + html;
             }
-
-            $('form').attr('stop',1);
             tip.confirm(confirm_msg, function () {
-                $('form').removeAttr('stop');
                 $('form').submit();
             });
-
         });
     })
 

@@ -106,7 +106,7 @@
         });
         $("#next").click(function (e) {
             e.preventDefault();
-            var textarea = $("#message").text();
+            var textarea = $("#message").val();
             core.json('order/pay/peerpay', {type:subtype,message:textarea,id:orderid,}, function (data) {
                 if (data.status=='1'){
                     location.href = data.result.url;

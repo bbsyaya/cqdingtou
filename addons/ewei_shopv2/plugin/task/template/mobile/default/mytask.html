@@ -153,8 +153,9 @@
                         {if substr($ek,0,10) == 'cost_goods'}
                         <a href="{php echo mobileUrl('goods.detail',array('id'=>substr($ek,10)));}">
                         {/if}
-                        目标：{php echo $this->model->returnName($ek);}{$ev['verb']}{$ev['num']}{$ev['unit']}{php if(substr($ek,0,10) == 'cost_goods')echo '件<div class="my-getreward">去购买</div></a>';}
-
+                        目标：{if $this->model->returnName($ek) == '绑定手机'}<a href="{php echo mobileUrl('member')}">{php echo $this->model->returnName($ek);}{if $this->model->returnName($ek) != '绑定手机'}{$ev['verb']}{$ev['num']}{$ev['unit']}{/if}</a>
+                            {else}{php echo $this->model->returnName($ek);}{if $this->model->returnName($ek) != '绑定手机'}{$ev['verb']}{$ev['num']}{$ev['unit']}{/if}{/if}
+                            {php if(substr($ek,0,10) == 'cost_goods')echo '件<div class="my-getreward">去购买</div></a>';}
                     </div>
                     {/loop}
                     {loop $reward $rk $rv}
@@ -318,8 +319,9 @@
                     {php $require = unserialize($v['require_data']);$reward = unserialize($v['rewarded']);}
                     {loop $require $ek $ev}
                     <div class="my-require-title">
-                        目标：{php echo $this->model->returnName($ek);}{$ev['verb']}{$ev['num']}{$ev['unit']}
-
+                        目标：
+                        {php echo $this->model->returnName($ek);}
+                        {if $this->model->returnName($ek) != '绑定手机'}{$ev['verb']}{$ev['num']}{$ev['unit']}{/if}
                     </div>
                     {/loop}
                     {loop $reward $rk $rv}

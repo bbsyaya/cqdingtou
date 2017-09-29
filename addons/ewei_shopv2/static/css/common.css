@@ -712,3 +712,5 @@ input[type=text] { padding:0px 5px;  }
 .fui-tag{display: inline-block;}
 .fui-tag-danger{background: #ff9326;color:#fff;font-size:12px;-webkit-border-radius: 3px;border-radius:3px;font-style: normal;
 	padding:2px;line-height: 16px;}
+
+.modal-dialog .embed-responsive-16by9{padding-bottom:0; height:490px; overflow:hidden;}

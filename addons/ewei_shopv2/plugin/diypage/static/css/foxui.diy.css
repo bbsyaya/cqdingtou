@@ -970,8 +970,8 @@
 }
 
 .follow_topbar ~ .diy-fixedsearch {
-    top: 32px;
+    top: 2.6rem;
 }
 .fui-header ~ .diy-fixedsearch {
-    top: 44px;
+    top: 2.2rem;
 }

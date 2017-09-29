@@ -35,7 +35,7 @@ var myconfig = {
     }
     , preload: ['jquery']
 
-}
+};
 
 var myrequire = function (arr, callback) {
     var newarr = [];
@@ -45,8 +45,15 @@ var myrequire = function (arr, callback) {
         if (myconfig.css[js]) {
             var css = myconfig.css[js].split(',');
             $.each(css, function () {
-                if(parseInt(myrequire.systemVersion[0])>0){
-                    newarr.push("loadcss!" + myconfig.path + this + myconfig.map['css']);
+                if(typeof myrequire.systemVersion !== 'undefined'){
+                    if (myrequire.systemVersion === '1.0.0' || myrequire.systemVersion <= '0.8')
+                    {
+                        newarr.push("css!" + myconfig.path + this + myconfig.map['css']);
+                    }
+                    else
+                    {
+                        newarr.push("loadcss!" + myconfig.path + this + myconfig.map['css']);
+                    }
                 }else{
                     newarr.push("css!" + myconfig.path + this + myconfig.map['css']);
                 }

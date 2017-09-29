@@ -2,7 +2,7 @@
 <style type="text/css">
 .order-create-page .buybtn{width:5rem;margin:0;float:right;}
 </style>
-<form name='form' method="post">
+<form name='form' action="" method="post">
     <div class='fui-page order-create-page'>
         <div class="fui-header">
             <div class="fui-header-left">
@@ -216,7 +216,6 @@
         </div>
         {/if}
     </div>
-</form>
 </div>
 <div class="fui-navbar order-create-checkout">
     <input type="submit" name="submit" value="提交订单" id= 'submit' style="-webkit-appearance: none;" class="nav-item btn btn-danger buybtn" />
@@ -225,6 +224,7 @@
         需付：¥ <span class="text-danger totalprice">{php echo number_format($price+$goods['freight'],2)}</span>
     </a>
 </div>
+</form>
 <script language='javascript'>
     require(['../addons/ewei_shopv2/plugin/groups/static/js/confirm.js'], function (modal) {modal.init({php echo json_encode($createInfo)}); modal.totalPrice();});
 </script>

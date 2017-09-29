@@ -232,7 +232,7 @@ a {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 999;
+    z-index: 1;
     background-repeat: no-repeat;
     background-position: bottom right;
 }
@@ -2911,6 +2911,10 @@ a {
 
 .fui-fullHigh-item.container {
     padding: 0.3rem;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
 }
 
 .page-shop-goods_category .fui-fullHigh-item.container .swipe {

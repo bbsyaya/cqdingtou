@@ -131,7 +131,7 @@
     <label class="col-sm-2 control-label">商户位置</label>
     <div class="col-sm-9 col-xs-12">
         {ife 'merch.user' $item}
-        {php echo tpl_form_field_coordinate('map',array('lng'=>$item['lng'],'lat'=>$item['lat']))}
+        {php echo tpl_form_field_position('map',array('lng'=>$item['lng'],'lat'=>$item['lat']))}
         {else}
         <div class='form-control-static'>lng={$item['lng']},lat={$item['lat']}</div>
         {/if}
@@ -190,6 +190,17 @@
         <span class="help-block">商户可以创建的子管理帐号个数，默认不能创建</span>
         {else}
         <div class="form-control-static">{$item['accounttotal']} 个子账户</div>
+        {/if}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label">商品数量</label>
+    <div class="col-sm-8">
+        {ife 'merch.user' $item}
+        <input type="num" class="form-control" name="maxgoods" value="{$item['maxgoods']}"/>
+        <span class="help-block">商户可以创建的商品个数</span>
+        {else}
+        <div class="form-control-static">{$item['maxgoods']} 个子账户</div>
         {/if}
     </div>
 </div>

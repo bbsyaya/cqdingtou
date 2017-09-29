@@ -49,6 +49,11 @@
 	{php $this->diyGotop(true, $diypage)}
 {/if}
 
+
+{if p('live')}
+	{php $this->backliving()}
+{/if}
+
 {php $this->wapQrcode()}
 <span style="display:none">{$_W['shopset']['shop']['diycode']}</span>
 </body>

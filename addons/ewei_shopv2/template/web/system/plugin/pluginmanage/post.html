@@ -26,12 +26,31 @@
                             <span class="help-block">数字越大，排名越靠前,如果为空，默认排序方式为创建时间</span>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">应用类型</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <div class="input-group">
+                                <label class="radio radio-inline">
+                                    <input type="radio" name="plugintype" value="0" {if intval($item['plugintype']) ==0}checked="checked"{/if}> 系统应用
+                                </label>
+                                <label class="radio radio-inline">
+                                    <input type="radio" name="plugintype" value="1" {if intval($item['plugintype']) ==1 }checked="checked"{/if}> 自定义应用
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label must">标题</label>
+                        <div class="col-sm-9 col-xs-12">
+                            <input type='text' class='form-control' name='name' value="{$item['name']}" data-rule-required='true' data-msg-required='请设置标题' />
+                        </div>
+                    </div>
 
-                    <div class="form-group" id="product">
+                    <div class="form-group" id="product" {if intval($item['plugintype']) ==1 }style="display:none;"{/if}>
                         <label class="col-sm-2 control-label">选择应用</label>
                         <div class="col-sm-9 col-xs-12">
                             <?php echo tpl_selector('pluginid',
-            array('value'=>$item['name'],
+            array('value'=>$item['title'],
                             'type'=>'text',
                             'placeholder'=>'指定应用名称',
                             'buttontext'=>'选择应用',
@@ -117,7 +136,14 @@
 </form>
 <script type="text/javascript">
     $(function () {
-
+        $("input[name='plugintype']").click(function () {
+            var plugintype = this.value;
+            if(plugintype==1){
+                $("#product").hide();
+            }else{
+                $("#product").show();
+            }
+        })
     })
     function addDate() {
         var group = $(".input-group-date").length;

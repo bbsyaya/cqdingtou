@@ -68,7 +68,7 @@
 		<img src="{php echo tomedia($pluginsetting['adv'])}" width="100%" alt="授权应用中心">
 	</a>
 	{/if}
-	{loop $category $ck $cv} 
+	{loop $category $ck $cv}
 		{if count($cv['plugins'])<=0}{php continue;}{/if} 
 		<div class="panel-heading" style='background:none;border:none;'>
 			{$cv['name']}
@@ -112,12 +112,12 @@
                                 var times="研究生考试";
                                 var now = new Date();
                                 var date = timedate.getTime() - now.getTime();
-                                var time = Math.floor(date / (1000 * 60 * 60 * 24));
+                                var time = Math.floor(date / (1000 * 60 * 60 * 24 * 30));
                                 if (time >= 0) {
-                                    if(time <=30){
+                                    if(time <=1){
                                         document.write("授权剩余：<span style='font-size:12px;color:#fff;background: #ed5565 ;padding:2px 5px;display:inline-block;border-radius: 3px;'>"+1 +"月</span>");
                                     }else{
-                                        document.write("授权剩余：<span style='font-size:12px;color:#fff;background: #3c9be1 ;padding:2px 5px;display:inline-block;border-radius: 3px;'>"+month +"月</span>");
+                                        document.write("授权剩余：<span style='font-size:12px;color:#fff;background: #3c9be1 ;padding:2px 5px;display:inline-block;border-radius: 3px;'>"+time +"月</span>");
                                     }
                                 }else{
                                     if(month==0 && isperm > 0){

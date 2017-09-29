@@ -120,9 +120,9 @@
                     <div id='comments-container'></div>
                 {elseif $diyitem['id']=='detail_pullup'}
                     {if empty($diyitem['params']['hide']) && !$new_temp}
-                        <div class="fui-cell-group">
+                        <div class="fui-cell-group" style="background: {$diyitem['style']['background']}; margin-top: {$diyitem['style']['margintop']}px;">
                             <div class="fui-cell">
-                                <div class="fui-cell-text text-center look-detail"><i class='icon icon-fold'></i> <span>上拉查看图文详情</span></div>
+                                <div class="fui-cell-text text-center look-detail" style="color: {$diyitem['style']['textcolor']}"><i class='icon icon-fold'></i> <span>上拉查看图文详情</span></div>
                             </div>
                         </div>
                     {/if}

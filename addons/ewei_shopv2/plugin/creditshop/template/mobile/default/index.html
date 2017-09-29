@@ -56,7 +56,7 @@
         </div>
         <div class="fui-goods-group white block">
             {loop $lotterydraws $item}
-            <a class="fui-goods-item" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
+            <a class="fui-goods-item external" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
                 <div class="image" data-lazyloaded="true" style="background-image: url('{php echo tomedia($item['thumb'])}');"></div>
                 <div class="detail">
                     <div class="name">
@@ -93,7 +93,7 @@
         </div>
         <div class="fui-goods-group white block">
             {loop $exchanges $item}
-            <a class="fui-goods-item" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
+            <a class="fui-goods-item external" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
                 <div class="image" data-lazyloaded="true" style="background-image: url('{php echo tomedia($item['thumb'])}');"></div>
                 <div class="detail">
                     <div class="name">
@@ -125,7 +125,7 @@
         </div>
         <div class="fui-goods-group white block">
             {loop $redbags $item}
-            <a class="fui-goods-item" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
+            <a class="fui-goods-item external" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
                 <div class="image" data-lazyloaded="true" style="background-image: url('{php echo tomedia($item['thumb'])}');"></div>
                 <div class="detail">
                     <div class="name">{$item['title']}</div>
@@ -155,7 +155,7 @@
         </div>
         <div class="fui-goods-group">
             {loop $coupons $item}
-            <a class="fui-goods-item" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
+            <a class="fui-goods-item external" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
                 <div class="image" data-lazyloaded="true" style="background-image: url('{php echo tomedia($item['thumb'])}');"></div>
                 <div class="detail">
                     <div class="name">{$item['title']}</div>
@@ -184,7 +184,7 @@
         </div>
         <div class="fui-goods-group white block">
             {loop $balances $item}
-            <a class="fui-goods-item" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
+            <a class="fui-goods-item external" href="{php echo mobileUrl('creditshop/detail',array('id'=>$item['id']))}" data-nocache="true">
                 <div class="image" data-lazyloaded="true" style="background-image: url('{php echo tomedia($item['thumb'])}');"></div>
                 <div class="detail">
                     <div class="name">{$item['title']}</div>

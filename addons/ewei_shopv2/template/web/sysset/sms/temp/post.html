@@ -377,12 +377,12 @@
 
     var kw = 1;
     function addType() {
-        $(".btn-add-type").button("loading");
+        $(".btn-add-type").html("loading").addClass('disabled');
         $.ajax({
             url: "{php echo webUrl('sysset/sms/temp/tpl')}&kw="+kw,
             cache: false
         }).done(function (html) {
-            $(".btn-add-type").button("reset");
+            $(".btn-add-type").html('<i class="fa fa-plus" title=""></i> 增加一条数据值').removeClass('disabled');
             $("#datas").append(html);
         });
         kw++;

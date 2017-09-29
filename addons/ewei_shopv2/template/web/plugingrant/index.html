@@ -85,7 +85,7 @@
 				<li class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
 					<a href="{php echo webUrl('plugingrant/detail',array('id'=>$row['id'],'type'=>'plugin'))}" class="plugingrant-plugin-list">
 						<img src="{php echo empty($row['thumb'])?'../addons/ewei_shopv2/static/images/plugin.png': tomedia($row['thumb'])}" alt="{$row['name']}">
-						<h3>{$row['name']}</h3>
+						<h3>{if !empty($row['name'])}{$row['name']}{else}{$row['pname']}{/if}</h3>
 						<div class="plugingrant-plugin-list-price">
 							价格：<span>&yen;{$row['data'][0]['price']}</span>
 						</div>

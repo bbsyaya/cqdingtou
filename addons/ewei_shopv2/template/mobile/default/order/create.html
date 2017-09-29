@@ -232,7 +232,7 @@
     </div>
 </div>
 {/if}
-{if empty($exchangeOrder) && empty($taskgoodsprice)}
+{if empty($exchangeOrder) && empty($taskgoodsprice) && empty($packageid) && empty($if_bargain['bargain'])}
 <div class="fui-cell-group  sm">
 
     <div id='coupondiv' class="fui-cell fui-cell-click" {if $couponcount<=0}style='display:none'{/if}>
@@ -374,8 +374,13 @@
 <div class="fui-cell-info"></div>
 <div class="fui-cell-remark noremark">-&yen; <span id="seckillprice_money">{php echo number_format($seckill_price,2)}</span></div>
 </div>
+
 {/if}
 
+{/if}
+
+{if $liveprice>0}
+    <input type="hidden" id="liveid" value="{$liveid}" />
 {/if}
 
 <div class="fui-cell">

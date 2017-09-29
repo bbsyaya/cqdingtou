@@ -101,7 +101,6 @@
 
             </div>
         </div>
-	
         <div class="form-group">
             <label class="col-sm-2 control-label">任务状态</label>
             <div class="col-sm-9 col-xs-12">
@@ -149,6 +148,8 @@
                 <div id="{$dk}"><div class="input-group"><span class="input-group-addon" style="background: #f8ac59;color: #fff;">
                     {php echo $this->model->returnTaskname($dk);}
                 </span><span class="input-group-addon">{$dv['verb']}</span><input class="form-control" name="data[require_data][{$dk}][num]" value="{$dv['num']}"><input type="hidden" class="form-control" name="data[require_data][{$dk}][classify]" value="number"><input type="hidden" class="form-control" name="data[require_data][{$dk}][verb]" value="{$dv['verb']}"><input type="hidden" class="form-control" name="data[require_data][{$dk}][unit]" value="{$dv['unit']}"><span class="input-group-addon">{$dv['unit']}</span><a class="btn btn-danger input-group-addon" style="background-color: #ec4758;color: #fff" onclick="$('#{$dk}').remove()">X</a></div><br></div>
+                {elseif $dv['classify'] == 1}
+                <div id="member_info"><div class="input-group"><span class="input-group-addon" style="background: #f8ac59;color: #fff;">绑定手机</span><span class="form-control">绑定手机号（必须开启wap或小程序）</span><input class="form-control" name="data[require_data][member_info]" type="hidden" value="1"><a class="btn btn-danger input-group-addon" style="background-color: #ec4758;color: #fff" onclick="$('#member_info').remove()">X</a></div><br></div>
                 {else}
                 {if empty($cc)}
                 {php $cc++;}

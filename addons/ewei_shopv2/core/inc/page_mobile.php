@@ -1,576 +1,624 @@
 <?php
-if (!(defined('IN_IA'))) 
-{
+if (!(defined('IN_IA'))) {
 	exit('Access Denied');
 }
-class MobilePage extends Page 
+
+class MobilePage extends Page
 {
 	public $footer = array();
 	public $followBar = false;
 	protected $merch_user = array();
-	public function __construct() 
+
+	public function __construct()
 	{
 		global $_W;
 		global $_GPC;
 		m('shop')->checkClose();
 		$preview = intval($_GPC['preview']);
 		$wap = m('common')->getSysset('wap');
-		if ($wap['open'] && !(is_weixin()) && empty($preview)) 
-		{
-			if ($this instanceof MobileLoginPage || $this instanceof PluginMobileLoginPage) 
-			{
-				if (empty($_W['openid'])) 
-				{
+		if ($wap['open'] && !(is_weixin()) && empty($preview)) {
+			if (($this instanceof MobileLoginPage) || ($this instanceof PluginMobileLoginPage)) {
+				if (empty($_W['openid'])) {
 					$_W['openid'] = m('account')->checkLogin();
 				}
+
 			}
-			else 
-			{
+			 else {
 				$_W['openid'] = m('account')->checkOpenid();
 			}
 		}
-		else 
-		{
-			if ($preview && !(is_weixin())) 
-			{
+		 else {
+			if ($preview && !(is_weixin())) {
 				$_W['openid'] = 'oq_xbwGp2g7-d0-7Ye4oNYOF5exI';
 			}
-			if (EWEI_SHOPV2_DEBUG) 
-			{
+
+
+			if (EWEI_SHOPV2_DEBUG) {
 				$_W['openid'] = 'oq_xbwGp2g7-d0-7Ye4oNYOF5exI';
 			}
+
 		}
+
 		$member = m('member')->checkMember();
 		$_W['mid'] = ((!(empty($member)) ? $member['id'] : ''));
 		$_W['mopenid'] = ((!(empty($member)) ? $member['openid'] : ''));
 		$merch_plugin = p('merch');
 		$merch_data = m('common')->getPluginset('merch');
-		if (!(empty($_GPC['merchid'])) && $merch_plugin && $merch_data['is_openmerch']) 
-		{
+
+		if (!(empty($_GPC['merchid'])) && $merch_plugin && $merch_data['is_openmerch']) {
 			$this->merch_user = pdo_fetch('select * from ' . tablename('ewei_shop_merch_user') . ' where id=:id limit 1', array(':id' => intval($_GPC['merchid'])));
 		}
+
 	}
-	public function followBar($diypage = false, $merch = false) 
+
+	public function followBar($diypage = false, $merch = false)
 	{
 		global $_W;
 		global $_GPC;
-		if (is_h5app() || !(is_weixin())) 
-		{
+		if (is_h5app() || !(is_weixin())) {
 			return;
 		}
+
+
 		$openid = $_W['openid'];
 		$followed = m('user')->followed($openid);
 		$mid = intval($_GPC['mid']);
 		$memberid = m('member')->getMid();
-		if (p('diypage')) 
-		{
-			if ($merch && p('merch')) 
-			{
+
+		if (p('diypage')) {
+			if ($merch && p('merch')) {
 				$diypagedata = p('merch')->getSet('diypage', $merch);
 			}
-			else 
-			{
+			 else {
 				$diypagedata = m('common')->getPluginset('diypage');
 			}
+
 			$diyfollowbar = $diypagedata['followbar'];
 		}
-		if ($diypage) 
-		{
+		if ($diypage) {
 			$diyfollowbar['params']['isopen'] = 1;
 		}
+
+
 		@session_start();
-		if ((!($followed) && ($memberid != $mid)) || (!(empty($diyfollowbar['params']['showtype'])) && !(empty($diyfollowbar['params']['isopen'])))) 
-		{
+		if ((!($followed) && ($memberid != $mid)) || (!(empty($diyfollowbar['params']['showtype'])) && !(empty($diyfollowbar['params']['isopen'])))) {
 			$set = $_W['shopset'];
 			$followbar = array('followurl' => $set['share']['followurl'], 'shoplogo' => tomedia($set['shop']['logo']), 'shopname' => $set['shop']['name'], 'qrcode' => tomedia($set['share']['followqrcode']), 'share_member' => false);
 			$friend = false;
-			if (!(empty($mid)) && ($memberid != $mid)) 
-			{
-				if (!(empty($_SESSION[EWEI_SHOPV2_PREFIX . '_shareid'])) && ($_SESSION[EWEI_SHOPV2_PREFIX . '_shareid'] == $mid)) 
-				{
+
+			if (!(empty($mid)) && ($memberid != $mid)) {
+				if (!(empty($_SESSION[EWEI_SHOPV2_PREFIX . '_shareid'])) && ($_SESSION[EWEI_SHOPV2_PREFIX . '_shareid'] == $mid)) {
 					$mid = $_SESSION[EWEI_SHOPV2_PREFIX . '_shareid'];
 				}
+
+
 				$member = m('member')->getMember($mid);
-				if (!(empty($member))) 
-				{
+
+				if (!(empty($member))) {
 					$_SESSION[EWEI_SHOP_PREFIX . '_shareid'] = $mid;
 					$friend = true;
 					$followbar['share_member'] = array('id' => $member['id'], 'nickname' => $member['nickname'], 'realname' => $member['realname'], 'avatar' => $member['avatar']);
 				}
+
 			}
+
+
 			$showdiyfollowbar = false;
-			if (p('diypage')) 
-			{
-				if ((!(empty($diyfollowbar)) && !(empty($diyfollowbar['params']['isopen']))) || (!(empty($diyfollowbar)) && $diypage)) 
-				{
+
+			if (p('diypage')) {
+				if ((!(empty($diyfollowbar)) && !(empty($diyfollowbar['params']['isopen']))) || (!(empty($diyfollowbar)) && $diypage)) {
 					$showdiyfollowbar = true;
-					if (!(empty($followbar['share_member']))) 
-					{
-						if (!(empty($diyfollowbar['params']['sharetext']))) 
-						{
+
+					if (!(empty($followbar['share_member']))) {
+						if (!(empty($diyfollowbar['params']['sharetext']))) {
 							$touser = m('member')->getMember($memberid);
 							$diyfollowbar['text'] = str_replace('[商城名称]', '<span style="color:' . $diyfollowbar['style']['highlight'] . ';">' . $set['shop']['name'] . '</span>', $diyfollowbar['params']['sharetext']);
 							$diyfollowbar['text'] = str_replace('[邀请人]', '<span style="color:' . $diyfollowbar['style']['highlight'] . ';">' . $followbar['share_member']['nickname'] . '</span>', $diyfollowbar['text']);
 							$diyfollowbar['text'] = str_replace('[访问者]', '<span style="color:' . $diyfollowbar['style']['highlight'] . ';">' . $touser['nickname'] . '</span>', $diyfollowbar['text']);
 						}
-						else 
-						{
+						 else {
 							$diyfollowbar['text'] = '来自好友<span class="text-danger">' . $followbar['share_member']['nickname'] . '</span>的推荐<br>' . '关注公众号，享专属服务';
 						}
 					}
-					else if (!(empty($diyfollowbar['params']['defaulttext']))) 
-					{
+					 else if (!(empty($diyfollowbar['params']['defaulttext']))) {
 						$diyfollowbar['text'] = str_replace('[商城名称]', '<span style="color:' . $diyfollowbar['style']['highlight'] . ';">' . $set['shop']['name'] . '</span>', $diyfollowbar['params']['defaulttext']);
 					}
-					else 
-					{
+					 else {
 						$diyfollowbar['text'] = '欢迎进入<span class="text-danger">' . $set['shop']['name'] . '</span><br>' . '关注公众号，享专属服务';
 					}
+
 					$diyfollowbar['text'] = nl2br($diyfollowbar['text']);
 					$diyfollowbar['logo'] = tomedia($set['shop']['logo']);
-					if (($diyfollowbar['params']['icontype'] == 1) && !(empty($followbar['share_member']))) 
-					{
+
+					if (($diyfollowbar['params']['icontype'] == 1) && !(empty($followbar['share_member']))) {
 						$diyfollowbar['logo'] = tomedia($followbar['share_member']['avatar']);
 					}
-					else if (($diyfollowbar['params']['icontype'] == 3) && !(empty($diyfollowbar['params']['iconurl']))) 
-					{
+					 else if (($diyfollowbar['params']['icontype'] == 3) && !(empty($diyfollowbar['params']['iconurl']))) {
 						$diyfollowbar['logo'] = tomedia($diyfollowbar['params']['iconurl']);
 					}
-					if (empty($diyfollowbar['params']['btnclick'])) 
-					{
-						if (empty($diyfollowbar['params']['btnlinktype'])) 
-						{
+
+
+					if (empty($diyfollowbar['params']['btnclick'])) {
+						if (empty($diyfollowbar['params']['btnlinktype'])) {
 							$diyfollowbar['link'] = $set['share']['followurl'];
 						}
-						else 
-						{
+						 else {
 							$diyfollowbar['link'] = $diyfollowbar['params']['btnlink'];
 						}
 					}
-					else if (empty($diyfollowbar['params']['qrcodetype'])) 
-					{
+					 else if (empty($diyfollowbar['params']['qrcodetype'])) {
 						$diyfollowbar['qrcode'] = tomedia($set['share']['followqrcode']);
 					}
-					else 
-					{
+					 else {
 						$diyfollowbar['qrcode'] = tomedia($diyfollowbar['params']['qrcodeurl']);
 					}
 				}
 			}
-			if ($showdiyfollowbar) 
-			{
+			if ($showdiyfollowbar) {
 				include $this->template('diypage/followbar');
 			}
-			else 
-			{
+			 else {
 				include $this->template('_followbar');
 			}
 		}
+
 	}
-	public function MemberBar($diypage = false, $merch = false) 
+
+	public function MemberBar($diypage = false, $merch = false)
 	{
 		global $_W;
 		global $_GPC;
-		if (is_h5app() || !(is_weixin())) 
-		{
+		if (is_h5app() || !(is_weixin())) {
 			return;
 		}
+
+
 		$mid = intval($_GPC['mid']);
 		$cmember_plugin = p('cmember');
-		if (!($cmember_plugin)) 
-		{
+
+		if (!($cmember_plugin)) {
 			return;
 		}
+
+
 		$openid = $_W['openid'];
 		$followed = m('user')->followed($openid);
-		if (!($followed)) 
-		{
+
+		if (!($followed)) {
 			return;
 		}
+
+
 		$check = $cmember_plugin->checkMember($openid);
-		if (!(empty($check))) 
-		{
+
+		if (!(empty($check))) {
 			return;
 		}
+
+
 		$data = m('common')->getPluginset('commission');
-		if (!(empty($data['become_goodsid']))) 
-		{
+
+		if (!(empty($data['become_goodsid']))) {
 			$goods = pdo_fetch('select id,title,thumb from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1 ', array(':id' => $data['become_goodsid'], ':uniacid' => $_W['uniacid']));
 		}
-		else 
-		{
+		 else {
 			return;
 		}
+
 		$buy_member_url = mobileUrl('goods/detail', array('id' => $goods['id'], 'mid' => $mid));
 		include $this->template('cmember/_memberbar');
 	}
-	public function footerMenus($diymenuid = NULL, $ismerch = false) 
+
+	public function footerMenus($diymenuid = NULL, $ismerch = false)
 	{
 		global $_W;
 		global $_GPC;
 		$params = array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']);
 		$cartcount = pdo_fetchcolumn('select ifnull(sum(total),0) from ' . tablename('ewei_shop_member_cart') . ' where uniacid=:uniacid and openid=:openid and deleted=0 and selected =1', $params);
 		$commission = array();
-		if (p('commission') && intval(0 < $_W['shopset']['commission']['level'])) 
-		{
+		if (p('commission') && intval(0 < $_W['shopset']['commission']['level'])) {
 			$member = m('member')->getMember($_W['openid']);
-			if (!($member['agentblack'])) 
-			{
-				if (($member['isagent'] == 1) && ($member['status'] == 1)) 
-				{
+
+			if (!($member['agentblack'])) {
+				if (($member['isagent'] == 1) && ($member['status'] == 1)) {
 					$commission = array('url' => mobileUrl('commission'), 'text' => (empty($_W['shopset']['commission']['texts']['center']) ? '分销中心' : $_W['shopset']['commission']['texts']['center']));
 				}
-				else 
-				{
+				 else {
 					$commission = array('url' => mobileUrl('commission/register'), 'text' => (empty($_W['shopset']['commission']['texts']['become']) ? '成为分销商' : $_W['shopset']['commission']['texts']['become']));
 				}
 			}
+
 		}
+
+
 		$showdiymenu = false;
 		$routes = explode('.', $_W['routes']);
 		$controller = $routes[0];
-		if (($controller == 'member') || ($controller == 'cart') || ($controller == 'order') || ($controller == 'goods')) 
-		{
+		if (($controller == 'member') || ($controller == 'cart') || ($controller == 'order') || ($controller == 'goods')) {
 			$controller = 'shop';
 		}
-		if (empty($diymenuid)) 
-		{
+
+
+		if (empty($diymenuid)) {
 			$pageid = ((!(empty($controller)) ? $controller : 'shop'));
 			(($pageid == 'index' ? 'shop' : $pageid));
-			if (!(empty($_GPC['merchid'])) && ($_W['routes'] == 'shop.category')) 
-			{
+
+			if (!(empty($_GPC['merchid'])) && (($_W['routes'] == 'shop.category') || ($_W['routes'] == 'goods'))) {
 				$pageid = 'merch';
 			}
-			if (($pageid == 'merch') && !(empty($_GPC['merchid'])) && p('merch')) 
-			{
+
+
+			if (($pageid == 'merch') && !(empty($_GPC['merchid'])) && p('merch')) {
 				$merchdata = p('merch')->getSet('diypage', $_GPC['merchid']);
-				if (!(empty($merchdata['menu']))) 
-				{
+
+				if (!(empty($merchdata['menu']))) {
 					$diymenuid = $merchdata['menu']['shop'];
-					if (!(is_weixin()) || is_h5app()) 
-					{
+					if (!(is_weixin()) || is_h5app()) {
 						$diymenuid = $merchdata['menu']['shop_wap'];
 					}
+
 				}
+
 			}
-			else 
-			{
+			 else {
 				$diypagedata = m('common')->getPluginset('diypage');
-				if (!(empty($diypagedata['menu']))) 
-				{
+
+				if (!(empty($diypagedata['menu']))) {
 					$diymenuid = $diypagedata['menu'][$pageid];
-					if (!(is_weixin()) || is_h5app()) 
-					{
+					if (!(is_weixin()) || is_h5app()) {
 						$diymenuid = $diypagedata['menu'][$pageid . '_wap'];
 					}
+
 				}
+
 			}
 		}
-		if (!(empty($diymenuid))) 
-		{
+
+
+		if (!(empty($diymenuid))) {
 			$menu = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_diypage_menu') . ' WHERE id=:id and uniacid=:uniacid limit 1 ', array(':id' => $diymenuid, ':uniacid' => $_W['uniacid']));
-			if (!(empty($menu))) 
-			{
+
+			if (!(empty($menu))) {
 				$menu = $menu['data'];
 				$menu = base64_decode($menu);
 				$diymenu = json_decode($menu, true);
 				$showdiymenu = true;
 			}
 		}
-		if ($showdiymenu) 
-		{
+		if ($showdiymenu) {
 			include $this->template('diypage/menu');
 		}
-		else if (($controller == 'commission') && ($routes[1] != 'myshop')) 
-		{
+		 else if (($controller == 'commission') && ($routes[1] != 'myshop')) {
 			include $this->template('commission/_menu');
 		}
-		else if ($controller == 'creditshop') 
-		{
+		 else if ($controller == 'creditshop') {
 			include $this->template('creditshop/_menu');
 		}
-		else if ($controller == 'groups') 
-		{
+		 else if ($controller == 'groups') {
 			include $this->template('groups/_groups_footer');
 		}
-		else if ($controller == 'merch') 
-		{
+		 else if ($controller == 'merch') {
 			include $this->template('merch/_menu');
 		}
-		else if ($controller == 'mr') 
-		{
+		 else if ($controller == 'mr') {
 			include $this->template('mr/_menu');
 		}
-		else if ($controller == 'newmr') 
-		{
+		 else if ($controller == 'newmr') {
 			include $this->template('newmr/_menu');
 		}
-		else if ($controller == 'sign') 
-		{
+		 else if ($controller == 'sign') {
 			include $this->template('sign/_menu');
 		}
-		else if ($controller == 'sns') 
-		{
+		 else if ($controller == 'sns') {
 			include $this->template('sns/_menu');
 		}
-		else if ($controller == 'seckill') 
-		{
+		 else if ($controller == 'seckill') {
 			include $this->template('seckill/_menu');
 		}
-		else if ($controller == 'mmanage') 
-		{
+		 else if ($controller == 'mmanage') {
 			include $this->template('mmanage/_menu');
 		}
-		else if ($ismerch) 
-		{
+		 else if ($ismerch) {
 			include $this->template('merch/_menu');
 		}
-		else 
-		{
+		 else {
 			include $this->template('_menu');
 		}
 	}
-	public function shopShare() 
+
+	public function shopShare()
 	{
 		global $_W;
 		global $_GPC;
 		$trigger = false;
-		if (empty($_W['shopshare'])) 
-		{
+
+		if (empty($_W['shopshare'])) {
 			$set = $_W['shopset'];
 			$_W['shopshare'] = array('title' => (empty($set['share']['title']) ? $set['shop']['name'] : $set['share']['title']), 'imgUrl' => (empty($set['share']['icon']) ? tomedia($set['shop']['logo']) : tomedia($set['share']['icon'])), 'desc' => (empty($set['share']['desc']) ? $set['shop']['description'] : $set['share']['desc']), 'link' => (empty($set['share']['url']) ? mobileUrl('', NULL, true) : $set['share']['url']));
 			$plugin_commission = p('commission');
-			if ($plugin_commission) 
-			{
+
+			if ($plugin_commission) {
 				$set = $plugin_commission->getSet();
-				if (!(empty($set['level']))) 
-				{
+
+				if (!(empty($set['level']))) {
 					$openid = $_W['openid'];
 					$member = m('member')->getMember($openid);
-					if (!(empty($member)) && ($member['status'] == 1) && ($member['isagent'] == 1)) 
-					{
-						if (empty($set['closemyshop'])) 
-						{
+
+					if (!(empty($member)) && ($member['status'] == 1) && ($member['isagent'] == 1)) {
+						if (empty($set['closemyshop'])) {
 							$myshop = $plugin_commission->getShop($member['id']);
 							$_W['shopshare'] = array('title' => $myshop['name'], 'imgUrl' => tomedia($myshop['logo']), 'desc' => $myshop['desc'], 'link' => mobileUrl('commission/myshop', array('mid' => $member['id']), true));
 						}
-						else 
-						{
+						 else {
 							$_W['shopshare']['link'] = ((empty($_W['shopset']['share']['url']) ? mobileUrl('', array('mid' => $member['id']), true) : $_W['shopset']['share']['url']));
 						}
-						if (empty($set['become_reg']) && (empty($member['realname']) || empty($member['mobile']))) 
-						{
+
+						if (empty($set['become_reg']) && (empty($member['realname']) || empty($member['mobile']))) {
 							$trigger = true;
 						}
+
 					}
-					else if (!(empty($_GPC['mid']))) 
-					{
+					 else if (!(empty($_GPC['mid']))) {
 						$m = m('member')->getMember($_GPC['mid']);
-						if (!(empty($m)) && ($m['status'] == 1) && ($m['isagent'] == 1)) 
-						{
-							if (empty($set['closemyshop'])) 
-							{
+
+						if (!(empty($m)) && ($m['status'] == 1) && ($m['isagent'] == 1)) {
+							if (empty($set['closemyshop'])) {
 								$myshop = $plugin_commission->getShop($_GPC['mid']);
 								$_W['shopshare'] = array('title' => $myshop['name'], 'imgUrl' => tomedia($myshop['logo']), 'desc' => $myshop['desc'], 'link' => mobileUrl('commission/myshop', array('mid' => $member['id']), true));
 							}
-							else 
-							{
+							 else {
 								$_W['shopshare']['link'] = ((empty($_W['shopset']['share']['url']) ? mobileUrl('', array('mid' => $_GPC['mid']), true) : $_W['shopset']['share']['url']));
 							}
 						}
-						else 
-						{
+						 else {
 							$_W['shopshare']['link'] = ((empty($_W['shopset']['share']['url']) ? mobileUrl('', array('mid' => $_GPC['mid']), true) : $_W['shopset']['share']['url']));
 						}
 					}
+
 				}
+
 			}
+
 		}
+
+
 		return $trigger;
 	}
-	public function diyPage($type) 
+
+	public function diyPage($type)
 	{
 		global $_W;
 		global $_GPC;
-		if (empty($type) || !(p('diypage'))) 
-		{
+		if (empty($type) || !(p('diypage'))) {
 			return false;
 		}
+
+
 		$merch = intval($_GPC['merchid']);
-		if ($merch && ($type != 'member') && ($type != 'commission')) 
-		{
-			if (!(p('merch'))) 
-			{
+		if ($merch && ($type != 'member') && ($type != 'commission')) {
+			if (!(p('merch'))) {
 				return false;
 			}
+
+
 			$diypagedata = p('merch')->getSet('diypage', $merch);
 		}
-		else 
-		{
+		 else {
 			$diypagedata = m('common')->getPluginset('diypage');
 		}
-		if (!(empty($diypagedata))) 
-		{
+
+		if (!(empty($diypagedata))) {
 			$diypageid = $diypagedata['page'][$type];
-			if (!(empty($diypageid))) 
-			{
+
+			if (!(empty($diypageid))) {
 				$page = p('diypage')->getPage($diypageid, true);
-				if (!(empty($page))) 
-				{
+
+				if (!(empty($page))) {
 					p('diypage')->setShare($page);
 					$diyitems = $page['data']['items'];
 					$diyitem_search = array();
-					if (!(empty($diyitems)) && is_array($diyitems)) 
-					{
+
+					if (!(empty($diyitems)) && is_array($diyitems)) {
 						$jsondiyitems = json_encode($diyitems);
-						if (strexists($jsondiyitems, 'fixedsearch')) 
-						{
-							foreach ($diyitems as $diyitemid => $diyitem ) 
-							{
-								if ($diyitem['id'] == 'fixedsearch') 
-								{
+
+						if (strexists($jsondiyitems, 'fixedsearch')) {
+							foreach ($diyitems as $diyitemid => $diyitem ) {
+								if ($diyitem['id'] == 'fixedsearch') {
 									$diyitem_search = $diyitem;
 									unset($diyitems[$diyitemid]);
 								}
+
 							}
+
 							unset($diyitem);
 						}
+
+
 						unset($diyitem);
 					}
+
+
 					$startadv = p('diypage')->getStartAdv($page['diyadv']);
 					include $this->template('diypage');
 					exit();
 				}
+
 			}
+
 		}
+
 	}
-	public function diyLayer($v = false, $diy = false, $merch = false) 
+
+	public function diyLayer($v = false, $diy = false, $merch = false)
 	{
 		global $_W;
 		global $_GPC;
-		if (!(p('diypage')) || $diy) 
-		{
+		if (!(p('diypage')) || $diy) {
 			return;
 		}
-		if ($merch) 
-		{
-			if (!(p('merch'))) 
-			{
+		if ($merch) {
+			if (!(p('merch'))) {
 				return false;
 			}
+
+
 			$diypagedata = p('merch')->getSet('diypage', $merch);
 		}
-		else 
-		{
+		 else {
 			$diypagedata = m('common')->getPluginset('diypage');
 		}
-		if (!(empty($diypagedata))) 
-		{
+
+		if (!(empty($diypagedata))) {
 			$diylayer = $diypagedata['layer'];
-			if (!($diylayer['params']['isopen']) && $v) 
-			{
+
+			if (!($diylayer['params']['isopen']) && $v) {
 				return;
 			}
+
+
 			include $this->template('diypage/layer');
 		}
+
 	}
-	public function diyGotop($v = false, $diy = false, $merch = false) 
+
+	public function diyGotop($v = false, $diy = false, $merch = false)
 	{
 		global $_W;
 		global $_GPC;
-		if (!(p('diypage')) || $diy) 
-		{
+		if (!(p('diypage')) || $diy) {
 			return;
 		}
-		if ($merch) 
-		{
-			if (!(p('merch'))) 
-			{
+		if ($merch) {
+			if (!(p('merch'))) {
 				return false;
 			}
+
+
 			$diypagedata = p('merch')->getSet('diypage', $merch);
 		}
-		else 
-		{
+		 else {
 			$diypagedata = m('common')->getPluginset('diypage');
 		}
-		if (!(empty($diypagedata))) 
-		{
+
+		if (!(empty($diypagedata))) {
 			$diygotop = $diypagedata['gotop'];
-			if (!($diygotop['params']['isopen']) && $v) 
-			{
+
+			if (!($diygotop['params']['isopen']) && $v) {
 				return;
 			}
+
+
 			include $this->template('diypage/gotop');
 		}
+
 	}
-	public function diyDanmu($diy = false) 
+
+	public function diyDanmu($diy = false)
 	{
 		global $_W;
 		global $_GPC;
-		if (!(p('diypage'))) 
-		{
+
+		if (!(p('diypage'))) {
 			return;
 		}
+
+
 		$diypagedata = m('common')->getPluginset('diypage');
 		$danmu = $diypagedata['danmu'];
-		if (empty($danmu) || (!($diy) && empty($danmu['params']['isopen']))) 
-		{
+		if (empty($danmu) || (!($diy) && empty($danmu['params']['isopen']))) {
 			return;
 		}
-		if (empty($danmu['params']['datatype'])) 
-		{
+
+
+		if (empty($danmu['params']['datatype'])) {
 			$condition = ((!(empty($_W['openid'])) ? ' AND openid!=\'' . $_W['openid'] . '\' ' : ''));
 			$danmu['data'] = pdo_fetchall('SELECT nickname, avatar as imgurl FROM' . tablename('ewei_shop_member') . ' WHERE uniacid=:uniacid AND nickname!=\'\' AND avatar!=\'\' ' . $condition . ' ORDER BY rand() LIMIT 10', array(':uniacid' => $_W['uniacid']));
 			$randstart = ((!(empty($danmu['params']['starttime'])) ? intval($danmu['params']['starttime']) : 0));
 			$randend = ((!(empty($danmu['params']['endtime'])) ? intval($danmu['params']['endtime']) : 0));
-			if ($randend <= $randstart) 
-			{
+
+			if ($randend <= $randstart) {
 				$randend = $randend + rand(100, 999);
 			}
+
 		}
-		else if ($danmu['params']['datatype'] == 1) 
-		{
+		 else if ($danmu['params']['datatype'] == 1) {
 			$danmu['data'] = pdo_fetchall('SELECT m.nickname, m.avatar as imgurl, o.createtime as time FROM' . tablename('ewei_shop_order') . ' o LEFT JOIN ' . tablename('ewei_shop_member') . ' m ON m.openid=o.openid WHERE o.uniacid=:uniacid AND m.nickname!=\'\' AND m.avatar!=\'\' ORDER BY o.createtime DESC LIMIT 10', array(':uniacid' => $_W['uniacid']));
 		}
-		else if ($danmu['params']['datatype'] == 2) 
-		{
+		 else if ($danmu['params']['datatype'] == 2) {
 			$danmu['data'] = set_medias($danmu['data'], 'imgurl');
 		}
-		if (empty($danmu['data']) || !(is_array($danmu['data']))) 
-		{
+
+
+		if (empty($danmu['data']) || !(is_array($danmu['data']))) {
 			return;
 		}
-		foreach ($danmu['data'] as $index => $item ) 
-		{
-			if (empty($danmu['params']['datatype'])) 
-			{
+
+
+		foreach ($danmu['data'] as $index => $item ) {
+			if (empty($danmu['params']['datatype'])) {
 				$time = rand($randstart, $randend);
 				$danmu['data'][$index]['time'] = p('diypage')->getDanmuTime($time);
 			}
-			else if ($danmu['params']['datatype'] == 1) 
-			{
+			 else if ($danmu['params']['datatype'] == 1) {
 				$danmu['data'][$index]['time'] = p('diypage')->getDanmuTime(time() - $item['time']);
 			}
-			else if ($danmu['params']['datatype'] == 2) 
-			{
+			 else if ($danmu['params']['datatype'] == 2) {
 				$danmu['data'][$index]['time'] = p('diypage')->getDanmuTime($danmu['data'][$index]['time']);
 			}
+
 		}
+
 		include $this->template('diypage/danmu');
 	}
-	public function wapQrcode() 
+
+	public function backliving()
+	{
+		global $_W;
+		global $_GPC;
+
+		if (!(p('live'))) {
+			return;
+		}
+
+
+		if (strexists($_W['routes'], 'live')) {
+			return false;
+		}
+
+
+		$liveid = intval($_GPC['liveid']);
+
+		if (empty($liveid)) {
+			return;
+		}
+
+
+		$living = p('live')->isLiving($liveid);
+
+		if (!($living)) {
+			return;
+		}
+
+
+		include $this->template('live/backliving');
+	}
+
+	public function wapQrcode()
 	{
 		global $_W;
 		global $_GPC;
 		$currenturl = '';
-		if (!(is_mobile())) 
-		{
+
+		if (!(is_mobile())) {
 			$currenturl = $_W['siteroot'] . 'app/index.php?' . $_SERVER['QUERY_STRING'];
 		}
+
+
 		$shop = m('common')->getSysset('shop');
 		$shopname = $shop['name'];
 		include $this->template('_wapqrcode');
 	}
 }
+
+
 ?>

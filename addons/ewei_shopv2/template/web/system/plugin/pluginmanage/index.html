@@ -64,7 +64,7 @@
                 <img src="{php echo tomedia($row['thumb'])}" style="width:40px;height:40px;padding:1px;border:1px solid #ccc;"  />
             </td>
             <td class='full'>
-                {$row['name']}
+                {if !empty($row['name'])}{$row['name']}{else}{$row['pname']}{/if}
             </td>
             <td style="text-align: center;">
                 <span class='label {if $row['state']==1}label-success{else}label-default{/if}'

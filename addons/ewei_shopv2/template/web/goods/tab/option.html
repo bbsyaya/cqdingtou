@@ -165,7 +165,6 @@
 		$("#hasoption").click(function(){
 			var obj = $(this);
 			if (obj.get(0).checked){
-				refreshOptions();
 				$('.hasoption').attr('readonly',true);
 				$("#tboption").show();
 				$("#tbdiscount").show();
@@ -174,7 +173,8 @@
 				$("#commission").show();
 				$("#commission_default").hide();
 				$("#discounts_type1").show().parent().show();
-			}else{
+                refreshOptions();
+            }else{
 				$("#tboption").hide();
 				refreshOptions();
 

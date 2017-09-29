@@ -67,7 +67,7 @@
 									<label class="fui-goods-list checkbox-inline row">
 										<span class="col-sm-1">
 											{if $g['sendtype']==0}
-											<input type="checkbox" name="sendgoodsid[]" style="margin-top:5px;" value="{$g['id']}" {if !empty($item['quality'])}checked="true"{/if}   />
+											<input type="checkbox" name="ordergoodsid[]" style="margin-top:5px;" value="{$g['id']}" {if !empty($item['quality'])}checked="true"{/if}   />
 											{/if}
 											<img src="{php echo tomedia($g['thumb'])}" width="25" height="25" alt="">
 										</span>
@@ -104,7 +104,7 @@
 							<label class="fui-goods-list checkbox-inline row">
 								<span class="col-sm-1">
 									{if $g['sendtype']==0}
-									<input type="checkbox" name="sendgoodsid[]" style="margin-top:5px;" value="{$g['id']}" {if !empty($item['quality'])}checked="true"{/if}   />
+									<input type="checkbox" name="ordergoodsid[]" style="margin-top:5px;" value="{$g['id']}" {if !empty($item['quality'])}checked="true"{/if}   />
 									{/if}
 									<img src="{php echo tomedia($g['thumb'])}" width="25" height="25" alt="">
 								</span>

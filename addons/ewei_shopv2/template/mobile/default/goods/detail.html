@@ -11,6 +11,11 @@
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/coupon.css?v=2.0.0">
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/coupon-new.css?v=2017030302">
 <link rel="stylesheet" href="../addons/ewei_shopv2/static/js/dist/swiper/swiper.min.css">
+
+{if !empty($liveprice)}
+    <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/plugin/live/static/css/living.css?v=20170628" />
+{/if}
+
 <div class='fui-page fui-page-current  page-goods-detail' id='page-goods-detail-index'>
     {php $this->followBar()}
 
@@ -104,6 +109,10 @@
 <i class="icon icon-qrcode" id="alert-click"></i>
 {/if}
 <div class='fui-swipe goods-swipe'>
+    {if !empty($liveprice)}
+        <a class="external isliving" href="{php echo mobileUrl('live/room', array('id'=>$liveid))}"></a>
+    {/if}
+
     <div class='fui-swipe-wrapper'>
         {loop $thumbs $thumb}
         <div class='fui-swipe-item'><img src="{EWEI_SHOPV2_PLACEHOLDER}"  data-lazy="{php echo tomedia($thumb)}" /></div>
@@ -360,6 +369,15 @@
     </div>
 </div>
 {/if}
+{/if}
+
+{if $liveprice}
+<div class="fui-cell-group  fui-sale-group" style="margin-top:0">
+    <div class="fui-cell">
+        <div class="fui-cell-text" style="white-space: normal;">您通过直播间<span class="text-danger">{$liveprice['name']}</span>进入 可享受 <span class="text-danger">￥{$liveprice['price']}</span>的价格</div>
+        <input type="hidden" id="liveid" value="{$liveprice['id']}">
+    </div>
+</div>
 {/if}
 
 {/if}

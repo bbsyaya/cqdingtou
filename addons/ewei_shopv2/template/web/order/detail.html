@@ -309,7 +309,7 @@
                                 </td>
                             </tr>
 
-                            {if $item['verifytype']==0}
+                            {if $item['verifytype']==0 && $item['status']>=1}
                                 <tr>
                                     <td style='width:80px'>消费码：</td>
                                     <td>{$item['verifycode']}</td>
