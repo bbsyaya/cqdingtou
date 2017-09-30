@@ -74,19 +74,14 @@ class Verifygoods_EweiShopV2Page extends ComWebPage
 		global $_GPC;
 		$id = $_GPC['id'];
 		$uniacid = $_W['uniacid'];
-		$verifygoods = pdo_fetch('select vg.*,g.title,g.subtitle,g.thumb,o.ordersn,o.paytime,o.openid  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = og.orderid' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where  vg.id =:id and vg.uniacid=:uniacid   limit 1', array(':id' => $id, ':uniacid' => $uniacid));
-		if (empty($verifygoods)) 
+		$item = pdo_fetch('select vg.*,g.title,g.subtitle,g.thumb,o.ordersn,o.paytime,o.openid  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = og.orderid' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where  vg.id =:id and vg.uniacid=:uniacid   limit 1', array(':id' => $id, ':uniacid' => $uniacid));
+		if (empty($item)) 
 		{
 			header('location: ' . webUrl('store/verifygoods'));
 		}
-		$member = m('member')->getMember($verifygoods['openid']);
+		$member = m('member')->getMember($item['openid']);
 		$username = $member['realname'];
 		$mobile = $member['mobile'];
-		$limitdays = intval($_GPC['limitdays']);
-		if (empty($limitdays)) 
-		{
-			$limitdays = 365;
-		}
 		$verifygoodlogs = pdo_fetchall('select vgl.*,s.storename,sa.salername  from ' . tablename('ewei_shop_verifygoods_log') . '   vgl' . "\r\n\t\t" . 'left  join ' . tablename('ewei_shop_store') . ' s on s.id = vgl.storeid' . "\r\n\t\t" . 'left  join ' . tablename('ewei_shop_saler') . ' sa on sa.id = vgl.salerid' . "\r\n" . '          where  vgl.verifygoodsid =:id  ', array(':id' => $id));
 		$verifynum = 0;
 		foreach ($verifygoodlogs as $verifygoodlog ) 
@@ -95,6 +90,13 @@ class Verifygoods_EweiShopV2Page extends ComWebPage
 		}
 		if ($_W['ispost']) 
 		{
+			$limittype = intval($_GPC['limittype']);
+			$limitdate = strtotime($_GPC['limitdate']);
+			$limitdays = intval($_GPC['limitdays']);
+			if (empty($limitdays)) 
+			{
+				$limitdays = 365;
+			}
 			$limitnum = intval($_GPC['limitnum']);
 			if (empty($limitnum) || ($verifynum < $limitnum)) 
 			{
@@ -104,11 +106,19 @@ class Verifygoods_EweiShopV2Page extends ComWebPage
 			{
 				$used = 1;
 			}
-			$data = array('limitdays' => $limitdays, 'limitnum' => intval($_GPC['limitnum']), 'invalid' => intval($_GPC['invalid']), 'used' => $used);
+			$data = array('limittype' => $limittype, 'limitdate' => $limitdate, 'limitdays' => $limitdays, 'limitnum' => intval($_GPC['limitnum']), 'invalid' => intval($_GPC['invalid']), 'used' => $used);
 			pdo_update('ewei_shop_verifygoods', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
 			plog('store.edit', '编辑核销商品核销信息 ID: ' . $id);
 			com('wxcard')->updateusercardbyvarifygoodid($id);
 			show_json(1, array('url' => referer()));
+		}
+		if (empty($item['limittype'])) 
+		{
+			$limitdatestr = date('Y-m-d H:i:s', intval($item['starttime']) + ($item['limitdays'] * 86400));
+		}
+		else 
+		{
+			$limitdatestr = date('Y-m-d H:i:s', $item['limitdate']);
 		}
 		include $this->template();
 	}
@@ -162,7 +172,7 @@ class Verifygoods_EweiShopV2Page extends ComWebPage
 		}
 		unset($rom);
 		$total = pdo_fetchcolumn('select  COUNT(*)   from ' . tablename('ewei_shop_verifygoods_log') . '   vgl' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_verifygoods') . ' vg on vg.id = vgl.verifygoodsid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_store') . ' s  on s.id = vgl.storeid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_saler') . ' sa  on sa.id = vgl.salerid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = og.orderid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . '  where  1 and  ' . $condition . ' ORDER BY vgl.verifydate DESC ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function verifygoodslogdelete() 

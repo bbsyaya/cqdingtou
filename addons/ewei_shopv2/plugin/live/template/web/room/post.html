@@ -70,6 +70,13 @@
                 $(".salf_screen input[name='screen']").prop("checked","true");
             }else{
                 $(".full_screen").show();
+            };
+            if(livetype==2){
+                $(".live-url").hide();
+                $(".live-video").show();
+            }else{
+                $(".live-url").show();
+                $(".live-video").hide();
             }
         })
     })

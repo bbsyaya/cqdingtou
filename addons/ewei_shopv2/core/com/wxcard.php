@@ -980,6 +980,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	}
 	public function ActivateMembercardbyopenid($openid) 
 	{
+		global $_W;
 		$sql = 'select m.*  from ' . tablename('ewei_shop_member') . ' m inner join ' . tablename('mc_mapping_fans') . ' f on f.openid=m.openid where m.openid=:openid and f.follow=1 limit 1';
 		$member = pdo_fetch($sql, array(':openid' => $openid));
 		if (empty($member)) 
@@ -1001,6 +1002,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$params['init_balance'] = $credit2 * 100;
 		if (empty($member['level'])) 
 		{
+			$shop = $_W['shopset']['shop'];
 			$level = ((empty($shop['levelname']) ? '普通会员' : $shop['levelname']));
 		}
 		else 
@@ -1017,7 +1019,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	public function ActivateVerifygoodCard($id, $card_id, $code, $openid) 
 	{
 		global $_W;
-		$sql = 'select vg.*,c.card_id  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t" . ' inner  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0' . "\r\n\t" . ' and vg.limitdays * 86400 + vg.starttime >=unix_timestamp() and  vg.used =0 and (vg.activecard=0 or vg.activecard is null) and g.cardid>0 and vg.id=:id ';
+		$sql = 'select vg.*,c.card_id  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t" . ' inner  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0' . "\r\n\t" . ' and  ((vg.limittype=0   and vg.limitdays * 86400 + vg.starttime >=unix_timestamp() )or ( vg.limittype=1   and vg.limitdate >=unix_timestamp() ))  and  vg.used =0 and (vg.activecard=0 or vg.activecard is null) and g.cardid>0 and vg.id=:id ';
 		$verifygoods = pdo_fetch($sql, array(':uniacid' => $_W['uniacid'], ':openid' => $openid, ':id' => $id));
 		$verifygoodlogs = pdo_fetchall('select *  from ' . tablename('ewei_shop_verifygoods_log') . '    where verifygoodsid =:id  ', array(':id' => $id));
 		$verifynum = 0;
@@ -1126,6 +1128,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	}
 	public function updateMemberCardByOpenid($openid) 
 	{
+		global $_W;
 		$sql = 'select m.*  from ' . tablename('ewei_shop_member') . ' m inner join ' . tablename('mc_mapping_fans') . ' f on f.openid=m.openid where m.openid=:openid limit 1';
 		$member = pdo_fetch($sql, array(':openid' => $openid));
 		if (empty($member)) 
@@ -1145,6 +1148,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$params['balance'] = $credit2 * 100;
 		if (empty($member['level'])) 
 		{
+			$shop = $_W['shopset']['shop'];
 			$level = ((empty($shop['levelname']) ? '普通会员' : $shop['levelname']));
 		}
 		else 
@@ -1271,7 +1275,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	}
 	public function verifygoodcard($carddata, $card_id = '') 
 	{
-		$params = array('card_type' => 'MEMBER_CARD', 'title' => $carddata['card_title'], 'background_pic_url' => $carddata['card_backgroundwxurl'], 'brand_name' => $carddata['card_brand_name'], 'quantity' => $carddata['card_quantity'], 'wxlogourl' => $carddata['card_logowxurl'], 'prerogative' => $carddata['prerogative'], 'color' => $carddata['color'], 'notice' => '点击使用按钮并向服务员出示二维码', 'can_give_friend' => 0, 'description' => $carddata['card_description'], 'center_title' => '立即使用', 'center_url' => mobileUrl('verifygoods/detail', '', true), 'center_sub_title' => '点击使用', 'BIZ_SERVICE_FREE_WIFI' => intval($carddata['freewifi']), 'BIZ_SERVICE_WITH_PET' => intval($carddata['withpet']), 'BIZ_SERVICE_FREE_PARK' => intval($carddata['freepark']), 'BIZ_SERVICE_DELIVER' => intval($carddata['deliver']), 'datetype' => 'DATE_TYPE_PERMANENT', 'custom_cell1' => $carddata['custom_cell1'], 'custom_cell1_name' => $carddata['custom_cell1_name'], 'custom_cell1_tips' => $carddata['custom_cell1_tips'], 'custom_cell1_url' => $carddata['custom_cell1_url'], 'custom_field1' => 1, 'custom_field_name_type1' => 'FIELD_NAME_TYPE_TIMS', 'supply_bonus' => 'false', 'supply_balance' => 'false', 'auto_activate' => 'false', 'wx_activate' => 'false', 'activate_url' => mobileUrl('verifygoods/activecard', '', true), 'use_limit' => 100, 'get_limit' => 100);
+		$params = array('card_type' => 'MEMBER_CARD', 'title' => $carddata['card_title'], 'background_pic_url' => $carddata['card_backgroundwxurl'], 'brand_name' => $carddata['card_brand_name'], 'quantity' => $carddata['card_quantity'], 'wxlogourl' => $carddata['card_logowxurl'], 'prerogative' => $carddata['prerogative'], 'color' => $carddata['color'], 'notice' => '点击使用按钮并向服务员出示二维码', 'can_give_friend' => 0, 'description' => $carddata['card_description'], 'center_title' => '立即使用', 'center_url' => mobileUrl('verifygoods/detail', '', true), 'center_sub_title' => '点击使用', 'BIZ_SERVICE_FREE_WIFI' => intval($carddata['freewifi']), 'BIZ_SERVICE_WITH_PET' => intval($carddata['withpet']), 'BIZ_SERVICE_FREE_PARK' => intval($carddata['freepark']), 'BIZ_SERVICE_DELIVER' => intval($carddata['deliver']), 'datetype' => 'DATE_TYPE_PERMANENT', 'custom_cell1' => $carddata['custom_cell1'], 'custom_cell1_name' => $carddata['custom_cell1_name'], 'custom_cell1_tips' => $carddata['custom_cell1_tips'], 'custom_cell1_url' => $carddata['custom_cell1_url'], 'custom_field1' => 1, 'custom_field_name_type1' => 'FIELD_NAME_TYPE_TIMS', 'supply_bonus' => 'false', 'supply_balance' => 'false', 'auto_activate' => 'false', 'wx_activate' => 'false', 'activate_url' => mobileUrl('verifygoods/activecard', '', true), 'use_limit' => 1000, 'get_limit' => 1000);
 		if (empty($card_id)) 
 		{
 			return $this->createCard($params);

@@ -38,6 +38,7 @@ foreach ($sets as $set )
 			m('member')->upgradeLevel($order['openid'], $orderid);
 			m('order')->setGiveBalance($orderid, 1);
 			m('notice')->sendOrderMessage($orderid);
+			m('order')->fullback($orderid);
 			if ($pcoupon) 
 			{
 				com('coupon')->sendcouponsbytask($item['id']);

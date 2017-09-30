@@ -1,11 +1,11 @@
 <?php
-if (!(defined('IN_IA'))) {
+if (!(defined('IN_IA'))) 
+{
 	exit('Access Denied');
 }
-
-class Category_EweiShopV2Page extends PluginMobileLoginPage
+class Category_EweiShopV2Page extends PluginMobileLoginPage 
 {
-	public function main()
+	public function main() 
 	{
 		global $_W;
 		global $_GPC;
@@ -17,6 +17,4 @@ class Category_EweiShopV2Page extends PluginMobileLoginPage
 		include $this->template();
 	}
 }
-
-
 ?>

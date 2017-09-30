@@ -1498,3 +1498,48 @@
         </div>
     </div>
 </script>
+
+<script type="text/html" id="tpl_show_verify">
+    <div class="drag" data-itemid="<%itemid%>">
+        <div class="fui-cell-group fui-cell-click" style="margin-top: 10px; background-color: <%style.titlebg%>;">
+            <div class="fui-cell">
+                <div class="fui-cell-icon" style="color: #999999;"><i class="icon <%params.iconclass%>"></i></div>
+                <div class="fui-cell-text" style="color: <%style.titlecolor%>;"><% params.title%></div>
+                <div class="fui-cell-remark" style="color: <%style.remarkcolor%>;"><% params.remark%></div>
+            </div>
+        </div>
+        <div class="fui-icon-group selecter" style="overflow: scroll; background: <%style.background%>">
+            <%if params.style!='style2'%>
+            <ul class="banner-ul">
+                <li class="" style="border-color: <%style.cardbg2%>; " >
+                    <a>
+                        <div style="background: <%style.cardbg2%>"></div><span>待使用</span>
+                        <img src="../addons/ewei_shopv2/plugin/diypage/static/images/default/goods-1.jpg" alt=""><p style="color: <%style.cardcolor2%>">测试核销商品</p>
+                    </a>
+                </li>
+                <li class="banner-li-blue" style="border-color: <%style.cardbg%>; ">
+                    <a>
+                        <div style="background: <%style.cardbg%>"></div><span>待使用</span>
+                        <img src="../addons/ewei_shopv2/plugin/diypage/static/images/default/goods-2.jpg" alt=""><p style="color: <%style.cardcolor%>">测试核销商品</p>
+                    </a>
+                </li>
+            </ul>
+            <%else%>
+            <ul class="banner-ul style2">
+                <li class="" style="background: <%style.cardbg2%>">
+                    <a>
+                        <div></div><span>待使用</span>
+                        <img src="../addons/ewei_shopv2/plugin/diypage/static/images/default/goods-1.jpg" alt=""><p style="color: <%style.cardcolor2%>">测试核销商品</p>
+                    </a>
+                </li>
+                <li class="banner-li-blue" style="background: <%style.cardbg%>">
+                    <a>
+                        <div></div><span>待使用</span>
+                        <img src="../addons/ewei_shopv2/plugin/diypage/static/images/default/goods-2.jpg" alt=""><p style="color: <%style.cardcolor%>">测试核销商品</p>
+                    </a>
+                </li>
+            </ul>
+            <%/if%>
+        </div>
+    </div>
+</script>

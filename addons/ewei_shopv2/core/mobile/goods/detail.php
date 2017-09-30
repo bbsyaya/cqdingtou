@@ -68,19 +68,23 @@ class Detail_EweiShopV2Page extends MobilePage
 		$gifts = pdo_fetchall('select id,goodsid,giftgoodsid,thumb,title from ' . tablename('ewei_shop_gift') . ' where uniacid = ' . $uniacid . ' and activity = 2 and status = 1 and starttime <= ' . time() . ' and endtime >= ' . time() . '  ');
 		foreach ($gifts as $key => $value ) 
 		{
-			if (strstr($value['goodsid'], trim($id))) 
+			$gid = explode(',', $value['goodsid']);
+			foreach ($gid as $key => $val ) 
 			{
-				$giftgoods = explode(',', $value['giftgoodsid']);
-				foreach ($giftgoods as $k => $val ) 
+				if ($val == $id) 
 				{
-					$isgift = 1;
-					$gifts[$key]['gift'][$k] = pdo_fetch('select id,title,thumb,marketprice from ' . tablename('ewei_shop_goods') . ' where uniacid = ' . $uniacid . ' and deleted = 0 and total > 0 and status = 2 and id = ' . $val . ' ');
-					$gifttitle = ((!(empty($gifts[$key]['gift'][$k]['title'])) ? $gifts[$key]['gift'][$k]['title'] : '赠品'));
+					$giftgoods = explode(',', $value['giftgoodsid']);
+					foreach ($giftgoods as $k => $val ) 
+					{
+						$isgift = 1;
+						$gifts[$key]['gift'][$k] = pdo_fetch('select id,title,thumb,marketprice from ' . tablename('ewei_shop_goods') . ' where uniacid = ' . $uniacid . ' and deleted = 0 and total > 0 and status = 2 and id = ' . $val . ' ');
+						$gifttitle = ((!(empty($gifts[$key]['gift'][$k]['title'])) ? $gifts[$key]['gift'][$k]['title'] : '赠品'));
+					}
 				}
-			}
-			else 
-			{
-				unset($gifts[$key]);
+				else 
+				{
+					unset($gifts[$key]);
+				}
 			}
 		}
 		$goods = pdo_fetch('select * from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
@@ -124,7 +128,7 @@ class Detail_EweiShopV2Page extends MobilePage
 			$fullbackgoods = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' limit 1 ');
 			if ($goods['hasoption'] == 1) 
 			{
-				$fullprice = pdo_fetch('select min(allfullbackprice) as minfullprice,max(allfullbackprice) as maxfullprice,min(allfullbackratio) as minfullratio' . "\r\n" . '                            ,max(allfullbackratio) as maxfullratio,min(fullbackprice) as minfullbackprice,max(fullbackprice) as maxfullbackprice' . "\r\n" . '                            ,min(fullbackratio) as minfullbackratio,max(fullbackratio) as maxfullbackratio,min(`day`) as minday,max(`day`) as maxday' . "\r\n" . '                            from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '');
+				$fullprice = pdo_fetch('select min(allfullbackprice) as minfullprice,max(allfullbackprice) as maxfullprice,min(allfullbackratio) as minfullratio' . "\n" . '                            ,max(allfullbackratio) as maxfullratio,min(fullbackprice) as minfullbackprice,max(fullbackprice) as maxfullbackprice' . "\n" . '                            ,min(fullbackratio) as minfullbackratio,max(fullbackratio) as maxfullbackratio,min(`day`) as minday,max(`day`) as maxday' . "\n" . '                            from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '');
 				$fullbackgoods['minallfullbackallprice'] = $fullprice['minfullprice'];
 				$fullbackgoods['maxallfullbackallprice'] = $fullprice['maxfullprice'];
 				$fullbackgoods['minallfullbackallratio'] = $fullprice['minfullratio'];
@@ -294,10 +298,10 @@ class Detail_EweiShopV2Page extends MobilePage
 		{
 			$has_city = 0;
 		}
-		$package_goods = pdo_fetch('select pg.id,pg.pid,pg.goodsid,p.displayorder from ' . tablename('ewei_shop_package_goods') . ' as pg' . "\r\n" . '                        left join ' . tablename('ewei_shop_package') . ' as p on pg.pid = p.id' . "\r\n" . '                        where pg.uniacid = ' . $uniacid . ' and pg.goodsid = ' . $id . ' ORDER BY p.displayorder desc,pg.id desc limit 1 ');
+		$package_goods = pdo_fetch('select pg.id,pg.pid,pg.goodsid,p.displayorder from ' . tablename('ewei_shop_package_goods') . ' as pg' . "\n" . '                        left join ' . tablename('ewei_shop_package') . ' as p on pg.pid = p.id' . "\n" . '                        where pg.uniacid = ' . $uniacid . ' and pg.goodsid = ' . $id . ' ORDER BY p.displayorder desc,pg.id desc limit 1 ');
 		if ($package_goods['pid']) 
 		{
-			$packages = pdo_fetchall('SELECT id,title,thumb,packageprice FROM ' . tablename('ewei_shop_package_goods') . "\r\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $package_goods['pid'] . '  ORDER BY id DESC');
+			$packages = pdo_fetchall('SELECT id,title,thumb,packageprice FROM ' . tablename('ewei_shop_package_goods') . "\n" . '                    WHERE uniacid = ' . $uniacid . ' and pid = ' . $package_goods['pid'] . '  ORDER BY id DESC');
 			$packages = set_medias($packages, array('thumb'));
 		}
 		$goods['dispatchprice'] = $this->getGoodsDispatchPrice($goods);
@@ -513,7 +517,7 @@ class Detail_EweiShopV2Page extends MobilePage
 				{
 					$optionids[] = $val['id'];
 				}
-				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\r\n" . '        g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '        g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '        where g.id = ' . $id . ' and g.hasoption=1';
+				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\n" . '        g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\n" . '        g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\n" . '        where g.id = ' . $id . ' and g.hasoption=1';
 				pdo_query($sql);
 			}
 			else 
@@ -771,7 +775,8 @@ class Detail_EweiShopV2Page extends MobilePage
 			$showComments = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order_comment') . ' where goodsid=:goodsid and level>=0 and deleted=0 and checked=0 and uniacid=:uniacid', array(':goodsid' => $id, ':uniacid' => $_W['uniacid']));
 		}
 		$goodscode = '';
-		if (com('goodscode') && ($commission_data['codeShare'] == 3)) 
+		$parameter = array();
+		if (com('goodscode')) 
 		{
 			if ($goods['minprice'] == $goods['maxprice']) 
 			{
@@ -783,11 +788,58 @@ class Detail_EweiShopV2Page extends MobilePage
 			}
 			$url = mobileUrl('goods/detail', array('id' => $id, 'mid' => $mid), true);
 			$qrcode = m('qrcode')->createQrcode($url);
-			$title[0] = mb_substr($goods['title'], 0, 20, 'utf-8');
-			$title[1] = mb_substr($goods['title'], 21, 20, 'utf-8');
-			$title = $title[0] . "\r\n" . $title[1];
-			$codedata = array( 'title' => array('text' => $title, 'left' => 27, 'top' => 40, 'size' => 22, 'width' => 600, 'height' => 90, 'color' => '#333'), 'thumb' => array('thumb' => tomedia($goods['thumb']), 'left' => 0, 'top' => 150, 'width' => 640, 'height' => 640), 'qrcode' => array('thumb' => tomedia($qrcode), 'left' => 20, 'top' => 810, 'width' => 220, 'height' => 220), 'price' => array('text' => $price, 'left' => 280, 'top' => 870, 'size' => 30, 'color' => '#000'), 'desc' => array('text' => '长按二维码扫码购买', 'left' => 280, 'top' => 950, 'size' => 18, 'color' => '#666') );
-			$goodscode = com('goodscode')->createcode($id, $qrcode, $codedata, $mid);
+			if ($commission_data['codeShare'] == 1) 
+			{
+				$title[0] = mb_substr($goods['title'], 0, 10, 'utf-8');
+				$title[1] = mb_substr($goods['title'], 11, 10, 'utf-8');
+				$title = '    ' . $title[0] . "\n" . '    ' . $title[1];
+				$codedata = array( 'portrait' => array('thumb' => (tomedia($_W['shopset']['shop']['logo']) ? tomedia($_W['shopset']['shop']['logo']) : tomedia($member['avatar'])), 'left' => 40, 'top' => 40, 'width' => 100, 'height' => 100), 'shopname' => array('text' => $_W['shopset']['shop']['name'], 'left' => 160, 'top' => 80, 'size' => 28, 'width' => 360, 'height' => 50, 'color' => '#333'), 'thumb' => array('thumb' => tomedia($goods['thumb']), 'left' => 40, 'top' => 160, 'width' => 560, 'height' => 560), 'qrcode' => array('thumb' => tomedia($qrcode), 'left' => 23, 'top' => 730, 'width' => 220, 'height' => 220), 'title' => array('text' => $title, 'left' => 230, 'top' => 770, 'size' => 24, 'width' => 360, 'height' => 50, 'color' => '#333'), 'price' => array('text' => $price, 'left' => 270, 'top' => 880, 'size' => 30, 'color' => '#f20'), 'desc' => array('text' => '长按二维码扫码购买', 'left' => 210, 'top' => 980, 'size' => 18, 'color' => '#666') );
+			}
+			else if ($commission_data['codeShare'] == 2) 
+			{
+				$title[0] = mb_substr($goods['title'], 0, 14, 'utf-8');
+				$title[1] = mb_substr($goods['title'], 15, 14, 'utf-8');
+				$title = '    ' . $title[0] . "\n" . '    ' . $title[1];
+				$codedata = array( 'thumb' => array('thumb' => tomedia($goods['thumb']), 'left' => 20, 'top' => 20, 'width' => 150, 'height' => 150), 'title' => array('text' => $title, 'left' => 170, 'top' => 30, 'size' => 22, 'width' => 430, 'height' => 90, 'color' => '#333'), 'price' => array('text' => $price, 'left' => 210, 'top' => 120, 'size' => 30, 'color' => '#f20'), 'qrcode' => array('thumb' => tomedia($qrcode), 'left' => 170, 'top' => 200, 'width' => 300, 'height' => 300), 'desc' => array('text' => '长按二维码扫码购买', 'left' => 205, 'top' => 510, 'size' => 18, 'color' => '#666'), 'shopname' => array('text' => $_W['shopset']['shop']['name'], 'left' => 0, 'top' => 585, 'size' => 28, 'width' => 640, 'height' => 50, 'color' => '#fff') );
+			}
+			else if ($commission_data['codeShare'] == 3) 
+			{
+				$title[0] = mb_substr($goods['title'], 0, 12, 'utf-8');
+				$title[1] = mb_substr($goods['title'], 13, 12, 'utf-8');
+				$title = '                ' . $title[0] . "\n" . '                ' . $title[1];
+				$codedata = array( 'title' => array('text' => $title, 'left' => 27, 'top' => 40, 'size' => 22, 'width' => 600, 'height' => 90, 'color' => '#333'), 'thumb' => array('thumb' => tomedia($goods['thumb']), 'left' => 0, 'top' => 150, 'width' => 640, 'height' => 640), 'qrcode' => array('thumb' => tomedia($qrcode), 'left' => 20, 'top' => 810, 'width' => 220, 'height' => 220), 'price' => array('text' => $price, 'left' => 280, 'top' => 870, 'size' => 30, 'color' => '#000'), 'desc' => array('text' => '长按二维码扫码购买', 'left' => 280, 'top' => 950, 'size' => 18, 'color' => '#666') );
+			}
+			$parameter = array('goodsid' => $id, 'qrcode' => $qrcode, 'codedata' => $codedata, 'mid' => $mid, 'codeshare' => $commission_data['codeShare']);
+			$goodscode = com('goodscode')->createcode($parameter);
+		}
+		else 
+		{
+			if ($goods['minprice'] == $goods['maxprice']) 
+			{
+				$price = '¥' . $goods['minprice'];
+			}
+			else 
+			{
+				$price = '¥' . $goods['minprice'] . ' ~ ' . $goods['maxprice'];
+			}
+			$url = mobileUrl('goods/detail', array('id' => $id, 'mid' => $mid), true);
+			$qrcode = m('qrcode')->createQrcode($url);
+			if ($commission_data['codeShare'] == 1) 
+			{
+				$title[0] = mb_substr($goods['title'], 0, 10, 'utf-8');
+				$title[1] = mb_substr($goods['title'], 11, 10, 'utf-8');
+				$title = '    ' . $title[0] . "\n" . '    ' . $title[1];
+				$codedata = array( 'portrait' => array('thumb' => (tomedia($_W['shopset']['shop']['logo']) ? tomedia($_W['shopset']['shop']['logo']) : tomedia($member['avatar'])), 'left' => 40, 'top' => 40, 'width' => 100, 'height' => 100), 'shopname' => array('text' => $_W['shopset']['shop']['name'], 'left' => 160, 'top' => 80, 'size' => 28, 'width' => 360, 'height' => 50, 'color' => '#333'), 'thumb' => array('thumb' => tomedia($goods['thumb']), 'left' => 40, 'top' => 160, 'width' => 560, 'height' => 560), 'qrcode' => array('thumb' => tomedia($qrcode), 'left' => 23, 'top' => 730, 'width' => 220, 'height' => 220), 'title' => array('text' => $title, 'left' => 230, 'top' => 770, 'size' => 24, 'width' => 360, 'height' => 50, 'color' => '#333'), 'price' => array('text' => $price, 'left' => 270, 'top' => 880, 'size' => 30, 'color' => '#f20'), 'desc' => array('text' => '长按二维码扫码购买', 'left' => 210, 'top' => 980, 'size' => 18, 'color' => '#666') );
+			}
+			else if ($commission_data['codeShare'] == 2) 
+			{
+				$title[0] = mb_substr($goods['title'], 0, 14, 'utf-8');
+				$title[1] = mb_substr($goods['title'], 15, 14, 'utf-8');
+				$title = '    ' . $title[0] . "\n" . '    ' . $title[1];
+				$codedata = array( 'thumb' => array('thumb' => tomedia($goods['thumb']), 'left' => 20, 'top' => 20, 'width' => 150, 'height' => 150), 'title' => array('text' => $title, 'left' => 170, 'top' => 30, 'size' => 22, 'width' => 430, 'height' => 90, 'color' => '#333'), 'price' => array('text' => $price, 'left' => 210, 'top' => 120, 'size' => 30, 'color' => '#f20'), 'qrcode' => array('thumb' => tomedia($qrcode), 'left' => 170, 'top' => 200, 'width' => 300, 'height' => 300), 'desc' => array('text' => '长按二维码扫码购买', 'left' => 205, 'top' => 510, 'size' => 18, 'color' => '#666'), 'shopname' => array('text' => $_W['shopset']['shop']['name'], 'left' => 0, 'top' => 585, 'size' => 28, 'width' => 640, 'height' => 50, 'color' => '#fff') );
+			}
+			$parameter = array('goodsid' => $id, 'qrcode' => $qrcode, 'codedata' => $codedata, 'mid' => $mid, 'codeshare' => $commission_data['codeShare']);
+			$goodscode = m('goods')->createcode($parameter);
 		}
 		$plugin_diypage = p('diypage');
 		if ($plugin_diypage) 

@@ -44,7 +44,18 @@ if (!(class_exists('GlobonusModel')))
 			}
 			if (in_array('lock', $params)) 
 			{
-				$ret['lock'] = pdo_fetchcolumn('select ifnull(sum(paymoney),0) from ' . tablename('ewei_shop_globonus_billp') . ' where openid=:openid and status<>1 and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+				$billdData = pdo_fetchall('select id from ' . tablename('ewei_shop_globonus_bill') . ' where 1 and uniacid = ' . intval($_W['uniacid']));
+				$id = '';
+				if (!(empty($billdData))) 
+				{
+					$ids = array();
+					foreach ($billdData as $v ) 
+					{
+						$ids[] = $v['id'];
+					}
+					$id = implode(',', $ids);
+					$ret['lock'] = pdo_fetchcolumn('select ifnull(sum(paymoney),0) from ' . tablename('ewei_shop_globonus_billp') . ' where openid=:openid and status<>1 and uniacid=:uniacid  and billid in(' . $id . ') limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+				}
 			}
 			$ret['total'] = $ret['ok'] + $ret['lock'];
 			return $ret;
@@ -149,6 +160,7 @@ if (!(class_exists('GlobonusModel')))
 				$arr['[昵称]'] = $data['nickname'];
 				case 'pay_advanced': $arr['[时间]'] = date('Y-m-d H:i:s', $data['paytime']);
 				$arr['[昵称]'] = $data['nickname'];
+				break;
 			}
 			foreach ($arr as $key => $value ) 
 			{

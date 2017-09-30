@@ -28,10 +28,6 @@ class Activation_EweiShopV2Page extends MobileLoginPage
 			$iserror = true;
 		}
 		$item = pdo_fetch('select * from ' . tablename('ewei_shop_member') . ' where uniacid=:uniacid and openid =:openid limit 1 ', array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
-		if (!(empty($item)) && ($item['membercardcode'] == $code) && ($item['membercardactive'] == 1)) 
-		{
-			$this->message(array('message' => '会员卡已激活,请勿充重复激活!', 'title' => '会员卡已被激活!', 'buttondisplay' => true), mobileUrl('member'), 'error');
-		}
 		if ($iserror) 
 		{
 			$this->message(array('message' => '激活链接错误!', 'title' => '激活链接错误!', 'buttondisplay' => true), mobileUrl('member'), 'error');
@@ -90,10 +86,6 @@ class Activation_EweiShopV2Page extends MobileLoginPage
 			show_json(0, '激活链接错误!');
 		}
 		$item = pdo_fetch('select * from ' . tablename('ewei_shop_member') . ' where uniacid=:uniacid and openid =:openid limit 1 ', array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
-		if (!(empty($item)) && ($item['membercardcode'] == $code) && ($item['membercardactive'] == 1)) 
-		{
-			show_json(0, '会员卡已激活,请勿充重复激活!');
-		}
 		$arr = array('membercardid' => $card_id, 'membercardcode' => $code, 'membershipnumber' => $code, 'membercardactive' => 0);
 		$CardActivation = m('common')->getSysset('memberCardActivation');
 		if (!(empty($CardActivation['openactive']))) 
@@ -136,8 +128,11 @@ class Activation_EweiShopV2Page extends MobileLoginPage
 			}
 			else 
 			{
+				if (empty($item['membercardactive'])) 
+				{
+					$this->sendGift($_W['openid']);
+				}
 				pdo_update('ewei_shop_member', array('membercardactive' => 1), array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
-				$this->sendGift($_W['openid']);
 				show_json(1, '您的会员卡已成功激活');
 			}
 		}

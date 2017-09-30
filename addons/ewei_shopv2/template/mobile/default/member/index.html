@@ -108,7 +108,7 @@
 				<div class="icon icon-orange radius"><i class="icon icon-like"></i></div>
 				<div class="text">待使用</div>
 			</a>
-			<a class="fui-icon-col external" href="{php echo mobileUrl('newstore/norder',array('status'=>2))}">
+			<a class="fui-icon-col external" href="{php echo mobileUrl('newstore/norder',array('status'=>3))}">
 				{if $statics['norder_3']>0}<div class="badge">{$statics['norder_3']}</div>{/if}
 				<div class="icon icon-blue radius"><i class="icon icon-discover"></i></div>
 				<div class="text">已完成</div>
@@ -121,6 +121,33 @@
 		</div>
 	</div>
 	{/if}
+
+	<div class="fui-cell-group fui-cell-click">
+		<a class="fui-cell external" href="{php echo mobileUrl('verifygoods')}">
+			<div class="fui-cell-icon"><i class="icon icon-list"></i></div>
+			<div class="fui-cell-text">待使用商品信息</div>
+			<div class="fui-cell-remark" style="font-size: 0.5rem;"></div>
+		</a>
+
+		{if !empty($verifygoods)}
+		<div class="fui-icon-group selecter" style="overflow: scroll;">
+			<ul class="banner-ul">
+				{loop $verifygoods $item}
+				<li   {if $item['numlimit']}class="banner-li-blue"{/if}>
+				<a  {if $item['cangetcard']} href="javascript:;" onclick="addCard('{$item['card_id']}','{$item['cardcode']}')" {else} href="{php echo mobileUrl('verifygoods/detail',array('id'=>$item['id']))}" {/if}>
+				<div></div>
+				<span>  {if $item['cangetcard']}  待激活 {else}待使用{/if}</span>
+				<img src="{$item['thumb']}" alt="">
+				<p>	{$item['title']}</p>
+				</a>
+				</li>
+				{/loop}
+			</ul>
+		</div>
+
+		{/if}
+
+	</div>
 
 	{if p('task')}
 	{php $open = pdo_get('ewei_shop_task_default',array('uniacid'=>$_W['uniacid']),array('open'));}
@@ -195,7 +222,7 @@
 
 	{if !empty($showcard)}
 	<div class="fui-cell-group fui-cell-click">
-		<a class="fui-cell" href="javascript:;" onclick="addCard('{$card['card_id']}')">
+		<a class="fui-cell" href="javascript:;" onclick="addCard('{$card['card_id']}','')">
 			<div class="fui-cell-icon"><i class="icon icon-same"></i></div>
 			<div class="fui-cell-text"><p>{$cardtag}</p></div>
 			<div class="fui-cell-remark"></div>
@@ -204,29 +231,21 @@
 	{/if}
 
 	{if $hascoupon}
-			<div class="fui-cell-group fui-cell-click">
-				 {if $hascouponcenter}
-				<a class="fui-cell" href="{php echo mobileUrl('sale/coupon')}">
-					<div class="fui-cell-icon"><i class="icon icon-same"></i></div>
-					<div class="fui-cell-text"><p>领取优惠券</p></div>
-					<div class="fui-cell-remark"></div>
-				</a>
-				 {/if}
-				<a class="fui-cell"  href="{php echo mobileUrl('sale/coupon/my')}">
-					<div class="fui-cell-icon"><i class="icon icon-card"></i></div>
-					<div class="fui-cell-text"><p>我的优惠券</p></div>
-					<div class="fui-cell-remark">{if $statics['coupon']>0}<span  {if $statics['newcoupon']>0}style="background: #fe5455;color:#fff"{/if} class='badge'>  {if $statics['newcoupon']>0}new{else}{$statics['coupon']}{/if}</span>{/if}</div>
-				</a>
-			</div>
+		<div class="fui-cell-group fui-cell-click">
+			 {if $hascouponcenter}
+			<a class="fui-cell" href="{php echo mobileUrl('sale/coupon')}">
+				<div class="fui-cell-icon"><i class="icon icon-same"></i></div>
+				<div class="fui-cell-text"><p>领取优惠券</p></div>
+				<div class="fui-cell-remark"></div>
+			</a>
+			 {/if}
+			<a class="fui-cell"  href="{php echo mobileUrl('sale/coupon/my')}">
+				<div class="fui-cell-icon"><i class="icon icon-card"></i></div>
+				<div class="fui-cell-text"><p>我的优惠券</p></div>
+				<div class="fui-cell-remark">{if $statics['coupon']>0}<span  {if $statics['newcoupon']>0}style="background: #fe5455;color:#fff"{/if} class='badge'>  {if $statics['newcoupon']>0}new{else}{$statics['coupon']}{/if}</span>{/if}</div>
+			</a>
+		</div>
 		{/if}
-
-	<div class="fui-cell-group fui-cell-click">
-		<a class="fui-cell" href="{php echo mobileUrl('verifygoods')}">
-			<div class="fui-cell-icon"><i class="icon icon-same"></i></div>
-			<div class="fui-cell-text"><p>核销商品信息</p></div>
-			<div class="fui-cell-remark"></div>
-		</a>
-	</div>
 
 		{if $hasLineUp}
 		<div class="fui-cell-group fui-cell-click">
@@ -353,9 +372,12 @@
 </div>
 
 <script  language='javascript'>
-	function addCard(card_id) {
+	var lis = $('.banner-ul').find('li');
+	$('.banner-ul').width(lis.length*8.3+'rem');
 
-		var data = {'openid': '{php echo $_W["openid"]}', 'card_id': card_id};
+	function addCard(card_id,code) {
+
+		var data = {'openid': '{php echo $_W["openid"]}', 'card_id': card_id, 'code': code};
 		$.ajax({
 			url: "{php echo mobileUrl('sale/coupon/getsignature')}",
 			data: data,
@@ -371,8 +393,6 @@
 						}
 					],
 					success: function (res) {
-
-						//alert(JSON.stringify(res))
 						//alert('已添加卡券：' + JSON.stringify(res.cardList));
 					},
 					cancel: function (res) {
@@ -388,5 +408,10 @@
 
 </script>
 
-{php $this->footerMenus()}
+{if empty($_GPC['isnewstore']) }
+	{php $this->footerMenus()}
+{else}
+	{template '../../../plugin/newstore/template/mobile/default/_menu'}
+{/if}
+
 {template '_footer'}

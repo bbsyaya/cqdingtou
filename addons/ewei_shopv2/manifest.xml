@@ -3,12 +3,12 @@
 	<application setting="false">
 		<name><![CDATA[人人商城V2]]></name>
 		<identifie><![CDATA[ewei_shopv2]]></identifie>
-		<version><![CDATA[2.10.6]]></version>
+		<version><![CDATA[2.10.7]]></version>
 		<type><![CDATA[business]]></type>
 		<ability><![CDATA[人人商城(分销),多用户分权，淘宝商品一键转换，多种插件支持。]]></ability>
 		<description><![CDATA[人人商城(分销)，多项信息模板，强大的自定义规格设置]]></description>
 		<author><![CDATA[微上宝科技]]></author>
-		<url><![CDATA[http://heirui.taobao.com]]></url>
+		<url><![CDATA[http://wesambo.taobao.com]]></url>
 	</application>
 	<platform>
 		<subscribes>

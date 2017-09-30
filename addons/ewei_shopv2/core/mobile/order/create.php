@@ -1946,10 +1946,6 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$dispatchid = intval($_GPC['dispatchid']);
 		$dispatchtype = intval($_GPC['dispatchtype']);
 		$carrierid = intval($_GPC['carrierid']);
-		if($carrierid < 1){
-			$store = pdo_fetch('select * from ' . tablename('ewei_shop_store') . ' where uniacid=:uniacid and type<>2 limit 1', array( ':uniacid' => $_W['uniacid']));
-			$carrierid = $store['id'];
-		}
 		$goods = $_GPC['goods'];
 		$goods[0]['bargain_id'] = $_SESSION['bargain_id'];
 		$_SESSION['bargain_id'] = NULL;
@@ -2072,7 +2068,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			{
 				$threensql .= ',threen';
 			}
-			$sql = 'SELECT id as goodsid,' . $sql_condition . 'title,type,intervalfloor,intervalprice, weight,total,issendfree,isnodiscount, thumb,marketprice,liveprice,cash,isverify,verifytype,' . ' goodssn,productsn,sales,istime,timestart,timeend,hasoption,isendtime,usetime,endtime,ispresell,presellprice,preselltimeend,' . ' usermaxbuy,minbuy,maxbuy,unit,buylevels,buygroups,deleted,unite_total,' . ' status,deduct,manydeduct,`virtual`,discounts,deduct2,ednum,edmoney,edareas,edareas_code,diyformtype,diyformid,diymode,' . ' dispatchtype,dispatchid,dispatchprice,merchid,merchsale,cates,' . ' isdiscount,isdiscount_time,isdiscount_discounts, virtualsend,' . ' buyagain,buyagain_islong,buyagain_condition, buyagain_sale ' . $threensql . ' FROM ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid  limit 1';
+			$sql = 'SELECT id as goodsid,' . $sql_condition . 'title,type,intervalfloor,intervalprice, weight,total,issendfree,isnodiscount, thumb,marketprice,liveprice,cash,isverify,verifytype,' . ' goodssn,productsn,sales,istime,timestart,timeend,hasoption,isendtime,usetime,endtime,ispresell,presellprice,preselltimeend,' . ' usermaxbuy,minbuy,maxbuy,unit,buylevels,buygroups,deleted,unite_total,' . ' status,deduct,manydeduct,`virtual`,discounts,deduct2,ednum,edmoney,edareas,edareas_code,diyformtype,diyformid,diymode,' . ' dispatchtype,dispatchid,dispatchprice,merchid,merchsale,cates,' . ' isdiscount,isdiscount_time,isdiscount_discounts, virtualsend,' . ' buyagain,buyagain_islong,buyagain_condition, buyagain_sale ,verifygoodslimittype,verifygoodslimitdate  ' . $threensql . ' FROM ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid  limit 1';
 			$data = pdo_fetch($sql, array(':uniacid' => $uniacid, ':id' => $goodsid));
 			$data['seckillinfo'] = plugin_run('seckill::getSeckill', $goodsid, $optionid, true, $_W['openid']);
 			if ((0 < $data['ispresell']) && (($data['preselltimeend'] == 0) || (time() < $data['preselltimeend']))) 
@@ -2082,6 +2078,18 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			if ($data['type'] != 5) 
 			{
 				$isonlyverifygoods = false;
+			}
+			else if (!(empty($data['verifygoodslimittype']))) 
+			{
+				$verifygoodslimitdate = intval($data['verifygoodslimitdate']);
+				if ($verifygoodslimitdate < time()) 
+				{
+					show_json(0, '商品:"' . $data['title'] . '"的使用时间已失效,无法购买!');
+				}
+				if (($verifygoodslimitdate - 7200) < time()) 
+				{
+					show_json(0, '商品:"' . $data['title'] . '"的使用时间即将失效,无法购买!');
+				}
 			}
 			if (!(empty($liveid))) 
 			{

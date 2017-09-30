@@ -24,11 +24,11 @@
                         <div class="btn-favorite">订阅</div>
                     {/if}
                 </div>
-                {if !empty($room_coupon) || !empty($packet)}
-                    <!--<div class="btn-gifts">
+                {if !empty($room_coupon) && $room['iscoupon']>0}
+                    <div class="btn-gifts">
                         <div class="inner"></div>
                         <div class="text">商城礼包待领取</div>
-                    </div>-->
+                    </div>
                 {/if}
             </div>
 
@@ -118,9 +118,15 @@
                         <div class="info">
                             <div class="title">{$row['title']}</div>
                             <div class="price">
-                                <div class="num">&yen;{$row['liveprice']}</div>
+                                <div class="num">
+                                    <span class="label">直播价</span>
+                                    <span class="bigprice">&yen;{php echo price_format($row['liveprice'],2)}</span>
+                                    {if $row['marketprice']>$row['liveprice']}
+                                    <span class="product">原价: &yen;{php echo price_format($row['marketprice'],2)}</span>
+                                    {/if}
+                                </div>
                                 <div class="btn-buy">
-                                    <a href="{php echo mobileUrl('goods/detail',array('id'=>$row['id'], 'liveid'=>$roomid))}">立即去购买</a>
+                                    <a href="{php echo mobileUrl('goods/detail',array('id'=>$row['id'], 'liveid'=>$roomid))}" data-nocache="true">立即去购买</a>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +145,9 @@
                         <p>直播间: {$room['title']}</p>
                         <p>直播时间: {php echo date('Y-m-d H:i:s', $room['livetime'])}</p>
                     </div>
-                    <div class="room-info">直播间介绍: {if !empty($room['introduce'])}{php echo htmlspecialchars_decode($room['introduce'])}{else}暂无介绍{/if}</div>
+                    <div class="room-info">
+                        <p>直播间介绍: {if !empty($room['introduce'])}{php echo htmlspecialchars_decode($room['introduce'])}{else}暂无介绍{/if}</p>
+                    </div>
                 </div>
                 <div class="tab-content" data-tab="diy01">diy01</div>
             {/if}
@@ -176,31 +184,17 @@
         <div class="layer-gifts layer">
             <div class="layer-close"></div>
             <div class="inner">
-                {if $packet}
-                <div class="redpack-item disabled">
-                    <div class="left">
-                        <div class="title">{php echo price_format($room['packetprice'],2)}元余额红包</div>
-                        <div class="subtitle">{php echo $room['packetdes']? $room['packetdes']: '余额红包'}</div>
-                    </div>
-                    <div class="right"></div>
-                </div>
-                {/if}
                 {loop $room_coupon $coupon}
-                <div class="coupon-item">
+                <div class="coupon-item roomcoupon {if $coupon['iscoupon'] === false}disabled{/if}" data-roomid="{$room['id']}" data-couponid="{$coupon['couponid']}" data-livetime="{$room['livetime']}">
                     <div class="left">
-                        {if $coupon['backtype']==0}
-                        <span>&yen;</span>50
-                        {elseif $coupon['backtype']==1}
-
-                        {elseif $coupon['backtype']==2}
-
-                        {/if}
+                        <span>{$coupon['display_title']}</span>
                     </div>
                     <div class="center">
                         <div class="title">{$coupon['couponname']}</div>
                         <div class="subtitle">满{$coupon['enough']}元可用</div>
                     </div>
                     <div class="right"></div>
+                    <div class="live-mask">{if $coupon['iscoupon'] === false}{$coupon['couponmessage']}{/if}</div>
                 </div>
                 {/loop}
             </div>
@@ -280,8 +274,14 @@
                     <div class="info">
                         <div class="title">{$row['title']}</div>
                         <div class="price">
-                            <div class="num">&yen;{$row['liveprice']}</div>
-                            <div class="btn-buy"><a href="{php echo mobileUrl('goods/detail',array('id'=>$row['id'], 'liveid'=>$roomid))}">立即去购买</a></div>
+                            <div class="num">
+                                <span class="label">直播价</span>
+                                <span class="bigprice">&yen;{php echo price_format($row['liveprice'],2)}</span>
+                                {if $row['marketprice']>$row['liveprice']}
+                                <span class="product">原价: &yen;{php echo price_format($row['marketprice'],2)}</span>
+                                {/if}
+                            </div>
+                            <div class="btn-buy"><a href="{php echo mobileUrl('goods/detail',array('id'=>$row['id'], 'liveid'=>$roomid))}" data-nocache="true">立即去购买</a></div>
                         </div>
                     </div>
                 </div>
@@ -294,7 +294,9 @@
                 <div class="btn-goods"></div>
             {/if}
             <div class="input">
-                <input id="input" placeholder="跟大家说点什么吧..." />
+                <div class="input-place">服务器连接中...</div>
+                <input id="input" placeholder="跟大家说点什么吧..."  style="display: none
+" />
                 <div class="btn-emoji"></div>
             </div>
             <div class="btn-like"></div>

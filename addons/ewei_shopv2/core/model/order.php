@@ -9,12 +9,12 @@ class Order_EweiShopV2Model
 	{
 		global $_W;
 		$uniacid = $_W['uniacid'];
-		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
+		$order_goods = pdo_fetchall('select o.openid,og.optionid,og.goodsid,og.price,og.total from ' . tablename('ewei_shop_order_goods') . ' as og' . "\r\n" . '                    left join ' . tablename('ewei_shop_order') . ' as o on og.orderid = o.id' . "\r\n" . '                    where og.uniacid = ' . $uniacid . ' and og.orderid = ' . $orderid . ' ');
 		foreach ($order_goods as $key => $value ) 
 		{
 			if (0 < $value['optionid']) 
 			{
-				$goods = pdo_fetch('select g.hasoption,g.id,go.goodsid,go.isfullback from ' . tablename('ewei_shop_goods') . ' as g' . "\n" . '                left join ' . tablename('ewei_shop_goods_option') . ' as go on go.goodsid = :id and go.id = ' . $value['optionid'] . "\n" . '                 where g.id=:id and g.uniacid=:uniacid limit 1', array(':id' => $value['goodsid'], ':uniacid' => $uniacid));
+				$goods = pdo_fetch('select g.hasoption,g.id,go.goodsid,go.isfullback from ' . tablename('ewei_shop_goods') . ' as g' . "\r\n" . '                left join ' . tablename('ewei_shop_goods_option') . ' as go on go.goodsid = :id and go.id = ' . $value['optionid'] . "\r\n" . '                 where g.id=:id and g.uniacid=:uniacid limit 1', array(':id' => $value['goodsid'], ':uniacid' => $uniacid));
 			}
 			else 
 			{
@@ -22,10 +22,10 @@ class Order_EweiShopV2Model
 			}
 			if (0 < $goods['isfullback']) 
 			{
-				$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
+				$fullbackgoods = pdo_fetch('SELECT id,minallfullbackallprice,maxallfullbackallprice,minallfullbackallratio,maxallfullbackallratio,`day`,' . "\r\n" . '                          fullbackprice,fullbackratio,status,hasoption,marketprice,`type`,startday' . "\r\n" . '                          FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $value['goodsid'] . ' limit 1');
 				if (!(empty($fullbackgoods)) && $goods['hasoption'] && (0 < $value['optionid'])) 
 				{
-					$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $value['goodsid'], ':id' => $value['optionid']));
+					$option = pdo_fetch('select id,title,allfullbackprice,allfullbackratio,fullbackprice,fullbackratio,`day` from ' . tablename('ewei_shop_goods_option') . ' ' . "\r\n" . '                        where id=:id and goodsid=:goodsid and uniacid=:uniacid and isfullback = 1 limit 1', array(':uniacid' => $uniacid, ':goodsid' => $value['goodsid'], ':id' => $value['optionid']));
 					if (!(empty($option))) 
 					{
 						$fullbackgoods['minallfullbackallprice'] = $option['allfullbackprice'];
@@ -1309,7 +1309,7 @@ class Order_EweiShopV2Model
 							}
 						}
 					}
-					if (!$sendfree  && !$sendfree && ($isnodispatch == 0))
+					if (!$sendfree  && !$sendfree && ($isnodispatch == 0)) 
 					{
 						$areas = unserialize($dispatch_data['areas']);
 						if ($dispatch_data['calculatetype'] == 1) 
@@ -1658,33 +1658,60 @@ class Order_EweiShopV2Model
 	public function checkOrderGoods($orderid) 
 	{
 		global $_W;
+		$uniacid = $_W['uniacid'];
+		$openid = $_W['openid'];
+		$member = m('member')->getMember($openid, true);
 		$flag = 0;
 		$msg = '订单中的商品' . '<br/>';
 		$uniacid = $_W['uniacid'];
+		$ispeerpay = m('order')->checkpeerpay($orderid);
 		$item = pdo_fetch('select * from ' . tablename('ewei_shop_order') . '  where  id = :id and uniacid=:uniacid limit 1', array(':id' => $orderid, ':uniacid' => $uniacid));
-		if ((empty($item['isnewstore']) || empty($item['storeid'])) && empty($item['istrade'])) 
+		if (empty($item['storeid']) && (empty($item['isnewstore']) || empty($item['istrade']))) 
 		{
-			$sql = 'select g.id,g.title,g.status,g.deleted' . ' from ' . tablename('ewei_shop_goods') . ' g left join  ' . tablename('ewei_shop_order_goods') . ' og on g.id=og.goodsid and g.uniacid=og.uniacid' . ' where og.orderid=:orderid and og.uniacid=:uniacid';
-			$list = pdo_fetchall($sql, array(':uniacid' => $uniacid, ':orderid' => $orderid));
-			if (!(empty($list))) 
+			$order_goods = pdo_fetchall('select og.id,g.title, og.goodsid,og.optionid,g.total as stock,og.total as buycount,g.status,g.deleted,g.maxbuy,g.usermaxbuy,g.istime,g.timestart,g.timeend,g.buylevels,g.buygroups,g.totalcnf,og.seckill from  ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id ' . ' where og.orderid=:orderid and og.uniacid=:uniacid ', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
+			foreach ($order_goods as $data ) 
 			{
-				foreach ($list as $k => $v ) 
+				if (empty($data['status']) || !(empty($data['deleted']))) 
 				{
-					if (empty($v['status']) || !(empty($v['deleted']))) 
-					{
-						$flag = 1;
-						$msg .= $v['title'] . '<br/>';
-					}
+					$flag = 1;
+					$msg .= $data['title'] . '<br/> 已下架,不能付款!!';
 				}
-				if ($flag == 1) 
+				$unit = ((empty($data['unit']) ? '件' : $data['unit']));
+				$seckillinfo = plugin_run('seckill::getSeckill', $data['goodsid'], $data['optionid'], true, $_W['openid']);
+				if (($seckillinfo && ($seckillinfo['status'] == 0)) || !(empty($ispeerpay))) 
 				{
-					$msg .= '已下架,不能付款!';
+				}
+				else if ($data['totalcnf'] == 1) 
+				{
+					if (!(empty($data['optionid']))) 
+					{
+						$option = pdo_fetch('select id,title,marketprice,goodssn,productsn,stock,`virtual` from ' . tablename('ewei_shop_goods_option') . ' where id=:id and goodsid=:goodsid and uniacid=:uniacid  limit 1', array(':uniacid' => $uniacid, ':goodsid' => $data['goodsid'], ':id' => $data['optionid']));
+						if (!(empty($option))) 
+						{
+							if ($option['stock'] != -1) 
+							{
+								if (empty($option['stock'])) 
+								{
+									$flag = 1;
+									$msg .= $data['title'] . '<br/>' . $option['title'] . ' 库存不足!';
+								}
+							}
+						}
+					}
+					else if ($data['stock'] != -1) 
+					{
+						if (empty($data['stock'])) 
+						{
+							$flag = 1;
+							$msg .= $data['title'] . '<br/>库存不足!';
+						}
+					}
 				}
 			}
 		}
 		else if (p('newstore')) 
 		{
-			$sql = 'select g.id,g.title,ng.gstatus,g.deleted' . ' from ' . tablename('ewei_shop_order_goods') . ' og left join  ' . tablename('ewei_shop_goods') . ' g  on g.id=og.goodsid and g.uniacid=og.uniacid' . ' inner join ' . tablename('ewei_shop_newstore_goods') . ' ng on ng.goodsid = g.id  ' . ' where og.orderid=:orderid and og.uniacid=:uniacid';
+			$sql = 'select g.id,g.title,ng.gstatus,g.deleted' . ' from ' . tablename('ewei_shop_order_goods') . ' og left join  ' . tablename('ewei_shop_goods') . ' g  on g.id=og.goodsid and g.uniacid=og.uniacid' . ' inner join ' . tablename('ewei_shop_newstore_goods') . ' ng on ng.goodsid = g.id AND ng.storeid=' . $item['storeid'] . ' where og.orderid=:orderid and og.uniacid=:uniacid';
 			$list = pdo_fetchall($sql, array(':uniacid' => $uniacid, ':orderid' => $orderid));
 			if (!(empty($list))) 
 			{
@@ -1701,11 +1728,6 @@ class Order_EweiShopV2Model
 					$msg .= '已下架,不能付款!';
 				}
 			}
-		}
-		else 
-		{
-			$flag = 1;
-			$msg .= '门店歇业,不能付款!';
 		}
 		$data = array();
 		$data['flag'] = $flag;
@@ -1736,19 +1758,19 @@ class Order_EweiShopV2Model
 	public function getVerifyCardNumByOrderid($orderid) 
 	{
 		global $_W;
-		$num = pdo_fetchcolumn('select SUM(og.total)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\n\t\t" . ' where og.uniacid=:uniacid  and og.orderid =:orderid and g.cardid>0', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
+		$num = pdo_fetchcolumn('select SUM(og.total)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where og.uniacid=:uniacid  and og.orderid =:orderid and g.cardid>0', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 		return $num;
 	}
 	public function checkisonlyverifygoods($orderid) 
 	{
 		global $_W;
-		$num = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\n\t\t" . ' where og.uniacid=:uniacid  and og.orderid =:orderid and g.type<>5', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
+		$num = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where og.uniacid=:uniacid  and og.orderid =:orderid and g.type<>5', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 		$num = intval($num);
 		if (0 < $num) 
 		{
 			return false;
 		}
-		$num2 = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\n" . '             inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\n" . '             where og.uniacid=:uniacid  and og.orderid =:orderid and g.type=5', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
+		$num2 = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\r\n" . '             inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n" . '             where og.uniacid=:uniacid  and og.orderid =:orderid and g.type=5', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 		$num2 = intval($num2);
 		if (0 < $num2) 
 		{
@@ -1759,7 +1781,7 @@ class Order_EweiShopV2Model
 	public function checkhaveverifygoods($orderid) 
 	{
 		global $_W;
-		$num = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\n\t\t" . ' where og.uniacid=:uniacid  and og.orderid =:orderid and g.type=5', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
+		$num = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_order_goods') . ' og' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where og.uniacid=:uniacid  and og.orderid =:orderid and g.type=5', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 		$num = intval($num);
 		if (0 < $num) 
 		{
@@ -1770,7 +1792,7 @@ class Order_EweiShopV2Model
 	public function checkhaveverifygoodlog($orderid) 
 	{
 		global $_W;
-		$num = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_verifygoods_log') . ' vl' . "\n\t\t" . ' inner join ' . tablename('ewei_shop_verifygoods') . ' v on vl.verifygoodsid = v.id' . "\n\t\t" . ' where v.uniacid=:uniacid  and v.orderid =:orderid ', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
+		$num = pdo_fetchcolumn('select COUNT(1)  from ' . tablename('ewei_shop_verifygoods_log') . ' vl' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_verifygoods') . ' v on vl.verifygoodsid = v.id' . "\r\n\t\t" . ' where v.uniacid=:uniacid  and v.orderid =:orderid ', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 		$num = intval($num);
 		if (0 < $num) 
 		{

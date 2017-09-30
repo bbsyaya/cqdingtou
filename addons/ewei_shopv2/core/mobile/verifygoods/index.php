@@ -36,7 +36,7 @@ class Index_EweiShopV2Page extends MobilePage
 		$sql = 'select vg.*,g.title,g.subtitle,g.thumb,c.card_id  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order') . ' o on vg.orderid = o.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order_refund') . ' orf on o.refundid = orf.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0 and (o.refundid=0 or orf.status<0) and o.status>0';
 		if (!(empty($past))) 
 		{
-			$sql .= ' and  vg.limitdays * 86400 + vg.starttime <unix_timestamp()';
+			$sql .= ' and  ((vg.limittype=0   and vg.limitdays * 86400 + vg.starttime <unix_timestamp() )or ( vg.limittype=1   and vg.limitdate <unix_timestamp() )) ';
 		}
 		else if (!(empty($used))) 
 		{
@@ -44,7 +44,7 @@ class Index_EweiShopV2Page extends MobilePage
 		}
 		else if (empty($used)) 
 		{
-			$sql .= ' and vg.limitdays * 86400 + vg.starttime >=unix_timestamp() and  vg.used =0  ';
+			$sql .= ' and   ((vg.limittype=0   and vg.limitdays * 86400 + vg.starttime >=unix_timestamp() )or ( vg.limittype=1   and vg.limitdate >=unix_timestamp() ))  and  vg.used =0  ';
 		}
 		$total = pdo_fetchcolumn($sql, array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 		$sql .= ' order by vg.starttime desc  LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
@@ -64,7 +64,14 @@ class Index_EweiShopV2Page extends MobilePage
 			$row['numlimit'] = 0;
 			if (empty($row['limitnum'])) 
 			{
-				$surplusdays = ((intval($row['starttime']) + ($row['limitdays'] * 86400)) - time()) / 86400;
+				if (empty($row['limittype'])) 
+				{
+					$surplusdays = ((intval($row['starttime']) + ($row['limitdays'] * 86400)) - time()) / 86400;
+				}
+				else 
+				{
+					$surplusdays = (intval($row['limitdate']) - time()) / 86400;
+				}
 				if (0 < $surplusdays) 
 				{
 					$row['surplusnum'] = intval($surplusdays);
@@ -87,7 +94,14 @@ class Index_EweiShopV2Page extends MobilePage
 					$row['surplusnum'] = '<span style=\'font-size: 1rem\'>已使用</span>';
 				}
 			}
-			$row['termofvalidity'] = date('Y-m-d', intval($row['starttime']) + ($row['limitdays'] * 86400));
+			if (empty($row['limittype'])) 
+			{
+				$row['termofvalidity'] = date('Y-m-d H:i', intval($row['starttime']) + ($row['limitdays'] * 86400));
+			}
+			else 
+			{
+				$row['termofvalidity'] = date('Y-m-d H:i', $row['limitdate']);
+			}
 			if (empty($cate)) 
 			{
 				$row['canuse'] = 1;
@@ -123,22 +137,35 @@ class Index_EweiShopV2Page extends MobilePage
 				header('location: ' . mobileUrl('verifygoods'));
 			}
 			$code = $data['code'];
-			$verifygoods = pdo_fetch('select vg.*,g.title,g.subtitle,g.thumb  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order') . ' o on vg.orderid = o.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order_refund') . ' orf on o.refundid = orf.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' inner  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0  and c.card_id =:card_id and vg.cardcode=:cardcode and (o.refundid=0 or orf.status<0) and o.status>0  limit 1', array(':uniacid' => $uniacid, ':openid' => $openid, ':card_id' => $card_id, ':cardcode' => $code));
-			if (empty($verifygoods)) 
+			$item = pdo_fetch('select vg.*,g.title,g.subtitle,g.thumb  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order') . ' o on vg.orderid = o.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order_refund') . ' orf on o.refundid = orf.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' inner  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0  and c.card_id =:card_id and vg.cardcode=:cardcode and (o.refundid=0 or orf.status<0) and o.status>0  limit 1', array(':uniacid' => $uniacid, ':openid' => $openid, ':card_id' => $card_id, ':cardcode' => $code));
+			if (empty($item)) 
 			{
 				header('location: ' . mobileUrl('verifygoods'));
 			}
-			$id = $verifygoods['id'];
+			$id = $item['id'];
 		}
 		else 
 		{
 			$id = $_GPC['id'];
-			$verifygoods = pdo_fetch('select vg.*,g.title,g.subtitle,g.thumb  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order') . ' o on vg.orderid = o.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order_refund') . ' orf on o.refundid = orf.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where  vg.id =:id and vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0 and (o.refundid=0 or orf.status<0) and o.status>0 limit 1', array(':id' => $id, ':uniacid' => $uniacid, ':openid' => $openid));
+			$item = pdo_fetch('select vg.*,g.title,g.subtitle,g.thumb  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order') . ' o on vg.orderid = o.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order_refund') . ' orf on o.refundid = orf.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where  vg.id =:id and vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0 and (o.refundid=0 or orf.status<0) and o.status>0 limit 1', array(':id' => $id, ':uniacid' => $uniacid, ':openid' => $openid));
 		}
-		if (empty($verifygoods)) 
+		if (empty($item)) 
 		{
 			header('location: ' . mobileUrl('verifygoods'));
 		}
+		if (empty($item['limittype'])) 
+		{
+			$limitdate = intval($item['starttime']) + (intval($item['limitdays']) * 86400);
+		}
+		else 
+		{
+			$limitdate = intval($item['limitdate']);
+		}
+		if ($limitdate < time()) 
+		{
+			header('location: ' . mobileUrl('verifygoods'));
+		}
+		$limitdatestr = date('Y-m-d H:i', $limitdate);
 		$verifygoodlogs = pdo_fetchall('select vgl.*,s.storename,sa.salername  from ' . tablename('ewei_shop_verifygoods_log') . '   vgl' . "\r\n\t\t" . 'left  join ' . tablename('ewei_shop_store') . ' s on s.id = vgl.storeid' . "\r\n\t\t" . 'left  join ' . tablename('ewei_shop_saler') . ' sa on sa.id = vgl.salerid' . "\r\n" . '          where  vgl.verifygoodsid =:id  ', array(':id' => $id));
 		$verifynum = 0;
 		foreach ($verifygoodlogs as &$verifygoodlog ) 
@@ -150,15 +177,15 @@ class Index_EweiShopV2Page extends MobilePage
 			$verifynum += intval($verifygoodlog['verifynum']);
 		}
 		unset($verifygoodlog);
-		if (!(empty($verifygoods['limitnum']))) 
+		if (!(empty($item['limitnum']))) 
 		{
-			if (intval($verifygoods['limitnum']) <= $verifynum) 
+			if (intval($item['limitnum']) <= $verifynum) 
 			{
 				header('location: ' . mobileUrl('verifygoods'));
 			}
 		}
-		$verifycode = $verifygoods['verifycode'];
-		if (empty($verifycode) || ($verifygoods['codeinvalidtime'] < time())) 
+		$verifycode = $item['verifycode'];
+		if (empty($verifycode) || ($item['codeinvalidtime'] < time())) 
 		{
 			$verifycode = '8' . random(8, true);
 			while (1) 
@@ -171,11 +198,19 @@ class Index_EweiShopV2Page extends MobilePage
 				$verifycode = random(8, true);
 			}
 			$data = array('verifycode' => $verifycode, 'codeinvalidtime' => time() + 1800);
-			pdo_update('ewei_shop_verifygoods', $data, array('id' => $verifygoods['id']));
+			pdo_update('ewei_shop_verifygoods', $data, array('id' => $item['id']));
 		}
-		$query = array('id' => $verifygoods['id'], 'verifycode' => $verifycode);
+		$query = array('id' => $item['id'], 'verifycode' => $verifycode);
 		$url = mobileUrl('verify/verifygoods/detail', $query, true);
 		$qrurl = m('qrcode')->createQrcode($url);
+		if (strlen($verifycode) == 8) 
+		{
+			$verifycode = substr($verifycode, 0, 4) . ' ' . substr($verifycode, 4, 4);
+		}
+		else if (strlen($verifycode) == 9) 
+		{
+			$verifycode = substr($verifycode, 0, 3) . ' ' . substr($verifycode, 3, 3) . ' ' . substr($verifycode, 6, 3);
+		}
 		include $this->template();
 	}
 	public function activecard() 
@@ -195,7 +230,7 @@ class Index_EweiShopV2Page extends MobilePage
 			$this->message(array('message' => '激活链接错误!', 'title' => '激活链接错误!', 'buttondisplay' => true), mobileUrl('verifygoods'), 'error');
 		}
 		$code = $data['code'];
-		$sql = 'select vg.*,g.title,g.subtitle,g.thumb,c.card_id  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0' . "\r\n\t\t" . ' and vg.limitdays * 86400 + vg.starttime >=unix_timestamp() and  vg.used =0  and (vg.activecard=0 or vg.activecard is null) and g.cardid>0  and c.card_id=:card_id';
+		$sql = 'select vg.*,g.title,g.subtitle,g.thumb,c.card_id  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0' . "\r\n\t\t" . ' and ((vg.limittype=0   and vg.limitdays * 86400 + vg.starttime >=unix_timestamp() )or ( vg.limittype=1   and vg.limitdate >=unix_timestamp() ))  and  vg.used =0  and (vg.activecard=0 or vg.activecard is null) and g.cardid>0  and c.card_id=:card_id';
 		$verifygoods = set_medias(pdo_fetchall($sql, array(':uniacid' => $_W['uniacid'], ':openid' => $openid, ':card_id' => $card_id)), 'thumb');
 		if (empty($verifygoods)) 
 		{
@@ -226,7 +261,14 @@ class Index_EweiShopV2Page extends MobilePage
 				$num = intval($row['limitnum']) - $verifynum;
 				$row['surplusnum'] = $num . '次';
 			}
-			$row['termofvalidity'] = date('Y-m-d', intval($row['starttime']) + ($row['limitdays'] * 86400));
+			if (empty($row['limittype'])) 
+			{
+				$row['termofvalidity'] = date('Y-m-d H:i', intval($row['starttime']) + ($row['limitdays'] * 86400));
+			}
+			else 
+			{
+				$row['termofvalidity'] = date('Y-m-d H:i', $row['limitdate']);
+			}
 			if (!(empty($row['card_id'])) && empty($row['getcard'])) 
 			{
 				$row['cangetcard'] = 1;

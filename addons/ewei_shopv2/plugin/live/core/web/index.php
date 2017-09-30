@@ -1,11 +1,11 @@
 <?php
-if (!(defined('IN_IA'))) {
+if (!(defined('IN_IA'))) 
+{
 	exit('Access Denied');
 }
-
-class Index_EweiShopV2Page extends PluginWebPage
+class Index_EweiShopV2Page extends PluginWebPage 
 {
-	public function main()
+	public function main() 
 	{
 		global $_W;
 		$wsConfig = json_encode(array('address' => $this->model->getWsAddress()));
@@ -18,83 +18,60 @@ class Index_EweiShopV2Page extends PluginWebPage
 		$liveprice[30] = $this->selectOrderPrice(30);
 		include $this->template();
 	}
-
-	/**
-     * 获取指定天数内销售额
-     * @param $day
-     */
-	public function selectOrderPrice($day = 0)
+	public function selectOrderPrice($day = 0) 
 	{
 		global $_W;
-
-		if (!(empty($day))) {
+		if (!(empty($day))) 
+		{
 			$createtime1 = strtotime(date('Y-m-d', time() - ($day * 3600 * 24)));
 			$createtime2 = strtotime(date('Y-m-d', time()));
 		}
-		 else {
+		else 
+		{
 			$createtime1 = strtotime(date('Y-m-d', time()));
 			$createtime2 = strtotime(date('Y-m-d', time() + (3600 * 24)));
 		}
-
 		$sql = 'select id,price,createtime from ' . tablename('ewei_shop_order') . ' where uniacid = :uniacid and liveid>0 and ismr=0 and isparent=0 and (status > 0 or ( status=0 and paytype=3)) and deleted=0 and createtime between :createtime1 and :createtime2';
 		$param = array(':uniacid' => $_W['uniacid'], ':createtime1' => $createtime1, ':createtime2' => $createtime2);
 		$pdo_res = pdo_fetchall($sql, $param);
 		$price = 0;
-
-		foreach ($pdo_res as $arr ) {
+		foreach ($pdo_res as $arr ) 
+		{
 			$price += $arr['price'];
 		}
-
 		return round($price, 1);
 	}
-
-	/**
-     * 获取视频地址
-     */
-	public function get()
+	public function get() 
 	{
 		global $_W;
 		global $_GPC;
-
-		if ($_W['ispost']) {
+		if ($_W['ispost']) 
+		{
 			$url = trim($_GPC['url']);
-			$type = trim($_GPC['type']);
-
-			if (empty($url)) {
+			$type = 'auto';
+			if (empty($url)) 
+			{
 				show_json(0, '请输入PC端直播地址');
 			}
-
-
-			if (!(strexists($url, 'http://')) && !(strexists($url, 'https://'))) {
+			if (!(strexists($url, 'http://')) && !(strexists($url, 'https://'))) 
+			{
 				show_json(0, '直播地址请以http://或https://开头');
 			}
-
-
 			$result = $this->model->getLiveInfo($url, $type);
-
-			if (is_error($result)) {
+			if (is_error($result)) 
+			{
 				show_json(0, $result['message']);
 			}
-
-
 			show_json(1, $result);
 		}
-
-
 		$list = $this->model->getLiveList();
 		include $this->template();
 	}
-
-	/**
-     * 服务平滑重启
-     */
-	public function service()
+	public function service() 
 	{
 		global $_W;
 		$wsConfig = json_encode(array('address' => $this->model->getWsAddress()));
 		include $this->template();
 	}
 }
-
-
 ?>

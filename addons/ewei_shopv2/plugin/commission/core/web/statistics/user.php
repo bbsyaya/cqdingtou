@@ -9,18 +9,17 @@ class User_EweiShopV2Page extends PluginWebPage
 	{
 		global $_W;
 		global $_GPC;
-		$condition = '';
 		$params = array();
 		$level = intval($_GPC['level']);
 		$searchstart = intval($_GPC['searchstart']);
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 100;
-		$sql = 'select dm.id,dm.diycommissionfields,dm.diycommissionfields,dm.diymemberfields,dm.diymemberdata,dm.nickname,dm.realname,dm.avatar,l.levelname from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' lm on lm.agentid = dm.id' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . ' and dm.isagent =1 and lm.isagent =1 and dm.status=1 and lm.status=1 ' . $condition . ' ORDER BY dm.agenttime desc';
+		$sql = 'select dm.id,dm.diycommissionfields,dm.diycommissionfields,dm.diymemberfields,dm.diymemberdata,dm.nickname,dm.realname,dm.avatar,l.levelname from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' lm on lm.agentid = dm.id' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . ' and dm.isagent =1 and lm.isagent =1 and dm.status=1 and lm.status=1  group by dm.id ORDER BY dm.agenttime desc';
 		$sql .= ' LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		if (!(empty($searchstart))) 
 		{
 			$userlist = pdo_fetchall($sql, $params);
-			$total_sql = 'select COUNT(1) from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' lm on lm.agentid = dm.id' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . ' and dm.isagent =1 and lm.isagent =1 and dm.status=1 and lm.status=1 ' . $condition;
+			$total_sql = 'select COUNT(1) from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' lm on lm.agentid = dm.id' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . ' and dm.isagent =1 and lm.isagent =1 and dm.status=1 and lm.status=1';
 			$total = pdo_fetchcolumn($total_sql, $params);
 			$pager = pagination($total, $pindex, $psize);
 		}

@@ -283,13 +283,13 @@ class PosteraProcessor extends PluginProcessor
 			{
 				$upgrade['reccouponid'] = $poster['reccouponid'];
 				$upgrade['reccouponnum'] = $poster['reccouponnum'];
-				$plugin_coupon->poster($qrmember, $poster['reccouponid'], $poster['reccouponnum']);
+				$plugin_coupon->poster($qrmember, $poster['reccouponid'], $poster['reccouponnum'], 5);
 			}
 			if ($cansendsubcoupon) 
 			{
 				$upgrade['subcouponid'] = $poster['subcouponid'];
 				$upgrade['subcouponnum'] = $poster['subcouponnum'];
-				$plugin_coupon->poster($member, $poster['subcouponid'], $poster['subcouponnum']);
+				$plugin_coupon->poster($member, $poster['subcouponid'], $poster['subcouponnum'], 5);
 			}
 			if (!(empty($upgrade))) 
 			{
@@ -392,26 +392,26 @@ class PosteraProcessor extends PluginProcessor
 									}
 								}
 							}
-							if (!(empty($poster['beagent']))) 
+						}
+						if (!(empty($poster['beagent']))) 
+						{
+							$become_check = intval($cset['become_check']);
+							pdo_update('ewei_shop_member', array('isagent' => 1, 'status' => $become_check, 'agenttime' => $time), array('id' => $member['id']));
+							if ($become_check == 1) 
 							{
-								$become_check = intval($cset['become_check']);
-								pdo_update('ewei_shop_member', array('isagent' => 1, 'status' => $become_check, 'agenttime' => $time), array('id' => $member['id']));
-								if ($become_check == 1) 
+								$p->sendMessage($member['openid'], array('nickname' => $member['nickname'], 'agenttime' => $time), TM_COMMISSION_BECOME);
+								$p->upgradeLevelByAgent($qrmember['id']);
+								if (p('globonus')) 
 								{
-									$p->sendMessage($member['openid'], array('nickname' => $member['nickname'], 'agenttime' => $time), TM_COMMISSION_BECOME);
-									$p->upgradeLevelByAgent($qrmember['id']);
-									if (p('globonus')) 
-									{
-										p('globonus')->upgradeLevelByAgent($qrmember['id']);
-									}
-									if (p('abonus')) 
-									{
-										p('abonus')->upgradeLevelByAgent($qrmember['id']);
-									}
-									if (p('author')) 
-									{
-										p('author')->upgradeLevelByAgent($qrmember['id']);
-									}
+									p('globonus')->upgradeLevelByAgent($qrmember['id']);
+								}
+								if (p('abonus')) 
+								{
+									p('abonus')->upgradeLevelByAgent($qrmember['id']);
+								}
+								if (p('author')) 
+								{
+									p('author')->upgradeLevelByAgent($qrmember['id']);
 								}
 							}
 						}

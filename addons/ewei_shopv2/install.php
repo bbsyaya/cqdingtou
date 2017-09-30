@@ -5939,6 +5939,71 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxcard` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_invitation`;
+CREATE TABLE `ims_ewei_shop_invitation` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`uniacid`  int(11) NOT NULL DEFAULT 0 ,
+`type`  tinyint(3) NOT NULL DEFAULT 0 ,
+`title`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`data`  text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`scan`  int(11) NOT NULL DEFAULT 0 ,
+`follow`  int(11) NOT NULL DEFAULT 0 ,
+`qrcode`  tinyint(3) NOT NULL DEFAULT 0 ,
+`status`  tinyint(3) NOT NULL ,
+`createtime`  int(11) NOT NULL DEFAULT 0 ,
+PRIMARY KEY (`id`),
+INDEX `idx_uniacid` (`uniacid`) USING BTREE ,
+INDEX `idx_type` (`type`) USING BTREE 
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_invitation_log`;
+CREATE TABLE `ims_ewei_shop_invitation_log` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`uniacid`  int(11) NOT NULL DEFAULT 0 ,
+`invitation_id`  int(11) NOT NULL DEFAULT 0 ,
+`openid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`invitation_openid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`scan_time`  int(10) NOT NULL DEFAULT 0 ,
+`follow`  tinyint(3) NOT NULL DEFAULT 0 ,
+PRIMARY KEY (`id`),
+INDEX `idx_uniacid` (`uniacid`) USING BTREE ,
+INDEX `idx_posterid` (`invitation_id`) USING BTREE ,
+INDEX `idx_scantime` (`scan_time`) USING BTREE ,
+INDEX `idx_openid` (`openid`) USING BTREE 
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
+DROP TABLE IF EXISTS `ims_ewei_shop_invitation_qr`;
+CREATE TABLE `ims_ewei_shop_invitation_qr` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`acid`  int(11) NOT NULL DEFAULT 0 ,
+`openid`  varchar(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`invitationid`  int(11) NOT NULL ,
+`roomid`  int(11) NOT NULL DEFAULT 0 ,
+`sceneid`  int(11) NOT NULL ,
+`ticket`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`createtime`  int(11) NOT NULL ,
+`expire`  int(11) NOT NULL DEFAULT 0 ,
+`qrimg`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+CHECKSUM=0
+ROW_FORMAT=Dynamic
+DELAY_KEY_WRITE=0
+;
+
 INSERT INTO `ims_ewei_shop_member_message_template_type` (`id`, `name`, `typecode`, `templatecode`, `templateid`, `templatename`, `content`, `typegroup`, `groupname`, `showtotaladd`) VALUES
 (1, '订单付款通知', 'saler_pay', 'OPENTM405584202', '', '订单付款通知', '{{first.DATA}}订单编号：{{keyword1.DATA}}商品名称：{{keyword2.DATA}}商品数量：{{keyword3.DATA}}支付金额：{{keyword4.DATA}}{{remark.DATA}}', 'sys', '系统消息通知', 0),
 (2, '自提订单提交成功通知', 'carrier', 'OPENTM201594720', '', '订单付款通知', '{{first.DATA}}自提码：{{keyword1.DATA}}商品详情：{{keyword2.DATA}}提货地址：{{keyword3.DATA}}提货时间：{{keyword4.DATA}}{{remark.DATA}}', 'sys', '系统消息通知', 0),

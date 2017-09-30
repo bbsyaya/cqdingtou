@@ -8,7 +8,6 @@
     <!--<form class="form-horizontal form-validate" action="{php echo webUrl('sale/fullback/hasoption')}" method="post" enctype="multipart/form-data">-->
         <input type='hidden' name='pid' value='{$pid}' />
         <input type='hidden' name='goodsid' value='{$goodsid}' />
-
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -16,6 +15,7 @@
                     <h4 class="modal-title">设置</h4>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-info">提示：直播商品的价格需低于商品在商城的价格。</div>
                     <table class="table" style="width:100%;">
                         <thead>
                         <tr>
@@ -43,7 +43,7 @@
                         <tr class="multi-product-item option-item" data-id="{$item['id']}">
                             <td>{$item['title']}</td>
                             <td>&yen;{$item['marketprice']}</td>
-                            <td style="" class="fullprice">
+                            <td style="" class="fullprice" data-price="{$item['marketprice']}">
                                 <input name="option_liveprice_{$item['id']}" type="text" class="form-control option_liveprice option_liveprice_{$item['id']}" placeholder="0" value="{$item['liveprice']}">
                             </td>
 
@@ -54,7 +54,7 @@
                             <tr class="multi-product-item goods-item" data-id="{$item['id']}">
                                 <td>{$goods['title']}</td>
                                 <td>&yen;{$goods['marketprice']}</td>
-                                <td style="" class="fullprice">
+                                <td style="" class="fullprice" data-price="{$goods['marketprice']}">
                                     <input name="liveprice{$goodsid}" type="text" class="form-control liveprice liveprice{$goodsid}" placeholder="0" value="{$goods['liveprice']}">
                                     <input type="hidden" name="live_goods" data-goodsid="{$goodsid}" data-id="{$goods['id']}">
                                 </td>
@@ -75,6 +75,24 @@
 
 <script type="text/javascript">
     $(function(){
+        $(".option_liveprice").blur(function () {
+            var price = parseFloat($(this).parent("td").attr("data-price"));
+            var liveprice = $(this).val();
+            if(price<=liveprice){
+                $(this).val(price-0.01);
+            }else{
+                $(this).val(liveprice);
+            }
+        });
+        $(".liveprice").blur(function () {
+            var price = parseFloat($(this).parent("td").attr("data-price"));
+            var liveprice = $(this).val();
+            if(price<=liveprice){
+                $(this).val(price-0.01);
+            }else{
+                $(this).val(liveprice);
+            }
+        })
 
         $(".option-item input[name=optionid]").removeProp('checked');
         var optionid = $("#livegoods"+{$goodsid}+"").val()
@@ -108,8 +126,12 @@
             var liveprice = 0;
             $("#param-items .option-item").each(function (index) {
                 if($(this).find("input[name='optionid']").prop("checked")){
+                    var price = parseFloat($(this).find("td.fullback").attr("data-price"));
                     option[index] = $(this).find("input[name='optionid']").val();
                     liveprice = $(this).find("input[name^='option_liveprice']").val() ? parseFloat($(this).find("input[name^='option_liveprice']").val()).toFixed(2) : 0;
+                    if(price<=liveprice){
+                        liveprice = price - 0.01;
+                    }
                     livegoods[index] = [liveprice];
                     optoinhtml += '<input type="hidden" value="'+livegoods[index]+'" name="livegoodsoption'+option[index]+'" >';
                 }
@@ -140,8 +162,12 @@
             }else{
                 //无规格提交
                 var goodsid = $("input[name='live_goods']").attr("data-goodsid");
-                var price = $("input[name='liveprice"+goodsid+"']").val();
-                var livegoods = price;
+
+                var price = parseFloat($("#param-items .fullprice").attr("data-price"));
+                var livegoods = $("input[name='liveprice"+goodsid+"']").val();
+                if(price <= livegoods){
+                    livegoods = price - 0.01;
+                }
 
                 var livegoodshtml = '<input type="hidden" value="'+livegoods+'" name="goods'+{$goodsid}+'" >';
                 if($("input[name='goods"+goodsid+"']").val()){
@@ -162,7 +188,13 @@
         $(".option-item").each(function () {
             var opid = $(this).attr("data-id");
             var option_allprice = parseFloat(Math.abs($("input.option_liveprice_"+opid+"").val())).toFixed(2);
-            $("input.option_liveprice_"+opid+"").val(option_allprice);
+            var price = parseFloat($(this).find("td.fullprice").attr("data-price"));
+            if(price<=option_allprice){
+                $("input.option_liveprice_"+opid+"").val(price-0.01);
+            }else{
+                $("input.option_liveprice_"+opid+"").val(option_allprice);
+            }
+
         })
     }
 

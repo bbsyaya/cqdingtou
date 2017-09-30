@@ -95,32 +95,70 @@
             </div>
         </div>
 
-
-
-        <div class="form-group">
-            <label class="col-sm-2 control-label must">直播地址</label>
-            <div class="col-sm-9 col-xs-12">
-                {ife 'leve.room' $item}
-                <input type='url' class='form-control' name='url' value="{$item['url']}" data-rule-required='true' data-msg-required='请设置直播地址'/>
-                {else}
-                <div class='form-control-static'>{$item['displayorder']}</div>
-                {/if}
-            </div>
+<div class="form-group live-url" {if $item['livetype']==2}style="display: none;"{/if}>
+    <label class="col-sm-2 control-label must">直播地址</label>
+    <div class="col-sm-9 col-xs-12">
+        {ife 'leve.room' $item}
+        <div class="input-group">
+            <input type='url' class='form-control' name='url' readonly="true" value="{$item['url']}" />
+            <a data-toggle="ajaxModal" href="{php echo webUrl('live/get')}" class="input-group-addon">视频抓取</a>
         </div>
-        <div class="form-group">
-            <label class="col-sm-2 control-label">直播间封面</label>
-            <div class="col-sm-9 col-xs-12 thumb-container gimgs">
-                {ife 'leve.room' $item}
-                {php echo tpl_form_field_image('thumb',$item['thumb'])}
-                {else}
-                {if !empty($item['thumb'])}
-                <a href='{php echo tomedia($item['thumb'])}' target='_blank'>
-                <img src="{php echo tomedia($item['thumb'])}" style='width:100px;border:1px solid #ccc;padding:1px'/>
-                </a>
-                {/if}
-                {/if}
-            </div>
-        </div>
+        {else}
+        <div class='form-control-static'>{$item['url']}</div>
+        {/if}
+    </div>
+</div>
+<div class="form-group live-video" {if $item['livetype']!=2}style="display: none;"{/if}>
+    <label class="col-sm-2 control-label must">视频流</label>
+    <div class="col-sm-9 col-xs-12">
+        {ife 'leve.room' $item}
+            <input type='url' class='form-control' name='video' value="{$item['video']}" />
+        {else}
+        <div class='form-control-static'>{$item['video']}</div>
+        {/if}
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-2 control-label">封面类型</label>
+    <div class="col-sm-9 col-xs-12">
+        {ife 'leve.room' $item}
+        <label class="radio-inline"><input type="radio" name='covertype' value="0" {if empty($item['covertype'])}checked{/if} /> 自动抓取直播封面</label>
+        <label class="radio-inline"><input type="radio" name='covertype' value="1" {if $item['covertype']==1}checked{/if} /> 自定义封面</label>
+        {else}
+        <div class='form-control-static'>{if empty($item['covertype'])}自动抓取直播封面{elseif $item['covertype']==1}自定义封面{/if}</div>
+        {/if}
+    </div>
+</div>
+<div class="form-group coverthumb" {if $item['covertype']==1}style="display: none"{/if}>
+    <label class="col-sm-2 control-label">直播间封面</label>
+    <div class="col-sm-9 col-xs-12 thumb-container gimgs">
+        {ife 'leve.room' $item}
+        {php echo tpl_form_field_image('thumb',$item['thumb'])}
+        <span class='help-block text-info'>直播开始前将显示您上传的直播间封面，直播开始后，系统将自动抓取直播平台的图片并替换直播间已上传的封面</span>
+        {else}
+        {if !empty($item['thumb'])}
+        <a href='{php echo tomedia($item['thumb'])}' target='_blank'>
+        <img src="{php echo tomedia($item['thumb'])}" style='width:100px;border:1px solid #ccc;padding:1px'/>
+        </a>
+        {/if}
+        {/if}
+    </div>
+</div>
+<div class="form-group cover" style="{if empty($item['covertype'])}display: none{/if}">
+    <label class="col-sm-2 control-label">自定义封面</label>
+    <div class="col-sm-9 col-xs-12 thumb-container gimgs">
+        {ife 'leve.room' $item}
+        {php echo tpl_form_field_image('cover',$item['cover'])}
+        <span class='help-block text-info'>您上传的图片将作为直播封面显示，您可手动上传修改直播间封面</span>
+        {else}
+        {if !empty($item['cover'])}
+        <a href='{php echo tomedia($item['cover'])}' target='_blank'>
+        <img src="{php echo tomedia($item['cover'])}" style='width:100px;border:1px solid #ccc;padding:1px'/>
+        </a>
+        {/if}
+        {/if}
+    </div>
+</div>
         <div class="form-group">
             <label class="col-sm-2 control-label">直播商品</label>
             <div class="col-sm-9 col-xs-12">
@@ -141,6 +179,7 @@
                     )
                     ?>
                 </div>
+                <span class='help-block'>提示：直播商品可在直播中显示，且观看直播的用户可在直播中自由购买已添加的商品。</span>
                 {else}
                 {if !empty($goods)}
                 <table class="table">
@@ -231,7 +270,7 @@
 
 <script type="text/javascript">
     $(function () {
-        $("input[name='livetype']").off("click").on("click",function () {
+        /*$("input[name='livetype']").off("click").on("click",function () {
             var livetype = $(this).val();
             $("select[name='liveidentity']").val('');
             $(".identity_livetype").hide();
@@ -242,6 +281,23 @@
             }else{
                 $(".full_screen").show();
             }
-        })
+            /!*if(livetype==2){
+                $(".live-url").hide();
+                $(".live-video").show();
+            }else{
+                $(".live-url").show();
+                $(".live-video").hide();
+            }*!/
+        });*/
+        $("input[name=covertype]").off("click").on("click",function () {
+           var value = parseInt($(this).val());
+           if(value==1){
+               $(".coverthumb").hide();
+               $(".cover").show();
+           }else{
+               $(".coverthumb").show();
+               $(".cover").hide();
+           }
+        });
     })
 </script>

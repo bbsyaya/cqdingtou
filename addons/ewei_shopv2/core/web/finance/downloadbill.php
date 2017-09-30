@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -13,7 +13,9 @@ class Downloadbill_EweiShopV2Page extends WebPage
 		{
 			$starttime = strtotime($_GPC['time']['start']);
 			$endtime = strtotime($_GPC['time']['end']);
-			$result = m('finance')->downloadbill($starttime, $endtime, $_GPC['type']);
+			$type = trim($_GPC['type']);
+			$datatype = intval($_GPC['datatype']);
+			$result = m('finance')->downloadbill($starttime, $endtime, $type, $datatype);
 			if (is_error($result)) 
 			{
 				$this->message($result['message'], '', 'error');

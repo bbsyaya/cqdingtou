@@ -791,7 +791,7 @@ class Finance_EweiShopV2Model
 		}
 		return error($result['alipay_trade_refund_response']['code'], $result['alipay_trade_refund_response']['msg'] . ':' . $result['alipay_trade_refund_response']['sub_msg']);
 	}
-	public function downloadbill($starttime, $endtime, $type = 'ALL') 
+	public function downloadbill($starttime, $endtime, $type = 'ALL', $datatype = 0) 
 	{
 		global $_W;
 		global $_GPC;

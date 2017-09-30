@@ -4707,3 +4707,89 @@
     </div>
 
 </script>
+
+<script type="text/html" id="tpl_edit_verify">
+
+    <div class="form-group">
+        <div class="col-sm-2 control-label">样式选择</div>
+        <div class="col-sm-10">
+            <label class="radio-inline"><input type="radio" name="style" value="" class="diy-bind" data-bind-child="params" data-bind="style" <%if params.style==''||!params.style%>checked<%/if%>> 样式一</label>
+            <label class="radio-inline"><input type="radio" name="style" value="style2" class="diy-bind" data-bind-child="params" data-bind="style" <%if params.style=='style2'%>checked<%/if%>> 样式二</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-2 control-label">标题文字</div>
+        <div class="col-sm-10">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind" style="width: 175px;" value="<%params.title%>" data-bind-child="params" data-bind="title" />
+                <span class="input-group-addon" style="border-left: 0; border-right: 0;">提示文字</span>
+                <input class="form-control input-sm diy-bind" style="width: 120px;" value="<%params.remark%>" data-bind-child="params" data-bind="remark" />
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-2 control-label">标题颜色</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="titlecolor" value="<%style.titlecolor%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#333333').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+        <div class="col-sm-2 control-label">提示文字颜色</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="remarkcolor" value="<%style.remarkcolor%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#888888').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-2 control-label">标题背景</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="titlebg" value="<%style.titlebg%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#ffffff').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+        <div class="col-sm-2 control-label">整体背景</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="background" value="<%style.background%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#ffffff').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+    </div>
+    <div class="line"></div>
+    <div class="form-group">
+        <div class="col-sm-2 control-label">计次卡主色调</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="cardbg" value="<%style.cardbg%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#68bfe7').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+        <div class="col-sm-2 control-label">计次卡文字</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="cardcolor" value="<%style.cardcolor%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#000000').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-2 control-label">计时卡主色调</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="cardbg2" value="<%style.cardbg2%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#77cd44').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+        <div class="col-sm-2 control-label">计时卡文字</div>
+        <div class="col-sm-4">
+            <div class="input-group input-group-sm">
+                <input class="form-control input-sm diy-bind color" data-bind-child="style" data-bind="cardcolor2" value="<%style.cardcolor2%>" type="color">
+                <span class="input-group-addon btn btn-default" onclick="$(this).prev().val('#000000').trigger('propertychange')">重置</span>
+            </div>
+        </div>
+    </div>
+</script>

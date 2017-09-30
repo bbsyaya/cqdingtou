@@ -117,12 +117,22 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		else if ($datatype == 1) 
 		{
 			$cateid = intval($_GPC['cateid']);
+			
 			if (!(empty($cateid))) 
 			{
-				$goodslist = $this->model->getList(array('cate' => $cateid, 'page' => $page, 'pagesize' => $pagesize, 'order' => $orderby));
-				$result['list'] = $goodslist['list'];
-				$result['total'] = $goodslist['total'];
-				$result['pagesize'] = $pagesize;
+				if (!(empty($merchid))) 
+				{
+					$goodslist = $this->model->getList(array('cate' => $cateid, 'page' => $page, 'pagesize' => $pagesize, 'order' => $orderby,'merchid'=>$merchid));
+					$result['list'] = $goodslist['list'];
+					$result['total'] = $goodslist['total'];
+					$result['pagesize'] = $pagesize;
+				}else{
+					$goodslist = $this->model->getList(array('cate' => $cateid, 'page' => $page, 'pagesize' => $pagesize, 'order' => $orderby));
+					$result['list'] = $goodslist['list'];
+					$result['total'] = $goodslist['total'];
+					$result['pagesize'] = $pagesize;
+				}
+				
 			}
 		}
 		else if ($datatype == 2) 

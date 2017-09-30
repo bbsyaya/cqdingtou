@@ -653,6 +653,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			}
 			else if (strlen($order['verifycode']) == 9) 
 			{
+				$verifycode = substr($order['verifycode'], 0, 3) . ' ' . substr($order['verifycode'], 3, 3) . ' ' . substr($order['verifycode'], 6, 3);
 			}
 		}
 		if (!(empty($order['merchid'])) && ($is_openmerch == 1)) 

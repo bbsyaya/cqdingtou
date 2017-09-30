@@ -16,36 +16,48 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 		{
 			$this->message('未查询到核销商品或核销码已失效,请核对核销码!', '', 'error');
 		}
-		$verifygood = pdo_fetch('select vg.*,g.id as goodsid ,g.title,g.subtitle,g.thumb,vg.storeid  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where  vg.id =:id and  vg.verifycode=:verifycode and vg.uniacid=:uniacid  limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid'], ':verifycode' => $verifycode));
-		if (empty($verifygood)) 
+		$item = pdo_fetch('select vg.*,g.id as goodsid ,g.title,g.subtitle,g.thumb,vg.storeid  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where  vg.id =:id and  vg.verifycode=:verifycode and vg.uniacid=:uniacid  limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid'], ':verifycode' => $verifycode));
+		if (empty($item)) 
 		{
 			$this->message('未查询到核销商品或核销码已失效,请核对核销码!', '', 'error');
 		}
-		if (intval($verifygood['codeinvalidtime']) < time()) 
+		if (intval($item['codeinvalidtime']) < time()) 
 		{
 			$this->message('核销码已过期,请用户重新获取核销码!', '', 'error');
 		}
-		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where  status=1  and openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 		if (empty($saler)) 
 		{
 			$this->message('您不是核销员,无权核销', '', 'error');
 		}
 		$store = pdo_fetch('select * from ' . tablename('ewei_shop_store') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $saler['storeid'], ':uniacid' => $_W['uniacid']));
-		if (!(empty($verifygood['storeid'])) && !(empty($store)) && ($verifygood['storeid'] != $store['id'])) 
+		if (!(empty($item['storeid'])) && !(empty($store)) && ($item['storeid'] != $store['id'])) 
 		{
 			$this->message('该商品无法在您所属门店核销!请重新确认!', '', 'error');
 		}
-		if (!(empty($verifygood['limitnum']))) 
+		if (!(empty($item['limitnum']))) 
 		{
-			$verifygoodlogs = pdo_fetchall('select *  from ' . tablename('ewei_shop_verifygoods_log') . '    where verifygoodsid =:id  ', array(':id' => $verifygood['id']));
+			$verifygoodlogs = pdo_fetchall('select *  from ' . tablename('ewei_shop_verifygoods_log') . '    where verifygoodsid =:id  ', array(':id' => $item['id']));
 			$verifynum = 0;
 			foreach ($verifygoodlogs as $verifygoodlog ) 
 			{
 				$verifynum += intval($verifygoodlog['verifynum']);
 			}
-			$lastverifys = intval($verifygood['limitnum']) - $verifynum;
+			$lastverifys = intval($item['limitnum']) - $verifynum;
 		}
-		$termofvalidity = date('Y-m-d', intval($verifygood['starttime']) + ($verifygood['limitdays'] * 86400));
+		if (empty($item['limittype'])) 
+		{
+			$limitdate = intval($item['starttime']) + (intval($item['limitdays']) * 86400);
+		}
+		else 
+		{
+			$limitdate = intval($item['limitdate']);
+		}
+		if ($limitdate < time()) 
+		{
+			$this->message('该商品已过期!', '', 'error');
+		}
+		$termofvalidity = date('Y-m-d H:i', $limitdate);
 		include $this->template();
 	}
 	public function main() 
@@ -53,7 +65,7 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 		global $_W;
 		global $_GPC;
 		$openid = $_W['openid'];
-		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where status=1  and openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 		if (empty($saler)) 
 		{
 			$this->message('您无核销权限!');
@@ -85,7 +97,7 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 		{
 			show_json(0, '核销码已过期,请用户重新获取核销码');
 		}
-		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where  status=1  and  openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 		if (empty($saler)) 
 		{
 			show_json(0, '您不是核销员,无权核销');
@@ -115,7 +127,7 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 		{
 			show_json(0, '核销码已过期,请重新输入核销码或扫取二维码');
 		}
-		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+		$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where status=1  and openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 		if (empty($saler)) 
 		{
 			show_json(0, '您不是核销员,无权核销');
@@ -144,9 +156,17 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 				$used = 1;
 			}
 		}
-		if ((intval($verifygood['starttime']) + (intval($verifygood['limitdays']) * 86400)) < time()) 
+		if (empty($verifygood['limittype'])) 
 		{
-			show_json(0, '该商品已过期,无法核销!');
+			$limitdate = intval($verifygood['starttime']) + (intval($verifygood['limitdays']) * 86400);
+		}
+		else 
+		{
+			$limitdate = intval($verifygood['limitdate']);
+		}
+		if ($limitdate < time()) 
+		{
+			$this->message('该商品已过期!', '', 'error');
 		}
 		$data = array('uniacid' => $_W['uniacid'], 'verifygoodsid' => $verifygood['id'], 'salerid' => $saler['id'], 'storeid' => $store['id'], 'verifynum' => $times, 'verifydate' => time(), 'remarks' => $remarks);
 		pdo_insert('ewei_shop_verifygoods_log', $data);

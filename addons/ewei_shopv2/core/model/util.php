@@ -72,10 +72,6 @@ class Util_EweiShopV2Model
 				pdo_update('ewei_shop_express_cache', array('lasttime' => time(), 'datas' => iserializer($list)), array('id' => $cache['id']));
 			}
 		}
-		if (empty($list) && !(empty($info['message']))) 
-		{
-			$list[] = array('step' => '未查询到物流信息(' . trim($info['message']) . ')');
-		}
 		return $list;
 	}
 	public function getIpAddress() 

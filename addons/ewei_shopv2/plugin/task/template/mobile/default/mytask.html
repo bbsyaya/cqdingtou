@@ -219,17 +219,17 @@
 
             <div id="detailp{$v['join_id']}" style="display: none">
                 {if $v['poster_type'] != 2}
-                {php $thisreward = unserialize($poster[0][0]['reward_data']);}
+                {php $thisreward = ($poster[2][$k]['reward_data']);}
                 <div class="my-require">
                     <div class="my-require-title">
                         目标：邀请{$v['needcount']}人
                     </div>
-                    {loop $thisreward['rec'] $rk $rv}
+                    {loop $thisreward $rk $rv}
                     {if $rk == 'goods'}
                     {loop $rv $gk $gv}
                     <div class="my-reward" style="overflow: hidden">
                         <div class="reward-title">
-                    <a href="{php echo mobileUrl('goods.detail',array('id'=>$gk,'join_id'=>$v['join_id']),1);}">{$gv['title']}</a>
+                            <a href="{php echo mobileUrl('goods.detail',array('id'=>$gk,'join_id'=>$v['join_id']),1);}">{$gv['title']}</a>
                         </div>
                     </div>
                     {/loop}

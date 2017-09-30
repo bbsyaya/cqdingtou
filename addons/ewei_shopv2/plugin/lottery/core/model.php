@@ -195,7 +195,7 @@ class LotteryModel extends PluginModel
 		global $_W;
 		if (isset($poster['credit']) && (0 < $poster['credit'])) 
 		{
-			m('member')->setCredit($openid, 'credit1', $poster['credit'], array(0, '推荐扫码关注积分+' . $poster['credit']));
+			m('member')->setCredit($openid, 'credit1', $poster['credit'], array(0, '获得抽奖积分+' . $poster['credit']));
 		}
 		if (isset($poster['money']) && (0 < $poster['money']['num'])) 
 		{
@@ -204,12 +204,12 @@ class LotteryModel extends PluginModel
 			{
 				$pay *= 100;
 			}
-			m('finance')->pay($openid, $poster['money']['type'], $pay, '', '任务活动推荐奖励', false);
+			m('finance')->pay($openid, $poster['money']['type'], $pay, '', '抽奖奖励', false);
 		}
 		if (isset($poster['bribery']) && (0 < $poster['bribery'])) 
 		{
 			$tid = rand(1, 1000) . time() . rand(1, 10000);
-			$params = array('openid' => $openid, 'tid' => $tid, 'send_name' => '推荐奖励', 'money' => $poster['bribery']['num'], 'wishing' => '推荐奖励', 'act_name' => $title, 'remark' => '推荐奖励');
+			$params = array('openid' => $openid, 'tid' => $tid, 'send_name' => '抽奖奖励', 'money' => $poster['bribery']['num'], 'wishing' => '抽奖奖励', 'act_name' => $title, 'remark' => '抽奖奖励');
 			$err = m('common')->sendredpack($params);
 			if (!(is_error($err))) 
 			{

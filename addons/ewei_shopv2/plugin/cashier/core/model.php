@@ -686,11 +686,14 @@ class CashierModel extends PluginModel
 				{
 					$paytype = 102;
 				}
+				else 
+				{
+					$paytype = 1;
+				}
 				if (empty($_W['cashieruser']['alipay_status']) && ($paytype != 102)) 
 				{
 					return error(-101, '暂时不支持支付宝支付!');
 				}
-				$paytype = 1;
 			}
 			else if (in_array($type, $wechat)) 
 			{
@@ -1320,7 +1323,7 @@ class CashierModel extends PluginModel
 		}
 		$price = $price * $credit1_double;
 		$credit1 = com_run('sale::getCredit1', $log['openid'], $price, 37, 1, 0, $log['title'] . '收银订单号 : ' . $log['logno'] . '  收银台消费送积分');
-		m('notice')->sendMemberPointChange($log['openid'], $price, 0);
+		m('notice')->sendMemberPointChange($log['openid'], $price, 0, 1);
 		return $credit1;
 	}
 	public function upload_cert($fileinput) 

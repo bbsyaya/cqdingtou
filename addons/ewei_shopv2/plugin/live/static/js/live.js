@@ -10,7 +10,8 @@ define(['core', 'tpl'], function (core, tpl) {
         wsCanAt: false,
         wsCanRepeal: false,
         msgAt: {},
-        lastliketime: 0
+        lastliketime: 0,
+        inputTip: ['跟大家说点什么吧...', '点击键盘回车也可发送信息哦~']
     };
     modal.init = function (params) {
         modal.wsConfig = params.wsConfig || {};
@@ -18,18 +19,41 @@ define(['core', 'tpl'], function (core, tpl) {
         modal.initWs();
         modal.initClick();
         modal.initPlayer();
-        var inputTip = ['跟大家说点什么吧...', '点击键盘回车发送信息哦~', '点击蓝色昵称可@Ta'];
         setInterval(function () {
             var tipIndex = Math.floor(Math.random() * 3);
             if (tipIndex == 2 && !modal.wsCanAt) {
                 tipIndex == 1
             }
-            $('#input').attr('placeholder', inputTip[tipIndex]);
+            $('#input').attr('placeholder', modal.inputTip[tipIndex]);
             if (modal.wsConnected) {
                 modal.wsSend('communication', {toUser: 'system'});
-                modal.clickLike();
+                modal.clickLike()
             }
-        }, 8000)
+        }, 8000);
+        $(".roomcoupon").off("click").on("click", function () {
+            var _this = $(this);
+            var roomid = parseInt(_this.attr("data-roomid"));
+            var couponid = parseInt(_this.attr("data-couponid"));
+            var livetime = parseInt(_this.attr("data-livetime"));
+            var disabled = _this.hasClass("disabled") ? false : true;
+            if (disabled) {
+                core.json('live/room/roomcoupon', {
+                    roomid: roomid,
+                    livetime: livetime,
+                    couponid: couponid
+                }, function (ret) {
+                    var result = ret.result;
+                    if (ret.status < -1) {
+                        _this.addClass("disabled").find(".live-mask").text(result.message);
+                        return
+                    } else if (ret.status >= -1 && ret.status <= 0) {
+                        FoxUI.toast.show(result.message)
+                    } else {
+                        FoxUI.toast.show('优惠券已领取，请到我的优惠券中查看')
+                    }
+                })
+            }
+        })
     };
     modal.initPlayer = function () {
         if (modal.wsConfig.isMobile && modal.wsConfig.isIos) {
@@ -63,7 +87,7 @@ define(['core', 'tpl'], function (core, tpl) {
             modal.liveMsg('notice', '通讯服务器配置错误');
             return
         } else {
-            modal.liveMsg('notice', '初始化通讯服务...')
+            $('.block-input .input-place').html('初始化通讯服务...').show().siblings().hide();
         }
         var wsConfig = modal.wsConfig;
         var wsClient = new WebSocket(wsConfig.address);
@@ -73,7 +97,8 @@ define(['core', 'tpl'], function (core, tpl) {
         wsClient.onmessage = function (evt) {
             var data = JSON.parse(evt.data);
             if (data.type == 'connected') {
-                modal.liveMsg('notice', '聊天服务器连接成功...');
+                FoxUI.toast.show('连接成功');
+                $('.block-input .input-place').html('').hide().siblings().show();
                 modal.wsConnected = true;
                 modal.wsBanned = data.banned;
                 if (data.banned.all == 1) {
@@ -87,7 +112,17 @@ define(['core', 'tpl'], function (core, tpl) {
                 modal.realOnline = data.online || 0;
                 modal.showOnline = data.settings.virtual || 0;
                 modal.initStatus();
-                modal.initOnline()
+                modal.initOnline();
+                if (modal.wsCanAt) {
+                    modal.inputTip.push('点击蓝色昵称可@Ta')
+                } else {
+                    modal.inputTip.splice(2, 1)
+                }
+                if (modal.wsCanRepeal) {
+                    $('.btn-repeal').addClass('show')
+                } else {
+                    $('.btn-repeal').removeClass('show')
+                }
             } else if (data.type == 'notice') {
                 modal.liveMsg('notice', data.text)
             } else if (data.type == 'setting') {
@@ -105,10 +140,19 @@ define(['core', 'tpl'], function (core, tpl) {
                 }
                 modal.wsCanAt = settings.canat == 1 ? true : false;
                 modal.wsCanRepeal = settings.canrepeal == 1 ? true : false;
+                if (modal.wsCanAt) {
+                    modal.inputTip.push('点击蓝色昵称可@Ta')
+                } else {
+                    modal.inputTip.splice(2, 1)
+                }
+                if (modal.wsCanRepeal) {
+                    $('.btn-repeal').addClass('show')
+                } else {
+                    $('.btn-repeal').removeClass('show')
+                }
                 if (settings.nickname_old) {
                     modal.liveMsg('notice', '管理员"' + settings.nickname_old + '"更名为"' + settings.nickname + '"')
                 }
-                $('#videoID').attr('src', 'http://hlive.jia.360.cn/live_jia_public/_LC_RE_non_3602009206814924798411004291_BX/index.m3u8')
             } else if (data.type == 'userEnter') {
                 if (data.role != 'manage') {
                     modal.liveMsg('notice', data.nickname + ' 进入直播间！掌声欢迎~')
@@ -223,16 +267,20 @@ define(['core', 'tpl'], function (core, tpl) {
                 }
                 $('.layer-redpack').removeClass('stop')
             }
+
+            setTimeout(function () {
+                modal.scrollBottom();
+            }, 10);
         };
         wsClient.onclose = function (evt) {
             if (!modal.wsConnected) {
                 return
             }
-            modal.liveMsg('notice', '与通讯服务器断开 <a class="btn-reconnect">点击重连</a>');
+            $('.block-input .input-place').html('与通讯服务器断开 <a class="btn-reconnect">点击重连</a>').show().siblings().hide();
             modal.wsConnected = false
         };
         wsClient.onerror = function (evt) {
-            modal.liveMsg('notice', '与通讯服务器连接失败 <a class="btn-reconnect"> 点击重连</a>');
+            $('.block-input .input-place').html('与通讯服务器连接失败 <a class="btn-reconnect"> 点击重连</a>').show().siblings().hide();
             modal.wsConnected = false
         };
         modal.wsClient = wsClient
@@ -429,7 +477,7 @@ define(['core', 'tpl'], function (core, tpl) {
                     textValue = tempStr1 + tempStr2;
                     if (delValue == "]" && tempStr1.indexOf("[") > -1) {
                         var res = tempStr1.match(/(\[[\u4E00-\u9FA5]*)$/g);
-                        textValue = tempStr1.substring(0, tempStr1.lastIndexOf("[")) + tempStr2;
+                        textValue = tempStr1.substring(0, tempStr1.lastIndexOf("[")) + tempStr2
                     } else if (delValue == " " && tempStr1.indexOf("@") > -1) {
                         textValue = tempStr1.substring(0, tempStr1.lastIndexOf("@")) + tempStr2;
                         modal.msgAt = {}
@@ -506,7 +554,7 @@ define(['core', 'tpl'], function (core, tpl) {
             modal.insertAtCaret('#input', '[' + id + ']')
         });
         $('.btn-like').click(function () {
-            if (!modal.wsConnected || modal.wsBanned.all == 1 || modal.wsBanned.self == 1) {
+            if (!modal.wsConnected) {
                 return
             }
             modal.clickLike();
@@ -530,7 +578,7 @@ define(['core', 'tpl'], function (core, tpl) {
                 modal.msgAt = {}
             }
             $('.fui-content').removeClass('show-emoji');
-            $('.block-input .input .btn-emoji').removeClass('active');
+            $('.block-input .input .btn-emoji').removeClass('active')
         });
         $('.layer-roominfo .room-btn').click(function () {
             var _this = $(this);
@@ -625,15 +673,14 @@ define(['core', 'tpl'], function (core, tpl) {
             $('.layer-mask').fadeIn(200);
             $('.layer-gifts').addClass('in')
         });
-
         $(document).click(function (e) {
             var input = $(e.target).closest('.block-input').length;
             var emoji = $(e.target).closest('.block-emoji').length;
-            if(emoji<1 && input<1){
+            if (emoji < 1 && input < 1) {
                 $('.fui-content').removeClass('show-emoji');
-                $('.block-input .input .btn-emoji').removeClass('active');
+                $('.block-input .input .btn-emoji').removeClass('active')
             }
-        });
+        })
     };
     modal.clickLike = function () {
         var colors = ['#ffc510', '#ff4a4a', '#ff9141', '#fb7c63', '#05e0e8', '#24ec79', '#50b7ff', '#b9f110', '#59e4b5', '#fe76e9', '#b976fe', '#fea2d0', '#918eff'],
