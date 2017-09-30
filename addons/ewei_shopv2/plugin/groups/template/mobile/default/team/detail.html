@@ -37,6 +37,7 @@
 		</div>
 	</div>
 	<div class='fui-content' style="padding-bottom:0;top:2.2rem;">
+		{if !empty($thumb)}
 		<div class="lynn_team_detail_head">
 			<div class="fui-swipe lynn_swipe" data-speed="5000" data-gap="5">
 				<div class="fui-swipe-wrapper">
@@ -63,6 +64,7 @@
 				拼团价：¥<strong>{$goods['groupsprice']}</strong>/{if $goods['units']}{$goods['goodsnum']}{$goods['units']}{else}1件{/if}<del>{$goods['price']}</del>
 			</p>
 		</div>
+		{/if}
 		<div class="pp">
 			{if $lasttime2 > 0 && $n > 0 }
 			<div class="fui-cell">

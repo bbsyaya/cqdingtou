@@ -54,13 +54,13 @@
         if(pindex==''||pindex==0){
             return;
         }
-        var keyword = $.trim($("#goodsid_input").val());
+        var keyword = $.trim($("input[name=keyword]").val());
         $("#goodsid_input").html('<div class="tip">正在进行搜索...</div>');
 
         $.ajax({
             url:"{php echo webUrl('sale/fullback/query')}",
             type:'get',
-            data:{title:keyword,page:pindex,psize:8},
+            data:{keyword:keyword,page:pindex,psize:8},
             async : false, //默认为true 异步
             success:function(data){
                 $(".content").html(data);

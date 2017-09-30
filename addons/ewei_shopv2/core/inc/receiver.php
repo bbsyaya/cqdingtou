@@ -29,7 +29,7 @@ class Receiver extends WeModuleReceiver
 			return false;
 		}
 		load()->model('account');
-		$account = account_fetch($_W['acid']);
+		$account = account_fetch($_W['uniacid']);
 		$totalagent = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . (int) $account['uniacid'] . ' and isagent =1');
 		$totalmember = pdo_fetchcolumn('select count(*) from' . tablename('ewei_shop_member') . ' where uniacid =' . (int) $account['uniacid']);
 		$acc = WeAccount::create();

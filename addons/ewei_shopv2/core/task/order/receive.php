@@ -20,7 +20,7 @@ foreach ($sets as $set )
 	$days = intval($trade['receive']);
 	$p = p('commission');
 	$pcoupon = com('coupon');
-	$orders = pdo_fetchall('select id,couponid,openid,isparent,sendtime,price,merchid from ' . tablename('ewei_shop_order') . ' where uniacid=' . $_W['uniacid'] . ' and status=2 ', array(), 'id');
+	$orders = pdo_fetchall('select id,couponid,openid,isparent,sendtime,price,merchid,isverify,addressid,isvirtualsend,virtual,dispatchtype from ' . tablename('ewei_shop_order') . ' where uniacid=' . $_W['uniacid'] . ' and status=2 ', array(), 'id');
 	if (!(empty($orders))) 
 	{
 		foreach ($orders as $orderid => $order ) 
@@ -64,6 +64,15 @@ foreach ($sets as $set )
 function goodsReceive($order, $sysday = 0) 
 {
 	$days = array();
+	if (checkFetchOrder($order)) 
+	{
+		return false;
+	}
+	$isonlyverifygoods = m('order')->checkisonlyverifygoods($order['id']);
+	if ($isonlyverifygoods) 
+	{
+		return false;
+	}
 	if ($order['merchid'] == 0) 
 	{
 		$goods = pdo_fetchall('select og.goodsid, g.autoreceive from' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.orderid=' . $order['id']);
@@ -91,6 +100,14 @@ function goodsReceive($order, $sysday = 0)
 	}
 	$daytimes = 86400 * $day;
 	if (($order['sendtime'] + $daytimes) <= time()) 
+	{
+		return true;
+	}
+	return false;
+}
+function checkFetchOrder($order) 
+{
+	if (($order['isverify'] != 1) && empty($item['addressid']) && empty($item['isvirtualsend']) && empty($item['virtual']) && $item['dispatchtype']) 
 	{
 		return true;
 	}

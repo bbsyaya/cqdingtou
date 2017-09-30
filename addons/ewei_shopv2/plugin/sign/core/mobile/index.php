@@ -308,10 +308,5 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		}
 		show_json(1, array('total' => $total, 'list' => $list, 'pagesize' => $psize));
 	}
-	public function footerMenus($a, $b) 
-	{
-		$p = $this->model->getSet();
-		include $this->template('sign/_menu');
-	}
 }
 ?>

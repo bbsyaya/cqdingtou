@@ -36,6 +36,8 @@ class Perm_EweiShopV2ComModel extends ComModel
 		{
 			$perm['staff'] = array('text' => '服务人员管理', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '修改-log', 'view' => '查看', 'delete' => '删除-log');
 			$perm['role'] = array('text' => '店员角色管理', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '修改-log', 'view' => '查看', 'delete' => '删除-log');
+			$perm['category'] = array('text' => '门店分类管理', 'main' => '查看列表', 'add' => '添加-log', 'edit' => '修改-log', 'view' => '查看', 'delete' => '删除-log');
+			$perm['diypage'] = array( 'text' => '门店装修', 'setting' => '设置门店默认模板-log', 'add' => '装修模板添加-log', 'edit' => '装修模板编辑-log', 'delete' => '装修模板删除-log', 'preview' => '门店页面/模板预览', 'xxx' => array('status' => 'edit'), 'page' => array( 'text' => '门店页面设置', 'add' => '添加-log', 'edit' => '编辑-log', 'delete' => '删除-log', 'xxx' => array('status' => 'edit') ) );
 		}
 		return $perm;
 	}
@@ -79,7 +81,7 @@ class Perm_EweiShopV2ComModel extends ComModel
 	}
 	protected function perm_finance() 
 	{
-		return array( 'text' => '财务管理', 'log' => array('text' => '财务管理', 'recharge' => '充值记录', 'withdraw' => '提现申请', 'refund' => '充值退款-log', 'wechat' => '微信提现-log', 'manual' => '手动提现-log', 'refuse' => '拒绝提现-log', 'recharge.export' => '充值记录导出-log', 'withdraw.export' => '提现申请导出-log'), 'downloadbill' => array('text' => '对账单', 'main' => '下载-log'), 'recharge' => array('text' => '充值', 'credit1' => '充值积分-log', 'credit2' => '充值余额-log'), 'credit' => array('text' => '积分余额明细', 'credit1' => '积分明细', 'credit1.export' => '导出积分明细', 'credit2' => '余额明细', 'credit2.export' => '导出余额明细') );
+		return array( 'text' => '财务管理', 'log' => array('text' => '财务管理', 'recharge' => '充值记录', 'withdraw' => '提现申请', 'refund' => '充值退款-log', 'alipay' => '支付宝提现-log', 'wechat' => '微信提现-log', 'manual' => '手动提现-log', 'refuse' => '拒绝提现-log', 'recharge.export' => '充值记录导出-log', 'withdraw.export' => '提现申请导出-log'), 'downloadbill' => array('text' => '对账单', 'main' => '下载-log'), 'recharge' => array('text' => '充值', 'credit1' => '充值积分-log', 'credit2' => '充值余额-log'), 'credit' => array('text' => '积分余额明细', 'credit1' => '积分明细', 'credit1.export' => '导出积分明细', 'credit2' => '余额明细', 'credit2.export' => '导出余额明细') );
 	}
 	protected function perm_statistics() 
 	{

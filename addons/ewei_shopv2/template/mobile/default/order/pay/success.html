@@ -27,15 +27,15 @@
 	
 	<div class='fui-list-group result-list ' style="margin-top: 0;">
 	    <div class='fui-list'>
-		<div class='fui-list-media'>
+		<div class='fui-list-media' >
 			{if $_GPC['result']=='seckill_refund'}
 					<i class='icon icon-cry'></i>
 			{else}
-		                   {if !empty($address)}<i class='icon icon-deliver'></i>{/if}
+		   {if !empty($address)&&empty($order['istrade'])}<i class='icon icon-deliver'></i>{/if}
 			
 			{if !empty($order['dispatchtype']) && empty($order['isverify'])}<i class='icon icon-store'></i>{/if}
 			
-			{if !empty($order['isverify'])||$isonlyverifygoods}<i class='icon icon-store'></i>{/if}
+			{if !empty($order['isverify'])||$isonlyverifygoods || !empty($order['istrade'])}<i class='icon icon-store'></i>{/if}
 			
 			{if !empty($order['virtual'])}<i class='icon icon-text'></i>{/if}
 			
@@ -58,6 +58,7 @@
 				订单提交支付
 				{else}
 				订单支付成功
+
 				{/if}
 				{/if}
 
@@ -69,7 +70,9 @@
 				{else}
 
 
-			{if !empty($address)}您的包裹整装待发{/if}
+			{if !empty($address)&&empty($order['istrade'])}您的包裹整装待发{/if}
+
+			{if !empty($order['istrade'])}您的服务已成功预约{/if}
 			
 			{if !empty($order['dispatchtype']) && empty($order['isverify'])}您可以到您选择的自提点取货了{/if}
 			
@@ -181,20 +184,19 @@
 	{/if}
 
 
+
 	{if $hasverifygood}
-	<div class="fui-cell-group noborder">
+	<a  href="{php echo mobileUrl('verifygoods')}" class="fui-cell-group small noborder nopadding no_active" style="display: block;">
 		<div class="fui-cell">
 			<div class="fui-cell-label">
-				<img src="../addons/ewei_shopv2/static/images/card.jpg" alt="" class="card"/ >
+				<img src="../addons/ewei_shopv2/static/images/card.png" alt="" class="card"/ >
 			</div>
 			<div class="fui-cell-info" style="font-size: 0.75rem;" >
-				您有一件核销商品待使用
-			</div>
-			<div class="fui-cell-remark noremark">
-				<a class="active" href="{php echo mobileUrl('verifygoods')}">立即查看</a>
+				<p>您有一件核销商品待使用</p>
+				<div>立即前往激活>></div>
 			</div>
 		</div>
-	</div>
+	</a>
 	{/if}
 
 	
@@ -234,7 +236,7 @@
 	{/if}
 	
 	
-	<div class="fui-cell-group">
+	<div class="fui-cell-group small">
 	    <div class="fui-cell">
 		<div class="fui-cell-label">{if $order['paytype']==3}需到付{else}实付金额{/if}</div>
 		<div class="fui-cell-info"></div>
@@ -275,4 +277,7 @@
             require(['biz/order/success'], function (modal) {modal.init("{$lottery_changes['is_changes']}","{$lottery_changes['lottery']['lottery_id']}");});
         </script>
 </div>
+{if $share}
+	{template 'sale/sendticket/share'}
+{/if}
 {template '_footer'}

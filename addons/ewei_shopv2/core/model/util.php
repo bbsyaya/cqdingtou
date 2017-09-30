@@ -9,10 +9,10 @@ class Util_EweiShopV2Model
 	{
 		global $_W;
 		$express_set = $_W['shopset']['express'];
-		$express = (($express == 'jymwl' ? 'jiayunmeiwuliu' : $express));
-		$express = (($express == 'TTKD' ? 'tiantian' : $express));
-		$express = (($express == 'jjwl' ? 'jiajiwuliu' : $express));
-		$express = (($express == 'zhongtiekuaiyun' ? 'ztky' : $express));
+		(($express == 'jymwl' ? 'jiayunmeiwuliu' : $express));
+		(($express == 'TTKD' ? 'tiantian' : $express));
+		(($express == 'jjwl' ? 'jiajiwuliu' : $express));
+		(($express == 'zhongtiekuaiyun' ? 'ztky' : $express));
 		load()->func('communication');
 		if (!(empty($express_set['isopen'])) && !(empty($express_set['apikey']))) 
 		{
@@ -71,6 +71,10 @@ class Util_EweiShopV2Model
 			{
 				pdo_update('ewei_shop_express_cache', array('lasttime' => time(), 'datas' => iserializer($list)), array('id' => $cache['id']));
 			}
+		}
+		if (empty($list) && !(empty($info['message']))) 
+		{
+			$list[] = array('step' => '未查询到物流信息(' . trim($info['message']) . ')');
 		}
 		return $list;
 	}
@@ -203,6 +207,25 @@ class Util_EweiShopV2Model
 			return '';
 		}
 		return str_replace('=', '', base64_encode($result));
+	}
+	public function location($lat, $lng) 
+	{
+		$newstore_plugin = p('newstore');
+		if ($newstore_plugin) 
+		{
+			$newstore_data = m('common')->getPluginset('newstore');
+			$key = $newstore_data['baidukey'];
+		}
+		if (empty($key)) 
+		{
+			$key = 'ZQiFErjQB7inrGpx27M1GR5w3TxZ64k7';
+		}
+		$url = 'http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=' . $lat . ',' . $lng . '&output=json&pois=1&ak=' . $key;
+		$fileContents = file_get_contents($url);
+		$contents = ltrim($fileContents, 'renderReverse&&renderReverse(');
+		$contents = rtrim($contents, ')');
+		$data = json_decode($contents, true);
+		return $data;
 	}
 }
 ?>

@@ -374,7 +374,6 @@ class CashierModel extends PluginModel
 		{
 			$data['status'] = 1;
 			(($data['paytype'] == 3 ? $data['paytype'] : 2));
-			$data['deduction'] -= $data['randommoney'];
 			$data['paytime'] = time();
 			pdo_update('ewei_shop_cashier_pay_log', $data, array('id' => $data['id']));
 			m('member')->setCredit($data['openid'], 'credit2', -$data['deduction'], array(0, '收银台 ' . $_W['cashieruser']['title'], '收款'));
@@ -833,9 +832,13 @@ class CashierModel extends PluginModel
 		{
 			if (($value['enough'] <= $price) && (0 < $value)) 
 			{
-				$new_price = $price - $value['money'];
-				$enough = $value['enough'];
 				$money = $value['money'];
+				if ($price < $money) 
+				{
+					$money = $price;
+				}
+				$new_price = $price - $money;
+				$enough = $value['enough'];
 				break;
 			}
 		}
@@ -910,6 +913,10 @@ class CashierModel extends PluginModel
 		if ($random) 
 		{
 			$randommoney = $this->getrandommoney($money);
+		}
+		if ($money < $randommoney) 
+		{
+			$randommoney = $money;
 		}
 		$realmoney = round($money - $randommoney, 2);
 		$enoughs = $this->getEnoughs($realmoney);
@@ -1313,6 +1320,7 @@ class CashierModel extends PluginModel
 		}
 		$price = $price * $credit1_double;
 		$credit1 = com_run('sale::getCredit1', $log['openid'], $price, 37, 1, 0, $log['title'] . '收银订单号 : ' . $log['logno'] . '  收银台消费送积分');
+		m('notice')->sendMemberPointChange($log['openid'], $price, 0);
 		return $credit1;
 	}
 	public function upload_cert($fileinput) 

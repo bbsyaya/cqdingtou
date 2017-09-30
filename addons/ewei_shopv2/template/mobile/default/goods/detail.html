@@ -12,7 +12,7 @@
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/coupon-new.css?v=2017030302">
 <link rel="stylesheet" href="../addons/ewei_shopv2/static/js/dist/swiper/swiper.min.css">
 
-{if !empty($liveprice)}
+{if !empty($islive)}
     <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/plugin/live/static/css/living.css?v=20170628" />
 {/if}
 
@@ -109,8 +109,8 @@
 <i class="icon icon-qrcode" id="alert-click"></i>
 {/if}
 <div class='fui-swipe goods-swipe'>
-    {if !empty($liveprice)}
-        <a class="external isliving" href="{php echo mobileUrl('live/room', array('id'=>$liveid))}"></a>
+    {if !empty($islive)}
+        <a class="external isliving" href="{php echo mobileUrl('live/room', array('id'=>$liveid))}">直播中</a>
     {/if}
 
     <div class='fui-swipe-wrapper'>
@@ -204,8 +204,11 @@
     {/if}
     {if empty($seckillinfo)&&$goods['type']!=4}
     <div class="fui-cell">
-        <div class="fui-cell-text price">
-			<span class="text-danger">
+        <div class="fui-cell-text price" >
+            {if $islive}
+                <span class="live-price">直播价</span>
+            {/if}
+			<span class="text-danger" style="vertical-align: middle;">
                 {if !empty($taskGoodsInfo)}
                     ￥{$taskGoodsInfo['price']}
                 {elseif $threen &&(!empty($threenprice['price'])||!empty($threenprice['discount']))}
@@ -219,7 +222,9 @@
                         {$goods['presellprice']}
                     {else}
                         {if $goods['minprice']==$goods['maxprice']}
-                            {$goods['minprice']}{else}{$goods['minprice']}~{$goods['maxprice']}
+                            {$goods['minprice']}
+                        {else}
+                            {$goods['minprice']}~{$goods['maxprice']}
                         {/if}
                     {/if}
                     {if $goods['isdiscount'] && $goods['isdiscount_time']>=time()}
@@ -350,16 +355,6 @@
 
 
 {if empty($seckillinfo)}
-
-{if $liveprice}
-<div class="fui-cell-group  fui-sale-group" style="margin-top:0">
-    <div class="fui-cell">
-        <div class="fui-cell-text" style="white-space: normal;">您通过直播间<span class="text-danger">{$liveprice['name']}</span>进入 可享受 <span class="text-danger">￥{$liveprice['price']}</span>的价格</div>
-        <input type="hidden" id="liveid" value="{$liveprice['id']}">
-    </div>
-</div>
-{/if}
-
 
 {if floatval($goods['buyagain'])>0}
 <div class="fui-cell-group  fui-sale-group" style="margin-top:0">
@@ -1191,7 +1186,8 @@
             attachurl_local:"{$GLOBALS['_W']['attachurl_local']}",
             attachurl_remote:"{$GLOBALS['_W']['attachurl_remote']}",
             coupons: {php echo json_encode($coupons)},
-            new_temp: {$new_temp}
+            new_temp: {$new_temp},
+            liveid: {$liveid}
         });
     });
 </script>

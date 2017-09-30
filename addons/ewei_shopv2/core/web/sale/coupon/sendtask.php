@@ -21,7 +21,7 @@ class Sendtask_EweiShopV2Page extends ComWebPage
 		$params = array(':uniacid' => $uniacid);
 		$sendtasks = pdo_fetchall('SELECT cs.*, c.couponname, c.thumb FROM ' . tablename('ewei_shop_coupon_sendtasks') . '  cs left  join  ' . tablename('ewei_shop_coupon') . '  c on cs.couponid =c.id' . "\r\n" . '                    WHERE 1 ' . $condition . '  order by enough LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT COUNT(1) FROM ' . tablename('ewei_shop_coupon_sendtasks') . ' cs WHERE 1 ' . $condition . ' ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function opentask() 
@@ -88,6 +88,14 @@ class Sendtask_EweiShopV2Page extends ComWebPage
 				plog('coupon.sendtask.add', '添加优惠券发送任务 ID: ' . $id);
 			}
 			show_json(1, array('url' => webUrl('sale.coupon.sendtask')));
+		}
+		if (empty($item['starttime'])) 
+		{
+			$item['starttime'] = time();
+		}
+		if (empty($item['endtime'])) 
+		{
+			$item['endtime'] = time() + (60 * 60 * 24 * 7);
 		}
 		include $this->template();
 	}

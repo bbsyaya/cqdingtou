@@ -148,11 +148,11 @@ class Index_EweiShopV2Page extends WebPage
 		{
 			show_json(1, array('status' => 0, 'messages' => '默认模板信息错误', 'tag' => $tag));
 		}
-		$content = str_replace("\n", '', $templatetype['content']);
+		$content = str_replace(array("\r\n", "\r", "\n"), '', $templatetype['content']);
 		$issnoet = true;
 		foreach ($result['template_list'] as $key => $value ) 
 		{
-			if (str_replace("\n", '', $value['content']) == $content) 
+			if (str_replace(array("\r\n", "\r", "\n"), '', $value['content']) == $content) 
 			{
 				$issnoet = false;
 				$defaulttemp = pdo_fetch('select 1  from ' . tablename('ewei_shop_member_message_template_default') . ' where typecode=:typecode and uniacid=:uniacid  limit 1', array(':typecode' => $tag, ':uniacid' => $_W['uniacid']));
@@ -358,7 +358,7 @@ class Index_EweiShopV2Page extends WebPage
 		if ($opensms) 
 		{
 			$smsset = com('sms')->sms_set();
-			if (empty($smsset['juhe']) && empty($smsset['dayu']) && empty($smsset['emay'])) 
+			if (empty($smsset['juhe']) && empty($smsset['dayu']) && empty($smsset['emay']) && empty($smsset['aliyun'])) 
 			{
 				$opensms = false;
 			}

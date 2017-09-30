@@ -184,7 +184,7 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 		{
 			return false;
 		}
-		pdo_update('ewei_shop_order', array('status' => 3, 'finishtime' => time()), array('id' => $item['id'], 'uniacid' => $_W['uniacid']));
+		pdo_update('ewei_shop_order', array('status' => 3, 'sendtime' => time(), 'finishtime' => time()), array('id' => $item['id'], 'uniacid' => $_W['uniacid']));
 		m('order')->fullback($item['id']);
 		if (p('ccard') && !(empty($item['ccardid']))) 
 		{

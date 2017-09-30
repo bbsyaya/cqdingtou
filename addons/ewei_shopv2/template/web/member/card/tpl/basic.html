@@ -73,37 +73,38 @@
 		{/if}
 	</div>
 </div>
-
-<div class="form-group">
-	<label class="col-sm-2 control-label must">手机短信验证</label>
-	<div class="col-sm-9 col-xs-12">
-		{ife 'member.card' $item}
-			<label class="radio-inline"><input type="radio" value="0" name="sms_active"  {if empty($item['sms_active'])}checked="true"{/if}  >关闭</label>
-			<label class="radio-inline"><input type="radio" value="1" name="sms_active"  {if $item['sms_active'] == 1}checked="true"{/if} >开启</label>
-		{else}
-		<div class='form-control-static'>
-			{if $item['sms_active']==0}
-				关闭
-			{else if $item['sms_active']==1}
-				开启
+{if com("sms")}
+	<div class="form-group">
+		<label class="col-sm-2 control-label must">手机短信验证</label>
+		<div class="col-sm-9 col-xs-12">
+			{ife 'member.card' $item}
+				<label class="radio-inline"><input type="radio" value="0" name="sms_active"  {if empty($item['sms_active'])}checked="true"{/if}  >关闭</label>
+				<label class="radio-inline"><input type="radio" value="1" name="sms_active"  {if $item['sms_active'] == 1}checked="true"{/if} >开启</label>
+			{else}
+			<div class='form-control-static'>
+				{if $item['sms_active']==0}
+					关闭
+				{else if $item['sms_active']==1}
+					开启
+				{/if}
+			</div>
 			{/if}
+
 		</div>
-		{/if}
-
 	</div>
-</div>
 
-<div class="form-group">
-	<label class="col-sm-2 control-label must">短息模板</label>
-	<div class="col-sm-9 col-xs-12">
-		<select class="select2" style="display: block; width: 100%" name="sms_id">
-		<option value=''>从短信消息库中选择</option>
-		{loop $template_sms $template_val}
-			<option value="{$template_val['id']}" {if $item['sms_id']==$template_val['id']}selected{/if}>{$template_val['name']}</option>
-		{/loop}
-		</select>
+	<div class="form-group">
+		<label class="col-sm-2 control-label must">短息模板</label>
+		<div class="col-sm-9 col-xs-12">
+			<select class="select2" style="display: block; width: 100%" name="sms_id">
+			<option value=''>从短信消息库中选择</option>
+			{loop $template_sms $template_val}
+				<option value="{$template_val['id']}" {if $item['sms_id']==$template_val['id']}selected{/if}>{$template_val['name']}</option>
+			{/loop}
+			</select>
+		</div>
 	</div>
-</div>
+{/if}
 
 <!--
 <div class="form-group">

@@ -21,7 +21,7 @@ class Printer_EweiShopV2Page extends WebPage
 		}
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE ' . $condition . '  ORDER BY id asc limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 
@@ -39,7 +39,7 @@ class Printer_EweiShopV2Page extends WebPage
 		$id = intval($_GPC['id']);
 		if (!(empty($id))) 
 		{
-			$list = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE id=:id and uniacid=:uniacid  and merchid=0', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+			$list = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE id=:id and uniacid=:uniacid ', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 			$print_data = json_decode($list['print_data'], true);
 			$keys = ((isset($print_data['key']) ? $print_data['key'] : array()));
 			$values = ((isset($print_data['value']) ? $print_data['value'] : array()));
@@ -51,7 +51,7 @@ class Printer_EweiShopV2Page extends WebPage
 		}
 		if ($_W['ispost']) 
 		{
-			$data = array('uniacid' => $_W['uniacid'], 'merchid' => 0, 'type' => intval($_GPC['type']), 'title' => trim($_GPC['title']), 'print_title' => trim($_GPC['print_title']), 'print_style' => trim($_GPC['print_style']), 'code' => intval($_GPC['code']), 'qrcode' => trim($_GPC['qrcode']));
+			$data = array('uniacid' => $_W['uniacid'], 'merchid' => 0, 'type' => intval($_GPC['type']), 'title' => trim($_GPC['title']), 'print_title' => trim($_GPC['print_title']), 'print_style' => trim($_GPC['print_style']), 'code' => intval($_GPC['code']), 'qrcode' => trim($_GPC['qrcode']), 'goodssn' => trim($_GPC['goodssn']), 'productsn' => trim($_GPC['productsn']));
 			$data['print_data'] = json_encode(array('key' => (is_array($_GPC['key']) ? array_values($_GPC['key']) : array()), 'value' => (is_array($_GPC['value']) ? array_values($_GPC['value']) : array())));
 			if (empty($id)) 
 			{
@@ -133,7 +133,7 @@ class Printer_EweiShopV2Page extends WebPage
 		}
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_printer') . ' WHERE ' . $condition . '  ORDER BY id asc limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_member_printer') . ' WHERE ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		$printer = com_run('printer::printer_list');
 		include $this->template();
 	}
@@ -212,7 +212,7 @@ class Printer_EweiShopV2Page extends WebPage
 			$condition .= ' AND `title` LIKE :keyword';
 			$params[':keyword'] = '%' . $kwd . '%';
 		}
-		$ds = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_member_printer') . ' WHERE ' . $condition . ' order by id asc', $params);
+		$ds = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_member_printer') . ' WHERE  ' . $condition . ' order by id asc', $params);
 		if ($_GPC['suggest']) 
 		{
 			exit(json_encode(array('value' => $ds)));
@@ -244,7 +244,7 @@ class Printer_EweiShopV2Page extends WebPage
 		$data = com_run('printer::getPrinterSet');
 		$order_printer_array = $data['order_printer'];
 		$ordertype = $data['ordertype'];
-		$order_template = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE uniacid=:uniacid and merchid=0', array(':uniacid' => $_W['uniacid']));
+		$order_template = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE uniacid=:uniacid ', array(':uniacid' => $_W['uniacid']));
 		include $this->template();
 	}
 }

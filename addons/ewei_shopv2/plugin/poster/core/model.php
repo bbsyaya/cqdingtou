@@ -399,10 +399,16 @@ class PosterModel extends PluginModel
 	public function checkMember($openid = '', $acc = '') 
 	{
 		global $_W;
+		$new_user = true;
 		$redis = redis();
 		if (!(is_error($redis))) 
 		{
 			$member = $redis->get($openid . '_poster_checkMember');
+			$newuser = $redis->get('new_user');
+			if (!(empty($newuser))) 
+			{
+				$new_user = $redis->get('new_user');
+			}
 			if (!(empty($member))) 
 			{
 				return json_decode($member, true);
@@ -423,13 +429,17 @@ class PosterModel extends PluginModel
 		pdo_update('mc_mapping_fans', array('nickname' => $userinfo['nickname']), array('uniacid' => $_W['uniacid'], 'openid' => $openid));
 		$model = m('member');
 		$member = $model->getMember($openid);
-		if (empty($member)) 
+		if (empty($member) && $new_user) 
 		{
 			$mc = mc_fetch($uid, array('realname', 'nickname', 'mobile', 'avatar', 'resideprovince', 'residecity', 'residedist'));
 			$member = array('uniacid' => $_W['uniacid'], 'uid' => $uid, 'openid' => $openid, 'realname' => $mc['realname'], 'mobile' => $mc['mobile'], 'nickname' => (!(empty($mc['nickname'])) ? $mc['nickname'] : $userinfo['nickname']), 'avatar' => (!(empty($mc['avatar'])) ? $mc['avatar'] : $userinfo['avatar']), 'gender' => (!(empty($mc['gender'])) ? $mc['gender'] : $userinfo['sex']), 'province' => (!(empty($mc['resideprovince'])) ? $mc['resideprovince'] : $userinfo['province']), 'city' => (!(empty($mc['residecity'])) ? $mc['residecity'] : $userinfo['city']), 'area' => $mc['residedist'], 'createtime' => time(), 'status' => 0);
 			pdo_insert('ewei_shop_member', $member);
 			$member['id'] = pdo_insertid();
 			$member['isnew'] = true;
+			if (!(is_error($redis))) 
+			{
+				$redis->set('new_user', false, 20);
+			}
 		}
 		else 
 		{

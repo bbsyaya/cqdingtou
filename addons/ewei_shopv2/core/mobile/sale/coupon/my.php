@@ -24,14 +24,14 @@ class My_EweiShopV2Page extends MobileLoginPage
 		{
 			if (empty($coupon)) 
 			{
-				header('location: ' . webUrl('sale/coupon/my'));
+				header('location: ' . mobileUrl('sale/coupon/my'));
 				exit();
 			}
 		}
 		$coupon = pdo_fetch('select * from ' . tablename('ewei_shop_coupon') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $data['couponid'], ':uniacid' => $_W['uniacid']));
 		if (empty($coupon)) 
 		{
-			header('location: ' . webUrl('sale/coupon/my'));
+			header('location: ' . mobileUrl('sale/coupon/my'));
 			exit();
 		}
 		$coupon['gettime'] = $data['gettime'];
@@ -198,7 +198,7 @@ class My_EweiShopV2Page extends MobileLoginPage
 		$psize = 10;
 		$time = time();
 		$sql = 'select d.id,d.couponid,d.gettime,c.timelimit,c.coupontype,c.timedays,c.timestart,c.timeend,c.thumb,c.couponname,c.enough,c.backtype,c.deduct,c.discount,c.backmoney,c.backcredit,c.backredpack,c.bgcolor,c.thumb,c.merchid,c.tagtitle,c.settitlecolor,c.titlecolor from ' . tablename('ewei_shop_coupon_data') . ' d';
-		$sql .= ' left join ' . tablename('ewei_shop_coupon') . ' c on d.couponid = c.id';
+		$sql .= ' inner join ' . tablename('ewei_shop_coupon') . ' c on d.couponid = c.id';
 		$sql .= ' where d.openid=:openid and d.uniacid=:uniacid ';
 		if (!(empty($past))) 
 		{
@@ -562,13 +562,13 @@ class My_EweiShopV2Page extends MobileLoginPage
 		foreach ($goods as $i => &$row ) 
 		{
 			$couponprice = (double) $row['minprice'];
-			if ($row['backtype'] == 0) 
+			if ($data['backtype'] == 0) 
 			{
 				$couponprice = $couponprice - (double) $data['deduct'];
 			}
-			if ($row['backtype'] == 1) 
+			if ($data['backtype'] == 1) 
 			{
-				$couponprice = ($couponprice * $data['discount']) / 10;
+				$couponprice = (double) $couponprice * (floatval($data['discount']) / 10);
 			}
 			if ($couponprice < 0) 
 			{

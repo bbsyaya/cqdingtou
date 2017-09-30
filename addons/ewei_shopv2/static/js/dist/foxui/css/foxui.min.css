@@ -3471,7 +3471,8 @@ position: relative;
 .fui-according-content {
 	position: relative;
 	width: 100%;
-	height: 0;
+	height: auto;
+	display: none;
 	overflow: hidden;
 	-moz-transition-duration: 200ms;
 	-webkit-transition-duration: 200ms;
@@ -3481,6 +3482,7 @@ position: relative;
 }
 
 .fui-according.expanded .fui-according-content {
+	display: block;
 	height:auto;
 }
 

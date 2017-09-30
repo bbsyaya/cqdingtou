@@ -10,19 +10,27 @@ class Index_EweiShopV2Page extends WebPage
 		if (cv('finance.recharge.view')) 
 		{
 			header('location: ' . webUrl('finance/log/recharge'));
-			return;
 		}
-		if (cv('finance.withdraw.view')) 
+		else if (cv('finance.withdraw.view')) 
 		{
 			header('location: ' . webUrl('finance/log/withdraw'));
-			return;
 		}
-		if (cv('finance.downloadbill')) 
+		else if (cv('finance.downloadbill')) 
 		{
 			header('location: ' . webUrl('finance/downloadbill'));
-			return;
 		}
-		header('location: ' . webUrl());
+		else if (cv('finance.credit.credit1')) 
+		{
+			header('location:' . webUrl('finance.credit.credit1'));
+		}
+		else if (cv('finance.credit.credit2')) 
+		{
+			header('location:' . webUrl('finance.credit.credit2'));
+		}
+		else 
+		{
+			header('location: ' . webUrl());
+		}
 	}
 }
 ?>

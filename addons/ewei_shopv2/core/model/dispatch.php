@@ -41,7 +41,7 @@ class Dispatch_EweiShopV2Model
 		}
 		else if ($param <= $d['firstweight']) 
 		{
-			if (0 < $param) 
+			if (0 <= $param) 
 			{
 				$price = floatval($d['firstprice']);
 			}

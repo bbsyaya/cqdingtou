@@ -11,7 +11,7 @@
             <div class="title">确认订单</div>
             <div class="fui-header-right">&nbsp;</div>
         </div>
-        <div class='fui-content  navbar'>
+        <div class='fui-content' style="padding-bottom: 2.5rem;overflow: scroll;overflow-scrolling: touch;">
             {if count($carrier_list)>0}
             <div id="carrierTab" class="fui-tab fui-tab-danger">
                 <a data-tab="tab1" class="active">快递配送</a>
@@ -19,7 +19,7 @@
             </div>
             {/if}
 
-            {if  !$isverify && !$isvirtual}
+            {if  !$isverify}
             <!--地址选择-->
             <div class="fui-list-group" id='addressInfo' data-addressid="{php echo intval($address['id'])}">
                 <a  class="fui-list"
@@ -62,7 +62,7 @@
             {/if}
 
         <!--联系填写-->
-        <div class="fui-cell-group sm" id="memberInfo" {if !$isverify && !$isvirtual}style="display:none"{/if}>
+        <div class="fui-cell-group sm" id="memberInfo" data-type="{$isverify}" {if !$isverify}style="display:none"{/if}>
             <div class="fui-cell">
                 <div class="fui-cell-label sm">联系人</div>
                 <div class="fui-cell-info"><input type="text" placeholder="请输入联系人" name='realname'   class="fui-input" value="{$member['realname']}"/></div>

@@ -1124,7 +1124,17 @@ class TaobaoModel extends PluginModel
 			$detail = ihttp_get($detailUrl);
 			$detail = iconv('GBK', 'UTF-8', $detail['content']);
 			preg_match('/var offer_details=(.+);$/', $detail, $detailStr);
-			$detail = json_decode($detailStr[1], true);
+			$detail_temp = json_decode($detailStr[1], true);
+			if (empty($detail_temp)) 
+			{
+				preg_match('/var desc=\'(.+)\';$/', $detail, $detailStr);
+				unset($detail);
+				$detail['content'] = $detailStr[1];
+			}
+			else 
+			{
+				$detail = $detail_temp;
+			}
 			$thumb_url = array();
 			foreach ($json1['imageList'] as $k => $v ) 
 			{
@@ -1137,7 +1147,30 @@ class TaobaoModel extends PluginModel
 			$maxprice = ((empty($priceRange[1]) ? floatval($priceRange[0]) : floatval($priceRange[1])));
 			$hasoption = ((empty($json1['skuProps']) ? 0 : 1));
 			$param = $json1['productFeatureList'];
-			$data = array('uniacid' => $_W['uniacid'], 'thumb' => $thumb, 'thumb_url' => serialize($thumb_url), 'title' => $json1['subject'], 'status' => 0, 'marketprice' => $maxprice, 'originalprice' => $minprice, 'minprice' => $minprice, 'maxprice' => $maxprice, 'hasoption' => $hasoption, 'createtime' => time(), 'total' => $json1['canBookedAmount'], 'content' => $detail['content'], 'merchid' => $merchid, 'cates' => $cates);
+			$detail['content'] = $this->contentpasswh($detail['content']);
+			preg_match_all('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg]?))[\\\\\'|\\"].*?[\\/]?>/', $detail['content'], $imgs);
+			if (isset($imgs[1])) 
+			{
+				foreach ($imgs[1] as $img ) 
+				{
+					$catchimg = $img;
+					if (substr($catchimg, 0, 2) == '//') 
+					{
+						$img = 'http://' . substr($img, 2);
+					}
+					$im = array('catchimg' => $catchimg, 'system' => $this->save_image($img, true));
+					$images[] = $im;
+				}
+			}
+			if (isset($images)) 
+			{
+				foreach ($images as $img ) 
+				{
+					$detail['content'] = str_replace($img['catchimg'], $img['system'], $detail['content']);
+				}
+			}
+			$detail['content'] = m('common')->html_to_images($detail['content']);
+			$data = array('uniacid' => $_W['uniacid'], 'thumb' => $thumb, 'thumb_url' => serialize($thumb_url), 'title' => $json1['subject'], 'status' => 0, 'marketprice' => $maxprice, 'originalprice' => $minprice, 'minprice' => $minprice, 'maxprice' => $maxprice, 'hasoption' => $hasoption, 'createtime' => time(), 'total' => $json1['canBookedAmount'], 'content' => $detail['content'], 'merchid' => $merchid, 'cates' => $cates, 'checked' => (empty($merchid) ? 0 : 1));
 			$pcates = array();
 			$ccates = array();
 			$tcates = array();

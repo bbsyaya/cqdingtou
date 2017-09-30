@@ -36,7 +36,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 		$maxcount = 0;
 		$maxcount_date = '';
 		$maxdate = '';
-		$countfield = ((empty($type) ? 'sum(money)' : 'count(*)'));
+		$countfield = ((empty($type) ? 'sum(money+deduction)' : 'count(*)'));
 		$typename = ((empty($type) ? '交易额' : '交易量'));
 		$dataname = ((!(empty($year)) && !(empty($month)) ? '月份' : '日期'));
 		if (!(empty($year)) && !(empty($month)) && !(empty($day))) 
@@ -78,7 +78,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 			foreach ($months as $m ) 
 			{
 				$lastday = get_last_day($year, $m);
-				$dr = array('data' => $m['data'], 'count' => pdo_fetchcolumn('SELECT ifnull(' . $countfield . ',0) as cnt FROM ' . tablename('ewei_shop_cashier_pay_log') . ' WHERE cashierid=:cashierid AND uniacid=:uniacid AND status>=1 AND createtime >=:starttime AND createtime <=:endtime', array(':cashierid' => $_W['cashierid'], ':uniacid' => $_W['uniacid'], ':starttime' => strtotime($year . '-' . $m['data'] . '-01 00:00:00'), ':endtime' => strtotime($year . '-' . $m['data'] . '-' . $lastday . ' 23:59:59'))));
+				$dr = array('data' => $m['data'], 'count' => pdo_fetchcolumn('SELECT ifnull(' . $countfield . ',0) as cnt FROM ' . tablename('ewei_shop_cashier_pay_log') . ' WHERE cashierid=:cashierid AND uniacid=:uniacid AND status>=1 AND createtime >=:starttime AND createtime <:endtime', array(':cashierid' => $_W['cashierid'], ':uniacid' => $_W['uniacid'], ':starttime' => strtotime($year . '-' . $m['data'] . '-01'), ':endtime' => strtotime($year . '-' . ($m['data'] + 1) . '-01'))));
 				$totalcount += $dr['count'];
 				if ($maxcount < $dr['count']) 
 				{

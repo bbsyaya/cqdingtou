@@ -85,6 +85,15 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				}
 			}
 		}
+		$liveid = intval($_GPC['liveid']);
+		if (p('live') && !(empty($liveid))) 
+		{
+			$isliving = p('live')->isLiving($liveid);
+			if (!($isliving)) 
+			{
+				$liveid = 0;
+			}
+		}
 		$open_redis = function_exists('redis') && !(is_error(redis()));
 		$seckillinfo = false;
 		$uniacid = $_W['uniacid'];
@@ -386,14 +395,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				{
 					$data['marketprice'] = $data['presellprice'];
 				}
-				$liveid = intval($_GPC['liveid']);
-				if (p('live') && !(empty($liveid))) 
+				if (!(empty($liveid))) 
 				{
-					$isliving = p('live')->isLiving($liveid);
-				}
-				if ($isliving && (0 < $data['liveprice']) && !(empty($data['islive']))) 
-				{
-					$liveprice = $data['marketprice'] = $data['liveprice'];
+					$isLiveGoods = p('live')->isLiveGoods($data['goodsid'], $liveid);
+					if (!(empty($isLiveGoods))) 
+					{
+						$data['marketprice'] = price_format($isLiveGoods['liveprice']);
+					}
 				}
 				if ($data['type'] == 4) 
 				{
@@ -463,6 +471,14 @@ class Create_EweiShopV2Page extends MobileLoginPage
 						if ($isliving && !(empty($option['islive'])) && (0 < $option['liveprice'])) 
 						{
 							$data['marketprice'] = $option['liveprice'];
+						}
+						if (!(empty($liveid))) 
+						{
+							$liveOption = p('live')->getLiveOptions($data['goodsid'], $liveid, array($option));
+							if (!(empty($liveOption)) && !(empty($liveOption[0]))) 
+							{
+								$data['marketprice'] = price_format($liveOption[0]['marketprice']);
+							}
 						}
 						$data['virtual'] = $option['virtual'];
 						if ($option['isfullback']) 
@@ -964,6 +980,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			}
 			$goodsdata = array();
 			$goodsdata_temp = array();
+			$gifts = array();
 			foreach ($goods as $g ) 
 			{
 				$goodsdata[] = array('goodsid' => $g['goodsid'], 'total' => $g['total'], 'optionid' => $g['optionid'], 'marketprice' => $g['marketprice'], 'merchid' => $g['merchid'], 'cates' => $g['cates'], 'discounttype' => $g['discounttype'], 'isdiscountprice' => $g['isdiscountprice'], 'discountprice' => $g['discountprice'], 'isdiscountunitprice' => $g['isdiscountunitprice'], 'discountunitprice' => $g['discountunitprice'], 'type' => $g['type'], 'intervalfloor' => $g['intervalfloor'], 'intervalprice1' => $g['intervalprice1'], 'intervalnum1' => $g['intervalnum1'], 'intervalprice2' => $g['intervalprice2'], 'intervalnum2' => $g['intervalnum2'], 'intervalprice3' => $g['intervalprice3'], 'intervalnum3' => $g['intervalnum3'], 'wholesaleprice' => $g['wholesaleprice'], 'goodsalltotal' => $g['goodsalltotal']);
@@ -1006,13 +1023,8 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				else 
 				{
 					$isgift = 0;
-					$gifts = array();
 					$giftgoods = array();
 					$gifts = pdo_fetchall('select id,goodsid,giftgoodsid,thumb,title from ' . tablename('ewei_shop_gift') . "\r\n" . '                    where uniacid = ' . $uniacid . ' and status = 1 and starttime <= ' . time() . ' and endtime >= ' . time() . ' and orderprice <= ' . $goodsprice . ' and activity = 1 ');
-					if (!(empty($gifts)) && (count($gifts) == 1)) 
-					{
-						$giftid = $gifts[0]['id'];
-					}
 					foreach ($gifts as $key => $value ) 
 					{
 						$isgift = 1;
@@ -1030,6 +1042,10 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					}
 				}
 			}
+			if (!(empty($gifts)) && (count($gifts) == 1)) 
+			{
+				$giftid = $gifts[0]['id'];
+			}
 			$couponcount = com_run('coupon::consumeCouponCount', $openid, $realprice, $merch_array, $goodsdata_temp);
 			$couponcount += com_run('wxcard::consumeWxCardCount', $openid, $merch_array, $goodsdata_temp);
 			if (empty($goodsdata_temp) || !($allow_sale)) 
@@ -1045,7 +1061,7 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			{
 				$merchs = $merch_plugin->getMerchs($merch_array);
 			}
-			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!(empty($address)) && !($isverify) && !($isvirtual) ? $address['id'] : 0), 'storeid' => (!(empty($carrier_list)) && !($isverify) && !($isvirtual) ? $carrier_list[0]['id'] : 0), 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'isonlyverifygoods' => $isonlyverifygoods, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind, 'fromquick' => intval($quickid));
+			$createInfo = array('id' => $id, 'gdid' => intval($_GPC['gdid']), 'fromcart' => $fromcart, 'addressid' => (!(empty($address)) && !($isverify) && !($isvirtual) ? $address['id'] : 0), 'storeid' => (!(empty($carrier_list)) && !($isverify) && !($isvirtual) ? $carrier_list[0]['id'] : 0), 'couponcount' => $couponcount, 'coupon_goods' => $goodsdata_temp, 'isvirtual' => $isvirtual, 'isverify' => $isverify, 'isonlyverifygoods' => $isonlyverifygoods, 'goods' => $goodsdata, 'merchs' => $merchs, 'orderdiyformid' => $orderdiyformid, 'giftid' => $giftid, 'mustbind' => $mustbind, 'fromquick' => intval($quickid), 'liveid' => intval($liveid));
 			$buyagain = $buyagainprice;
 		}
 		else 
@@ -1439,6 +1455,10 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		if (p('live') && !(empty($liveid))) 
 		{
 			$isliving = p('live')->isLiving($liveid);
+			if (!($isliving)) 
+			{
+				$liveid = 0;
+			}
 		}
 		$dispatchid = intval($_GPC['dispatchid']);
 		$totalprice = floatval($_GPC['totalprice']);
@@ -1480,9 +1500,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 				{
 					$data['marketprice'] = $data['presellprice'];
 				}
-				if ($isliving && !(empty($data['islive'])) && (0 < $data['liveprice'])) 
+				if (!(empty($liveid))) 
 				{
-					$data['marketprice'] = $data['liveprice'];
+					$isLiveGoods = p('live')->isLiveGoods($data['goodsid'], $liveid);
+					if (!(empty($isLiveGoods))) 
+					{
+						$data['marketprice'] = price_format($isLiveGoods['liveprice']);
+					}
 				}
 				if (empty($data)) 
 				{
@@ -1542,9 +1566,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 						$data['optionid'] = $optionid;
 						$data['optiontitle'] = $option['title'];
 						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
-						if ($isliving && !(empty($option['islive'])) && (0 < $option['liveprice'])) 
+						if (!(empty($liveid))) 
 						{
-							$data['marketprice'] = $option['liveprice'];
+							$liveOption = p('live')->getLiveOptions($data['goodsid'], $liveid, array($option));
+							if (!(empty($liveOption)) && !(empty($liveOption[0]))) 
+							{
+								$data['marketprice'] = price_format($liveOption[0]['marketprice']);
+							}
 						}
 						if (empty($data['unite_total'])) 
 						{
@@ -1918,6 +1946,10 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$dispatchid = intval($_GPC['dispatchid']);
 		$dispatchtype = intval($_GPC['dispatchtype']);
 		$carrierid = intval($_GPC['carrierid']);
+		if($carrierid < 1){
+			$store = pdo_fetch('select * from ' . tablename('ewei_shop_store') . ' where uniacid=:uniacid and type<>2 limit 1', array( ':uniacid' => $_W['uniacid']));
+			$carrierid = $store['id'];
+		}
 		$goods = $_GPC['goods'];
 		$goods[0]['bargain_id'] = $_SESSION['bargain_id'];
 		$_SESSION['bargain_id'] = NULL;
@@ -1928,6 +1960,15 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		if (empty($goods) || !(is_array($goods))) 
 		{
 			show_json(0, '未找到任何商品');
+		}
+		$liveid = intval($_GPC['liveid']);
+		if (p('live') && !(empty($liveid))) 
+		{
+			$isliving = p('live')->isLiving($liveid);
+			if (!($isliving)) 
+			{
+				$liveid = 0;
+			}
 		}
 		$allgoods = array();
 		$tgoods = array();
@@ -2042,14 +2083,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 			{
 				$isonlyverifygoods = false;
 			}
-			$liveid = intval($_GPC['liveid']);
-			if (p('live') && !(empty($liveid))) 
+			if (!(empty($liveid))) 
 			{
-				$isliving = p('live')->isLiving($liveid);
-			}
-			if ($isliving && (0 < $data['liveprice'])) 
-			{
-				$data['marketprice'] = $data['liveprice'];
+				$isLiveGoods = p('live')->isLiveGoods($data['goodsid'], $liveid);
+				if (!(empty($isLiveGoods))) 
+				{
+					$data['marketprice'] = price_format($isLiveGoods['liveprice']);
+				}
 			}
 			if ($data['status'] == 2) 
 			{
@@ -2290,9 +2330,13 @@ class Create_EweiShopV2Page extends MobileLoginPage
 					if ($data['type'] != 4) 
 					{
 						$data['marketprice'] = (((0 < intval($data['ispresell'])) && ((time() < $data['preselltimeend']) || ($data['preselltimeend'] == 0)) ? $option['presellprice'] : $option['marketprice']));
-						if ($isliving && (0 < $option['liveprice'])) 
+						if (!(empty($liveid))) 
 						{
-							$data['marketprice'] = $option['liveprice'];
+							$liveOption = p('live')->getLiveOptions($data['goodsid'], $liveid, array($option));
+							if (!(empty($liveOption)) && !(empty($liveOption[0]))) 
+							{
+								$data['marketprice'] = price_format($liveOption[0]['marketprice']);
+							}
 						}
 						$packageoption = array();
 						if ($packageid) 

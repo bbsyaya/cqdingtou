@@ -554,8 +554,8 @@ class Notice_EweiShopV2Model
 				return;
 			}
 			$remark = '，或<a href=\'' . $url . '\'>点击查看详情</a>';
-			$text = '您好，您的订单由于长时间未付款已经关闭！！！' . "\n\n" . '商品名称：' . substr_replace($goodsname, '', strrpos($goodsname, "\n\n"), strlen("\n\n")) . "\n" . '订单编号：' . "\n" . '[订单号]' . "\n" . '订单金额：[订单金额]' . "\n" . '下单时间：[下单时间]' . "\n" . '关闭时间：[取消时间]' . "\n\n" . '感谢您的关注，如有疑问请联系在线客服咨询' . $remark;
-			$msg = array( 'first' => array('value' => '您好，您的订单由于长时间未付款已经关闭！！！', 'color' => '#ff0000'), 'keyword1' => array('title' => '订单商品', 'value' => substr_replace($goodsname, '', strrpos($goodsname, "\n\n"), strlen("\n\n")), 'color' => '#000000'), 'keyword2' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword3' => array('title' => '下单时间', 'value' => date('Y-m-d H:i', $order['createtime']), 'color' => '#000000'), 'keyword4' => array('title' => '订单金额', 'value' => $order['price'], 'color' => '#000000'), 'keyword5' => array('title' => '关闭时间', 'value' => date('Y-m-d H:i', $order['canceltime']), 'color' => '#000000'), 'remark' => array('value' => "\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情！', 'color' => '#000000') );
+			$text = '您好，您的订单由于主动取消或长时间未付款已经关闭！！！' . "\n\n" . '商品名称：' . substr_replace($goodsname, '', strrpos($goodsname, "\n\n"), strlen("\n\n")) . "\n" . '订单编号：' . "\n" . '[订单号]' . "\n" . '订单金额：[订单金额]' . "\n" . '下单时间：[下单时间]' . "\n" . '关闭时间：[取消时间]' . "\n\n" . '感谢您的关注，如有疑问请联系在线客服咨询' . $remark;
+			$msg = array( 'first' => array('value' => '您好，您的订单由于主动取消或长时间未付款已经关闭！！！', 'color' => '#ff0000'), 'keyword1' => array('title' => '订单商品', 'value' => substr_replace($goodsname, '', strrpos($goodsname, "\n\n"), strlen("\n\n")), 'color' => '#000000'), 'keyword2' => array('title' => '订单编号', 'value' => $order['ordersn'], 'color' => '#000000'), 'keyword3' => array('title' => '下单时间', 'value' => date('Y-m-d H:i', $order['createtime']), 'color' => '#000000'), 'keyword4' => array('title' => '订单金额', 'value' => $order['price'], 'color' => '#000000'), 'keyword5' => array('title' => '关闭时间', 'value' => date('Y-m-d H:i', $order['canceltime']), 'color' => '#000000'), 'remark' => array('value' => "\n" . '感谢您关注，如有疑问请联系在线客服或点击查看详情！', 'color' => '#000000') );
 			$this->sendNotice(array('openid' => $openid, 'tag' => 'cancel', 'default' => $msg, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas, 'mobile' => $buyerinfo_mobile, 'appurl' => $appurl));
 			com_run('sms::callsms', array('tag' => 'cancel', 'datas' => $datas, 'mobile' => $member['mobile']));
 		}
@@ -1220,6 +1220,7 @@ class Notice_EweiShopV2Model
 		global $_GPC;
 		$url = $this->getUrl('member');
 		$member = m('member')->getMember($openid);
+		$credit1 = m('member')->getCredit($openid);
 		$usernotice = unserialize($member['noticeset']);
 		if (!(is_array($usernotice))) 
 		{
@@ -1475,7 +1476,23 @@ class Notice_EweiShopV2Model
 		$url = ((isset($params['url']) ? $params['url'] : ''));
 		$account = ((isset($params['account']) ? $params['account'] : m('common')->getAccount()));
 		$is_merch = intval($params['is_merch']);
-		
+		/*if (empty($is_merch)) 
+		{
+			if (!(empty($tm[$tag . '_close_advanced']))) 
+			{
+				return;
+				$merch_tm = ((isset($params['merch_tm']) ? $params['merch_tm'] : ''));
+				if (!(empty($merch_tm[$tag . '_close_advanced']))) 
+				{
+					return;
+				}
+			}
+		}
+		else 
+		{
+		$merch_tm = '';
+			return;
+		}*/
 		if (!(empty($templateid))) 
 		{
 			$template = pdo_fetch('select * from ' . tablename('ewei_shop_member_message_template') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $templateid, ':uniacid' => $_W['uniacid']));

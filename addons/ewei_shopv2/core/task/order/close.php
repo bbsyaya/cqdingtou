@@ -22,17 +22,13 @@ foreach ($sets as $set )
 		continue;
 	}
 	$daytimes = 86400 * $days;
-	$orders = pdo_fetchall('select id,openid,deductcredit2,ordersn,isparent,deductcredit,deductprice,status,isparent from ' . tablename('ewei_shop_order') . ' where uniacid=' . $_W['uniacid'] . ' and status=0 and paytype<>3  and createtime + ' . $daytimes . ' <=unix_timestamp() ');
+	$orders = pdo_fetchall('select id,openid,deductcredit2,ordersn,isparent,deductcredit,deductprice,status,isparent,isverify from ' . tablename('ewei_shop_order') . ' where uniacid=' . $_W['uniacid'] . '  and paytype<>3  and ((createtime + ' . $daytimes . ' <=unix_timestamp() and status=0) or (status = 1 and `isverify` = 1 and `verifyendtime` <= unix_timestamp() and `verifyendtime` > 0))');
 	$p = com('coupon');
 	foreach ($orders as $o ) 
 	{
-		$isPeerpay = m('order')->checkpeerpay($o['id']);
-		if (!(empty($isPeerpay))) 
-		{
-			$daytimes = 86400 * 15;
-		}
 		if ($o['status'] == 0) 
 		{
+			$isPeerpay = m('order')->checkpeerpay($o['id']);
 			if ($o['isparent'] == 0) 
 			{
 				if ($p) 
@@ -72,6 +68,54 @@ foreach ($sets as $set )
 			}
 			pdo_query('update ' . tablename('ewei_shop_order') . ' set status=-1,canceltime=' . time() . ' where id=' . $o['id']);
 		}
+		else if (($o['status'] == 1) && ($o['isverify'] == 1)) 
+		{
+			pdo_query('update ' . tablename('ewei_shop_order') . ' set status=-1,canceltime=' . time() . ' where id=' . $o['id']);
+		}
 	}
+}
+$list = pdo_fetchall('select id,uniacid,ordersn,cash,parentid from' . tablename('ewei_shop_order') . ' WHERE paytype = 22 limit 20000', array(), 'ordersn');
+$tids = implode('","', array_keys($list));
+$paylog = pdo_fetchall('select `type`,`uniacid`,`tid`,`tag` from' . tablename('core_paylog') . ' where tid in ("' . $tids . '")', array(), 'tid');
+foreach ($list as $k => $l ) 
+{
+	if (0 < $l['parentid']) 
+	{
+		$parent = pdo_fetch('select id,uniacid,ordersn,cash,parentid from' . tablename('ewei_shop_order') . ' WHERE id =:id', array(':id' => $l['parentid']));
+		$parentpaylog = pdo_fetch('select `type`,`uniacid`,`tid`,`tag` from' . tablename('core_paylog') . ' where tid=:tid', array(':tid' => $parent['ordersn']));
+		$paylog[$parentpaylog['tid']] = $parentpaylog;
+		$k = $parent['ordersn'];
+	}
+	if (empty($paylog[$k]['uniacid'])) 
+	{
+		continue;
+	}
+	$paytype = 1;
+	if ($paylog[$k]['type'] == 'wechat') 
+	{
+		$paytype = 21;
+	}
+	else if ($paylog[$k]['type'] == 'alipay') 
+	{
+		$paytype = 22;
+	}
+	else if ($paylog[$k]['type'] == 'cash') 
+	{
+		$paytype = 1;
+	}
+	else if ($paylog[$k]['type'] == '') 
+	{
+		$paytype = 11;
+		if ($l['cash'] == '1') 
+		{
+			$paytype = 3;
+		}
+		if (!(empty($paylog[$k]['tag']))) 
+		{
+			$tag = iunserializer($paylog[$k]['tag']);
+			$paytype = ((isset($tag['transaction_id']) ? 21 : 22));
+		}
+	}
+	pdo_update('ewei_shop_order', array('uniacid' => $paylog[$k]['uniacid'], 'paytype' => $paytype), array('id' => $l['id']));
 }
 ?>

@@ -99,7 +99,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 	{
 		global $_W;
 		global $_GPC;
-		$mobile = intval($_GPC['mobile']);
+		$mobile = trim($_GPC['mobile']);
 		if (!($mobile)) 
 		{
 			show_json(0);
@@ -122,7 +122,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 		if ($_W['ispost']) 
 		{
 			$password = trim($_GPC['password']);
-			$mobile = intval($_GPC['mobile']);
+			$mobile = trim($_GPC['mobile']);
 			$info = m('member')->getMobileMember($mobile);
 			if (md5($password . $info['salt']) == $info['pwd']) 
 			{

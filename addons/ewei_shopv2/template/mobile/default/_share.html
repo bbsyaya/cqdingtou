@@ -17,6 +17,15 @@
                     });
                 {/if}
 
+                    window.shareData.success = "{$_W['shopshare']['way']}";
+                    if(window.shareData.success){
+                        var success = window.shareData.success;
+                        window.shareData.success = function(){
+                            eval(success)
+                        };
+                    }
+
+
                 wx.onMenuShareAppMessage(window.shareData);
                 wx.onMenuShareTimeline(window.shareData);
                 wx.onMenuShareQQ(window.shareData);
@@ -24,6 +33,7 @@
                 wx.onMenuShareQZone(window.shareData);
             });
         },500);
+
 
 
 		{if !empty($_W['shopset']['wap']['open']) && !is_weixin()}

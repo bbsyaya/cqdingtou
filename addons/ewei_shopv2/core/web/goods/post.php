@@ -8,14 +8,6 @@ if (!(empty($item)) && ($item['type'] == 5) && !(empty($item['opencard'])) && !(
 {
 	$card = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods_cards') . ' WHERE id = :id and uniacid = :uniacid', array(':id' => $item['cardid'], ':uniacid' => $_W['uniacid']));
 }
-if (!(empty($item['isverify']))) 
-{
-	$showverify = true;
-}
-else 
-{
-	$showverify = false;
-}
 $status = $item['status'];
 if (json_decode($item['labelname'], true)) 
 {
@@ -391,10 +383,22 @@ if ($_W['ispost'])
 	if ($goodstype == 5) 
 	{
 		$verifygoodsnum = intval($_GPC['verifygoodsnum']);
-		$verifygoodsdays = intval($_GPC['verifygoodsdays']);
-		if (empty($verifygoodsdays)) 
+		$verifygoodslimittype = intval($_GPC['verifygoodslimittype']);
+		if (!(empty($_GPC['verifygoodslimitdate']))) 
 		{
-			$verifygoodsdays = 365;
+			$verifygoodslimitdate = strtotime($_GPC['verifygoodslimitdate']);
+		}
+		else 
+		{
+			$verifygoodslimitdate = 0;
+		}
+		$verifygoodsdays = intval($_GPC['verifygoodsdays']);
+		if (empty($verifygoodslimittype)) 
+		{
+			if (empty($verifygoodsdays)) 
+			{
+				$verifygoodsdays = 365;
+			}
 		}
 		if (com('wxcard')) 
 		{
@@ -439,7 +443,20 @@ if ($_W['ispost'])
 					if (!(is_file($imgurl))) 
 					{
 						$img = tomedia($_GPC['card_logolocalpath']);
-						file_put_contents($imgurl, file_get_contents($img));
+						$img = ihttp_get($img);
+						if (is_error($img)) 
+						{
+							show_json(0, '上传的logo图片限制文件大小限制1MB，像素为300*300，仅支持JPG、PNG格式。');
+						}
+						$img = $img['content'];
+						if (strlen($img) != 0) 
+						{
+							file_put_contents($imgurl, $img);
+						}
+						else 
+						{
+							show_json(0, '上传的logo图片限制文件大小限制1MB，像素为300*300，仅支持JPG、PNG格式。');
+						}
 					}
 					$result = com('wxcard')->wxCardUpdateImg($imgurl);
 					if (is_wxerror($result)) 
@@ -464,12 +481,25 @@ if ($_W['ispost'])
 						if (!(is_file($imgurl))) 
 						{
 							$img = tomedia($_GPC['card_backgroundimg_localpath']);
-							file_put_contents($imgurl, file_get_contents($img));
+							$img = ihttp_get($img);
+							if (is_error($img)) 
+							{
+								show_json(0, '上传的背景图片限制文件大小限制1MB，像素为1000*600，仅支持JPG、PNG格式');
+							}
+							$img = $img['content'];
+							if (strlen($img) != 0) 
+							{
+								file_put_contents($imgurl, $img);
+							}
+							else 
+							{
+								show_json(0, '上传的背景图片限制文件大小限制1MB，像素为1000*600，仅支持JPG、PNG格式');
+							}
 						}
 						$result = com('wxcard')->wxCardUpdateImg($imgurl);
 						if (is_wxerror($result)) 
 						{
-							show_json(0, '上传的logo图片限制文件大小限制1MB，像素为300*300，仅支持JPG、PNG格式。');
+							show_json(0, '上传的背景图片限制文件大小限制1MB，像素为1000*600，仅支持JPG、PNG格式');
 						}
 						$carddata['card_backgroundimg'] = $_GPC['card_backgroundimg'];
 						$carddata['card_backgroundwxurl'] = $result['url'];
@@ -532,8 +562,10 @@ if ($_W['ispost'])
 			}
 			$data['opencard'] = $opencard;
 		}
-		$data['verifygoodsnum'] = $verifygoodsnum;
-		$data['verifygoodsdays'] = $verifygoodsdays;
+		$data['verifygoodsnum'] = intval($verifygoodsnum);
+		$data['verifygoodslimittype'] = intval($verifygoodslimittype);
+		$data['verifygoodsdays'] = intval($verifygoodsdays);
+		$data['verifygoodslimitdate'] = intval($verifygoodslimitdate);
 	}
 	if (empty($id)) 
 	{

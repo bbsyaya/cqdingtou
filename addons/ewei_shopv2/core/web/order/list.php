@@ -357,6 +357,11 @@ class List_EweiShopV2Page extends WebPage
 				{
 					$value['dispatchname'] = '快递';
 				}
+				$isonlyverifygoods = m('order')->checkisonlyverifygoods($value['id']);
+				if ($isonlyverifygoods) 
+				{
+					$value['dispatchname'] = '核销商品';
+				}
 				if ($pt == 3) 
 				{
 					$value['dispatchname'] = '货到付款';
@@ -694,7 +699,10 @@ class List_EweiShopV2Page extends WebPage
 				$row['pickname'] = '';
 				if (!(empty($row['verifyopenid']))) 
 				{
-					$row['salerinfo'] = '[' . $row['salerid'] . ']' . $row['salername'] . '(' . $row['salernickname'] . ')';
+					if (!(empty($row['salerid'])) || !(empty($row['salername'])) || !(empty($row['salernickname']))) 
+					{
+						$row['salerinfo'] = '[' . $row['salerid'] . ']' . $row['salername'] . '(' . $row['salernickname'] . ')';
+					}
 				}
 				else if (!(empty($row['verifyinfo']))) 
 				{
@@ -759,6 +767,32 @@ class List_EweiShopV2Page extends WebPage
 						$diyformdata .= $da['name'] . ': ' . $da['value'] . "\r\n";
 					}
 					$row['order_diyformdata'] = $diyformdata;
+				}
+				if ($row['isverify']) 
+				{
+					if (is_array($verifyinfo)) 
+					{
+						if (empty($row['dispatchtype'])) 
+						{
+							$v = $verifyinfo[0];
+							if ($v['verified'] || ($row['verifytype'] == 1)) 
+							{
+								$v['storename'] = pdo_fetchcolumn('select storename from ' . tablename('ewei_shop_merch_store') . ' where id=:id limit 1', array(':id' => $v['verifystoreid']));
+								if (empty($v['storename'])) 
+								{
+									$v['storename'] = '总店';
+								}
+								$row['storeinfo'] = $v['storename'];
+								$v['nickname'] = pdo_fetchcolumn('select nickname from ' . tablename('ewei_shop_member') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':openid' => $v['verifyopenid'], ':uniacid' => $_W['uniacid']));
+								$v['salername'] = pdo_fetchcolumn('select salername from ' . tablename('ewei_shop_merch_saler') . ' where openid=:openid and uniacid=:uniacid and merchid = :merchid limit 1', array(':openid' => $v['verifyopenid'], ':uniacid' => $_W['uniacid'], ':merchid' => $_W['merchid']));
+								if (!(empty($v['nickname'])) || !(empty($v['nickname']))) 
+								{
+									$row['salerinfo'] = $v['salername'] . '(' . $v['nickname'] . ')';
+								}
+							}
+							unset($v);
+						}
+					}
 				}
 			}
 			unset($row);

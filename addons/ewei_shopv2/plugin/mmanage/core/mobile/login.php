@@ -72,6 +72,19 @@ class Login_EweiShopV2Page extends MmanageMobilePage
 					show_json(0, '用户名或密码错误');
 				}
 				$account = user_single(array('username' => $username));
+				$founders = explode(',', $_W['config']['setting']['founder']);
+				if (!(in_array($account['uid'], $founders))) 
+				{
+					if ($account['status'] != 2) 
+					{
+						show_json(0, '操作员已被禁用');
+					}
+				}
+				$permission = uni_permission($account['uid'], $_W['uniacid']);
+				if (empty($permission)) 
+				{
+					show_json(0, '此账号没有管理权限');
+				}
 				$account['hash'] = md5($account['password'] . $account['salt']);
 				$session = base64_encode(json_encode($account));
 				$session_key = '__mmanage_' . $_W['uniacid'] . '_session';
@@ -81,6 +94,7 @@ class Login_EweiShopV2Page extends MmanageMobilePage
 		}
 		$shopset = $_W['shopset'];
 		$logo = tomedia($shopset['shop']['logo']);
+		$name = $shopset['shop']['name'];
 		if (is_weixin() || (!(empty($shopset['wap']['open'])) && empty($shopset['wap']['inh5app']))) 
 		{
 			$goshop = true;

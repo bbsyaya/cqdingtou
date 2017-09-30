@@ -47,10 +47,7 @@ class aliApy
 		}
 		if ($this->post['trade_status'] != 'TRADE_SUCCESS') 
 		{
-			if ($this->post['trade_status'] != 'TRADE_FINISHED') 
-			{
-				exit('fail');
-			}
+			exit('fail');
 		}
 		$this->strs = explode(':', $this->body);
 		$this->type = intval($this->strs[1]);
@@ -121,6 +118,7 @@ class aliApy
 					$ret['card_type'] = $log['card_type'];
 					$ret['card_fee'] = $log['card_fee'];
 					$ret['card_id'] = $log['card_id'];
+					pdo_update('ewei_shop_order', array('paytype' => 22), array('uniacid' => $log['uniacid'], 'ordersn' => $log['tid']));
 					$result = $site->$method($ret);
 					if ($result) 
 					{
@@ -256,7 +254,7 @@ class aliApy
 		{
 			foreach ($orderids as $o ) 
 			{
-				if ($o['orderid'] == $row['id']) 
+				while ($o['orderid'] == $row['id']) 
 				{
 					$row['level'] = $o['level'];
 					break;

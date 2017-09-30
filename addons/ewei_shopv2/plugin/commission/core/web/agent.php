@@ -146,7 +146,7 @@ class Agent_EweiShopV2Page extends PluginWebPage
 			}
 			m('excel')->export($list, array('title' => '分销商数据-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
 		}
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		load()->func('tpl');
 		include $this->template();
 	}
@@ -171,6 +171,7 @@ class Agent_EweiShopV2Page extends PluginWebPage
 	{
 		global $_W;
 		global $_GPC;
+		$agentlevels = $this->model->getLevels(true, true);
 		$level = intval($_GPC['level']);
 		$agentid = intval($_GPC['id']);
 		$member = $this->model->getInfo($agentid);
@@ -251,6 +252,10 @@ class Agent_EweiShopV2Page extends PluginWebPage
 		{
 			$condition .= ' and dm.isagent=' . intval($_GPC['isagent']);
 		}
+		if ($_GPC['agentlevel'] != '') 
+		{
+			$condition .= ' and dm.agentlevel=' . intval($_GPC['agentlevel']);
+		}
 		if ($_GPC['status'] != '') 
 		{
 			$condition .= ' and dm.status=' . intval($_GPC['status']);
@@ -289,7 +294,7 @@ class Agent_EweiShopV2Page extends PluginWebPage
 		if ($hasagent) 
 		{
 			$total = pdo_fetchcolumn('select count(dm.id) from' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' p on p.id = dm.agentid ' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid' . ' where dm.uniacid =' . $_W['uniacid'] . '  ' . $condition, $params);
-			$sql = 'select dm.*,p.nickname as parentname,p.avatar as parentavatar  from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' p on p.id = dm.agentid ' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid  and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . '  ' . $condition . '   ORDER BY dm.agenttime desc';
+			$sql = 'select dm.*,p.nickname as parentname,p.avatar as parentavatar,l.levelname as levelname  from ' . tablename('ewei_shop_member') . ' dm ' . ' left join ' . tablename('ewei_shop_member') . ' p on p.id = dm.agentid ' . ' left join ' . tablename('ewei_shop_commission_level') . ' l on l.id = dm.agentlevel' . ' left join ' . tablename('mc_mapping_fans') . 'f on f.openid=dm.openid  and f.uniacid=' . $_W['uniacid'] . ' where dm.uniacid = ' . $_W['uniacid'] . '  ' . $condition . '   ORDER BY dm.agenttime desc';
 			if (empty($_GPC['export'])) 
 			{
 				$sql .= ' limit ' . (($pindex - 1) * $psize) . ',' . $psize;

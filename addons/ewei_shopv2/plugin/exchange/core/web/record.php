@@ -271,7 +271,7 @@ class Record_EweiShopV2Page extends PluginWebPage
 			$condition .= ' and o.authorid = :authorid';
 			$paras[':authorid'] = $authorid;
 		}
-		if (($condition != ' o.uniacid = :uniacid and o.ismr=0 and o.deleted=0 and o.isparent=0') || !(empty($sqlcondition))) 
+		if (($condition != ' o.uniacid = :uniacid and o.ordersn like \'DH%\' and o.ismr=0 and o.deleted=0 and o.isparent=0') || !(empty($sqlcondition))) 
 		{
 			$sql = 'select o.* , a.realname as arealname,a.mobile as amobile,a.province as aprovince ,a.city as acity , a.area as aarea,a.address as aaddress, d.dispatchname,m.nickname,m.id as mid,m.realname as mrealname,m.mobile as mmobile,sm.id as salerid,sm.nickname as salernickname,s.salername,r.rtype,r.status as rstatus from ' . tablename('ewei_shop_order') . ' o' . ' left join ' . tablename('ewei_shop_order_refund') . ' r on r.id =o.refundid ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid and m.uniacid =  o.uniacid ' . ' left join ' . tablename('ewei_shop_member_address') . ' a on a.id=o.addressid ' . ' left join ' . tablename('ewei_shop_dispatch') . ' d on d.id = o.dispatchid ' . ' left join ' . tablename('ewei_shop_saler') . ' s on s.openid = o.verifyopenid and s.uniacid=o.uniacid' . ' left join ' . tablename('ewei_shop_member') . ' sm on sm.openid = s.openid and sm.uniacid=s.uniacid' . ' ' . $sqlcondition . ' where ' . $condition . ' ' . $statuscondition . ' GROUP BY o.id ORDER BY o.createtime DESC  ';
 			if (empty($_GPC['export'])) 
@@ -754,7 +754,7 @@ class Record_EweiShopV2Page extends PluginWebPage
 			unset($r);
 			m('excel')->export($exportlist, array('title' => '订单数据-' . date('Y-m-d-H-i', time()), 'columns' => $columns));
 		}
-		if (($condition != ' o.uniacid = :uniacid and o.ismr=0 and o.deleted=0 and o.isparent=0') || !(empty($sqlcondition))) 
+		if (($condition != ' o.uniacid = :uniacid and o.ordersn like \'DH%\' o.ismr=0 and o.deleted=0 and o.isparent=0') || !(empty($sqlcondition))) 
 		{
 			$t = pdo_fetch('SELECT COUNT(*) as count, ifnull(sum(o.price),0) as sumprice   FROM ' . tablename('ewei_shop_order') . ' o ' . ' left join ' . tablename('ewei_shop_order_refund') . ' r on r.id =o.refundid ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid  and m.uniacid =  o.uniacid' . ' left join ' . tablename('ewei_shop_member_address') . ' a on o.addressid = a.id ' . ' left join ' . tablename('ewei_shop_saler') . ' s on s.openid = o.verifyopenid and s.uniacid=o.uniacid' . ' left join ' . tablename('ewei_shop_member') . ' sm on sm.openid = s.openid and sm.uniacid=s.uniacid' . ' ' . $sqlcondition . ' WHERE ' . $condition . ' ' . $statuscondition, $paras);
 		}
@@ -764,21 +764,10 @@ class Record_EweiShopV2Page extends PluginWebPage
 		}
 		$total = $t['count'];
 		$totalmoney = $t['sumprice'];
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		$stores = pdo_fetchall('select id,storename from ' . tablename('ewei_shop_store') . ' where uniacid=:uniacid ', array(':uniacid' => $uniacid));
 		$r_type = array('退款', '退货退款', '换货');
 		load()->func('tpl');
-		$li = $list;
-		unset($list);
-		$c = 0;
-		foreach ($li as $k => $v ) 
-		{
-			if (substr($v['ordersn'], 0, 2) == 'DH') 
-			{
-				$list[$c] = $v;
-				++$c;
-			}
-		}
 		include $this->template('exchange/record/list');
 	}
 }

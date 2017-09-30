@@ -26,6 +26,10 @@
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/coupon.css?v=2.0.0">
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/coupon-new.css?v=2017030302">
 
+{if !empty($islive)}
+    <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/plugin/live/static/css/living.css?v=20170628" />
+{/if}
+
 <div class='fui-page fui-page-current  page-goods-detail' id='page-goods-detail-index'>
     {if $diypage['followbar']}
         {php $this->followBar(true)}
@@ -542,7 +546,8 @@
             attachurl_local:"{$GLOBALS['_W']['attachurl_local']}",
             attachurl_remote:"{$GLOBALS['_W']['attachurl_remote']}",
             coupons: {php echo json_encode($coupons)},
-            new_temp: {$new_temp}
+            new_temp: {$new_temp},
+            liveid: {$liveid}
         });
     });
 

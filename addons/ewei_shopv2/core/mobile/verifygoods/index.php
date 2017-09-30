@@ -92,9 +92,12 @@ class Index_EweiShopV2Page extends MobilePage
 			{
 				$row['canuse'] = 1;
 			}
-			if (!(empty($row['card_id'])) && empty($row['activecard'])) 
+			if (is_weixin()) 
 			{
-				$row['cangetcard'] = 1;
+				if (!(empty($row['card_id'])) && empty($row['activecard'])) 
+				{
+					$row['cangetcard'] = 1;
+				}
 			}
 		}
 		unset($row);

@@ -317,7 +317,7 @@ class Member_EweiShopV2Model
 		$member = array();
 		$shopset = m('common')->getSysset(array('shop', 'wap'));
 		$openid = $_W['openid'];
-		if (($_W['routes'] == 'order.pay_alipay') || ($_W['routes'] == 'creditshop.log.dispatch_complete') || ($_W['routes'] == 'threen.register.threen_complete') || ($_W['routes'] == 'creditshop.detail.creditshop_complete') || ($_W['routes'] == 'order.pay_alipay.recharge_complete') || ($_W['routes'] == 'order.pay_alipay.complete') || ($_W['routes'] == 'newmr.alipay') || ($_W['routes'] == 'newmr.callback.gprs') || ($_W['routes'] == 'newmr.callback.bill') || ($_W['routes'] == 'account.sns') || ($_W['plugin'] == 'mmanage')) 
+		if (($_W['routes'] == 'order.pay_alipay') || ($_W['routes'] == 'creditshop.log.dispatch_complete') || ($_W['routes'] == 'threen.register.threen_complete') || ($_W['routes'] == 'creditshop.detail.creditshop_complete') || ($_W['routes'] == 'order.pay_alipay.recharge_complete') || ($_W['routes'] == 'order.pay_alipay.complete') || ($_W['routes'] == 'newmr.alipay') || ($_W['routes'] == 'newmr.callback.gprs') || ($_W['routes'] == 'newmr.callback.bill') || ($_W['routes'] == 'account.sns') || ($_W['plugin'] == 'mmanage') || ($_W['routes'] == 'live.send.credit') || ($_W['routes'] == 'live.send.coupon')) 
 		{
 			return;
 		}
@@ -336,6 +336,10 @@ class Member_EweiShopV2Model
 			{
 				return array('openid' => $_W['openid']);
 			}
+		}
+		if (!(is_error($redis))) 
+		{
+			$redis->set($_W['openid'], 1, 20);
 		}
 		if (empty($openid) && !(EWEI_SHOPV2_DEBUG)) 
 		{
@@ -364,10 +368,6 @@ class Member_EweiShopV2Model
 			$mc['gender'] = $userinfo['sex'];
 			$mc['resideprovince'] = $userinfo['province'];
 			$mc['residecity'] = $userinfo['city'];
-		}
-		if (!(is_error($redis))) 
-		{
-			$redis->set($_W['openid'], 1, 20);
 		}
 		if (empty($member) && !(empty($openid))) 
 		{

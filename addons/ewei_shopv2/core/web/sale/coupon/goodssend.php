@@ -93,6 +93,14 @@ class Goodssend_EweiShopV2Page extends ComWebPage
 			}
 			show_json(1, array('url' => webUrl('sale.coupon.goodssend')));
 		}
+		if (empty($item['starttime'])) 
+		{
+			$item['starttime'] = time();
+		}
+		if (empty($item['endtime'])) 
+		{
+			$item['endtime'] = time() + (60 * 60 * 24 * 7);
+		}
 		include $this->template();
 	}
 	public function delete() 

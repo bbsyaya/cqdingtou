@@ -76,6 +76,11 @@ class Index_EweiShopV2Page extends WebPage
 			$status = 0;
 			$condition .= ' AND g.`deleted`=1';
 		}
+		else if ($goodsfrom == 'verify') 
+		{
+			$status = 0;
+			$condition .= ' AND g.`deleted`=0 and merchid>0 and checked=1';
+		}
 		$sql = 'SELECT g.id FROM ' . tablename('ewei_shop_goods') . 'g' . $sqlcondition . $condition . $groupcondition;
 		$total_all = pdo_fetchall($sql, $params);
 		$total = count($total_all);
@@ -126,6 +131,10 @@ class Index_EweiShopV2Page extends WebPage
 	public function cycle() 
 	{
 		$this->main('cycle');
+	}
+	public function verify() 
+	{
+		$this->main('verify');
 	}
 	public function create() 
 	{
@@ -590,10 +599,24 @@ class Index_EweiShopV2Page extends WebPage
 		{
 			show_json(0, array('message' => '参数错误'));
 		}
-		$goods = pdo_fetch('select id,hasoption from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $id));
+		$goods = pdo_fetch('select id,hasoption,marketprice,dowpayment from ' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $id));
 		if (empty($goods)) 
 		{
 			show_json(0, array('message' => '参数错误'));
+		}
+		if ($type == 'dowpayment') 
+		{
+			if ($goods['marketprice'] < $value) 
+			{
+				show_json(0, array('message' => '定金不能大于总价'));
+			}
+		}
+		else if ($type == 'marketprice') 
+		{
+			if ($value < $goods['dowpayment']) 
+			{
+				show_json(0, array('message' => '总价不能小于定金'));
+			}
 		}
 		pdo_update('ewei_shop_goods', array($type => $value), array('id' => $id));
 		if ($goods['hasoption'] == 0) 
@@ -636,6 +659,7 @@ class Index_EweiShopV2Page extends WebPage
 		global $_GPC;
 		$kwd = trim($_GPC['keyword']);
 		$type = intval($_GPC['type']);
+		$live = intval($_GPC['live']);
 		$params = array();
 		$params[':uniacid'] = $_W['uniacid'];
 		$condition = ' and status=1 and deleted=0 and uniacid=:uniacid';
@@ -653,7 +677,7 @@ class Index_EweiShopV2Page extends WebPage
 			$condition .= ' AND `type` = :type ';
 			$params[':type'] = $type;
 		}
-		$ds = pdo_fetchall('SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,content, sales' . "\r\n" . '              FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
+		$ds = pdo_fetchall('SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,sales,islive,liveprice FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
 		$ds = set_medias($ds, array('thumb', 'share_icon'));
 		if ($_GPC['suggest']) 
 		{

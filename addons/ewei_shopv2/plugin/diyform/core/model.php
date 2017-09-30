@@ -430,7 +430,8 @@ class DiyformModel extends PluginModel
 			$sql = 'select * from ' . tablename($table_name) . ' where cid=:cid and diyformid=:diyformid and uniacid=:uniacid and openid=:openid and type=:type order by id desc Limit 1';
 			$params = array(':cid' => $cid, ':diyformid' => $diyformid, ':uniacid' => $_W['uniacid'], ':openid' => $member['openid'], ':type' => $type);
 			$diyform_data = pdo_fetch($sql, $params);
-			$data = $diyform_data['diyformdata'];
+			$DiyformInfo = $this->getDiyformInfo($diyformid, 0);
+			$data = ((empty($DiyformInfo['savedata']) ? $diyform_data['diyformdata'] : ''));
 			if (empty($data)) 
 			{
 				$table_name = 'ewei_shop_order_goods';
@@ -461,10 +462,14 @@ class DiyformModel extends PluginModel
 		$f_data = array();
 		if (!(empty($diyformid))) 
 		{
-			$order = pdo_fetch('select diyformdata,diyformfields from ' . tablename('ewei_shop_order') . ' where diyformid=:diyformid and openid=:openid order by id desc limit 1', array(':diyformid' => $diyformid, ':openid' => $member['openid']));
-			if (!(empty($order))) 
+			$DiyformInfo = $this->getDiyformInfo($diyformid, 0);
+			if (empty($DiyformInfo['savedata'])) 
 			{
-				$f_data = $this->getDiyformData($order['diyformdata'], iunserializer($order['diyformfields']), $member, 1, 1);
+				$order = pdo_fetch('select diyformdata,diyformfields from ' . tablename('ewei_shop_order') . ' where diyformid=:diyformid and openid=:openid order by id desc limit 1', array(':diyformid' => $diyformid, ':openid' => $member['openid']));
+				if (!(empty($order))) 
+				{
+					$f_data = $this->getDiyformData($order['diyformdata'], iunserializer($order['diyformfields']), $member, 1, 1);
+				}
 			}
 		}
 		return $f_data;
@@ -493,6 +498,10 @@ class DiyformModel extends PluginModel
 		$sql = 'select * from ' . tablename('ewei_shop_diyform_temp') . ' where cid=:cid and diyformid=:diyformid and openid=:openid and type=:type and uniacid=:uniacid Limit 1';
 		$params = array(':cid' => $goodsid, ':diyformid' => $diyformid, ':openid' => $openid, ':type' => $type, ':uniacid' => $_W['uniacid']);
 		$data = pdo_fetch($sql, $params);
+		if (!(empty($data['savedata']))) 
+		{
+			$data['diyformdata'] = '';
+		}
 		return $data;
 	}
 	public function getCountGoodsUsed($diyformid, $diyformtype = -1) 

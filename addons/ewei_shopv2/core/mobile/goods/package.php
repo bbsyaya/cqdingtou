@@ -79,7 +79,12 @@ class Package_EweiShopV2Page extends MobilePage
 		$goodsid = intval($_GPC['goodsid']);
 		$optionid = array();
 		$option = array();
-		$option = pdo_fetchall('select optionid,title,goodsid,packageprice from ' . tablename('ewei_shop_package_goods_option') . ' where pid = ' . $pid . ' and goodsid = ' . $goodsid . ' and uniacid = ' . $uniacid . ' ');
+		$packgoods = pdo_fetch('SELECT id,title,`option` FROM ' . tablename('ewei_shop_package_goods') . "\n" . '                    WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and pid = ' . $pid . '  ORDER BY id DESC');
+		$optionid = explode(',', $packgoods['option']);
+		foreach ($optionid as $key => $value ) 
+		{
+			$option[$key] = pdo_fetch('SELECT id,title,packageprice,optionid,goodsid FROM ' . tablename('ewei_shop_package_goods_option') . "\n" . '                    WHERE uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and optionid = ' . intval($value) . ' ORDER BY id DESC');
+		}
 		show_json(1, $option);
 	}
 }

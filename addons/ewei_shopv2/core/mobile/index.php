@@ -9,6 +9,7 @@ class Index_EweiShopV2Page extends MobilePage
 	{
 		global $_W;
 		global $_GPC;
+		$_SESSION['newstoreid'] = 0;
 		$this->diypage('home');
 		$uniacid = $_W['uniacid'];
 		$mid = intval($_GPC['mid']);
@@ -39,6 +40,7 @@ class Index_EweiShopV2Page extends MobilePage
 			, $index_cache);
 		}
 		$shop_data = m('common')->getSysset('shop');
+		$cpinfos = com('coupon')->getInfo();
 		include $this->template();
 	}
 	public function get_recommand() 

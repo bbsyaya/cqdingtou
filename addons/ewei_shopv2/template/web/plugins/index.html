@@ -104,8 +104,7 @@
 							// End -->
 							</Script>
 							{elseif $_W['role'] != 'founder' && $plugin['isplugingrant']>0}
-							<Script Language="JavaScript">
-                                <!-- Begin
+							<script type="text/javascript">
                                 var timedate= new Date({$plugin['permendtime']}*1000);
                                 var month = {$plugin['month']};
                                 var isperm = {$plugin['isperm']};
@@ -125,8 +124,7 @@
                                         }
 									}
 								};
-                                // End -->
-							</Script>
+							</script>
 							{/if}
 							<br>
 							<small class="text-muted">{$plugin['desc']}</small>

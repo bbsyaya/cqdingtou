@@ -4212,13 +4212,4 @@ font-size:0.6rem;line-height: 0.8rem;}
 .fui-payinfo-log-floor span.price{color:#f60;}
 .fui-payinfo-log-floor{height:1rem;line-height: 1rem;}
 
-
-
-
-
-
-
-
-
-
-
+.live-price {display: inline-block; color: #fff; font-size: 0.65rem; background: #ef4f4f; height: 1rem; line-height: 1rem; vertical-align: middle; padding: 0 0.1rem;}

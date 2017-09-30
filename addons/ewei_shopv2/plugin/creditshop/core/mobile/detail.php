@@ -688,7 +688,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		{
 			if ($log['paytype'] == 0) 
 			{
-				m('member')->setCredit($openid, 'credit2', -($goods['money'] + $goods['dispatch']), '积分商城抽奖扣除余额度 ' . $goods['money']);
+				m('member')->setCredit($openid, 'credit2', -($goods['money'] + $goods['dispatch']), '积分商城扣除余额度 ' . $goods['money']);
 				$update['paystatus'] = 1;
 			}
 			if ($log['paytype'] == 1) 
@@ -714,7 +714,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		}
 		if ((0 < $goods['credit']) && empty($log['creditpay'])) 
 		{
-			m('member')->setCredit($openid, 'credit1', -$goods['credit'], '积分商城抽奖扣除积分 ' . $goods['credit']);
+			m('member')->setCredit($openid, 'credit1', -$goods['credit'], '积分商城扣除积分 ' . $goods['credit']);
 			$update['creditpay'] = 1;
 			pdo_query('update ' . tablename('ewei_shop_creditshop_goods') . ' set joins=joins+1 where id=' . $log['goodsid']);
 		}
