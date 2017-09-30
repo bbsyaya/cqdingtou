@@ -98,7 +98,7 @@
                 </div>
             </div>
             {/if}
-            {if $cash['success'] && empty($ispeerpay)}
+            {if $cash['success'] && empty($ispeerpay)&&!$haveverifygood}
             <div class='fui-list pay-btn' data-type='cash'>
                 <div class='fui-list-media'>
                     <i class='icon icon-deliver1 cash'></i>
@@ -110,7 +110,7 @@
                 <div class='fui-list-angle'><span class="angle"></span></div>
             </div>
             {/if}
-            {if (!($ispeerpay)) && !empty($peerPaySwi)}
+            {if empty($ispeerpay) && !empty($peerPaySwi)}
             <div class='fui-list pay-btn' data-type='peerpay'>
                 <div class='fui-list-media'>
                     <i class='icon icon-natice peerpay' style="background: #ff9326;color: #fff"></i>

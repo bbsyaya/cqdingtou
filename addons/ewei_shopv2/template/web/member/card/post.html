@@ -60,12 +60,12 @@
                 <div class="logo">
                     <img id="logoimg" src="{if empty($card)}../addons/ewei_shopv2/static/images/default.png{else}{$card['card_logoimg']}{/if}"/>
                 </div>
-                <div class="name"  id="title">
-                    {php echo empty($card['card_brand_name'])?'会员卡标题名称':$card['card_brand_name']}
+                <div class="name"  id="brandname">
+                    {php echo empty($card['card_brand_name'])?'会员卡商铺名称':$card['card_brand_name']}
                 </div>
                 </br>
-                <div class="name"  id="brandname">
-                    {php echo empty($card['card_title'])?'会员卡商铺名称':$card['card_title']}
+                <div class="name"  id="title">
+                    {php echo empty($card['card_title'])?'会员卡标题名称':$card['card_title']}
                 </div>
                 <div class="code">
                     <img src="../addons/ewei_shopv2/static/images/code.jpg" alt="" />
@@ -105,6 +105,21 @@
         <div class="control" style="padding: 10px;margin-top: 30px;border: 1px solid #d0d1d2;width: 582px;">
             <div class="editor_section">
 
+                <!--商铺名称-->
+                <div class="control-group limit">
+                    <div class="frm_label pull-left">
+                        商铺名称<span style="color: red;">*</span>
+                    </div>
+                    <div class="frm_controls">
+                        {ifp 'member.card'}
+                        <input type="text" name="card_brand_name" id="card_brand_name" class="input" value="{$card['card_brand_name']}" {if !empty($card)}disabled{/if} maxlength=15/>
+                        {else}
+                        {$card['card_brand_name']}
+                        {/if}
+                    </div>
+                    <p class='card_tip'>商铺名称创建后无法修改</p>
+                </div>
+
                 <!--会员卡标题-->
                 <div class="control-group limit">
                     <div class="frm_label pull-left">
@@ -121,20 +136,6 @@
                     <p class='card_tip'>会员卡标题创建后无法修改</p>
                 </div>
 
-                <!--商铺名称-->
-                <div class="control-group limit">
-                    <div class="frm_label pull-left">
-                        商铺名称<span style="color: red;">*</span>
-                    </div>
-                    <div class="frm_controls">
-                        {ifp 'member.card'}
-                        <input type="text" name="card_brand_name" id="card_brand_name" class="input" value="{$card['card_brand_name']}" {if !empty($card)}disabled{/if} maxlength=15/>
-                        {else}
-                        {$card['card_brand_name']}
-                        {/if}
-                    </div>
-                    <p class='card_tip'>商铺名称创建后无法修改</p>
-                </div>
                 <hr style="height: 3px; background: #fff;margin: 0 -30px">
 
                 <!--库存总量-->
@@ -161,12 +162,12 @@
                         <div class="frm-image">
                             <input type="hidden" name="card_logoimg" id="card_logoimg" value="{$card['card_logoimg']}"/>
                             <input type="hidden" name="card_logolocalpath" id="card_logolocalpath" value=""/>
-                            <img  id="showlogo"  src="{if empty($card)}../addons/ewei_shopv2/static/images/default.png{else}{$card['card_logoimg']}{/if}"/>
+                            <img  id="showlogo" style="border-radius: 50%" src="{if empty($card)}../addons/ewei_shopv2/static/images/default.png{else}{$card['card_logoimg']}{/if}" />
                         </div>
                     </div>
                     <div class="frm_controls">
                         <a class="btn btn-default upload" href="javascript:void(0);" {ifp 'member.card'}id="uploadlogo"{else}disabled{/if} >上传图片</a>
-                        <p class='frm_tip'>卡券的商户logo，建议像素为300*300。图片大小不能超过1mb,仅支持jpg,png格式</p>
+                        <p class='frm_tip'>会员卡的商户logo，建议像素为300*300。图片大小不能超过1mb,仅支持jpg,png格式</p>
                     </div>
                 </div>
 
@@ -214,7 +215,7 @@
                     </div>
                     <div class="frm_controls">
                         <a class="btn btn-default upload" href="javascript:void(0);" {ifp 'member.card'} id="uploadbackground"    {else}disabled{/if} >上传图片</a>
-                        <p class='frm_tip'>卡券的商户logo，建议像素为1000*600。图片大小不能超过1mb,仅支持jpg,png格式</p>
+                        <p class='frm_tip'>会员卡背景图，建议像素为1000*600。图片大小不能超过1mb,仅支持jpg,png格式</p>
                     </div>
                 </div>
 
@@ -377,7 +378,11 @@
 </div>
 <div class='panel-body' style="text-align: right;">
     <a class="btn btn-default  btn-sm" href="{php echo webUrl('member.card')}">返回</a>
+    {ifp 'member.card.add|member.card.edit'}
     <input type="submit" value="提交" class="btn btn-primary"/>
+    {else}
+    {$card['custom_cell1_url']}
+    {/if}
 </div>
 </form>
 <script type="text/javascript" src="../addons/ewei_shopv2/static/js/app/biz/sale/wxcard/colorpalette.js" charset="utf-8"></script>

@@ -32,6 +32,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$json = json_encode($json_arr);
 		$this->model->setShare($set);
 		$texts = array('sign' => $set['textsign'], 'signed' => $set['textsigned'], 'signold' => $set['textsignold'], 'credit' => $set['textcredit'], 'color' => $set['maincolor']);
+		$p = $this->model->getSet();
 		include $this->template();
 	}
 	public function getCalendar() 
@@ -63,7 +64,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			show_json(0, $set['textcredit'] . $set['textsign'] . '未开启!');
 		}
 		$date = trim($_GPC['date']);
-		$date = (($date == 'null' ? '' : $date));
+		(($date == 'null' ? '' : $date));
 		$signinfo = $this->model->getSign($date);
 		if (!(empty($date))) 
 		{
@@ -306,6 +307,11 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			}
 		}
 		show_json(1, array('total' => $total, 'list' => $list, 'pagesize' => $psize));
+	}
+	public function footerMenus($a, $b) 
+	{
+		$p = $this->model->getSet();
+		include $this->template('sign/_menu');
 	}
 }
 ?>

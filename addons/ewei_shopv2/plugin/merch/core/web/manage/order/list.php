@@ -519,13 +519,43 @@ class List_EweiShopV2Page extends MerchWebPage
 				$row['finishtime'] = ((!(empty($row['finishtime'])) ? date('Y-m-d H:i:s', $row['finishtime']) : ''));
 				$row['salerinfo'] = '';
 				$row['storeinfo'] = '';
-				if (!(empty($row['verifyopenid']))) 
+				if (com('verify')) 
 				{
-					$row['salerinfo'] = '[' . $row['salerid'] . ']' . $row['salername'] . '(' . $row['salernickname'] . ')';
-				}
-				if (!(empty($row['verifystoreid']))) 
-				{
-					$row['storeinfo'] = pdo_fetchcolumn('select storename from ' . tablename('ewei_shop_merch_store') . ' where id=:storeid limit 1 ', array(':storeid' => $row['verifystoreid']));
+					$verifyinfo = iunserializer($row['verifyinfo']);
+					if (!(empty($row['verifyopenid']))) 
+					{
+						$saler = m('member')->getMember($row['verifyopenid']);
+						$merch_saler = pdo_fetch('select id,salername from ' . tablename('ewei_shop_merch_saler') . ' where openid=:openid and uniacid=:uniacid and merchid = :merchid limit 1 ', array(':uniacid' => $_W['uniacid'], ':merchid' => $_W['merchid'], ':openid' => $row['verifyopenid']));
+						$saler['salername'] = ((isset($merch_saler['salername']) ? $merch_saler['salername'] : ''));
+						$row['salerinfo'] = (('[' . isset($merch_saler['id']) ? $merch_saler['id'] : '' . ']' . $saler['salername'] . '(' . $row['nickname'] . ')'));
+					}
+					if (!(empty($row['verifystoreid']))) 
+					{
+						$row['storeinfo'] = pdo_fetchcolumn('select storename from ' . tablename('ewei_shop_merch_store') . ' where id=:storeid limit 1 ', array(':storeid' => $row['verifystoreid']));
+					}
+					if ($row['isverify']) 
+					{
+						if (is_array($verifyinfo)) 
+						{
+							if (empty($row['dispatchtype'])) 
+							{
+								$v = $verifyinfo[0];
+								if ($v['verified'] || ($row['verifytype'] == 1)) 
+								{
+									$v['storename'] = pdo_fetchcolumn('select storename from ' . tablename('ewei_shop_merch_store') . ' where id=:id limit 1', array(':id' => $v['verifystoreid']));
+									if (empty($v['storename'])) 
+									{
+										$v['storename'] = '总店';
+									}
+									$row['storeinfo'] = $v['storename'];
+									$v['nickname'] = pdo_fetchcolumn('select nickname from ' . tablename('ewei_shop_member') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':openid' => $v['verifyopenid'], ':uniacid' => $_W['uniacid']));
+									$v['salername'] = pdo_fetchcolumn('select salername from ' . tablename('ewei_shop_merch_saler') . ' where openid=:openid and uniacid=:uniacid and merchid = :merchid limit 1', array(':openid' => $v['verifyopenid'], ':uniacid' => $_W['uniacid'], ':merchid' => $_W['merchid']));
+									$row['salerinfo'] = $v['salername'] . '(' . $v['nickname'] . ')';
+								}
+								unset($v);
+							}
+						}
+					}
 				}
 				if (p('diyform') && !(empty($row['diyformfields'])) && !(empty($row['diyformdata']))) 
 				{
@@ -596,7 +626,7 @@ class List_EweiShopV2Page extends MerchWebPage
 		$t = pdo_fetch('SELECT COUNT(*) as count, ifnull(sum(o.price),0) as sumprice   FROM ' . tablename('ewei_shop_order') . ' o ' . ' left join ' . tablename('ewei_shop_order_refund') . ' r on r.id =o.refundid ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid=o.openid  and m.uniacid =  o.uniacid' . ' left join ' . tablename('ewei_shop_member_address') . ' a on o.addressid = a.id ' . ' left join ' . tablename('ewei_shop_merch_saler') . ' s on s.openid = o.verifyopenid and s.uniacid=o.uniacid and s.merchid=o.merchid' . ' left join ' . tablename('ewei_shop_member') . ' sm on sm.openid = s.openid and sm.uniacid=s.uniacid' . ' ' . $sqlcondition . ' WHERE ' . $condition . ' ' . $statuscondition, $paras);
 		$total = $t['count'];
 		$totalmoney = $t['sumprice'];
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		$stores = pdo_fetchall('select id,storename from ' . tablename('ewei_shop_merch_store') . ' where uniacid=:uniacid and merchid = :merchid', array(':uniacid' => $uniacid, ':merchid' => $_W['merchid']));
 		$r_type = array('退款', '退货退款', '换货');
 		load()->func('tpl');

@@ -220,6 +220,13 @@
 			</div>
 		{/if}
 
+	<div class="fui-cell-group fui-cell-click">
+		<a class="fui-cell" href="{php echo mobileUrl('verifygoods')}">
+			<div class="fui-cell-icon"><i class="icon icon-same"></i></div>
+			<div class="fui-cell-text"><p>核销商品信息</p></div>
+			<div class="fui-cell-remark"></div>
+		</a>
+	</div>
 
 		{if $hasLineUp}
 		<div class="fui-cell-group fui-cell-click">
@@ -346,9 +353,6 @@
 </div>
 
 <script  language='javascript'>
-	require(['biz/sale/coupon/common'], function (modal) {modal.init();});
-
-
 	function addCard(card_id) {
 
 		var data = {'openid': '{php echo $_W["openid"]}', 'card_id': card_id};

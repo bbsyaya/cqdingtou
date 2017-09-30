@@ -15,7 +15,9 @@
     	<li {if $_W['action']=='member.group'} class="active" {/if}><a href="{php echo webUrl('member/group')}">会员分组</a></li>
     {/if}
     {ifp 'member.card'}
-    <li {if $_W['action']=='member.group'} class="active" {/if}><a href="{php echo webUrl('member/card')}">微信会员卡设置</a></li>
+        {if com('wxcard')}
+            <li {if $_W['action']=='member.group'} class="active" {/if}><a href="{php echo webUrl('member/card')}">微信会员卡设置</a></li>
+        {/if}
     {/if}
 </ul>
 {/if}

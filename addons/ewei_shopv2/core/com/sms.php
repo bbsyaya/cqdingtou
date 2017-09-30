@@ -18,18 +18,18 @@ class Sms_EweiShopV2ComModel extends ComModel
 		if ($template['type'] == 'juhe') 
 		{
 			$data = array('mobile' => $mobile, 'tpl_id' => $template['smstplid'], 'tpl_value' => $params, 'key' => $smsset['juhe_key']);
-			$result = $this->http_post('http://v.juhe.cn/sms/send', $data);
+			load()->func('communication');
+			$result = ihttp_post('http://v.juhe.cn/sms/send', $data);
+			$result = $result['content'];
 			if (empty($result) || (0 < $result['error_code'])) 
 			{
 				return array('status' => 0, 'message' => '短信发送失败(' . $result['error_code'] . ')：' . json_encode($result['reason']));
-			
-						
+				
 				
 			}
 		}
-		
-			if ($template['type'] == 'dayu') 
-				{
+		if ($template['type'] == 'dayu') 
+		{
 					include_once EWEI_SHOPV2_VENDOR . 'dayu/TopSdk.php';
 					$dayuClient = new TopClient();
 					$dayuClient->appkey = $smsset['dayu_key'];
@@ -47,23 +47,42 @@ class Sms_EweiShopV2ComModel extends ComModel
 						return array('status' => 0, 'message' => '短信发送失败(' . $dayuResult['sub_msg'] . '/code: ' . $dayuResult['code'] . '/sub_code: ' . $dayuResult['sub_code'] . ')');
 						
 					}
-				}
+		}
+		if ($template['type'] == 'aliyun') 
+		{
+							load()->func('communication');
+							$paramstr = http_build_query(array('ParamString' => $params, 'RecNum' => $mobile, 'SignName' => $template['smssign'], 'TemplateCode' => $template['smstplid']));
+							$header = array('Authorization' => 'APPCODE ' . $smsset['aliyun_appcode']);
+							$request = ihttp_request('http://sms.market.alicloudapi.com/singleSendSms?' . $paramstr, '', $header);
+							$result = json_decode($request['content'], true);
+							if (!($result['success']) || ($request['code'] != 200)) 
+							{
+								if ($request['code'] != 200) 
+								{
+									$result['message'] = $request['headers']['X-Ca-Error-Message'];
+								}
+								return array('status' => 0, 'message' => '短信发送失败(错误信息: ' . $result['message'] . ')');
+							
+								
+							}
+		}
+		
 			if ($template['type'] == 'emay') 
-			{
-							include_once EWEI_SHOPV2_VENDOR . 'emay/SMSUtil.php';
-							$balance = $this->sms_num('emay', $smsset);
-							if ($balance <= 0) 
-							{
-								return array('status' => 0, 'message' => '短信发送失败(亿美软通余额不足, 当前余额' . $balance . ')');
-							}
-							$emayClient = new SMSUtil($smsset['emay_url'], $smsset['emay_sn'], $smsset['emay_pw'], $smsset['emay_sk'], array('proxyhost' => $smsset['emay_phost'], 'proxyport' => $smsset['pport'], 'proxyusername' => $smsset['puser'], 'proxypassword' => $smsset['ppw']), $smsset['emay_out'], $smsset['emay_outresp']);
-							$emayResult = $emayClient->send($mobile, '【' . $template['smssign'] . '】' . $params);
-							if (!(empty($emayResult))) 
-							{
-								return array('status' => 0, 'message' => '短信发送失败(错误信息: ' . $emayResult . ')');
-							}
-			}
-						
+		{
+									include_once EWEI_SHOPV2_VENDOR . 'emay/SMSUtil.php';
+									$balance = $this->sms_num('emay', $smsset);
+									if ($balance <= 0) 
+									{
+										return array('status' => 0, 'message' => '短信发送失败(亿美软通余额不足, 当前余额' . $balance . ')');
+									}
+									$emayClient = new SMSUtil($smsset['emay_url'], $smsset['emay_sn'], $smsset['emay_pw'], $smsset['emay_sk'], array('proxyhost' => $smsset['emay_phost'], 'proxyport' => $smsset['pport'], 'proxyusername' => $smsset['puser'], 'proxypassword' => $smsset['ppw']), $smsset['emay_out'], $smsset['emay_outresp']);
+									$emayResult = $emayClient->send($mobile, '【' . $template['smssign'] . '】' . $params);
+									if (!(empty($emayResult))) 
+									{
+										return array('status' => 0, 'message' => '短信发送失败(错误信息: ' . $emayResult . ')');
+										
+									}
+		}
 		
 		return array('status' => 1);
 	}
@@ -85,6 +104,10 @@ class Sms_EweiShopV2ComModel extends ComModel
 			else if ($item['type'] == 'dayu') 
 			{
 				$item['name'] = '[大于]' . $item['name'];
+			}
+			else if ($item['type'] == 'aliyun') 
+			{
+				$item['name'] = '[阿里云]' . $item['name'];
 			}
 			else if ($item['type'] == 'emay') 
 			{
@@ -176,6 +199,25 @@ class Sms_EweiShopV2ComModel extends ComModel
 				return array('status' => 0, 'message' => '未填写阿里大于短信签名!');
 			}
 		}
+		else if ($template['type'] == 'aliyun') 
+		{
+			if (empty($smsset['aliyun'])) 
+			{
+				return array('status' => 0, 'message' => '未开启阿里云短信!');
+			}
+			if (empty($smsset['aliyun_appcode'])) 
+			{
+				return array('status' => 0, 'message' => '未填写阿里云短信AppCode!');
+			}
+			if (empty($template['data']) || !(is_array($template['data']))) 
+			{
+				return array('status' => 0, 'message' => '模板类型错误!');
+			}
+			if (empty($template['smssign'])) 
+			{
+				return array('status' => 0, 'message' => '未填写阿里云短信签名!');
+			}
+		}
 		else if ($template['type'] == 'emay') 
 		{
 			if (empty($smsset['emay'])) 
@@ -252,13 +294,16 @@ class Sms_EweiShopV2ComModel extends ComModel
 				++$i;
 			}
 		}
-		else if ($type == 'dayu') 
+		else 
 		{
-			$result = json_encode($data);
-		}
-		else if ($type == 'emay') 
-		{
-			$result = $data;
+			if (($type == 'dayu') || ($type == 'aliyun')) 
+			{
+				$result = json_encode($data);
+			}
+			else if ($type == 'emay') 
+			{
+				$result = $data;
+			}
 		}
 		return $result;
 	}
@@ -268,6 +313,15 @@ class Sms_EweiShopV2ComModel extends ComModel
 		$options = array( 'http' => array('method' => 'POST', 'header' => 'Content-type:application/x-www-form-urlencoded', 'content' => $postData, 'timeout' => 15 * 60) );
 		$context = stream_context_create($options);
 		$result = file_get_contents($url, false, $context);
+		if (!(is_array($result))) 
+		{
+			$result = json_decode($result, true);
+		}
+		return $result;
+	}
+	protected function http_get($url) 
+	{
+		$result = file_get_contents($url, false);
 		if (!(is_array($result))) 
 		{
 			$result = json_decode($result, true);

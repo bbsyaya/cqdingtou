@@ -21,7 +21,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 		}
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_message_mass_task') . ' WHERE 1 ' . $condition . '  ORDER BY id asc limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_message_mass_task') . ' WHERE 1 ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		foreach ($list as &$item ) 
 		{
 			switch ($item['status']) 
@@ -87,7 +87,7 @@ class Index_EweiShopV2Page extends PluginWebPage
 		}
 		$list = pdo_fetchall('SELECT *  FROM ' . tablename('ewei_message_mass_sign') . ' WHERE 1 ' . $condition . '  ORDER BY id asc limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_message_mass_sign') . ' WHERE 1 ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 
@@ -314,7 +314,8 @@ class Index_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 		$successnum = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_message_mass_sign') . 'WHERE taskid =\'' . $id . '\'  and status =3  and uniacid = \'' . $_W['uniacid'] . '\'');
 		$failnum = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_message_mass_sign') . 'WHERE taskid =\'' . $id . '\'  and status =4  and uniacid = \'' . $_W['uniacid'] . '\'');
-		$data = array('successnum' => intval($successnum), 'failnum' => intval($failnum));
+		$sendnum = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_message_mass_sign') . 'WHERE taskid =\'' . $id . '\'   and uniacid = \'' . $_W['uniacid'] . '\'');
+		$data = array('sendnum' => intval($sendnum), 'successnum' => intval($successnum), 'failnum' => intval($failnum));
 		pdo_update('ewei_message_mass_task', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
 		$item = pdo_fetch('SELECT  *   FROM ' . tablename('ewei_message_mass_task') . ' WHERE id =:id AND uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$remainnum = intval($item['sendnum']) - intval($item['successnum']) - intval($item['failnum']);

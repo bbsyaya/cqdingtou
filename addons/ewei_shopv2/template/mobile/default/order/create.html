@@ -15,7 +15,7 @@
     </div>
     <div class='fui-content  navbar'>
 
-        {if count($carrier_list)>0 && !$isverify && !$isvirtual}
+        {if count($carrier_list)>0 && !$isverify && !$isvirtual&&!$isonlyverifygoods}
         <div id="carrierTab" class="fui-tab fui-tab-danger">
             <a data-tab="tab1" class="active">快递配送</a>
             <a data-tab="tab2">上门自提</a>
@@ -31,66 +31,73 @@
         </div>
         {/if}
 
-        {if  !$isverify && !$isvirtual}
-        <!--地址选择-->
-        <div class="fui-list-group" id='addressInfo' data-addressid="{php echo intval($address['id'])}">
-            <a  class="fui-list {if empty($address)}external{/if}"
-                {if empty($address)}
-                href="{php echo mobileUrl('member/address/post')}"
-                {else}
-                href="{php echo mobileUrl('member/address/selector')}"
-                {/if}
-            data-nocache="true">
-            <div class="fui-list-media">
-                <i class="icon icon-location"></i>
+        {if  !$isverify && !$isvirtual&&!$isonlyverifygoods}
+            <!--地址选择-->
+            <div class="fui-list-group" id='addressInfo' data-addressid="{php echo intval($address['id'])}">
+                <a  class="fui-list {if empty($address)}external{/if}"
+                    {if empty($address)}
+                        href="{php echo mobileUrl('member/address/post')}"
+                    {else}
+                        href="{php echo mobileUrl('member/address/selector')}"
+                    {/if}
+                data-nocache="true">
+                    <div class="fui-list-media">
+                        <i class="icon icon-location"></i>
+                    </div>
+                    <div class="fui-list-inner" >
+                        <div class="title has-address" {if empty($address)}style='display:none'{/if}>
+                            <span class='realname'>{$address['realname']}</span>
+                            <span class='mobile'>{$address['mobile']}</span>
+                        </div>
+                        <div class="text has-address" {if empty($address)}style='display:none'{/if}>
+                            <span class='address'>{$address['province']}{$address['city']}{$address['area']}{if !empty($new_area) && !empty($address_street)} {$address['street']}{/if} {$address['address']}</span>
+                        </div>
+                        <div class="text no-address" {if !empty($address)}style='display:none'{/if}><i class="icon icon-add"></i> 添加收货地址</div>
+                    </div>
+                    <div class="fui-list-angle">
+                        <div class="angle"></div>
+                    </div>
+                </a>
             </div>
-            <div class="fui-list-inner" >
-                <div class="title has-address" {if empty($address)}style='display:none'{/if}><span class='realname'>{$address['realname']}</span> <span class='mobile'>{$address['mobile']}</span></div>
-            <div class="text has-address" {if empty($address)}style='display:none'{/if}><span class='address'>{$address['province']}{$address['city']}{$address['area']}{if !empty($new_area) && !empty($address_street)} {$address['street']}{/if} {$address['address']}</span></div>
-        <div class="text no-address" {if !empty($address)}style='display:none'{/if}><i class="icon icon-add"></i> 添加收货地址</div>
-</div>
-<div class="fui-list-angle">
-    <div class="angle"></div>
-</div>
-</a>
-</div>
 
+            <!--自提点选择-->
+            <div class="fui-list-group"  id="carrierInfo" style="display: none">
+                <a class="fui-list" href="{php echo mobileUrl('store/selector', array('type'=>1,'merchid'=>$merch_id))}" data-nocache='true'>
+                    <div class="fui-list-media">
+                        <i class="icon icon-shop"></i>
+                    </div>
 
-<!--自提点选择-->
-<div class="fui-list-group"  id="carrierInfo" style="display: none">
-    <a class="fui-list" href="{php echo mobileUrl('store/selector', array('type'=>1,'merchid'=>$merch_id))}" data-nocache='true'>
-        <div class="fui-list-media">
-            <i class="icon icon-shop"></i>
+                    <div class="fui-list-inner">
+                        <div class="title"><span class='storename'>{$carrier_list[0]['storename']}</span></div>
+                        <div class="subtitle">
+                            <span class='realname'>{$carrier_list[0]['realname']}</span>
+                            <span class='mobile' id="carrierInfo_mobile">{$carrier_list[0]['mobile']}</span>
+                        </div>
+                        <div class="text"><span class='address'>{$carrier_list[0]['address']}</span></div>
+                    </div>
+                    <div class="fui-list-angle">
+                        <div class="angle"></div>
+                    </div>
+                </a>
+            </div>
+        {/if}
+    <!--联系填写-->
+    {if $sysset['set_realname']==0 || $sysset['set_mobile']==0}
+        <div class="fui-cell-group sm" id="memberInfo" {if !$isverify && !$isvirtual}style="display:none"{/if}>
+            {if $sysset['set_realname']==0}
+                <div class="fui-cell">
+                    <div class="fui-cell-label sm">联系人</div>
+                    <div class="fui-cell-info"><input type="text" placeholder="请输入联系人" data-set="{$sysset['set_realname']}" name='carrier_realname' class="fui-input" value="{$member['realname']}"/></div>
+                </div>
+            {/if}
+            {if $sysset['set_mobile']==0}
+                <div class="fui-cell">
+                    <div class="fui-cell-label sm">联系电话</div>
+                    <div class="fui-cell-info"><input type="tel" placeholder="请输入联系电话" data-set="{$sysset['set_mobile']}" name='carrier_mobile' class="fui-input" value="{$member['carrier_mobile']}"/></div>
+                </div>
+            {/if}
         </div>
-
-        <div class="fui-list-inner">
-            <div class="title"><span class='storename'>{$carrier_list[0]['storename']}</span></div>
-            <div class="subtitle"><span class='realname'>{$carrier_list[0]['realname']}</span> <span class='mobile' id="carrierInfo_mobile">{$carrier_list[0]['mobile']}</span></div>
-            <div class="text"><span class='address'>{$carrier_list[0]['address']}</span></div>
-        </div>
-        <div class="fui-list-angle">
-            <div class="angle"></div>
-        </div>
-    </a>
-</div>
-{/if}
-<!--联系填写-->
-{if $sysset['set_realname']==0 || $sysset['set_mobile']==0}
-<div class="fui-cell-group sm" id="memberInfo" {if !$isverify && !$isvirtual}style="display:none"{/if}>
-{if $sysset['set_realname']==0}
-<div class="fui-cell">
-    <div class="fui-cell-label sm">联系人</div>
-    <div class="fui-cell-info"><input type="text" placeholder="请输入联系人" data-set="{$sysset['set_realname']}" name='carrier_realname' class="fui-input" value="{$member['realname']}"/></div>
-</div>
-{/if}
-{if $sysset['set_mobile']==0}
-<div class="fui-cell">
-    <div class="fui-cell-label sm">联系电话</div>
-    <div class="fui-cell-info"><input type="tel" placeholder="请输入联系电话" data-set="{$sysset['set_mobile']}" name='carrier_mobile' class="fui-input" value="{$member['carrier_mobile']}"/></div>
-</div>
-{/if}
-</div>
-{/if}
+    {/if}
 
 
 <div class="fui-list-group" >

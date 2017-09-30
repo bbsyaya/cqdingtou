@@ -30,7 +30,7 @@ class User_EweiShopV2Page extends WebPage
 		}
 		$list = pdo_fetchall('SELECT u.*,r.rolename FROM ' . tablename('ewei_shop_perm_user') . ' u  ' . ' left join ' . tablename('ewei_shop_perm_role') . ' r on u.roleid =r.id  ' . ' WHERE 1 ' . $condition . ' ORDER BY id desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_perm_user') . ' u  ' . ' left join ' . tablename('ewei_shop_perm_role') . ' r on u.roleid =r.id  ' . ' WHERE 1 ' . $condition . ' ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		$roles = pdo_fetchall('select id,rolename from ' . tablename('ewei_shop_perm_role') . ' where uniacid=:uniacid and deleted=0', array(':uniacid' => $_W['uniacid']));
 		include $this->template();
 	}
@@ -68,6 +68,35 @@ class User_EweiShopV2Page extends WebPage
 		if ($_W['ispost']) 
 		{
 			$data = array('uniacid' => $_W['uniacid'], 'username' => trim($_GPC['username']), 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'roleid' => intval($_GPC['roleid']), 'status' => intval($_GPC['status']), 'perms2' => (is_array($_GPC['perms']) ? implode(',', $_GPC['perms']) : ''), 'openid' => trim($_GPC['openid']));
+			if (!(empty($_GPC['password']))) 
+			{
+				$password = trim($_GPC['password']);
+				if (strlen($password) < 8) 
+				{
+					show_json(0, '密码长度至少8位');
+				}
+				$score = 0;
+				if (preg_match('/[0-9]+/', $password)) 
+				{
+					++$score;
+				}
+				if (preg_match('/[a-z]+/', $password)) 
+				{
+					++$score;
+				}
+				if (preg_match('/[A-Z]+/', $password)) 
+				{
+					++$score;
+				}
+				if (preg_match('/[_|\\-|+|=|*|!|@|#|$|%|^|&|(|)]+/', $password)) 
+				{
+					++$score;
+				}
+				if ($score < 2) 
+				{
+					show_json(0, '密码必须包含大小写字母、数字、标点符号的其中两项');
+				}
+			}
 			if (!(empty($item['id']))) 
 			{
 				$user = user_single(array('username' => $item['username']));

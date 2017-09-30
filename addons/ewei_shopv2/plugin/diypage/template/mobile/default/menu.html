@@ -77,34 +77,36 @@
         }
         $(function () {
             var len = $(".diymenu .child").length;
-            $(".diymenu .child").each(function (i) {
-                var width = $(this).outerWidth();
-                var margin = -(width / 2);
-                var left = '50%';
-                var pleft = $(this).position().left - width / 2;
-                if(i==0 && pleft<2){
-                    left = 2;
-                    margin = 0;
-                    var pwidth = $(this).closest('.item').width();
-                    var arrowleft = pwidth / 2;
-                    var oldleft = parseFloat( $(this).find('.arrow').css('left').replace('px','') );
-                    $(this).find('.arrow').css({'left': arrowleft-10, 'margin-left': 0});
-                }
-                else if(i+1==len) {
-                    var thisleft = parseFloat( $(this).offset().left.toString().replace('px',''));
-                    if((thisleft+width)>$(document).width()){
-                        var pleft = $(this).closest('.item').offset().left;
-                        left =  $(document).width() - width - 2 - pleft;
+            setTimeout(function () {
+                $(".diymenu .child").each(function (i) {
+                    var width = $(this).outerWidth();
+                    var margin = -(width / 2);
+                    var left = '50%';
+                    var pleft = $(this).position().left - width / 2;
+                    if(i==0 && pleft<2){
+                        left = 2;
                         margin = 0;
                         var pwidth = $(this).closest('.item').width();
-                        var itemleft = (pwidth / 2) + pleft;
-                        var childleft = $(document).width() - width - 2;
-                        var arrowleft = itemleft - childleft;
+                        var arrowleft = pwidth / 2;
+                        var oldleft = parseFloat( $(this).find('.arrow').css('left').replace('px','') );
                         $(this).find('.arrow').css({'left': arrowleft-10, 'margin-left': 0});
                     }
-                }
-                $(this).css({'position': 'absolute', 'left': left, 'margin-left': margin, 'z-index': 0});
-            })
+                    else if(i+1==len) {
+                        var thisleft = parseFloat( $(this).offset().left.toString().replace('px',''));
+                        if((thisleft+width)>$(document).width()){
+                            var pleft = $(this).closest('.item').offset().left;
+                            left =  $(document).width() - width - 2 - pleft;
+                            margin = 0;
+                            var pwidth = $(this).closest('.item').width();
+                            var itemleft = (pwidth / 2) + pleft;
+                            var childleft = $(document).width() - width - 2;
+                            var arrowleft = itemleft - childleft;
+                            $(this).find('.arrow').css({'left': arrowleft-10, 'margin-left': 0});
+                        }
+                    }
+                    $(this).css({'position': 'absolute', 'left': left, 'margin-left': margin, 'z-index': 0});
+                })
+            }, 500);
         })
     </script>
 {/if}

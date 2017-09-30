@@ -101,7 +101,19 @@ class Virtual_EweiShopV2ComModel extends ComModel
 		$virtual_info = '[' . implode(',', $virtual_info) . ']';
 		$time = time();
 		pdo_update('ewei_shop_order', array('virtual_info' => $virtual_info, 'virtual_str' => $virtual_str, 'status' => '3', 'paytime' => $time, 'sendtime' => $time, 'finishtime' => $time), array('id' => $order['id']));
-		$credits = $goods['total'] * $g['credit'];
+		$credits = 0;
+		$gcredit = trim($g['credit']);
+		if (!(empty($gcredit))) 
+		{
+			if (strexists($gcredit, '%')) 
+			{
+				$credits += intval((floatval(str_replace('%', '', $gcredit)) / 100) * $goods['realprice']);
+			}
+			else 
+			{
+				$credits += intval($g['credit']) * $goods['total'];
+			}
+		}
 		if (0 < $credits) 
 		{
 			$shopset = m('common')->getSysset('shop');

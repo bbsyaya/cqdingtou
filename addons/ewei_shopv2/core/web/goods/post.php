@@ -4,6 +4,18 @@ global $_GPC;
 $shopset_level = intval($_W['shopset']['commission']['level']);
 $id = intval($_GPC['id']);
 $item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods') . ' WHERE id = :id and uniacid = :uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+if (!(empty($item)) && ($item['type'] == 5) && !(empty($item['opencard'])) && !(empty($item['cardid']))) 
+{
+	$card = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods_cards') . ' WHERE id = :id and uniacid = :uniacid', array(':id' => $item['cardid'], ':uniacid' => $_W['uniacid']));
+}
+if (!(empty($item['isverify']))) 
+{
+	$showverify = true;
+}
+else 
+{
+	$showverify = false;
+}
 $status = $item['status'];
 if (json_decode($item['labelname'], true)) 
 {
@@ -376,6 +388,153 @@ if ($_W['ispost'])
 		}
 		$data['threen'] = json_encode($threen);
 	}
+	if ($goodstype == 5) 
+	{
+		$verifygoodsnum = intval($_GPC['verifygoodsnum']);
+		$verifygoodsdays = intval($_GPC['verifygoodsdays']);
+		if (empty($verifygoodsdays)) 
+		{
+			$verifygoodsdays = 365;
+		}
+		if (com('wxcard')) 
+		{
+			$opencard = intval($_GPC['opencard']);
+			if (!(empty($opencard))) 
+			{
+				if (128 < strlen($_GPC['custom_cell1_url'])) 
+				{
+					show_json(0, '入口跳转链接不能超过128个字符');
+				}
+				$prerogative = htmlspecialchars($_GPC['prerogative'], ENT_QUOTES);
+				$prerogative = istripslashes($prerogative);
+				$card_description = htmlspecialchars($_GPC['card_description'], ENT_QUOTES);
+				$card_description = istripslashes($card_description);
+				if (empty($prerogative)) 
+				{
+					show_json(0, '会员卡特权说明不能为空');
+				}
+				if (300 < strlen($prerogative)) 
+				{
+					show_json(0, '会员卡特权不能超过300个字符');
+				}
+				if (empty($card_description)) 
+				{
+					show_json(0, '使用须知说明不能为空');
+				}
+				if (300 < strlen($card_description)) 
+				{
+					show_json(0, '使用须知不能超过300个字符');
+				}
+				$carddata = array('uniacid' => $_W['uniacid'], 'card_backgroundtype' => $_GPC['card_backgroundtype'], 'color' => $_GPC['color'], 'color2' => $_GPC['color2'], 'prerogative' => $_GPC['prerogative'], 'card_description' => $_GPC['card_description'], 'custom_cell1' => $_GPC['custom_cell1'], 'custom_cell1_name' => $_GPC['custom_cell1_name'], 'custom_cell1_tips' => $_GPC['custom_cell1_tips'], 'custom_cell1_url' => $_GPC['custom_cell1_url']);
+				if (empty($card) || ($card['card_logoimg'] != $_GPC['card_logoimg'])) 
+				{
+					if (empty($card)) 
+					{
+						if (empty($_GPC['card_logoimg'])) 
+						{
+							show_json(0, 'logo图片不能为空');
+						}
+					}
+					$imgurl = ATTACHMENT_ROOT . $_GPC['card_logolocalpath'];
+					if (!(is_file($imgurl))) 
+					{
+						$img = tomedia($_GPC['card_logolocalpath']);
+						file_put_contents($imgurl, file_get_contents($img));
+					}
+					$result = com('wxcard')->wxCardUpdateImg($imgurl);
+					if (is_wxerror($result)) 
+					{
+						show_json(0, '上传的logo图片限制文件大小限制1MB，像素为300*300，仅支持JPG、PNG格式。');
+					}
+					$carddata['card_logoimg'] = $_GPC['card_logoimg'];
+					$carddata['card_logowxurl'] = $result['url'];
+				}
+				if (!(empty($_GPC['card_backgroundtype']))) 
+				{
+					if (empty($card) || ($card['card_backgroundimg'] != $_GPC['card_backgroundimg'])) 
+					{
+						if (empty($card)) 
+						{
+							if (empty($_GPC['card_logoimg'])) 
+							{
+								show_json(0, '设置使用背景图片时图片不能为空');
+							}
+						}
+						$imgurl = ATTACHMENT_ROOT . $_GPC['card_backgroundimg_localpath'];
+						if (!(is_file($imgurl))) 
+						{
+							$img = tomedia($_GPC['card_backgroundimg_localpath']);
+							file_put_contents($imgurl, file_get_contents($img));
+						}
+						$result = com('wxcard')->wxCardUpdateImg($imgurl);
+						if (is_wxerror($result)) 
+						{
+							show_json(0, '上传的logo图片限制文件大小限制1MB，像素为300*300，仅支持JPG、PNG格式。');
+						}
+						$carddata['card_backgroundimg'] = $_GPC['card_backgroundimg'];
+						$carddata['card_backgroundwxurl'] = $result['url'];
+					}
+					else if (!(empty($card)) && ($card['card_backgroundimg'] == $_GPC['card_backgroundimg'])) 
+					{
+						$carddata['card_backgroundimg'] = $card['card_backgroundimg'];
+						$carddata['card_backgroundwxurl'] = $card['card_backgroundwxurl'];
+					}
+				}
+				if (!(empty($card))) 
+				{
+					$change = com('wxcard')->checkchange($card, $carddata);
+					if ($change) 
+					{
+						$result = com('wxcard')->verifygoodcard($carddata, $card['card_id']);
+						if (is_wxerror($result)) 
+						{
+							show_json(0, '卡券信息填写有误。');
+						}
+						pdo_update('ewei_shop_goods_cards', $carddata, array('id' => $card['id']));
+					}
+					$cardid = $card['id'];
+				}
+				else 
+				{
+					if (25 < strlen($_GPC['title'])) 
+					{
+						show_json(0, '会员卡标题不能超过25个字符');
+					}
+					if (30 < strlen($_GPC['card_brand_name'])) 
+					{
+						show_json(0, '商户名字不能超过30个字符');
+					}
+					if ((9999999 < intval($_GPC['card_totalquantity'])) || (intval($_GPC['card_totalquantity']) < 1)) 
+					{
+						show_json(0, '会员卡库存需设置再1与9999999之间');
+					}
+					$carddata['card_title'] = $_GPC['card_title'];
+					$carddata['card_brand_name'] = $_GPC['card_brand_name'];
+					$carddata['card_totalquantity'] = $_GPC['card_totalquantity'];
+					$carddata['card_quantity'] = $_GPC['card_totalquantity'];
+					$carddata['freewifi'] = (($_GPC['freewifi'] == 'on' ? 1 : 0));
+					$carddata['withpet'] = (($_GPC['withpet'] == 'on' ? 1 : 0));
+					$carddata['freepark'] = (($_GPC['freepark'] == 'on' ? 1 : 0));
+					$carddata['deliver'] = (($_GPC['deliver'] == 'on' ? 1 : 0));
+					$result = com('wxcard')->verifygoodcard($carddata);
+					if (is_wxerror($result)) 
+					{
+						show_json(0, '卡券信息填写有误。');
+					}
+					else 
+					{
+						$carddata['card_id'] = $result['card_id'];
+					}
+					pdo_insert('ewei_shop_goods_cards', $carddata);
+					$cardid = pdo_insertid();
+				}
+				$data['cardid'] = $cardid;
+			}
+			$data['opencard'] = $opencard;
+		}
+		$data['verifygoodsnum'] = $verifygoodsnum;
+		$data['verifygoodsdays'] = $verifygoodsdays;
+	}
 	if (empty($id)) 
 	{
 		$data['merchid'] = 0;
@@ -520,7 +679,7 @@ if ($_W['ispost'])
 		{
 			foreach ($spec_items as $it ) 
 			{
-				if ($it['get_id'] == $ida) 
+				while ($it['get_id'] == $ida) 
 				{
 					$newids[] = $it['id'];
 					break;
@@ -647,7 +806,7 @@ if ($_W['ispost'])
 	if ((0 < count($optionids)) && ($data['hasoption'] !== 0)) 
 	{
 		pdo_query('delete from ' . tablename('ewei_shop_goods_option') . ' where goodsid=' . $id . ' and id not in ( ' . implode(',', $optionids) . ')');
-		$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\n" . '            g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
+		$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\r\n" . '            g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\r\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\r\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
 		pdo_query($sql);
 	}
 	else 
@@ -719,7 +878,7 @@ if (!(empty($id)))
 				$items = $ss['items'];
 				foreach ($items as $it ) 
 				{
-					if ($it['id'] == $itemid) 
+					while ($it['id'] == $itemid) 
 					{
 						$specs[] = $ss;
 						break;
@@ -889,7 +1048,7 @@ if (!(empty($id)))
 			}
 			foreach ($options as $o ) 
 			{
-				if ($ids === $o['specs']) 
+				while ($ids === $o['specs']) 
 				{
 					$val = array('id' => $o['id'], 'title' => $o['title'], 'stock' => $o['stock'], 'costprice' => $o['costprice'], 'productprice' => $o['productprice'], 'presell' => $o['presellprice'], 'marketprice' => $o['marketprice'], 'goodssn' => $o['goodssn'], 'productsn' => $o['productsn'], 'weight' => $o['weight'], 'virtual' => $o['virtual']);
 					$discount_val = array('id' => $o['id']);

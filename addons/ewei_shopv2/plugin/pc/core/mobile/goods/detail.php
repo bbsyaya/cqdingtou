@@ -235,13 +235,13 @@ class Detail_EweiShopV2Page extends PcMobilePage
 				{
 					$optionids[] = $val['id'];
 				}
-				pdo_query("delete from " . tablename("ewei_shop_goods_option") . " where goodsid=" . $id . ' and id not in ( ' . implode(',', $optionids) . ')');
+				//pdo_query("delete from " . tablename("ewei_shop_goods_option") . " where goodsid=" . $id . ' and id not in ( ' . implode(',', $optionids) . ')');
 				$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\n" . '            g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . '),' . "\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $id . ')' . "\n" . '            where g.id = ' . $id . ' and g.hasoption=1';
 				pdo_query($sql);
 			}
 			else 
 			{
-				pdo_query("delete from " . tablename("ewei_shop_goods_option") . " where goodsid=" . $id);
+				//pdo_query("delete from " . tablename("ewei_shop_goods_option") . " where goodsid=" . $id);
 				$sql = 'update ' . tablename('ewei_shop_goods') . ' set minprice = marketprice,maxprice = marketprice where id = ' . $id . ' and hasoption=0;';
 				pdo_query($sql);
 			}

@@ -186,12 +186,6 @@
             </td>
             <td class="is_default is_sms"></td>
         </tr>
-
-
-
-
-
-
         <tr>
             <td>商品付款通知</td>
             <td>
@@ -794,6 +788,167 @@
                 <input class="js-switch small checkone" data-type="sms" type="checkbox" value="{php echo intval($data['upgrade_close_sms'])}" {if empty($data['upgrade_close_sms'])}checked{/if}/>
             </td>
         </tr>
+        </tbody>
+    </table>
+  
+    <table class="table table-responsive">
+        <thead>
+        <th>o2o - 门店店员通知</th>
+
+        <th class="w200">模板消息</th>
+        <th class="w60 is_advanced"><!--<input class="js-switch small checkall" data-type="tpl-advanced" type="checkbox" />--></th>
+        <th class="w200 is_sms">短信模板</th>
+        <th class="w60 is_sms"><input class="js-switch small checkall" data-type="sms" type="checkbox" /></th>
+        </thead>
+        <tbody>
+        <tr>
+            <td>核销商品核销通知</td>
+            <td>
+                <select class="select2 is_advanced" name="data[o2o_sverify_template]">
+                    <option value=''>[默认]核销商品核销通知</option>
+                    {loop $template_group['o2o_sverify'] $template_val}
+                    <option value="{$template_val['id']}" {if $data['o2o_sverify_template'] == $template_val['id'] }selected{/if}>{$template_val['title']}</option>
+                    {/loop}
+                </select>
+            </td>
+            <td style="text-align: right;" class="is_advanced">
+                <label class="notice-default">
+                    <input type="hidden" name="data[o2o_sverify_close_advanced]" value="{php echo intval($data['o2o_sverify_close_advanced'])}" />
+                    <input class="js-switch small checkone" data-type="tpl-advanced"  data-tag="o2o_sverify"  type="checkbox" value="{php echo intval($data['o2o_sverify_close_advanced'])}" {if empty($data['o2o_sverify_close_advanced'])}checked{/if}/>
+                </label>
+                <label style="display: none;">
+                    <img src="../addons/ewei_shopv2/static/images/loading.gif" width="20" alt=""/>
+                </label>
+            </td>
+            <td class="is_sms">
+                <select class="select2" name="data[o2o_sverify_sms]">
+                    <option value=''>从短信消息库中选择</option>
+                    {loop $template_sms $template_val}
+                    <option value="{$template_val['id']}" {if $data['o2o_sverify_sms'] == $template_val['id'] }selected{/if}>{$template_val['name']}</option>
+                    {/loop}
+                </select>
+            </td>
+            <td style="text-align: right;" class="is_sms">
+                <input type="hidden" name="data[o2o_sverify_close_sms]" value="{php echo intval($data['o2o_sverify_close_sms'])}" />
+                <input class="js-switch small checkone" data-type="sms" type="checkbox" value="{php echo intval($data['o2o_sverify_close_sms'])}" {if empty($data['o2o_sverify_close_sms'])}checked{/if}/>
+            </td>
+        </tr>
+
+        {if p('newstore')}
+            <tr>
+                <td>商品预约通知</td>
+                <td>
+                    <select class="select2 is_advanced" name="data[o2o_snorder_template]">
+                        <option value=''>[默认]商品预约通知</option>
+                        {loop $template_group['o2o_snorder'] $template_val}
+                        <option value="{$template_val['id']}" {if $data['o2o_snorder_template'] == $template_val['id'] }selected{/if}>{$template_val['title']}</option>
+                        {/loop}
+                    </select>
+                </td>
+                <td style="text-align: right;" class="is_advanced">
+                    <label class="notice-default">
+                        <input type="hidden" name="data[o2o_snorder_close_advanced]" value="{php echo intval($data['o2o_snorder_close_advanced'])}" />
+                        <input class="js-switch small checkone" data-type="tpl-advanced"  data-tag="o2o_snorder"  type="checkbox" value="{php echo intval($data['o2o_snorder_close_advanced'])}" {if empty($data['o2o_snorder_close_advanced'])}checked{/if}/>
+                    </label>
+                    <label style="display: none;">
+                        <img src="../addons/ewei_shopv2/static/images/loading.gif" width="20" alt=""/>
+                    </label>
+                </td>
+                <td class="is_sms">
+                    <select class="select2" name="data[o2o_snorder_sms]">
+                        <option value=''>从短信消息库中选择</option>
+                        {loop $template_sms $template_val}
+                        <option value="{$template_val['id']}" {if $data['o2o_snorder_sms'] == $template_val['id'] }selected{/if}>{$template_val['name']}</option>
+                        {/loop}
+                    </select>
+                </td>
+                <td style="text-align: right;" class="is_sms">
+                    <input type="hidden" name="data[o2o_snorder_close_sms]" value="{php echo intval($data['o2o_snorder_close_sms'])}" />
+                    <input class="js-switch small checkone" data-type="sms" type="checkbox" value="{php echo intval($data['o2o_snorder_close_sms'])}" {if empty($data['o2o_snorder_close_sms'])}checked{/if}/>
+                </td>
+            </tr>
+        {/if}
+        </tbody>
+    </table>
+
+
+    <table class="table table-responsive">
+        <thead>
+        <th>o2o - 买家通知</th>
+
+        <th class="w200">模板消息</th>
+        <th class="w60 is_advanced"><!--<input class="js-switch small checkall" data-type="tpl-advanced" type="checkbox" />--></th>
+        <th class="w200 is_sms">短信模板</th>
+        <th class="w60 is_sms"><input class="js-switch small checkall" data-type="sms" type="checkbox" /></th>
+        </thead>
+        <tbody>
+        <tr>
+            <td>核销商品核销通知</td>
+            <td>
+                <select class="select2 is_advanced" name="data[o2o_bverify_template]">
+                    <option value=''>[默认]核销商品核销通知</option>
+                    {loop $template_group['o2o_bverify'] $template_val}
+                    <option value="{$template_val['id']}" {if $data['o2o_bverify_template'] == $template_val['id'] }selected{/if}>{$template_val['title']}</option>
+                    {/loop}
+                </select>
+            </td>
+            <td style="text-align: right;" class="is_advanced">
+                <label class="notice-default">
+                    <input type="hidden" name="data[o2o_bverify_close_advanced]" value="{php echo intval($data['o2o_bverify_close_advanced'])}" />
+                    <input class="js-switch small checkone" data-type="tpl-advanced"  data-tag="o2o_bverify"  type="checkbox" value="{php echo intval($data['o2o_bverify_close_advanced'])}" {if empty($data['o2o_bverify_close_advanced'])}checked{/if}/>
+                </label>
+                <label style="display: none;">
+                    <img src="../addons/ewei_shopv2/static/images/loading.gif" width="20" alt=""/>
+                </label>
+            </td>
+            <td class="is_sms">
+                <select class="select2" name="data[o2o_bverify_sms]">
+                    <option value=''>从短信消息库中选择</option>
+                    {loop $template_sms $template_val}
+                    <option value="{$template_val['id']}" {if $data['o2o_bverify_sms'] == $template_val['id'] }selected{/if}>{$template_val['name']}</option>
+                    {/loop}
+                </select>
+            </td>
+            <td style="text-align: right;" class="is_sms">
+                <input type="hidden" name="data[o2o_bverify_close_sms]" value="{php echo intval($data['o2o_bverify_close_sms'])}" />
+                <input class="js-switch small checkone" data-type="sms" type="checkbox" value="{php echo intval($data['o2o_bverify_close_sms'])}" {if empty($data['o2o_bverify_close_sms'])}checked{/if}/>
+            </td>
+        </tr>
+
+        {if p('newstore')}
+        <tr>
+            <td>商品预约成功通知</td>
+            <td>
+                <select class="select2 is_advanced" name="data[o2o_bnorder_template]">
+                    <option value=''>[默认]商品预约成功通知</option>
+                    {loop $template_group['o2o_bnorder'] $template_val}
+                    <option value="{$template_val['id']}" {if $data['o2o_bnorder_template'] == $template_val['id'] }selected{/if}>{$template_val['title']}</option>
+                    {/loop}
+                </select>
+            </td>
+            <td style="text-align: right;" class="is_advanced">
+                <label class="notice-default">
+                    <input type="hidden" name="data[o2o_bnorder_close_advanced]" value="{php echo intval($data['o2o_bnorder_close_advanced'])}" />
+                    <input class="js-switch small checkone" data-type="tpl-advanced"  data-tag="o2o_bnorder"  type="checkbox" value="{php echo intval($data['o2o_bnorder_close_advanced'])}" {if empty($data['o2o_bnorder_close_advanced'])}checked{/if}/>
+                </label>
+                <label style="display: none;">
+                    <img src="../addons/ewei_shopv2/static/images/loading.gif" width="20" alt=""/>
+                </label>
+            </td>
+            <td class="is_sms">
+                <select class="select2" name="data[o2o_bnorder_sms]">
+                    <option value=''>从短信消息库中选择</option>
+                    {loop $template_sms $template_val}
+                    <option value="{$template_val['id']}" {if $data['o2o_bnorder_sms'] == $template_val['id'] }selected{/if}>{$template_val['name']}</option>
+                    {/loop}
+                </select>
+            </td>
+            <td style="text-align: right;" class="is_sms">
+                <input type="hidden" name="data[o2o_bnorder_close_sms]" value="{php echo intval($data['o2o_bnorder_close_sms'])}" />
+                <input class="js-switch small checkone" data-type="sms" type="checkbox" value="{php echo intval($data['o2o_bnorder_close_sms'])}" {if empty($data['o2o_bnorder_close_sms'])}checked{/if}/>
+            </td>
+        </tr>
+        {/if}
         </tbody>
     </table>
 

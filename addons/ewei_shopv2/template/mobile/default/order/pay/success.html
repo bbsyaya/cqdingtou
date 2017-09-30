@@ -1,11 +1,12 @@
 {template '_header'}
 
+<link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/index.css"/>
 <style>
     .fui-mask {
         opacity: 1;
     }
 </style>
-<div class='fui-page order-success-page'>
+<div class='fui-page order-success-page pay'>
 
 	<div class="fui-header">
 		<div class="fui-header-left">
@@ -34,7 +35,7 @@
 			
 			{if !empty($order['dispatchtype']) && empty($order['isverify'])}<i class='icon icon-store'></i>{/if}
 			
-			{if !empty($order['isverify'])}<i class='icon icon-store'></i>{/if}
+			{if !empty($order['isverify'])||$isonlyverifygoods}<i class='icon icon-store'></i>{/if}
 			
 			{if !empty($order['virtual'])}<i class='icon icon-text'></i>{/if}
 			
@@ -178,6 +179,24 @@
 	    </div>
 	</div>
 	{/if}
+
+
+	{if $hasverifygood}
+	<div class="fui-cell-group noborder">
+		<div class="fui-cell">
+			<div class="fui-cell-label">
+				<img src="../addons/ewei_shopv2/static/images/card.jpg" alt="" class="card"/ >
+			</div>
+			<div class="fui-cell-info" style="font-size: 0.75rem;" >
+				您有一件核销商品待使用
+			</div>
+			<div class="fui-cell-remark noremark">
+				<a class="active" href="{php echo mobileUrl('verifygoods')}">立即查看</a>
+			</div>
+		</div>
+	</div>
+	{/if}
+
 	
 	{if !empty($carrier) || !empty($store)}
 	 

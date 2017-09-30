@@ -329,7 +329,7 @@ class PosteraModel extends PluginModel
 		}
 		return false;
 	}
-	public function checkMember($openid = '') 
+	public function checkMember($openid = '', $acc = '') 
 	{
 		global $_W;
 		$redis = redis();
@@ -341,7 +341,10 @@ class PosteraModel extends PluginModel
 				return json_decode($member, true);
 			}
 		}
-		$acc = WeiXinAccount::create($_W['acid']);
+		if (empty($acc)) 
+		{
+			$acc = WeiXinAccount::create();
+		}
 		$userinfo = $acc->fansQueryInfo($openid);
 		$userinfo['avatar'] = $userinfo['headimgurl'];
 		load()->model('mc');

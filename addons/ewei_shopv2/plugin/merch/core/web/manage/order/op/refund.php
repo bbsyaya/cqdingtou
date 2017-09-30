@@ -83,11 +83,7 @@ class Refund_EweiShopV2Page extends MerchWebPage
 				{
 					$raddress = pdo_fetch('select * from ' . tablename('ewei_shop_refund_address') . ' where uniacid=:uniacid and merchid = :merchid order by id desc limit 1', array(':uniacid' => $uniacid, ':merchid' => $merchid));
 				}
-				unset($raddress['uniacid']);
-				unset($raddress['merchid']);
-				unset($raddress['openid']);
-				unset($raddress['isdefault']);
-				unset($raddress['deleted']);
+				unset($raddress['uniacid'], $raddress['merchid'], $raddress['openid'], $raddress['isdefault'], $raddress['deleted']);
 				$raddress = iserializer($raddress);
 				$change_refund['reply'] = '';
 				$change_refund['refundaddress'] = $raddress;
@@ -166,13 +162,13 @@ class Refund_EweiShopV2Page extends MerchWebPage
 					}
 				}
 				$realprice = $refund['applyprice'];
-				$goods = pdo_fetchall('SELECT g.id,g.credit, o.total,o.realprice FROM ' . tablename('ewei_shop_order_goods') . ' o left join ' . tablename('ewei_shop_goods') . ' g on o.goodsid=g.id ' . ' WHERE o.orderid=:orderid and o.uniacid=:uniacid and o.merchid=:merchid', array(':orderid' => $item['id'], ':uniacid' => $uniacid, ':merchid' => $merchid));
+				$goods = pdo_fetchall('SELECT g.id,g.credit, o.total,o.realprice,g.isfullback FROM ' . tablename('ewei_shop_order_goods') . ' o left join ' . tablename('ewei_shop_goods') . ' g on o.goodsid=g.id ' . ' WHERE o.orderid=:orderid and o.uniacid=:uniacid', array(':orderid' => $item['id'], ':uniacid' => $uniacid));
 				$refundtype = 0;
 				if (empty($item['transid']) && ($item['paytype'] == 22) && empty($item['apppay'])) 
 				{
 					$item['paytype'] = 23;
 				}
-				$ispeerpay = m('order')->checkpeerpay($orderid);
+				$ispeerpay = m('order')->checkpeerpay($item['id']);
 				if (!(empty($ispeerpay))) 
 				{
 					$item['paytype'] = 21;
@@ -184,59 +180,6 @@ class Refund_EweiShopV2Page extends MerchWebPage
 				}
 				else if ($item['paytype'] == 21) 
 				{
-					$realprice = round($realprice - $item['deductcredit2'], 2);
-					$totalprice = $realprice;
-					if (!(empty($ispeerpay))) 
-					{
-						$pid = 'SELECT id,peerpay_realprice FROM ' . tablename('ewei_shop_order_peerpay') . ' WHERE orderid = :id AND uniacid = :uniacid';
-						$pid = pdo_fetch($pid, array(':id' => $orderid, ':uniacid' => $_W['uniacid']));
-						$peerpaysql = 'SELECT * FROM ' . tablename('ewei_shop_order_peerpay_payinfo') . ' WHERE pid = :pid and refundstatus=0';
-						$peerpaylist = pdo_fetchall($peerpaysql, array(':pid' => $pid['id']));
-						if (empty($peerpaylist)) 
-						{
-							show_json(0, '没有这个代付订单');
-						}
-						foreach ($peerpaylist as $k => $v ) 
-						{
-							$this_price = $v['price'];
-							if ($totalprice <= 0) 
-							{
-								break;
-							}
-							if (($totalprice - $this_price) < 0) 
-							{
-								$this_price = $totalprice;
-							}
-							$totalprice -= $this_price;
-							if (empty($v['tid'])) 
-							{
-								m('member')->setCredit($v['openid'], 'credit2', $this_price, array(0, $shopset['name'] . '退款: ' . $realprice . '元 代付订单号: ' . $item['ordersn']));
-								$this->changeRefundStatus($v['id'], $this_price);
-								$result = true;
-								continue;
-							}
-							$result = m('finance')->refund($v['openid'], $v['tid'], $refund['refundno'] . $v['id'], $pid['peerpay_realprice'] * 100, $this_price * 100, (!(empty($item['apppay'])) ? true : false));
-							if (!(is_error($result))) 
-							{
-								$this->changeRefundStatus($v['id'], $this_price);
-							}
-						}
-					}
-					else if (0 < $realprice) 
-					{
-						if (empty($item['isborrow'])) 
-						{
-							$result = m('finance')->refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
-						}
-						else 
-						{
-							$result = m('finance')->refundBorrow($item['borrowopenid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['ordersn2'])) ? 1 : 0));
-						}
-					}
-					$refundtype = 2;
-				}
-				else if ($item['paytype'] == 21) 
-				{
 					if ($item['apppay'] == 2) 
 					{
 						$result = m('finance')->wxapp_refund($item['openid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['apppay'])) ? true : false));
@@ -244,7 +187,27 @@ class Refund_EweiShopV2Page extends MerchWebPage
 					else 
 					{
 						$realprice = round($realprice - $item['deductcredit2'], 2);
-						if (0 < $realprice) 
+						if (!(empty($ispeerpay))) 
+						{
+							$pid = $ispeerpay['id'];
+							$peerpaysql = 'SELECT * FROM ' . tablename('ewei_shop_order_peerpay_payinfo') . ' WHERE pid = :pid';
+							$peerpaylist = pdo_fetchall($peerpaysql, array(':pid' => $pid));
+							if (empty($peerpaylist)) 
+							{
+								show_json(0, '没有人帮他代付过,无需退款');
+							}
+							foreach ($peerpaylist as $k => $v ) 
+							{
+								if (empty($v['tid'])) 
+								{
+									m('member')->setCredit($v['openid'], 'credit2', $v['price'], array(0, $shopset['name'] . '退款: ' . $realprice . '元 代付订单号: ' . $item['ordersn']));
+									$result = true;
+									continue;
+								}
+								$result = m('finance')->refund($v['openid'], $v['tid'], $refund['refundno'] . $v['id'], $v['price'] * 100, $v['price'] * 100, (!(empty($item['apppay'])) ? true : false));
+							}
+						}
+						else if (0 < $realprice) 
 						{
 							if (empty($item['isborrow'])) 
 							{
@@ -260,7 +223,7 @@ class Refund_EweiShopV2Page extends MerchWebPage
 				}
 				else if ($item['paytype'] == 22) 
 				{
-					$sec = m('common')->getSec($uniacid);
+					$sec = m('common')->getSec();
 					$sec = iunserializer($sec['sec']);
 					if (!(empty($item['apppay']))) 
 					{
@@ -274,14 +237,29 @@ class Refund_EweiShopV2Page extends MerchWebPage
 					}
 					else 
 					{
-						if ($realprice < 1) 
+						if (empty($item['transid'])) 
 						{
-							show_json(0, '退款金额必须大于1元，才能使用微信企业付款退款!');
+							show_json(0, '仅支持 升级后此功能后退款的订单!');
 						}
-						$realprice = round($realprice - $item['deductcredit2'], 2);
-						$result = m('finance')->pay($item['openid'], 1, $realprice * 100, $refund['refundno'], $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']);
-						$refundtype = 1;
+						$setting = uni_setting($_W['uniacid'], array('payment'));
+						if (!(is_array($setting['payment']))) 
+						{
+							return error(1, '没有设定支付参数');
+						}
+						$alipay_config = $setting['payment']['alipay'];
+						$batch_no_money = $realprice * 100;
+						$batch_no = date('Ymd') . 'RF' . $item['id'] . 'MONEY' . $batch_no_money;
+						$res = m('finance')->AlipayRefund(array('trade_no' => $item['transid'], 'refund_price' => $realprice, 'refund_reason' => $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']), $batch_no, $alipay_config);
+						if (is_error($res)) 
+						{
+							show_json(0, $res['message']);
+						}
+						show_json(1, array('url' => $res));
 					}
+				}
+				else if (($item['paytype'] == 23) && !(empty($item['isborrow']))) 
+				{
+					$result = m('finance')->refundBorrow($item['borrowopenid'], $ordersn, $refund['refundno'], $order_price * 100, $realprice * 100, (!(empty($item['ordersn2'])) ? 1 : 0));
 				}
 				else 
 				{
@@ -290,12 +268,19 @@ class Refund_EweiShopV2Page extends MerchWebPage
 						show_json(0, '退款金额必须大于1元，才能使用微信企业付款退款!');
 					}
 					$realprice = round($realprice - $item['deductcredit2'], 2);
-					$result = m('finance')->pay($item['openid'], 1, $realprice * 100, $refund['refundno'], $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']);
+					if (0 < $realprice) 
+					{
+						$result = m('finance')->pay($item['openid'], 1, $realprice * 100, $refund['refundno'], $shopset['name'] . '退款: ' . $realprice . '元 订单号: ' . $item['ordersn']);
+					}
 					$refundtype = 1;
 				}
 				if (is_error($result)) 
 				{
 					show_json(0, $result['message']);
+				}
+				if (0 < $goods['isfullback']) 
+				{
+					m('order')->fullbackstop($item['id']);
 				}
 				$credits = m('order')->getGoodsCredit($goods);
 				if (0 < $credits) 

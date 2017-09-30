@@ -54,48 +54,56 @@ class Index_EweiShopV2Page extends ComWebPage
 		global $_W;
 		global $_GPC;
 		$id = intval($_GPC['id']);
+		$area_set = m('util')->get_area_config_set();
+		$new_area = intval($area_set['new_area']);
+		$address_street = intval($area_set['address_street']);
 		if ($_W['ispost']) 
 		{
-			if (p('newstore')) 
+			if (!(empty($_GPC['perms']))) 
 			{
-				$condtion = '';
-				$goods = ((empty($_GPC['goods']) ? array() : $_GPC['goods']));
-				$goods = $_GPC['goods'];
-				$goodsgroup = ((empty($_GPC['goodsgroup']) ? array() : $_GPC['goodsgroup']));
-				foreach ($goods as $v ) 
-				{
-					$condtion .= ' AND goodsid != ' . $v . ' ';
-					$arr = array('uniacid' => $_W['uniacid'], 'storeid' => $id, 'goodsid' => $v);
-					if (!(pdo_get('ewei_shop_newstore_goods', array('storeid' => $id, 'goodsid' => $v)))) 
-					{
-						pdo_insert('ewei_shop_newstore_goods', $arr);
-					}
-				}
-				foreach ($goodsgroup as $v ) 
-				{
-					$grouplist = pdo_get('ewei_shop_store_goodsgroup', array('id' => $v));
-					$grouplist = unserialize($grouplist['goodsids']);
-					foreach ($grouplist as $v ) 
-					{
-						$condtion .= ' AND goodsid != ' . $v . ' ';
-						$arr = array('uniacid' => $_W['uniacid'], 'storeid' => $id, 'goodsid' => $v);
-						if (!(pdo_get('ewei_shop_newstore_goods', array('storeid' => $id, 'goodsid' => $v)))) 
-						{
-							pdo_insert('ewei_shop_newstore_goods', $arr);
-						}
-					}
-				}
-				$sql = 'DELETE FROM ' . tablename('ewei_shop_newstore_goods') . ' WHERE storeid = :id AND uniacid = :uniacid ' . $condtion . ' ';
-				pdo_query($sql, array(':id' => $id, ':uniacid' => $_W['uniacid']));
-				$banner = $_GPC['banner'];
-				if (strpos(',', '1' . $banner)) 
-				{
-					$banner = implode(',', $banner);
-				}
-				$label = trim($_GPC['label']);
-				$classify = $_GPC['classify'];
+				$perms = implode(',', $_GPC['perms']);
 			}
-			$data = array('uniacid' => $_W['uniacid'], 'storename' => trim($_GPC['storename']), 'address' => trim($_GPC['address']), 'tel' => trim($_GPC['tel']), 'lng' => $_GPC['map']['lng'], 'lat' => $_GPC['map']['lat'], 'type' => intval($_GPC['type']), 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'fetchtime' => trim($_GPC['fetchtime']), 'saletime' => trim($_GPC['saletime']), 'logo' => save_media($_GPC['logo']), 'desc' => trim($_GPC['desc']), 'status' => intval($_GPC['status']), 'banner' => $banner, 'label' => $label, 'classify' => $classify);
+			else 
+			{
+				$perms = '';
+			}
+			$label = '';
+			if (!(empty($_GPC['lab']))) 
+			{
+				if (8 < count($_GPC['lab'])) 
+				{
+					show_json(0, '标签不能超过8个');
+				}
+				foreach ($_GPC['lab'] as $lab ) 
+				{
+					if (20 < mb_strlen($lab, 'UTF-8')) 
+					{
+						show_json(0, '标签长度不能超过20个字符');
+					}
+				}
+				$label = implode(',', $_GPC['lab']);
+			}
+			$tag = '';
+			if (!(empty($_GPC['tag']))) 
+			{
+				if (3 < count($_GPC['tag'])) 
+				{
+					show_json(0, '角标不能超过3个');
+				}
+				foreach ($_GPC['tag'] as $tg ) 
+				{
+					if (3 < mb_strlen($tg, 'UTF-8')) 
+					{
+						show_json(0, '角标长度不能超过3个字符');
+					}
+				}
+				$tag = implode(',', $_GPC['tag']);
+			}
+			$data = array('uniacid' => $_W['uniacid'], 'storename' => trim($_GPC['storename']), 'address' => trim($_GPC['address']), 'province' => trim($_GPC['province']), 'city' => trim($_GPC['city']), 'area' => trim($_GPC['area']), 'provincecode' => trim($_GPC['chose_province_code']), 'citycode' => trim($_GPC['chose_city_code']), 'areacode' => trim($_GPC['chose_area_code']), 'tel' => trim($_GPC['tel']), 'lng' => $_GPC['map']['lng'], 'lat' => $_GPC['map']['lat'], 'type' => intval($_GPC['type']), 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'label' => $label, 'tag' => $tag, 'fetchtime' => trim($_GPC['fetchtime']), 'saletime' => trim($_GPC['saletime']), 'logo' => save_media($_GPC['logo']), 'desc' => trim($_GPC['desc']), 'opensend' => intval($_GPC['opensend']), 'status' => intval($_GPC['status']), 'perms' => $perms);
+			if (P('newstore')) 
+			{
+				$data['storegroupid'] = intval($_GPC['storegroupid']);
+			}
 			$data['order_printer'] = ((is_array($_GPC['order_printer']) ? implode(',', $_GPC['order_printer']) : ''));
 			$data['order_template'] = intval($_GPC['order_template']);
 			$data['ordertype'] = ((is_array($_GPC['ordertype']) ? implode(',', $_GPC['ordertype']) : ''));
@@ -110,12 +118,14 @@ class Index_EweiShopV2Page extends ComWebPage
 				$id = pdo_insertid();
 				plog('shop.verify.store.add', '添加门店 ID: ' . $id);
 			}
-			show_json(1, array('url' => webUrl('shop/verify/store')));
+			show_json(1, array('url' => webUrl('store')));
 		}
-		$goodslist = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_goods') . ' WHERE uniacid = :uniacid AND storeid = :id', array(':id' => $id, ':uniacid' => $_W['uniacid']));
-		$storegroup = pdo_getall('ewei_shop_store_storegroup', array('uniacid' => $_W['uniacid']));
-		$goodsgroup = pdo_getall('ewei_shop_store_goodsgroup', array('uniacid' => $_W['uniacid']));
+		if (p('newstore')) 
+		{
+			$storegroup = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_storegroup') . ' WHERE  uniacid=:uniacid  ', array(':uniacid' => $_W['uniacid']));
+		}
 		$item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_store') . ' WHERE id =:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $id));
+		$perms = explode(',', $item['perms']);
 		if ($printer = com('printer')) 
 		{
 			$item = $printer->getStorePrinterSet($item);
@@ -123,6 +133,8 @@ class Index_EweiShopV2Page extends ComWebPage
 			$ordertype = $item['ordertype'];
 			$order_template = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_printer_template') . ' WHERE uniacid=:uniacid AND merchid=0', array(':uniacid' => $_W['uniacid']));
 		}
+		$label = explode(',', $item['label']);
+		$tag = explode(',', $item['tag']);
 		include $this->template();
 	}
 	public function delete() 
@@ -194,11 +206,26 @@ class Index_EweiShopV2Page extends ComWebPage
 		include $this->template('shop/verify/store/query');
 		exit();
 	}
-	public function title($id) 
+	public function querygoods() 
 	{
 		global $_W;
-		$id = intval($id);
-		return pdo_fetchcolumn('SELECT `title` FROM ' . tablename('ewei_shop_goods') . ' WHERE id = ' . $id);
+		global $_GPC;
+		$kwd = trim($_GPC['keyword']);
+		$params = array();
+		$params[':uniacid'] = $_W['uniacid'];
+		$condition = ' and uniacid=:uniacid and deleted = 0 and `type` in (1,5,30)  and merchid =0';
+		if (!(empty($kwd))) 
+		{
+			$condition .= ' AND `title` LIKE :keyword';
+			$params[':keyword'] = '%' . $kwd . '%';
+		}
+		$ds = pdo_fetchall('SELECT id,title,thumb FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
+		$ds = set_medias($ds, array('thumb', 'share_icon'));
+		if ($_GPC['suggest']) 
+		{
+			exit(json_encode(array('value' => $ds)));
+		}
+		include $this->template();
 	}
 }
 ?>

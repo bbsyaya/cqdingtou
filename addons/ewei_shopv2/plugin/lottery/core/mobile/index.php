@@ -70,7 +70,7 @@ class index_EweiShopV2Page extends PluginMobilePage
 			{
 				$set = unserialize($set);
 			}
-			$log = pdo_fetchall('SELECT l.*,m.`nickname`,m.`avatar` FROM ' . tablename('ewei_shop_lottery_log') . ' AS l LEFT JOIN ' . tablename('ewei_shop_member') . ' AS m ON m.openid=l.join_user WHERE l.uniacid=:uniacid AND l.lottery_id=:lottery_id AND l.is_reward=1 LIMIT 5', array(':uniacid' => $_W['uniacid'], ':lottery_id' => $id));
+			$log = pdo_fetchall('SELECT l.*,m.`nickname`,m.`avatar` FROM ' . tablename('ewei_shop_lottery_log') . ' AS l LEFT JOIN ' . tablename('ewei_shop_member') . ' AS m ON m.openid=l.join_user WHERE l.uniacid=:uniacid AND l.lottery_id=:lottery_id AND l.is_reward=1 order by id desc LIMIT 5', array(':uniacid' => $_W['uniacid'], ':lottery_id' => $id));
 			if (!(empty($lottery['lottery_days']))) 
 			{
 				$effecttime = time() - $lottery['lottery_days'];
@@ -366,7 +366,10 @@ class index_EweiShopV2Page extends PluginMobilePage
 		{
 			foreach ($reward['coupon'] as $key => $val ) 
 			{
-				@$reward['coupon'][$key]['count'] -= $val['couponnum'];
+				@$
+				{
+					reward}
+				['coupon'][$key]['count'] -= $val['couponnum'];
 			}
 		}
 		if (isset($reward['goods'])) 

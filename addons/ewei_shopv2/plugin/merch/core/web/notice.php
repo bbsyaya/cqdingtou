@@ -42,8 +42,12 @@ class Notice_EweiShopV2Page extends PluginWebPage
 			$applysalers = pdo_fetchall('select id,nickname,avatar,openid from ' . tablename('ewei_shop_member') . ' where openid in (' . implode(',', $applyopenids) . ') and uniacid=' . $_W['uniacid']);
 		}
 		$template_list = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_member_message_template') . ' WHERE uniacid=:uniacid ', array(':uniacid' => $_W['uniacid']));
-		$template_sms = com('sms')->sms_temp();
 		$opensms = com('sms');
+		$template_sms = array();
+		if ($opensms) 
+		{
+			$template_sms = $opensms->sms_temp();
+		}
 		include $this->template();
 	}
 }

@@ -12,7 +12,15 @@ class Index_EweiShopV2Page extends MobilePage
 		$orderid = intval($_GPC['id']);
 		$verifycode = $_GPC['verifycode'];
 		$query = array('id' => $orderid, 'verifycode' => $verifycode);
-		$url = mobileUrl('verify/detail', $query, true);
+		$order = pdo_fetch('select istrade from ' . tablename('ewei_shop_order') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $orderid, ':uniacid' => $_W['uniacid']));
+		if (empty($order['istrade'])) 
+		{
+			$url = mobileUrl('verify/detail', $query, true);
+		}
+		else 
+		{
+			$url = mobileUrl('verify/tradedetail', $query, true);
+		}
 		show_json(1, array('url' => m('qrcode')->createQrcode($url)));
 	}
 	public function select() 
@@ -65,7 +73,7 @@ class Index_EweiShopV2Page extends MobilePage
 		{
 			show_json(0);
 		}
-		if ($order['verifytype'] == 0) 
+		if (($order['verifytype'] == 0) || ($order['verifytype'] == 3)) 
 		{
 			if (empty($order['verified'])) 
 			{
@@ -87,6 +95,31 @@ class Index_EweiShopV2Page extends MobilePage
 			$this->message($data['message']);
 		}
 		extract($data);
+		include $this->template();
+	}
+	public function tradedetail() 
+	{
+		global $_W;
+		global $_GPC;
+		$openid = $_W['openid'];
+		$uniacid = $_W['uniacid'];
+		$orderid = intval($_GPC['id']);
+		$data = com('verify')->allow($orderid);
+		if (is_error($data)) 
+		{
+			$this->message($data['message']);
+		}
+		extract($data);
+		$createInfo = array();
+		$createInfo['tradestatus'] = $order['tradestatus'];
+		$createInfo['betweenprice'] = $order['betweenprice'];
+		$newstore_plugin = p('newstore');
+		$temp_type = $newstore_plugin->getTempType();
+		$tempinfo = $newstore_plugin->getTempInfo($goods['tempid']);
+		if (!(empty($goods['peopleid']))) 
+		{
+			$goods['peopleinfo'] = $newstore_plugin->getPeopleInfo($goods['peopleid']);
+		}
 		include $this->template();
 	}
 	public function complete() 

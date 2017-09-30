@@ -9,6 +9,9 @@
 .fui-cell-group:not(.fui-cell-group-o):before,.fui-cell-group:not(.fui-cell-group-o):after{
 	border: none;
 }
+a.fui-list-group.noborder{
+	color: #000 ;
+}
 .fui-cell-group.noborder .fui-cell:before{
 	border-top: none;
 }
@@ -37,6 +40,16 @@
     -webkit-transform: scaleY(0.5);
     -ms-transform: scaleY(0.5);
     transform: scaleY(0.5);
+}
+.fui-cell-group .fui-cell .fui-cell-icon{
+	margin-right: 0.3rem;
+}
+.fui-list-icon{
+	width: 0.8rem;
+	margin-right: 0.3rem;
+}
+.fui-list:active {
+	background: #fff;
 }
 .fui-cell-group.noborder .fui-cell{
 	padding: 0.4rem 0.6rem;
@@ -127,7 +140,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
     width: 4rem;
     height: 4rem;
 }
-.fui-list-inner{
+.fui-list-inner.fixheight{
 	height: 3.5rem;
 }
 .fui-list-inner .title{
@@ -139,6 +152,9 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	white-space: normal;
+
+}
+.fui-list-inner.fixheight .title{
 	height: 2.1rem;
 }
 .fui-list-inner .subtitle{
@@ -218,8 +234,35 @@ i{
 	font-size: 0.85rem;
 	font-weight: bold;
 	color: #fff;
-	height: 1.7rem;
-	line-height:1.7rem;
+	height: 1.8rem;
+	/*line-height:1.7rem;*/
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+}
+.coupon-inner{
+	-webkit-box-flex: 1;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	height:auto;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	align-items: center;
+	-webkit-align-items: center;
+	vertical-align: middle;
+	line-height: 1rem;
+}
+.coupon-inner div{
+	width:100%;
+	overflow : hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
 }
 .coupon-time{
 	font-size: 0.6rem;
@@ -248,8 +291,16 @@ i{
 	background: rgba(0,0,0,0.3);
 	border-radius: 0.2rem;
 	text-align: center;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	justify-content: center;
+	-webkit-justify-content: center;
+	-webkit-align-items: center;
+	align-items: center;
 }
-.coupon-list .mask span{
+.coupon-list .mask a span{
 	display: inline-block;
 	width: 4.75rem;
 	height: 1.35rem;
@@ -320,6 +371,60 @@ i{
     margin: 0;
     line-height: 2.5rem;
     
+}
+.order_detail .mask{
+	position: fixed;
+	background:rgba(0,0,0,0.5);
+	width: 100%;
+	height: 100%;
+	top: 0;
+	text-align: center;
+	z-index: 100;
+	display: none;
+}
+.order_detail .mask .code_box{
+	position: absolute;
+	margin-top:-9rem;
+	top: 50%;
+	left: 50%;
+	margin-left: -7.35rem;
+	width: 14.7rem;
+	height: 18rem;
+	background: #fff;
+	border-radius:20px;
+	line-height: 3.5rem;
+	font-size: 0.7rem;
+	color: #000;
+	font-weight: bold;
+}
+.order_detail .mask .code_box img{
+	width: 8.25rem;
+	height: 8.25rem;
+}
+.order_detail .mask .code_box .img_box{
+	line-height: 3;
+}
+.order_detail .mask .cav_code{
+	width: 10rem;
+	height: 1.8rem;
+	line-height: 1.8rem;
+	margin: auto;
+	background: #f7f7f7;
+	color: #6f6f6f;
+}
+.order_detail .mask .error{
+	font-size: 0.65rem;
+	line-height: 1.2rem;
+	font-weight: normal;
+	color: #e85a6a;
+	margin-top: 0.5rem;
+}
+.order-info.fui-cell-group.noborder  .fui-cell{
+	padding: 0.2rem 0.6rem;
+}
+.order-info.fui-cell-group.noborder  .fui-cell .fui-cell-info{
+	color: #999;
+	font-size: 0.6rem;
 }
 /*主页*/
 /*预约*/
@@ -609,6 +714,100 @@ i{
 .chose-cover .icon .icon-check{
 	font-size: 0.6rem;
 }
+.fui-cell-title{
+	color: #000;
+}
+.fui-cell-title .remark{
+	font-size: 0.6rem;
+	color: #999;
+}
+.fui-cell-title .remark:after{
+	content: " ";
+	display: inline-block;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	height: 0.3rem;
+	width: 0.3rem;
+	border-width: 2px 2px 0 0;
+	border-color: #C8C8CD;
+	border-style: solid;
+	position: relative;
+	top: -1px;
+	margin-left: .3em;
+}
+.info_bottom{
+	height: 2rem;
+	background: rgba(255,113,113,0.8);
+	width: 100%;
+	position: fixed;
+	bottom: 2.5rem;
+	line-height: 2rem;
+	color: #fff;
+	font-size: 0.65rem;
+	padding-left: 0.6rem;
+}
+
+.order_info {
+	font-size: 0.6rem;
+	line-height: 2.5rem;
+	display: inline-block;
+	-webkit-box-flex: 1;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	text-align: right;
+	padding-right: 0.7rem;
+	color: #000;
+}
+/*预约商品详情页底部信息*/
+.fui-cell-title{
+	color: #000;
+}
+.fui-cell-title .remark{
+	font-size: 0.6rem;
+	color: #999;
+}
+.fui-cell-title .remark:after{
+	content: " ";
+	display: inline-block;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	height: 0.3rem;
+	width: 0.3rem;
+	border-width: 2px 2px 0 0;
+	border-color: #C8C8CD;
+	border-style: solid;
+	position: relative;
+	top: -1px;
+	margin-left: .3em;
+}
+.info_bottom{
+	height: 2rem;
+	background: rgba(255,113,113,0.8);
+	width: 100%;
+	position: fixed;
+	bottom: 2.5rem;
+	line-height: 2rem;
+	color: #fff;
+	font-size: 0.65rem;
+	padding-left: 0.6rem;
+}
+
+.order_btn .order_info {
+	font-size: 0.6rem;
+	line-height: 2.5rem;
+	display: inline-block;
+	-webkit-box-flex: 1;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	text-align: right;
+	padding-right: 0.7rem;
+	color: #000;
+}
+
 /*选择天弹出层*/
 .order-chose-close .icon{
 	font-size:1rem;

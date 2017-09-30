@@ -191,7 +191,7 @@
 	<div class="card_empty" {if !empty($card)} style="display: none" {/if}>
         <img src="../addons/ewei_shopv2/static/images/card_empty.jpg" alt="" />
         <p>暂无微信会员卡</p>
-		{ifp 'member.card'}
+		{ifp 'member.card.add'}
 			<a  href="{php echo webUrl('member/card/post')}"> 去添加</a>
 		{/if}
     </div>
@@ -251,7 +251,7 @@
 	<div class="basic" {if empty($card)} style="display: none" {/if}>
 		<div class="header">
 			基本信息
-			{ifp 'member.card'}
+			{ifp 'member.card.delete'}
 			<span class="delete_card">
 				<a  data-toggle='ajaxPost' href="{php echo webUrl('member/card/delete')}" data-confirm="确定要删除会员卡吗？如果删除,用户已领取的会员卡将全部失效,请谨慎操作!"><i class='fa fa-trash'></i> 删除会员卡</a>
 			</span>
@@ -276,7 +276,7 @@
 			<div class="card_cell">
 				剩余库存
 				<span class="remark">{$card['card_quantity']}</span>
-				{ifp 'member.card'}
+				{ifp 'member.card.stock'}
 				<a data-toggle="ajaxModal" href="{php echo webUrl('member/card/stock', array('id'=>$row['id'],'card_id'=>$row['card_id']))}" title='修改库存'><img style="position: absolute;right: -30px;top: 28px;" src="../addons/ewei_shopv2/static/images/edit_img.jpg" alt="" /></a>
 				{/if}
 
@@ -286,8 +286,10 @@
 				<span class="remark">{$card['card_totalquantity']}</span>
 			</div>
 			<div>
-				{ifp 'member.card'}
+				{ifp 'member.card.edit'}
 					<a class='edit_btn edit_card' href="{php echo webUrl('member/card/post')}"> 编辑会员卡</a>
+				{/if}
+				{ifp 'member.card.active'}
 					<a class="edit_btn act_card"  href="{php echo webUrl('member/card/activationset')}">会员卡激活设置</a>
 				{/if}
 			</div>

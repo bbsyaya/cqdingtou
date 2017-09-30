@@ -25,7 +25,7 @@ class Case_EweiShopV2Page extends SystemPage
 		}
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_system_case') . ' WHERE 1 ' . $condition . '  ORDER BY displayorder DESC limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_system_case') . ' WHERE 1 ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 
@@ -56,7 +56,7 @@ class Case_EweiShopV2Page extends SystemPage
 				$id = pdo_insertid();
 				plog('system.site.case.add', '添加 ID: ' . $id);
 			}
-			show_json(1);
+			show_json(1, array('url' => webUrl('system/site/case/edit', array('id' => $id))));
 		}
 		$category = pdo_fetchall('select * from ' . tablename('ewei_shop_system_casecategory'), array(), 'id');
 		$item = pdo_fetch('select * from ' . tablename('ewei_shop_system_case') . ' where id=:id limit 1', array(':id' => $id));
@@ -71,7 +71,7 @@ class Case_EweiShopV2Page extends SystemPage
 		{
 			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
-		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_system_article') . ' WHERE id in( ' . $id . ' )');
+		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_system_case') . ' WHERE id in( ' . $id . ' )');
 		foreach ($items as $item ) 
 		{
 			pdo_delete('ewei_shop_system_case', array('id' => $item['id']));

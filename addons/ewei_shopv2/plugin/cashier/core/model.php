@@ -230,37 +230,23 @@ class CashierModel extends PluginModel
 		}
 		switch ($type) 
 		{
-			case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => date('Y-m-d H:i:s', $params['createtime']));
+			case self::APPLY: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => date('Y-m-d H:i:s', $params['createtime']));
 			break;
-			default: switch ($type) 
-			{
-				case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[审核状态]' => $params['status'], '[审核时间]' => $params['createtime'], '[驳回原因]' => $params['reason']);
-				break;
-				default: switch ($type) 
-				{
-					case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => $params['createtime'], '[申请金额]' => $params['money']);
-					break;
-					default: switch ($type) 
-					{
-						case self: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => $params['createtime'], '[打款时间]' => $params['paytime'], '[申请金额]' => $params['money'], '[打款金额]' => $params['realmoney']);
-						break;
-						default: switch ($type) 
-						{
-							case self: $datas = array('[订单编号]' => $params['logno'], '[付款金额]' => $params['money'], '[余额抵扣]' => $params['deduction'], '[付款时间]' => $params['paytime'], '[收银台名称]' => $params['cashier_title']);
-							break;
-							default: switch ($type) 
-							{
-								case self: $datas = array('[订单编号]' => $params['logno'], '[付款金额]' => $params['money'], '[余额抵扣]' => $params['deduction'], '[付款时间]' => $params['paytime'], '[收银台名称]' => $params['cashier_title']);
-								break;
-								break;
-								$datas = ((isset($datas) ? $datas : array()));
-								$notice['openid'] = ((is_null($openid) ? $notice['openid'] : $openid));
-							}
-						}
-					}
-				}
-			}
+			case self::CHECKED: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[审核状态]' => $params['status'], '[审核时间]' => $params['createtime'], '[驳回原因]' => $params['reason']);
+			break;
+			case self::APPLY_CLEARING: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => $params['createtime'], '[申请金额]' => $params['money']);
+			break;
+			case self::PAY: $datas = array('[联系人]' => $params['name'], '[联系电话]' => $params['mobile'], '[申请时间]' => $params['createtime'], '[打款时间]' => $params['paytime'], '[申请金额]' => $params['money'], '[打款金额]' => $params['realmoney']);
+			break;
+			case self::PAY_CASHIER: $datas = array('[订单编号]' => $params['logno'], '[付款金额]' => $params['money'], '[余额抵扣]' => $params['deduction'], '[付款时间]' => $params['paytime'], '[收银台名称]' => $params['cashier_title']);
+			break;
+			case self::PAY_CASHIER_USER: $datas = array('[订单编号]' => $params['logno'], '[付款金额]' => $params['money'], '[余额抵扣]' => $params['deduction'], '[付款时间]' => $params['paytime'], '[收银台名称]' => $params['cashier_title']);
+			break;
+			default: break;
 		}
+		$datas = ((isset($datas) ? $datas : array()));
+		$notice['openid'] = ((is_null($openid) ? $notice['openid'] : $openid));
+		return $this->sendNotice($notice, $type, $datas);
 	}
 	protected function sendNotice($notice, $tag, $datas) 
 	{
@@ -358,7 +344,7 @@ class CashierModel extends PluginModel
 		{
 			$array['deduction'] = $realmoney;
 		}
-		$realmoney = $realmoney - $array['deduction'];
+		$realmoney = round($realmoney - $array['deduction'], 2);
 		$title = $_W['cashieruser']['title'] . '消费';
 		if (!(empty($array['title']))) 
 		{
@@ -1258,7 +1244,7 @@ class CashierModel extends PluginModel
 			$data = $coupon->getCoupon($set['coupon']['couponid']);
 			if (($data['total'] == '-1') || (0 < $data['total'])) 
 			{
-				$coupon->poster($member, $set['coupon']['couponid'], 1);
+				$coupon->poster($member, $set['coupon']['couponid'], 1, 9);
 				return $set['coupon']['couponid'];
 			}
 		}
@@ -1376,8 +1362,7 @@ class CashierModel extends PluginModel
 		{
 			$wechatpay['appid'] = $wechatpay['sub_appid'];
 			$wechatpay['mch_id'] = $wechatpay['sub_mch_id'];
-			unset($wechatpay['sub_mch_id']);
-			unset($wechatpay['sub_appid']);
+			unset($wechatpay['sub_mch_id'], $wechatpay['sub_appid']);
 		}
 		$url = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
 		$pars = array();
