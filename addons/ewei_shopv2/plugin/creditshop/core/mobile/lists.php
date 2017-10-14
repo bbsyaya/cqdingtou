@@ -39,7 +39,7 @@ class Lists_EweiShopV2Page extends CreditshopMobilePage
 				{
 					if (0 < $row) 
 					{
-						$category[$index] = pdo_fetchall('select id,name,thumb,isrecommand from ' . tablename('ewei_shop_creditshop_category') . "\n\t\t\t\t\t\t" . 'where id = ".$index." and uniacid=:uniacid and  enabled=1 order by displayorder desc', array(':uniacid' => $uniacid));
+						$category[$index] = pdo_fetchall('select id,name,thumb,isrecommand from ' . tablename('ewei_shop_creditshop_category') . "\r\n\t\t\t\t\t\t" . 'where id = ".$index." and uniacid=:uniacid and  enabled=1 order by displayorder desc', array(':uniacid' => $uniacid));
 						$category[$index] = set_medias($category, 'thumb');
 					}
 				}
@@ -107,7 +107,7 @@ class Lists_EweiShopV2Page extends CreditshopMobilePage
 		$list = array();
 		if (!(empty($total))) 
 		{
-			$sql = 'SELECT id,title,thumb,subtitle,`type`,price,credit,money,goodstype FROM ' . tablename('ewei_shop_creditshop_goods') . "\n" . '            ' . "\t\t" . 'where 1 ' . $condition . ' ORDER BY displayorder desc,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+			$sql = 'SELECT id,title,thumb,subtitle,`type`,price,credit,money,goodstype FROM ' . tablename('ewei_shop_creditshop_goods') . "\r\n" . '            ' . "\t\t" . 'where 1 ' . $condition . ' ORDER BY displayorder desc,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 			$list = pdo_fetchall($sql, $params);
 			$list = set_medias($list, 'thumb');
 			foreach ($list as &$row ) 

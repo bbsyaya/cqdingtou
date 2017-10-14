@@ -217,8 +217,8 @@ class Goods_EweiShopV2Page extends PluginWebPage
 			if ($canedit) 
 			{
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">库存</div><div class="input-group"><input type="text" class="form-control input-sm option_total_all"  VALUE=""/><span class="input-group-addon" ><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_total\');"></a></span></div></div></th>';
-				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">积分</div>' . "\n" . '<div class="input-group"><input type="text" class="form-control  input-sm option_credit_all"  VALUE=""/><span class="input-group-addon">' . "\n" . '<a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_credit\');"></a></span></div></div></th>';
-				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">金额</div>' . "\n" . '<div class="input-group"><input type="text" class="form-control input-sm option_money_all"  VALUE=""/><span class="input-group-addon">' . "\n" . '<a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_money\');"></a></span></div></div></th>';
+				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">积分</div>' . "\r\n" . '<div class="input-group"><input type="text" class="form-control  input-sm option_credit_all"  VALUE=""/><span class="input-group-addon">' . "\r\n" . '<a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_credit\');"></a></span></div></div></th>';
+				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">金额</div>' . "\r\n" . '<div class="input-group"><input type="text" class="form-control input-sm option_money_all"  VALUE=""/><span class="input-group-addon">' . "\r\n" . '<a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_money\');"></a></span></div></div></th>';
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">编码</div><div class="input-group"><input type="text" class="form-control input-sm option_goodssn_all"  VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_goodssn\');"></a></span></div></div></th>';
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">条码</div><div class="input-group"><input type="text" class="form-control input-sm option_productsn_all"  VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_productsn\');"></a></span></div></div></th>';
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">重量（克）</div><div class="input-group"><input type="text" class="form-control input-sm option_weight_all"  VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_weight\');"></a></span></div></div></th>';
@@ -567,7 +567,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 				if ((0 < count($optionids)) && ($data['hasoption'] !== 0)) 
 				{
 					pdo_query('delete from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid=' . $id . ' and id not in ( ' . implode(',', $optionids) . ')');
-					$sql = 'update ' . tablename('ewei_shop_creditshop_goods') . ' g set' . "\n\t\t\t\t\t" . 'g.mincredit = (select min(credit) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\n\t\t\t\t\t" . 'g.minmoney = (select min(money) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\n\t\t\t\t\t" . 'g.maxcredit = (select max(credit) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\n\t\t\t\t\t" . 'g.maxmoney = (select max(money) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . ')' . "\n\t\t\t\t\t" . 'where g.id = ' . $id . ' and g.hasoption=1';
+					$sql = 'update ' . tablename('ewei_shop_creditshop_goods') . ' g set' . "\r\n\t\t\t\t\t" . 'g.mincredit = (select min(credit) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\r\n\t\t\t\t\t" . 'g.minmoney = (select min(money) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\r\n\t\t\t\t\t" . 'g.maxcredit = (select max(credit) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\r\n\t\t\t\t\t" . 'g.maxmoney = (select max(money) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . ')' . "\r\n\t\t\t\t\t" . 'where g.id = ' . $id . ' and g.hasoption=1';
 					pdo_query($sql);
 				}
 				else 
@@ -701,7 +701,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		$type = intval($_GPC['type']);
 		$params = array();
 		$params[':uniacid'] = $_W['uniacid'];
-		$condition = ' and status=1 and deleted=0 and uniacid=:uniacid and type = 1 and groupstype = 0 ' . "\n" . '                    and isdiscount = 0 and istime = 0 and  ifnull(bargain,0)=0 and ispresell = 0 ';
+		$condition = ' and status=1 and deleted=0 and uniacid=:uniacid and type = 1 and groupstype = 0 ' . "\r\n" . '                    and isdiscount = 0 and istime = 0 and  ifnull(bargain,0)=0 and ispresell = 0 ';
 		if (!(empty($kwd))) 
 		{
 			$condition .= ' AND (`title` LIKE :keywords OR `keywords` LIKE :keywords)';
@@ -717,7 +717,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 			$params[':type'] = $type;
 		}
 		$list = array();
-		$list = pdo_fetchall('SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,content,hasoption' . "\n" . '              FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
+		$list = pdo_fetchall('SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,content,hasoption' . "\r\n" . '              FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
 		$list = set_medias($list, array('thumb', 'share_icon'));
 		foreach ($list as $key => $value ) 
 		{

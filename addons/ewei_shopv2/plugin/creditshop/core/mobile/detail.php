@@ -59,7 +59,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			$this->message('商品已下架或被删除!', mobileUrl('creditshop'), 'error');
 		}
 		$log = array();
-		$log = pdo_fetchall('select openid,createtime from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' and status > 0 order by createtime desc limit 2 ');
+		$log = pdo_fetchall('select openid,createtime from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' and status > 0 order by createtime desc limit 2 ');
 		foreach ($log as $key => $value ) 
 		{
 			$mem = m('member')->getMember($value['openid']);
@@ -71,7 +71,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		$logtotal = 0;
 		$logtotal = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_creditshop_log') . ' where uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' and status > 0 ');
 		$replys = array();
-		$replys = pdo_fetchall('select * from ' . tablename('ewei_shop_creditshop_comment') . "\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' and checked = 1 and deleted = 0 order by `time` desc limit 2 ');
+		$replys = pdo_fetchall('select * from ' . tablename('ewei_shop_creditshop_comment') . "\r\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' and checked = 1 and deleted = 0 order by `time` desc limit 2 ');
 		$replykeywords = explode(',', $set['desckeyword']);
 		$replykeystr = trim($set['replykeyword']);
 		if (empty($replykeystr)) 
@@ -124,7 +124,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			$replys[$key]['content'] = str_replace('=', '**', $value['content']);
 		}
 		$replytotal = 0;
-		$replytotal = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_creditshop_comment') . "\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' and checked = 1 and deleted = 0 order by `time` desc ');
+		$replytotal = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_creditshop_comment') . "\r\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $id . ' and checked = 1 and deleted = 0 order by `time` desc ');
 		if ($goods['goodstype'] == 0) 
 		{
 			$stores = array();
@@ -156,7 +156,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 				}
 			}
 		}
-		$goodsrec = pdo_fetchall('select id,thumb,title,credit,money,mincredit,minmoney from ' . tablename('ewei_shop_creditshop_goods') . "\n" . '                    where uniacid = ' . $uniacid . ' and goodstype = ' . $goods['goodstype'] . ' and `type` = ' . $goods['type'] . ' and status = 1 and deleted = 0 ORDER BY rand() limit 3 ');
+		$goodsrec = pdo_fetchall('select id,thumb,title,credit,money,mincredit,minmoney from ' . tablename('ewei_shop_creditshop_goods') . "\r\n" . '                    where uniacid = ' . $uniacid . ' and goodstype = ' . $goods['goodstype'] . ' and `type` = ' . $goods['type'] . ' and status = 1 and deleted = 0 ORDER BY rand() limit 3 ');
 		foreach ($goodsrec as $key => $value ) 
 		{
 			$goodsrec[$key]['credit'] = intval($value['credit']);
@@ -202,7 +202,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 5;
 		$log = array();
-		$log = pdo_fetchall('select openid,createtime from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' order by createtime desc LIMIT ' . ((($pindex - 1) * $psize) + 2) . ' , ' . $psize);
+		$log = pdo_fetchall('select openid,createtime from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' order by createtime desc LIMIT ' . ((($pindex - 1) * $psize) + 2) . ' , ' . $psize);
 		foreach ($log as $key => $value ) 
 		{
 			$mem = m('member')->getMember($value['openid']);
@@ -224,7 +224,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 5;
 		$replys = array();
-		$replys = pdo_fetchall('select * from ' . tablename('ewei_shop_creditshop_comment') . "\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and checked = 1 and deleted = 0 order by `time` desc LIMIT ' . ((($pindex - 1) * $psize) + 2) . ' , ' . $psize);
+		$replys = pdo_fetchall('select * from ' . tablename('ewei_shop_creditshop_comment') . "\r\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and checked = 1 and deleted = 0 order by `time` desc LIMIT ' . ((($pindex - 1) * $psize) + 2) . ' , ' . $psize);
 		foreach ($replys as $key => $value ) 
 		{
 			$replys[$key]['time_str'] = date('Y/m/d', $value['time']);
@@ -235,7 +235,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			$replys[$key]['nickname'] = cut_str($value['nickname'], 1, 0) . '**' . cut_str($value['nickname'], 1, -1);
 		}
 		$replytotal = 0;
-		$replytotal = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_creditshop_comment') . "\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and checked = 1 and deleted = 0 ');
+		$replytotal = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_creditshop_comment') . "\r\n" . '                where uniacid = ' . $uniacid . ' and goodsid = ' . $goodsid . ' and checked = 1 and deleted = 0 ');
 		show_json(1, array('list' => $replys, 'pagesize' => $psize, 'total' => $replytotal));
 	}
 	public function option() 
@@ -329,7 +329,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 		$address = false;
 		if (!(empty($addressid))) 
 		{
-			$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . "\n" . '            where id=:id and uniacid=:uniacid limit 1', array(':id' => $addressid, ':uniacid' => $_W['uniacid']));
+			$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . "\r\n" . '            where id=:id and uniacid=:uniacid limit 1', array(':id' => $addressid, ':uniacid' => $_W['uniacid']));
 			if (empty($address)) 
 			{
 				show_json(0, '未找到地址');
@@ -511,7 +511,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 					$record['paystatus'] = 1;
 					$record['paytype'] = 1;
 					pdo_update('ewei_shop_creditshop_log', $record, array('logno' => $log['logno']));
-					$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where logno=:logno and openid=:openid  and status=0 and paystatus=1 and uniacid=:uniacid limit 1', array(':logno' => $log['logno'], ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
+					$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                    where logno=:logno and openid=:openid  and status=0 and paystatus=1 and uniacid=:uniacid limit 1', array(':logno' => $log['logno'], ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
 					if (is_h5app()) 
 					{
 						pdo_update('ewei_shop_creditshop_log', array('apppay' => 1), array('logno' => $log['logno']));
@@ -566,7 +566,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			}
 			if (!(m('finance')->isAlipayNotify($_GET))) 
 			{
-				$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where logno=:logno  and uniacid=:uniacid limit 1', array(':logno' => $tid, ':uniacid' => $_W['uniacid']));
+				$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                    where logno=:logno  and uniacid=:uniacid limit 1', array(':logno' => $tid, ':uniacid' => $_W['uniacid']));
 				if (($lastlog['status'] == 1) && (0 < $lastlog['paystatus'])) 
 				{
 					if ($fromwechat) 
@@ -581,7 +581,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 				$this->message(array('message' => '支付出现错误，请重试(支付验证失败)!', 'buttondisplay' => ($fromwechat ? false : true)), ($fromwechat ? NULL : mobileUrl('order')));
 			}
 		}
-		$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where logno=:logno and uniacid=:uniacid limit 1', array(':logno' => $tid, ':uniacid' => $_W['uniacid']));
+		$lastlog = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                    where logno=:logno and uniacid=:uniacid limit 1', array(':logno' => $tid, ':uniacid' => $_W['uniacid']));
 		if (empty($lastlog)) 
 		{
 			$this->message(array('message' => '支付出现错误，请重试(支付验证失败2)!', 'buttondisplay' => ($fromwechat ? false : true)), ($fromwechat ? NULL : mobileUrl('order')));
@@ -601,7 +601,7 @@ class Detail_EweiShopV2Page extends CreditshopMobilePage
 			$record['paystatus'] = 1;
 			$record['paystatus'] = 1;
 			pdo_update('ewei_shop_creditshop_log', $record, array('logno' => $tid));
-			$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\n" . '                    where logno=:logno and openid=:openid  and status=0 and paystatus=1 and uniacid=:uniacid limit 1', array(':logno' => $tid, ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
+			$creditlog = pdo_fetch('select id from ' . tablename('ewei_shop_creditshop_log') . "\r\n" . '                    where logno=:logno and openid=:openid  and status=0 and paystatus=1 and uniacid=:uniacid limit 1', array(':logno' => $tid, ':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
 			if (is_h5app()) 
 			{
 				pdo_update('ewei_shop_creditshop_log', array('apppay' => 1), array('logno' => $tid));

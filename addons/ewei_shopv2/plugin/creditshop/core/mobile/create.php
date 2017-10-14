@@ -86,7 +86,7 @@ class Create_EweiShopV2Page extends PluginMobileLoginPage
 		$merchid = $goods['merchid'];
 		$dispatch = 0;
 		$dispatch_array = array();
-		$address = pdo_fetch('select id,realname,mobile,address,province,city,area,datavalue from ' . tablename('ewei_shop_member_address') . "\n" . '        where id=:id and uniacid=:uniacid limit 1', array(':id' => $addressid, ':uniacid' => $_W['uniacid']));
+		$address = pdo_fetch('select id,realname,mobile,address,province,city,area,datavalue from ' . tablename('ewei_shop_member_address') . "\r\n" . '        where id=:id and uniacid=:uniacid limit 1', array(':id' => $addressid, ':uniacid' => $_W['uniacid']));
 		$user_city = '';
 		$user_city_code = '';
 		if (empty($new_area)) 

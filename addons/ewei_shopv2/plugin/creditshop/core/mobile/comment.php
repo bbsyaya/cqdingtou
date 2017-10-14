@@ -38,7 +38,7 @@ class Comment_EweiShopV2Page extends PluginMobileLoginPage
 		{
 			$condition .= ' and g.merchid = ' . $merchid . ' ';
 		}
-		$log = pdo_fetch('select log.id,log.status,log.goodsid,g.goodstype,g.type,log.iscomment,log.optionid,g.thumb,o.title as optiontitle,g.title' . "\n" . '                ,g.credit,g.money' . "\n" . '                from ' . tablename('ewei_shop_creditshop_log') . ' as log' . "\n" . '                left join ' . tablename('ewei_shop_creditshop_goods') . ' as g on g.id = log.goodsid' . "\n" . '                left join ' . tablename('ewei_shop_creditshop_option') . ' o on o.id=log.optionid' . "\n" . '                where ' . $condition . ' and log.goodsid = ' . $goodsid . ' and log.id = ' . $logid . ' ');
+		$log = pdo_fetch('select log.id,log.status,log.goodsid,g.goodstype,g.type,log.iscomment,log.optionid,g.thumb,o.title as optiontitle,g.title' . "\r\n" . '                ,g.credit,g.money' . "\r\n" . '                from ' . tablename('ewei_shop_creditshop_log') . ' as log' . "\r\n" . '                left join ' . tablename('ewei_shop_creditshop_goods') . ' as g on g.id = log.goodsid' . "\r\n" . '                left join ' . tablename('ewei_shop_creditshop_option') . ' o on o.id=log.optionid' . "\r\n" . '                where ' . $condition . ' and log.goodsid = ' . $goodsid . ' and log.id = ' . $logid . ' ');
 		$log = set_medias($log, 'thumb');
 		if (($log['money'] - intval($log['money'])) == 0) 
 		{
@@ -118,7 +118,7 @@ class Comment_EweiShopV2Page extends PluginMobileLoginPage
 		}
 		foreach ($comments as $c ) 
 		{
-			$old_c = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_creditshop_comment') . "\n" . '            where uniacid=:uniacid and logid=:logid and goodsid=:goodsid limit 1', array(':uniacid' => $_W['uniacid'], ':goodsid' => $c['goodsid'], ':logid' => $logid));
+			$old_c = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_creditshop_comment') . "\r\n" . '            where uniacid=:uniacid and logid=:logid and goodsid=:goodsid limit 1', array(':uniacid' => $_W['uniacid'], ':goodsid' => $c['goodsid'], ':logid' => $logid));
 			if (empty($old_c)) 
 			{
 				$comment = array('uniacid' => $uniacid, 'logid' => $logid, 'logno' => $log['logno'], 'goodsid' => $c['goodsid'], 'level' => $c['level'], 'content' => trim($c['content']), 'images' => (is_array($c['images']) ? iserializer($c['images']) : iserializer(array())), 'openid' => $openid, 'nickname' => $member['nickname'], 'headimg' => $member['avatar'], 'time' => time(), 'checked' => $checked);

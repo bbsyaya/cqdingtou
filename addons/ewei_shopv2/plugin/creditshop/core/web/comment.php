@@ -77,7 +77,7 @@ class Comment_EweiShopV2Page extends PluginWebPage
 		}
 		$list = pdo_fetchall('SELECT  c.*,g.title,g.thumb FROM ' . tablename('ewei_shop_creditshop_comment') . ' c  ' . ' left join ' . tablename('ewei_shop_creditshop_goods') . ' g on c.goodsid = g.id  ' . ' WHERE 1 ' . $condition . ' ORDER BY c.time desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_creditshop_comment') . ' c  ' . ' left join ' . tablename('ewei_shop_creditshop_goods') . ' g on c.goodsid = g.id  ' . ' WHERE 1 ' . $condition . ' ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template('creditshop/comment/index');
 	}
 	public function add() 

@@ -1,5 +1,62 @@
 {template '_header'}
+<style>
+	.order_detail .fui-list-inner .title.has-address {
+		font-size: .7rem;
+		line-height: 1.2rem;
+		height: 1.2rem;
+		display: block;
+	}
+	.order_detail .fui-list-inner .text{
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+	.order_detail .fui-list:before{
+		border: 0;
+	}
+	.order_detail .fui-list_title{
+		position: relative;
+		display: flex;
+		align-items: center;
+		line-height: normal;
+	}
+	/*.order_detail .fui-list_title:before{*/
+		/*content: " ";*/
+		/*position: absolute;*/
+		/*left: 0.5rem;*/
+		/*right: 0.5rem;*/
+		/*bottom: 0;*/
+		/*height: 1px;*/
+		/*border-top: 1px solid #ebebeb;*/
+		/*color: #D9D9D9;*/
+		/*-webkit-transform-origin: 0 0;*/
+		/*-ms-transform-origin: 0 0;*/
+		/*transform-origin: 0 0;*/
+		/*-webkit-transform: scaleY(0.5);*/
+		/*-ms-transform: scaleY(0.5);*/
+		/*transform: scaleY(0.5);*/
+	/*}*/
+	.order_detail  .lineblock {
+		position: relative;
+		overflow: hidden;
+	}
 
+	.order_detail  .lineblock:before {
+		content: "";
+		position: absolute;
+		left: .5rem;
+		top: 0;
+		right: .5rem;
+		height: 1px;
+		border-top: 1px solid #ebebeb;
+		-webkit-transform-origin: 0 100%;
+		-ms-transform-origin: 0 100%;
+		transform-origin: 0 100%;
+		-webkit-transform: scaleY(0.5);
+		-ms-transform: scaleY(0.5);
+		transform: scaleY(0.5);
+	}
+</style>
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/orderdetail.css?v=2.0.0">
 
 	<div class="fui-page cav order_detail">
@@ -85,7 +142,7 @@
 							<div class="fui-list-icon">
 								<i class="icon icon-deliver" style="color: #ff5555;"></i>
 							</div>
-							<div class="fui-list-inner" style="font-size: 0.7rem;height: auto;line-height: 1.5rem;">
+							<div class="fui-list-inner" style="font-size: 0.7rem;height: auto;line-height: 1.2rem;">
 								{if empty($express)}
 								<p style='color:#ff5555'>快递公司:{$order['expresscom']}</p>
 								<p style='color:#999'>快递单号:{$order['expresssn']}</p>
@@ -104,7 +161,7 @@
 									<div class="fui-list-icon">
 										<i class="icon icon-deliver" style="color: #ff5555;"></i>
 									</div>
-									<div class="fui-list-inner" style="font-size: 0.7rem;height: auto;line-height: 1.5rem;">
+									<div class="fui-list-inner" style="font-size: 0.7rem;height: auto;line-height: 1.2rem;">
 										{if empty($express)}
 										<p style='color:#ff5555'>快递公司:{if $sg['expresscom']}{$sg['expresscom']}{else}其他快递{/if}</p>
 										<p style='color:#999'>快递单号:{$sg['expresssn']}</p>
@@ -118,52 +175,29 @@
 							{/loop}
 						{/if}
 					{/if}
-					<div class="fui-list" style="background: #fff;">
+					<div class="fui-list" style="background: #fff;    padding-top: .8rem;
+    padding-bottom: .83rem;">
 						<div class="fui-list-icon">
-							<i class="icon icon-map" style="color: #f95462;"></i>
+							<i class="icon icon-dingwei"></i>
 						</div>
-						<div class="fui-list-inner" style="font-size: 0.7rem;height: auto;line-height: 1.5rem;">
-							<p>{$address['realname']} {$address['mobile']}</p>
-							<p>{$address['province']}{$address['city']}{$address['area']}{if !empty($new_area) && !empty($address_street)} {$address['street']}{/if} {$address['address']}</p>
+						<div class="fui-list-inner" style="font-size: 0.7rem;height: auto;">
+							<div class="title has-address">{$address['realname']} {$address['mobile']}</div>
+							<!--<p>{$address['realname']} {$address['mobile']}</p>-->
+							<div class="text"><span class='address'>{$address['province']}{$address['city']}{$address['area']}{if !empty($new_area) && !empty($address_street)} {$address['street']}{/if} {$address['address']}</span></div>
+							<!--<p>{$address['province']}{$address['city']}{$address['area']}{if !empty($new_area) && !empty($address_street)} {$address['street']}{/if} {$address['address']}</p>-->
 						</div>
 					</div>
 				</div>
 			{/if}
 
 
-			{if !empty($carrier) ||!empty($store)}
-			<div class="fui-cell-group">
-				<div class="fui-cell">
-					<div class="fui-cell-info">
-						{$carrier['carrier_realname']} {$carrier['carrier_mobile']}
-					</div>
-					<div class="fui-cell-remark noremark">
-					</div>
-				</div>
 
-				{if !empty($store)}
-				<a href="{php echo mobileUrl('store/detail',array('id'=>$store['id']))}" class="fui-cell">
-					<div class="fui-cell-icon">
-						<i class="icon icon-locationfill"></i>
-					</div>
-					<div class="fui-cell-info">
-						适用门店 :{$store['realname']}
-					</div>
-					<div class="fui-cell-remark">
-						查看
-					</div>
-				</a>
-				{/if}
-			</div>
-
-
-			{/if}
 
 
 			<!--商品信息-->
 			<div class="fui-list-group">
 				{if empty($order['isnewstore'])}
-				<div class="fui-list_title"><i class="iconfont icon-dianpu" style="margin-right: 0.25rem;"></i>{$shopname}</div>
+				<div class="fui-list_title"><i class="icon icon-dianpu1" style="margin-right: 0.25rem;"></i>{$shopname}</div>
 				{/if}
 
 				{php $i=0;}
@@ -177,16 +211,15 @@
 							{if !empty($g['optionid'])}<div class="subtitle">{$g['optiontitle']}</div>{/if}
 							{if $g['status']==2}
 							<div class="subtitle">
-								<label class="fui-label fui-label-warning">赠品</label>
+								<label class="fui-label fui-label-danger">赠品</label>
 							</div>
 							{/if}
 						</div>
-						<div class="fui-list-angle">
-							<div>{$g['price']}</div>
+						<div class="fui-list-angle" style="margin-right: 0">
+							<div style="color: #000">￥{php echo number_format($g['price']/$g['total'],2)}</div>
 							<div class="num">x{$g['total']}</div>
 						</div>
 					</a>
-
 					{if !empty($g['fullbackgoods'])}
 						<div class="fui-cell-group" {if $g['fullbackgoods']['minallfullbackallprice']<=0 && $g['fullbackgoods']['minallfullbackallratio']<=0}display: none;{/if}>
 							<a href="{php echo mobileUrl('member/fullback')}"  class="fui-cell">
@@ -225,7 +258,90 @@
 				{php $i++;}
 			{/loop}
 		</div>
-
+		<!--门店-->
+		{if empty($order['isnewstore'])}
+		{if !empty($stores)}
+		<div class="fui-according-group">
+			<div class="fui-according expanded">
+				<div class="fui-according-header">
+					<span class="text">适用门店</span>
+							<span class="remark">
+								<span class="badge">{php echo count($stores)}</span>
+							</span>
+				</div>
+				<div class="fui-according-content">
+					<div class="content-block">
+						<div class="fui-cell-group notop store-container">
+							{loop $stores $item}
+							<a href="{php echo mobileUrl('store/detail',array('id'=>$item['id']))}" class="fui-cell">
+								<div class="fui-cell-icon">
+									<i class="icon icon-locationfill"></i>
+								</div>
+								<div class="fui-cell-info">
+									{$item['storename']}
+								</div>
+								<div class="fui-cell-remark">
+									查看
+								</div>
+							</a>
+							{/loop}
+							{if count($stores)>3}
+							<div class='show-allshop'><span class='show-allshop-btn'>加载更多门店</span></div>
+							{/if}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{/if}
+		{/if}
+		{if !empty($store)}
+		<div class="fui-according-group">
+			<div class="fui-according expanded">
+				<div class="fui-according-header">
+					<span class="text">适用门店</span>
+							<span class="remark">
+								<span class="badge">{php echo count($stores)}</span>
+							</span>
+				</div>
+				<div class="fui-according-content">
+					<div class="content-block">
+						<div class="fui-cell-group notop store-container">
+							<a href="{php echo mobileUrl('store/detail',array('id'=>$store['id']))}" class="fui-cell">
+								<div class="fui-cell-icon">
+									<i class="icon icon-locationfill"></i>
+								</div>
+								<div class="fui-cell-info">
+									{$store['realname']}
+								</div>
+								<div class="fui-cell-remark">
+									查看
+								</div>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{/if}
+		{if !empty($carrier)}
+		<div class="fui-cell-group">
+			<div class="fui-cell">
+				<div class="fui-cell-info">
+					姓名：{$carrier['carrier_realname']}
+				</div>
+				<div class="fui-cell-remark noremark">
+				</div>
+			</div>
+			<div class="fui-cell">
+				<div class="fui-cell-info">
+					电话：{$carrier['carrier_mobile']}
+				</div>
+				<div class="fui-cell-remark noremark">
+				</div>
+			</div>
+		</div>
+		{/if}
 		{if !empty($order_fields) && !empty($order_data)}
 			<div class="fui-cell-group noborder">
 				{php $datas = $order_data}
@@ -243,61 +359,17 @@
 			</div>
 		{/if}
 
-		<!--门店-->
-		{if empty($order['isnewstore'])}
-			{if !empty($stores)}
-				<div class="fui-according-group">
-					<div class="fui-according">
-						<div class="fui-according-header">
-							<span class="text">适用门店</span>
-							<span class="remark">
-								<span class="badge">{php echo count($stores)}</span>
-							</span>
-						</div>
-						<div class="fui-according-content">
-							<div class="content-block">
-								<div class="fui-cell-group notop">
-									{loop $stores $item}
-										<a href="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" class="fui-cell">
-											<div class="fui-cell-icon">
-												<i class="icon icon-locationfill"></i>
-											</div>
-											<div class="fui-cell-info">
-												{$item['storename']}
-											</div>
-											<div class="fui-cell-remark">
-												查看
-											</div>
-										</a>
-									{/loop}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			{/if}
-		{/if}
+
 
 
 		<!--消费码-->
 		{if $order['showverify']}
-
-			<div class="fui-according-group">
-				<div class="fui-according">
-					<div class="fui-according-header">
-						<span class="text">消费码</span>
-						<span class="remark">
-							<span class="badge">{php echo count($verifyinfo)}</span>
-						</span>
-					</div>
-					<div class="fui-according-content">
-						<div class="content-block">
-							<div class="fui-cell-group notop">
+			<div class="fui-cell-group">
 								{if $order['status']>0 || $order['paytime'] > 0}
 									{loop $verifyinfo $v}
-										<div  class="fui-cell">
+										<div  class="fui-cell lineblock">
 											<div class="fui-cell-info">
-												{$v['verifycode']}
+												消费码:{$v['verifycode']}
 											</div>
 
 											<div class="fui-cell-remark noremark">
@@ -320,40 +392,44 @@
 										</div>
 									{/loop}
 								{else}
-									<div   class="fui-cell">
+									<div   class="fui-cell lineblock">
 										<div class="fui-cell-info">
 											付款后可见!
 										</div>
 									</div>
 								{/if}
 							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 		{/if}
 
 		{if !empty($order['virtual']) && !empty($order['virtual_str'])}
 			<!--发货信息-->
-			<div class="fui-according-group">
-				<div class="fui-according expanded">
-					<div class="fui-according-header">
-						<span class="text">发货信息</span>
-						<span class="remark"></span>
-					</div>
-					<div class="fui-according-content"  style="display: block;">
-						<div class="content-block">
-							<div class="fui-cell-group notop">
-								<div   class="fui-cell">
-									<div class="fui-cell-info" style="white-space: normal;word-wrap: break-word">
-										{$order['virtual_str']}
-									</div>
-								</div>
-							</div>
+			{if is_array($ordervirtual) && !empty($ordervirtual)}
+				{loop $ordervirtual $ordervirtualindex $ordervirtualitem}
+					<div class="fui-cell-group">
+						<div class="fui-cell-title">Group{php echo count($ordervirtual)>1? $ordervirtualindex+1: ''}</div>
+						{loop $ordervirtualitem $ordervirtualrow}
+						<div class="fui-cell">
+							<div class="fui-cell-label">{$ordervirtualrow['key']}</div>
+							<div class="fui-cell-info" style="white-space: normal;word-wrap: break-word">{$ordervirtualrow['value']}</div>
 						</div>
+						{/loop}
+						{if !empty($virtualtemp) && !empty($virtualtemp['linkurl'])}
+						<a class="btn btn-default block" href="{$virtualtemp['linkurl']}">{php echo !empty($virtualtemp['linktext'])? $virtualtemp['linktext']: '使用地址'}</a>
+						{/if}
 					</div>
+				{/loop}
+			{else}
+				<div class="fui-cell-group">
+					<div class="fui-cell-title">发货信息</div>
+					<div class="fui-cell">
+						<div class="fui-cell-info" style="white-space: normal;word-wrap: break-word">{$order['virtual_str']}</div>
+					</div>
+					{if !empty($virtualtemp) && !empty($virtualtemp['linkurl'])}
+					<a class="btn btn-default block" href="{$virtualtemp['linkurl']}">{php echo !empty($virtualtemp['linktext'])? $virtualtemp['linktext']: '使用地址'}</a>
+					{/if}
 				</div>
-			</div>
+			{/if}
+
 		{/if}
 
 		{if !empty($order['isvirtualsend']) && !empty($order['virtualsend_info'])}
@@ -517,7 +593,7 @@
 
 					</div>
 					<div class="fui-cell-remark noremark text-danger">
-						&yen; <span style='font-size:.8rem'>{$order['price']}
+						 <span style='font-size:.75rem'>&yen;{$order['price']}
 					</div>
 				</div>
 			</div>
@@ -590,7 +666,7 @@
 					{if is_mobile()}
 						{if $order['paytype']!=3}
 							{if $order['paytype']!=3 && empty($ispeerpay)}
-								<a class="btn btn-sm btn-default-o"  href="{php echo mobileUrl('order/pay',array('id'=>$order['id']))">支付订单</a>
+								<a class="btn btn-sm btn-default-o"  href="{php echo mobileUrl('order/pay',array('id'=>$order['id']))}">支付订单</a>
 							{else}
 								<a class="btn btn-sm btn-default-o"  href="{php echo mobileUrl('order/pay/peerpayshare',array('id'=>$order['id']))}">代付订单</a>
 							{/if}
@@ -637,8 +713,7 @@
 				</div>
 				<div class="cav_code">{$verifycode}</div>
 				<div class="error">
-					<p>如果无法扫描</p>
-					<p>请使用消费码或自提码进行核销</p>
+					<p style="padding: 0 1.3rem">温馨提示：为了更好的保护您利益,请不要轻易将您的核销二维码泄露给他人</p>
 				</div>
 			</div>
 		</div>
@@ -659,3 +734,4 @@
 		});
 	</script>
 {template '_footer'}
+

@@ -5,7 +5,7 @@ if (!(defined('IN_IA')))
 }
 global $_W;
 global $_GPC;
-check_shop_auth('http://120.26.212.219/api.php');
+
 $id = intval($_GPC['id']);
 $log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 $store = false;

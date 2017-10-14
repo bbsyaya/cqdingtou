@@ -218,9 +218,8 @@ class Sendcoupon_EweiShopV2Page extends ComWebPage
 		$logid = pdo_insertid();
 		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $coupon['merchid'], 'openid' => $openid, 'couponid' => $couponid, 'gettype' => 0, 'gettime' => $time, 'senduid' => $_W['uid']);
 		pdo_insert('ewei_shop_coupon_data', $data);
-		
-		}
 		++$i;
+		}
 		show_json(1, array('openids' => $openids));
 	}
 	public function sendmessage() 

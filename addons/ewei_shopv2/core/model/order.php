@@ -71,6 +71,10 @@ class Order_EweiShopV2Model
 		$ordersn_tid = $params['tid'];
 		$ordersn = rtrim($ordersn_tid, 'TR');
 		$order = pdo_fetch('select id,ordersn, price,openid,dispatchtype,addressid,carrier,status,isverify,deductcredit2,`virtual`,isvirtual,couponid,isvirtualsend,isparent,paytype,merchid,agentid,createtime,buyagainprice,istrade,tradestatus from ' . tablename('ewei_shop_order') . ' where  ordersn=:ordersn and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':ordersn' => $ordersn));
+		if (1 <= $order['status']) 
+		{
+			return true;
+		}
 		$orderid = $order['id'];
 		$ispeerpay = $this->checkpeerpay($orderid);
 		if (!(empty($ispeerpay))) 
@@ -168,7 +172,19 @@ class Order_EweiShopV2Model
 							}
 						}
 					}
-					com_run('printer::sendOrderMessage', $orderid);
+					if ($order['isparent'] == 1) 
+					{
+						$merchSql = 'SELECT id,merchid FROM ' . tablename('ewei_shop_order') . ' WHERE uniacid = ' . intval($_W['uniacid']) . ' AND parentid = ' . intval($order['id']);
+						$merchData = pdo_fetchall($merchSql);
+						foreach ($merchData as $mk => $mv ) 
+						{
+							com_run('printer::sendOrderMessage', $mv['id']);
+						}
+					}
+					else 
+					{
+						com_run('printer::sendOrderMessage', $orderid);
+					}
 					if (p('commission')) 
 					{
 						p('commission')->checkOrderPay($order['id']);
@@ -833,7 +849,7 @@ class Order_EweiShopV2Model
 						{
 							$price2 = round($dd, 2);
 						}
-						else if (0 < $md) 
+						else if (0 < $md)
 						{
 							$price2 = round(($md / 10) * $gprice, 2);
 						}
@@ -1666,7 +1682,7 @@ class Order_EweiShopV2Model
 		$uniacid = $_W['uniacid'];
 		$ispeerpay = m('order')->checkpeerpay($orderid);
 		$item = pdo_fetch('select * from ' . tablename('ewei_shop_order') . '  where  id = :id and uniacid=:uniacid limit 1', array(':id' => $orderid, ':uniacid' => $uniacid));
-		if (empty($item['storeid']) && (empty($item['isnewstore']) || empty($item['istrade']))) 
+		if ((empty($order['isnewstore']) || empty($order['storeid'])) && empty($order['istrade'])) 
 		{
 			$order_goods = pdo_fetchall('select og.id,g.title, og.goodsid,og.optionid,g.total as stock,og.total as buycount,g.status,g.deleted,g.maxbuy,g.usermaxbuy,g.istime,g.timestart,g.timeend,g.buylevels,g.buygroups,g.totalcnf,og.seckill from  ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id ' . ' where og.orderid=:orderid and og.uniacid=:uniacid ', array(':uniacid' => $_W['uniacid'], ':orderid' => $orderid));
 			foreach ($order_goods as $data ) 
@@ -1729,6 +1745,11 @@ class Order_EweiShopV2Model
 				}
 			}
 		}
+		else 
+		{
+			$flag = 1;
+			$msg .= '门店歇业,不能付款!';
+		}
 		$data = array();
 		$data['flag'] = $flag;
 		$data['msg'] = $msg;
@@ -1737,7 +1758,7 @@ class Order_EweiShopV2Model
 	public function checkpeerpay($orderid) 
 	{
 		global $_W;
-		$sql = 'SELECT p.*,o.openid FROM ' . tablename('ewei_shop_order_peerpay') . ' AS p JOIN ' . tablename('ewei_shop_order') . ' AS o ON p.orderid = o.id AND p.status = o.status WHERE p.orderid = :orderid AND p.uniacid = :uniacid AND (p.status = 0 OR p.status=1) AND o.status >= 0 LIMIT 1';
+		$sql = 'SELECT p.*,o.openid FROM ' . tablename('ewei_shop_order_peerpay') . ' AS p JOIN ' . tablename('ewei_shop_order') . ' AS o ON p.orderid = o.id WHERE p.orderid = :orderid AND p.uniacid = :uniacid AND (p.status = 0 OR p.status=1) AND o.status >= 0 LIMIT 1';
 		$query = pdo_fetch($sql, array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
 		return $query;
 	}
@@ -1805,6 +1826,44 @@ class Order_EweiShopV2Model
 		global $_W;
 		$count = intval(substr_count($ordersn, $str));
 		return $count;
+	}
+	public function getOrderVirtual($order = array()) 
+	{
+		global $_W;
+		if (empty($order)) 
+		{
+			return false;
+		}
+		if (empty($order['virtual_info'])) 
+		{
+			return $order['virtual_str'];
+		}
+		$ordervirtual = array();
+		$virtual_type = pdo_fetch('select fields from ' . tablename('ewei_shop_virtual_type') . ' where id=:id and uniacid=:uniacid and merchid = :merchid limit 1 ', array(':id' => $order['virtual'], ':uniacid' => $_W['uniacid'], ':merchid' => $order['merchid']));
+		if (!(empty($virtual_type))) 
+		{
+			$virtual_type = iunserializer($virtual_type['fields']);
+			$virtual_info = ltrim($order['virtual_info'], '[');
+			$virtual_info = rtrim($virtual_info, ']');
+			$virtual_info = explode(',', $virtual_info);
+			if (!(empty($virtual_info))) 
+			{
+				foreach ($virtual_info as $index => $virtualinfo ) 
+				{
+					$virtual_temp = iunserializer($virtualinfo);
+					if (!(empty($virtual_temp))) 
+					{
+						foreach ($virtual_temp as $k => $v ) 
+						{
+							$ordervirtual[$index][] = array('key' => $virtual_type[$k], 'value' => $v, 'field' => $k);
+						}
+						unset($k, $v);
+					}
+				}
+				unset($index, $virtualinfo);
+			}
+		}
+		return $ordervirtual;
 	}
 }
 ?>

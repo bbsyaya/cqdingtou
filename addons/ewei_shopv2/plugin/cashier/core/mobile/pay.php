@@ -44,16 +44,6 @@ class Pay_EweiShopV2Page extends CashierMobilePage
 		}
 		$paytype = $this->model->paytype(-1);
 		list(, $payment) = m('common')->public_build();
-		if ($payment['is_new']) 
-		{
-			if (($payment['type'] == 2) || ($payment['type'] == 3)) 
-			{
-				if (!(empty($payment['sub_appsecret']))) 
-				{
-					m('member')->wxuser($payment['sub_appid'], $payment['sub_appsecret']);
-				}
-			}
-		}
 		if (($paytype == 101) && ($payment['is_new'] == 1) && ($payment['type'] == 4)) 
 		{
 			$paytype = 102;
