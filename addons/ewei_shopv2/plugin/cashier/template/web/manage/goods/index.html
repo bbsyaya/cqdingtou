@@ -179,6 +179,29 @@
         font-size: 20px;
     }
 
+    .warn{
+        position: absolute;
+        right: 0;
+        background: rgba(255, 0, 0, 0.7);
+        color: #fff;
+        max-height: 35px;
+        max-width: 35px;
+        transform: scale(0.8,0.8);
+        -webkit-transform: scale(0.8,0.8);
+        -moz-transform: scale(0.8,0.8);
+        -o-transform: scale(0.8,0.8);
+        -ms-transform: scale(0.8,0.8);
+        transform-origin: top right;
+        -webkit-transform-origin: top right;
+        -o-transform-origin: top right;
+        -ms-transform-origin: top right;
+        -moz-transform-origin: top right;
+        lin: 16px;
+        line-height: 14px;
+        padding: 3px 0;
+    }
+
+
 </style>
 
 
@@ -373,7 +396,7 @@
                     if (selfgoods.length>0){
                         var html = '';
                         $.each(selfgoods,function (key,value) {
-                            html += '<div class="item goods" data-id="'+value.id+'" data-title="'+value.title+'" data-option="0" data-selfgoods="1"><img src="'+value.thumb+'" /><div class="title">'+value.title+'</div></div>';
+                            html += '<div class="item goods" data-id="'+value.id+'" data-title="'+value.title+'" data-option="0" data-selfgoods="1">'+(value.iswarning==0?'':'<div class="warn">库存预警</div>')+'<img src="'+value.thumb+'" /><div class="title">'+value.title+'</div></div>';
                             winselfgoods[value.id] = value;
                         });
                         $goodsdata.html(html)
@@ -390,8 +413,7 @@
                                     break;
                                 }
                             }
-
-                            html += '<div class="item goods" data-id="'+value.id+'" data-title="'+value.title+'" data-option="'+(option==false?0:option.id)+'" data-selfgoods="0"><img src="'+value.thumb+'" /><div class="title">'+value.title+'</div></div>';
+                            html += '<div class="item goods" data-id="'+value.id+'" data-title="'+value.title+'" data-option="'+(option==false?0:option.id)+'" data-selfgoods="0">'+(value.iswarning==0?'':'<div class="warn">库存预警</div>')+'<img src="'+value.thumb+'" /><div class="title">'+value.title+'</div></div>';
                             wingoods[value.id] = value;
                         });
                         $goodsdata.append(html)

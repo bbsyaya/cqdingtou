@@ -53,7 +53,24 @@ class Sysset_EweiShopV2Page extends CashierWebPage
 		}
 		if ($_W['ispost']) 
 		{
-			$wechatpay = ((is_array($_GPC['wechatpay']) ? json_encode($_GPC['wechatpay']) : ''));
+			$wechatpay = '';
+			if (is_array($_GPC['wechatpay'])) 
+			{
+				$wechatpay = $_GPC['wechatpay'];
+				if ($_FILES['cert_file']['name']) 
+				{
+					$wechatpay['cert'] = $this->model->upload_cert('cert_file');
+				}
+				if ($_FILES['key_file']['name']) 
+				{
+					$wechatpay['key'] = $this->model->upload_cert('key_file');
+				}
+				if ($_FILES['root_file']['name']) 
+				{
+					$wechatpay['root'] = $this->model->upload_cert('root_file');
+				}
+				$wechatpay = json_encode($wechatpay);
+			}
 			if (!(empty($item))) 
 			{
 				$alipay_yuan = json_decode($item['alipay'], true);

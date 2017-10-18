@@ -166,5 +166,33 @@ class Index_EweiShopV2Page extends MerchWebPage
 		}
 		show_json(1);
 	}
+	public function switchversion() 
+	{
+		global $_W;
+		global $_GPC;
+		$route = trim($_GPC['route']);
+		$id = intval($_GPC['id']);
+		$set = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_version') . ' WHERE uid=:uid AND `type`=1', array(':uid' => $_W['merchuid']));
+		$data = array('type' => 1, 'version' => (!(empty($_W['shopversion'])) ? 0 : 1));
+		if (empty($set)) 
+		{
+			$data['uid'] = $_W['merchuid'];
+			pdo_insert('ewei_shop_version', $data);
+		}
+		else 
+		{
+			pdo_update('ewei_shop_version', $data, array('id' => $set['id']));
+		}
+		$params = array();
+		if (!(empty($id))) 
+		{
+			$params['id'] = $id;
+		}
+		load()->model('cache');
+		cache_clean();
+		cache_build_template();
+		header('location: ' . webUrl($route, $params));
+		exit();
+	}
 }
 ?>

@@ -216,7 +216,7 @@
 							{/if}
 						</div>
 						<div class="fui-list-angle" style="margin-right: 0">
-							<div style="color: #000">￥{$g['price']}</div>
+							<div style="color: #000">￥{php echo number_format($g['price']/$g['total'],2)}</div>
 							<div class="num">x{$g['total']}</div>
 						</div>
 					</a>
@@ -403,37 +403,33 @@
 
 		{if !empty($order['virtual']) && !empty($order['virtual_str'])}
 			<!--发货信息-->
-			<div class="fui-according-group">
-				<div class="fui-according expanded">
-					<div class="fui-according-header">
-						<span class="text">发货信息</span>
-						<span class="remark"></span>
-					</div>
-					<div class="fui-according-content"  style="display: block;">
-						<div class="content-block">
-							<div class="fui-cell-group notop">
-								{if is_array($ordervirtual)}
-									{loop $ordervirtual $ordervirtualrow}
-											<div  class="fui-cell">
-												<div class="fui-cell-label">{$ordervirtualrow['key']}</div>
-												<div class="fui-cell-info" style="white-space: normal;word-wrap: break-word">{$ordervirtualrow['value']}</div>
-											</div>
-									{/loop}
-								{else}
-									<div  class="fui-cell">
-										<div class="fui-cell-info" style="white-space: normal;word-wrap: break-word">
-											{$order['virtual_str']}
-										</div>
-									</div>
-								{/if}
-								{if !empty($virtualtemp) && !empty($virtualtemp['linkurl'])}
-								<a class="btn btn-default block" href="{$virtualtemp['linkurl']}">{php echo !empty($virtualtemp['linktext'])? $virtualtemp['linktext']: '使用地址'}</a>
-								{/if}
-							</div>
+			{if is_array($ordervirtual) && !empty($ordervirtual)}
+				{loop $ordervirtual $ordervirtualindex $ordervirtualitem}
+					<div class="fui-cell-group">
+						<div class="fui-cell-title">Group{php echo count($ordervirtual)>1? $ordervirtualindex+1: ''}</div>
+						{loop $ordervirtualitem $ordervirtualrow}
+						<div class="fui-cell">
+							<div class="fui-cell-label">{$ordervirtualrow['key']}</div>
+							<div class="fui-cell-info" style="white-space: normal;word-wrap: break-word">{$ordervirtualrow['value']}</div>
 						</div>
+						{/loop}
+						{if !empty($virtualtemp) && !empty($virtualtemp['linkurl'])}
+						<a class="btn btn-default block" href="{$virtualtemp['linkurl']}">{php echo !empty($virtualtemp['linktext'])? $virtualtemp['linktext']: '使用地址'}</a>
+						{/if}
 					</div>
+				{/loop}
+			{else}
+				<div class="fui-cell-group">
+					<div class="fui-cell-title">发货信息</div>
+					<div class="fui-cell">
+						<div class="fui-cell-info" style="white-space: normal;word-wrap: break-word">{$order['virtual_str']}</div>
+					</div>
+					{if !empty($virtualtemp) && !empty($virtualtemp['linkurl'])}
+					<a class="btn btn-default block" href="{$virtualtemp['linkurl']}">{php echo !empty($virtualtemp['linktext'])? $virtualtemp['linktext']: '使用地址'}</a>
+					{/if}
 				</div>
-			</div>
+			{/if}
+
 		{/if}
 
 		{if !empty($order['isvirtualsend']) && !empty($order['virtualsend_info'])}

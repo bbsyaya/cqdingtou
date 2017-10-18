@@ -71,6 +71,10 @@ class Order_EweiShopV2Model
 		$ordersn_tid = $params['tid'];
 		$ordersn = rtrim($ordersn_tid, 'TR');
 		$order = pdo_fetch('select id,ordersn, price,openid,dispatchtype,addressid,carrier,status,isverify,deductcredit2,`virtual`,isvirtual,couponid,isvirtualsend,isparent,paytype,merchid,agentid,createtime,buyagainprice,istrade,tradestatus from ' . tablename('ewei_shop_order') . ' where  ordersn=:ordersn and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':ordersn' => $ordersn));
+		if (1 <= $order['status']) 
+		{
+			return true;
+		}
 		$orderid = $order['id'];
 		$ispeerpay = $this->checkpeerpay($orderid);
 		if (!(empty($ispeerpay))) 
@@ -168,7 +172,19 @@ class Order_EweiShopV2Model
 							}
 						}
 					}
-					com_run('printer::sendOrderMessage', $orderid);
+					if ($order['isparent'] == 1) 
+					{
+						$merchSql = 'SELECT id,merchid FROM ' . tablename('ewei_shop_order') . ' WHERE uniacid = ' . intval($_W['uniacid']) . ' AND parentid = ' . intval($order['id']);
+						$merchData = pdo_fetchall($merchSql);
+						foreach ($merchData as $mk => $mv ) 
+						{
+							com_run('printer::sendOrderMessage', $mv['id']);
+						}
+					}
+					else 
+					{
+						com_run('printer::sendOrderMessage', $orderid);
+					}
 					if (p('commission')) 
 					{
 						p('commission')->checkOrderPay($order['id']);
@@ -833,7 +849,7 @@ class Order_EweiShopV2Model
 						{
 							$price2 = round($dd, 2);
 						}
-						else if (0 < $md) 
+						else if (0 < $md)
 						{
 							$price2 = round(($md / 10) * $gprice, 2);
 						}
@@ -1832,14 +1848,19 @@ class Order_EweiShopV2Model
 			$virtual_info = explode(',', $virtual_info);
 			if (!(empty($virtual_info))) 
 			{
-				foreach ($virtual_info as $k => $v ) 
+				foreach ($virtual_info as $index => $virtualinfo ) 
 				{
-					$virtual_temp = iunserializer($v);
-					$vall = array_values($virtual_temp);
-					$keyl = array_keys($virtual_temp);
-					$ordervirtual[] = array('key' => $virtual_type[$keyl[0]], 'value' => $vall[0], 'field' => $k);
+					$virtual_temp = iunserializer($virtualinfo);
+					if (!(empty($virtual_temp))) 
+					{
+						foreach ($virtual_temp as $k => $v ) 
+						{
+							$ordervirtual[$index][] = array('key' => $virtual_type[$k], 'value' => $v, 'field' => $k);
+						}
+						unset($k, $v);
+					}
 				}
-				unset($k, $v);
+				unset($index, $virtualinfo);
 			}
 		}
 		return $ordervirtual;

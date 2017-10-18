@@ -774,6 +774,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_cashier_user` (
   `show_paytype` tinyint(1) DEFAULT '0',
   `couponid` varchar(255) DEFAULT '',
   `management` varchar(1000) DEFAULT '',
+  `notice_openids` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `uniacid` (`uniacid`) USING BTREE,
   KEY `openid` (`manageopenid`) USING BTREE,
@@ -1855,6 +1856,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_exchange_setting` (
   `mistake` int(11) NOT NULL DEFAULT '0',
   `grouplimit` int(11) NOT NULL DEFAULT '0',
   `alllimit` int(11) NOT NULL DEFAULT '0',
+  `no_qrimg` tinyint(3) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`,`uniacid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED AUTO_INCREMENT=1 ;
 
@@ -2260,6 +2262,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `showtotal` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `subtitle` varchar(255) DEFAULT '',
   `minpriceupdated` tinyint(1) DEFAULT '0',
+  `newgoods` tinyint(3) NOT NULL DEFAULT '0',
   `sharebtn` tinyint(1) NOT NULL DEFAULT '0',
   `catesinit3` text,
   `showtotaladd` tinyint(1) DEFAULT '0',
@@ -3999,6 +4002,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order` (
   `dowpayment` decimal(10,2) NOT NULL DEFAULT '0.00',
   `betweenprice` decimal(10,2) NOT NULL DEFAULT '0.00',
   `isshare` int(11) NOT NULL DEFAULT '0',
+  `officcode` varchar(50) NOT NULL DEFAULT '',
+  `wxapp_prepay_id` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_openid` (`openid`),
@@ -4453,7 +4458,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_plugin` (
   PRIMARY KEY (`id`),
   KEY `idx_displayorder` (`displayorder`),
   KEY `idx_identity` (`identity`) USING BTREE
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=44 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_polyapi_key`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_polyapi_key` (
@@ -5933,7 +5938,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_version` (
   PRIMARY KEY (`id`),
   KEY `idx_uid` (`uid`) USING BTREE,
   KEY `idx_version` (`version`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED AUTO_INCREMENT=2 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_virtual_category`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_virtual_category` (
@@ -5958,6 +5963,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_virtual_data` (
   `ordersn` varchar(255) DEFAULT '',
   `price` decimal(10,2) DEFAULT '0.00',
   `merchid` int(11) DEFAULT '0',
+  `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_typeid` (`typeid`),
@@ -5977,10 +5983,25 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_virtual_type` (
   `merchid` int(11) DEFAULT '0',
   `linktext` varchar(50) DEFAULT NULL,
   `linkurl` varchar(255) DEFAULT NULL,
+  `recycled` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_cate` (`cate`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_wxapp_tmessage`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxapp_tmessage` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `templateid` varchar(50) DEFAULT '',
+  `datas` text,
+  `emphasis_keyword` int(11) NOT NULL DEFAULT '0',
+  `status` tinyint(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_status` (`status`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_wxcard`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxcard` (
