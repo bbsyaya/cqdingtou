@@ -55,7 +55,7 @@ class Goods_EweiShopV2Page extends WebPage
 		}
 		unset($row);
 		$total = pdo_fetchcolumn('select  count(*) from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = og.orderid ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id = og.goodsid ' . ' where 1 ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		if ($_GPC['export'] == 1) 
 		{
 			ca('statistics.goods.export');

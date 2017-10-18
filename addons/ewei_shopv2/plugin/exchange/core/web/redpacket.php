@@ -16,7 +16,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$allEnd = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) <' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allStart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) >' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allNostart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE  unix_timestamp(starttime) >' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
-		$pager = pagination($allStart, $page, $psize);
+		$pager = pagination2($allStart, $page, $psize);
 		include $this->template();
 	}
 	public function nostart() 
@@ -30,7 +30,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$allEnd = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) <' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allStart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) >' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allNostart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE  unix_timestamp(starttime) >' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
-		$pager = pagination($allNostart, $page, $psize);
+		$pager = pagination2($allNostart, $page, $psize);
 		include $this->template();
 	}
 	public function end() 
@@ -44,7 +44,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$allEnd = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) <' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allStart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) >' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allNostart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE  unix_timestamp(starttime) >' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
-		$pager = pagination($allEnd, $page, $psize);
+		$pager = pagination2($allEnd, $page, $psize);
 		include $this->template();
 	}
 	public function post() 
@@ -479,7 +479,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$dno = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 1 AND unix_timestamp(endtime)>' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dyet = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 2', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dend = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status!=2 AND unix_timestamp(endtime)<=' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
-		$pager = pagination($dno, $page, $psize);
+		$pager = pagination2($dno, $page, $psize);
 		include $this->template();
 	}
 	public function dyet() 
@@ -508,7 +508,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$dno = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 1 AND unix_timestamp(endtime)>' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dyet = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 2', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dend = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status!=2 AND unix_timestamp(endtime)<=' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
-		$pager = pagination($dyet, $page, $psize);
+		$pager = pagination2($dyet, $page, $psize);
 		include $this->template();
 	}
 	public function dend() 
@@ -537,7 +537,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$dno = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 1 AND unix_timestamp(endtime)>' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dyet = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 2', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dend = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status!=2 AND unix_timestamp(endtime)<=' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
-		$pager = pagination($dend, $page, $psize);
+		$pager = pagination2($dend, $page, $psize);
 		include $this->template();
 	}
 	public function delete() 
@@ -814,7 +814,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$allEnd = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) <' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allStart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE unix_timestamp(endtime) >' . time() . ' AND unix_timestamp(starttime) <' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
 		$allNostart = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_group') . ' WHERE  unix_timestamp(starttime) >' . time() . ' AND mode = 3 AND uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
-		$pager = pagination($count, $page, $psize);
+		$pager = pagination2($count, $page, $psize);
 		include $this->template();
 	}
 	public function codesearch() 
@@ -857,7 +857,7 @@ class Redpacket_EweiShopV2Page extends PluginWebPage
 		$dno = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 1 AND unix_timestamp(endtime)>' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dyet = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status = 2', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		$dend = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_code') . ' WHERE groupid = :id AND uniacid=:uniacid AND status!=2 AND unix_timestamp(endtime)<=' . time(), array(':id' => $id, ':uniacid' => $_W['uniacid']));
-		$pager = pagination($count, $page, $psize);
+		$pager = pagination2($count, $page, $psize);
 		include $this->template();
 	}
 	public function qr() 

@@ -25,7 +25,14 @@ class Cart_EweiShopV2Page extends MobileLoginPage
 		global $_GPC;
 		$uniacid = $_W['uniacid'];
 		$openid = $_W['openid'];
-		$condition = ' and f.uniacid= :uniacid and f.openid=:openid and f.deleted=0';
+		if (p('newstore')) 
+		{
+			$condition = ' and f.uniacid= :uniacid and f.openid=:openid and f.deleted=0 and f.isnewstore=0';
+		}
+		else 
+		{
+			$condition = ' and f.uniacid= :uniacid and f.openid=:openid and f.deleted=0';
+		}
 		$params = array(':uniacid' => $uniacid, ':openid' => $openid);
 		$list = array();
 		$total = 0;
@@ -182,6 +189,39 @@ class Cart_EweiShopV2Page extends MobileLoginPage
 		if (empty($list)) 
 		{
 			$list = array();
+		}
+		else 
+		{
+			foreach ($list as $g ) 
+			{
+				$goodsmerchid = $g['merchid'];
+				if (!(isset($merch_user[$goodsmerchid]))) 
+				{
+					$merch_user[$goodsmerchid] = array('goods_count' => 0, 'goods_selected' => 0);
+				}
+				$merch_user[$goodsmerchid]['goods_count'] = intval($merch_user[$goodsmerchid]['goods_count']);
+				$merch_user[$goodsmerchid]['goods_selected'] = intval($merch_user[$goodsmerchid]['goods_selected']);
+				++$merch_user[$goodsmerchid]['goods_count'];
+				if (!(empty($g['selected']))) 
+				{
+					++$merch_user[$goodsmerchid]['goods_selected'];
+				}
+			}
+			foreach ($merch_user as $merchid => $merchuser ) 
+			{
+				if (!(isset($merchuser['goods_selected'])) || !(isset($merchuser['goods_count']))) 
+				{
+					continue;
+				}
+				if ($merchuser['goods_selected'] == $merchuser['goods_count']) 
+				{
+					$merch_user[$merchid]['selectedall'] = 1;
+				}
+				else 
+				{
+					$merch_user[$merchid]['selectedall'] = 0;
+				}
+			}
 		}
 		show_json(1, array('ischeckall' => $ischeckall, 'list' => $list, 'total' => $total, 'totalprice' => round($totalprice, 2), 'merch_user' => $merch_user, 'merch' => $merch));
 	}

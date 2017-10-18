@@ -14,12 +14,12 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 		$id = trim($_GPC['id']);
 		if (empty($verifycode)) 
 		{
-			$this->message('未查询到核销商品或核销码已失效,请核对核销码!', '', 'error');
+			$this->message('未查询到记次时商品或核销码已失效,请核对核销码!', '', 'error');
 		}
 		$item = pdo_fetch('select vg.*,g.id as goodsid ,g.title,g.subtitle,g.thumb,vg.storeid  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where  vg.id =:id and  vg.verifycode=:verifycode and vg.uniacid=:uniacid  limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid'], ':verifycode' => $verifycode));
 		if (empty($item)) 
 		{
-			$this->message('未查询到核销商品或核销码已失效,请核对核销码!', '', 'error');
+			$this->message('未查询到记次时商品或核销码已失效,请核对核销码!', '', 'error');
 		}
 		if (intval($item['codeinvalidtime']) < time()) 
 		{
@@ -91,7 +91,7 @@ class Verifygoods_EweiShopV2Page extends MobilePage
 		$verifygood = pdo_fetch('select *  from ' . tablename('ewei_shop_verifygoods') . ' where uniacid=:uniacid and  verifycode=:verifycode  limit 1 ', array(':uniacid' => $_W['uniacid'], ':verifycode' => $verifycode));
 		if (empty($verifygood)) 
 		{
-			show_json(0, '未查询到核销商品或核销码已失效,请核对核销码!');
+			show_json(0, '未查询到记次时商品或核销码已失效,请核对核销码!');
 		}
 		if (intval($verifygood['codeinvalidtime']) < time()) 
 		{

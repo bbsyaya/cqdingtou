@@ -378,11 +378,11 @@
         $("#couponlist").append('<span class="couponlist" id="coupon'+couponid+'">'+$(obj).attr("data-name")+' <span class="badge badge-warning">x'+num+'</span><a class="btn btn-danger" onclick="$(this).parent().remove()" style="float: right;">X</a><input type="hidden" name="data[reward_data][coupon]['+couponid+'][id]" value="'+couponid+'"><input type="hidden" name="data[reward_data][coupon]['+couponid+'][num]" value="'+num+'"><input type="hidden" name="data[reward_data][coupon]['+couponid+'][name]" value="'+$(obj).attr("data-name")+'"></span>');
     }
 
-    function getpagecontent(page,type) {
-        if (type == 'certain'){
-            url = '{php echo webUrl("task.extension.single",array("taskfunc"=>certain));}&page='+page+'&type='+type;
+    function getpagecontent(page,type,title) {
+        if (type == 'coupon'){
+            url = '{php echo webUrl("task.extension.single",array("taskfunc"=>certain));}&page='+page+'&type='+type+'&title='+title;
         }else{
-            url = '{php echo webUrl("task.extension.single",array("taskfunc"=>goods));}&page='+page+'&type='+type;
+            url = '{php echo webUrl("task.extension.single",array("taskfunc"=>goods));}&page='+page+'&title='+title;
         }
         $.ajax({url:url,type:'get',
             success:function (data) {
@@ -391,6 +391,9 @@
         );
     }
 
+    function so2() {
+        getpagecontent(1,'coupon',$('#title2').val());
+    }
     function certain(obj) {
         var goodsid = $(obj).attr('data-id');
         var name = $(obj).attr('data-name');

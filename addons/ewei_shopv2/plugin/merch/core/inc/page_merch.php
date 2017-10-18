@@ -35,7 +35,6 @@ class MerchWebPage extends PluginWebPage
 			rc($this->pluginname);
 		}
 		$this->init();
-		m('system')->set_version(1);
 	}
 	private function init() 
 	{
@@ -92,7 +91,6 @@ class MerchWebPage extends PluginWebPage
 				}
 			}
 		}
-		m('system')->history_url();
 	}
 	public function getSet($name = '') 
 	{
@@ -109,6 +107,53 @@ class MerchWebPage extends PluginWebPage
 		$routes = explode('.', $_W['routes']);
 		$tab = ((isset($routes[0]) ? $routes[0] : ''));
 		include $this->template($tab . '/tabs');
+	}
+	public function template($filename = '', $type = TEMPLATE_INCLUDEPATH, $account = false) 
+	{
+		global $_W;
+		global $_GPC;
+		if (empty($filename)) 
+		{
+			$filename = str_replace('.', '/', $_W['routes']);
+		}
+		$filename = str_replace('/add', '/post', $filename);
+		$filename = str_replace('/edit', '/post', $filename);
+		$name = 'ewei_shopv2';
+		$moduleroot = IA_ROOT . '/addons/ewei_shopv2';
+		$compile = IA_ROOT . '/data/tpl/web/' . $_W['template'] . '/merch/' . $name . '/' . $filename . '.tpl.php';
+		$source = $moduleroot . '/template/' . $filename . '.html';
+		if (!(is_file($source))) 
+		{
+			$source = $moduleroot . '/template/' . $filename . '/index.html';
+		}
+		if (!(is_file($source))) 
+		{
+			$explode = explode('/', $filename);
+			$source = $moduleroot . '/plugin/merch/template/web/manage/' . implode('/', $explode) . '.html';
+			if (!(is_file($source))) 
+			{
+				$source = $moduleroot . '/plugin/merch/template/web/manage/' . implode('/', $explode) . '/index.html';
+			}
+		}
+		if (!(is_file($source))) 
+		{
+			$explode = explode('/', $filename);
+			$temp = array_slice($explode, 1);
+			$source = $moduleroot . '/plugin/' . $explode[0] . '/template/web/' . implode('/', $temp) . '.html';
+			if (!(is_file($source))) 
+			{
+				$source = $moduleroot . '/plugin/' . $explode[0] . '/template/web/' . implode('/', $temp) . '/index.html';
+			}
+		}
+		if (!(is_file($source))) 
+		{
+			exit('Error: template source \'' . $filename . '\' is not exist!');
+		}
+		if (DEVELOPMENT || !(is_file($compile)) || (filemtime($compile) < filemtime($source))) 
+		{
+			shop_template_compile($source, $compile, true);
+		}
+		return $compile;
 	}
 }
 ?>

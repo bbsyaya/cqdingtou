@@ -73,15 +73,13 @@ class Info_EweiShopV2Page extends MobileLoginPage
 			$m_data['diymemberid'] = $diyform_id;
 			$m_data['diymemberfields'] = iserializer($fields);
 			$m_data['diymemberdata'] = $data;
-			unset($mc_data['credit1']);
-			unset($m_data['credit2']);
+			unset($mc_data['credit1'], $m_data['credit2']);
 			pdo_update('ewei_shop_member', $m_data, array('openid' => $_W['openid'], 'uniacid' => $_W['uniacid']));
 			if (!(empty($this->member['uid']))) 
 			{
 				if (!(empty($mc_data))) 
 				{
-					unset($mc_data['credit1']);
-					unset($mc_data['credit2']);
+					unset($mc_data['credit1'], $mc_data['credit2']);
 					m('member')->mc_update($this->member['uid'], $mc_data);
 				}
 			}
@@ -97,8 +95,7 @@ class Info_EweiShopV2Page extends MobileLoginPage
 			if (!(empty($this->member['uid']))) 
 			{
 				$mcdata = $_GPC['mcdata'];
-				unset($mcdata['credit1']);
-				unset($mcdata['credit2']);
+				unset($mcdata['credit1'], $mcdata['credit2']);
 				m('member')->mc_update($this->member['uid'], $mcdata);
 			}
 		}

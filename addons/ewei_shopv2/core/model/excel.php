@@ -149,7 +149,7 @@ class Excel_EweiShopV2Model
 			$col = 0;
 			while ($col < $highestColumnCount) 
 			{
-				$rowValue[] = $sheet->getCellByColumnAndRow($col, $row)->getValue();
+				$rowValue[] = (string)$sheet->getCellByColumnAndRow($col, $row)->getValue();
 				++$col;
 			}
 			$values[] = $rowValue;

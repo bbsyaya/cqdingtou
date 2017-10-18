@@ -26,4 +26,4 @@ define('SOCKET_SERVER_SSL_CERT_FILE', '');
 define('SOCKET_SERVER_WORKNUM', 8);
 
 // 设置客户端请求IP
-define('SOCKET_CLIENT_IP', 'fx.gulaitec.com');   //请将域名换成你自己的
+define('SOCKET_CLIENT_IP', 'www.baidu.com');

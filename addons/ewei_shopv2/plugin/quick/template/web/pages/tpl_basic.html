@@ -16,7 +16,7 @@
         <label class="col-sm-2 control-label">页面地址</label>
         <div class="col-sm-9 col-xs-12">
             <div class="form-control-static">
-                <a href="javascript:;" data-url="{php echo mobileUrl('quick', array('id' => $item['id'], 'merchid'=>$_W['merchid']), true)}"  class=" js-clip">{php echo mobileUrl('quick', array('id'=>$item['id'], 'merchid'=>$_W['merchid']), true)}</a>
+                <a href="javascript:;" data-url="{php echo mobileUrl('quick', array('id' => $item['id']), true)}"  class=" js-clip">{php echo mobileUrl('quick', array('id'=>$item['id']), true)}</a>
                 <span style="cursor: pointer;" data-toggle="popover" data-trigger="hover" data-html="true"
                       data-content="<img src='{$qrcode}' width='130' alt='链接二维码'>" data-placement="auto right">
                     <i class="glyphicon glyphicon-qrcode"></i>
@@ -65,7 +65,7 @@
     <label class="col-sm-2 control-label">入口封面图标</label>
     <div class="col-sm-9 col-xs-12">
         {ife 'quick.pages' $item}
-            {php echo tpl_form_field_image('enter_icon', $item['enter_icon']);}
+            {php echo tpl_form_field_image2('enter_icon', $item['enter_icon']);}
         {else}
             {if !empty($item['share_icon'])}
                 <img src="{php echo tomedia($item['enter_icon'])}" style='width:100px;border:1px solid #ccc;padding:1px' />
@@ -102,7 +102,7 @@
     <label class="col-sm-2 control-label">分享图标</label>
     <div class="col-sm-9 col-xs-12">
         {ife 'quick.pages' $item}
-            {php echo tpl_form_field_image('share_icon', $item['share_icon']);}
+            {php echo tpl_form_field_image2('share_icon', $item['share_icon']);}
         {else}
             {if !empty($item['share_icon'])}
                 <img src="{php echo tomedia($item['share_icon'])}" style='width:100px;border:1px solid #ccc;padding:1px' />

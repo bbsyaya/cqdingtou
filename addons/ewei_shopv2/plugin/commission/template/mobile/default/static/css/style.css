@@ -35,7 +35,7 @@
 .page-commission-index .fui-title span {color: #fb6665;}
 .page-commission-index .up-group img { width:15px;height:15px;border-radius: 15px;margin-right:5px;}
 
-/*log*/
+
 .page-commission-log .row-remark {text-align: right; position: relative;flex-shrink: 0;padding-left: 0.625rem;}
 .page-commission-log .row-remark:before {content: ""; position: absolute; left: 0; top:0; width: 1px; height: 100%; background: #eee;}
 .page-commission-log .row-remark p{color: #aaa;font-size: 0.625rem}
@@ -56,7 +56,7 @@
 .page-commission-log-detail .fui-list .fui-list-inner .subtitle{font-size: 12px;color: #666}
 .page-commission-log-detail .fui-header .num{font-size: 12px;color:#999;}
 
-/*team*/
+
 .page-commission-down .row-remark {text-align: right; position: relative;flex-shrink: 0;padding-left: 0.625rem;}
 .page-commission-down .row-remark:before {content: ""; position: absolute; left: 0; top:0; width: 1px; height: 100%; background: #eee;}
 .page-commission-down .row-remark p{color: #aaa;font-size: 0.625rem}
@@ -67,7 +67,7 @@
 .page-commission-down .fui-list-media {padding:0;}
 .page-commission-down .fui-list-media i { font-size:2rem; padding:0;}
 
-/*order*/
+
 .page-commission-order .row-remark {text-align: right; position: relative;flex-shrink: 0;padding-left: 0.625rem;}
 .page-commission-order .row-remark:before {content: ""; position: absolute; left: 0; top:0; width: 1px; height: 100%; background: #eee;}
 .page-commission-order .row-remark p{color: #aaa;font-size: 0.625rem}
@@ -80,7 +80,7 @@
 .page-commission-order .fui-according-group .fui-according .fui-according-header .right{flex: 1; text-align: right}
 .page-commission-order .fui-according-group .fui-according-content{border-top: 1px solid #eeeeee}
 
-/*shares*/
+
 
 .page-commission-shares .img {padding:0;overflow:hidden;height:auto;}
 .page-commission-shares .img img { width:100%;display: none}

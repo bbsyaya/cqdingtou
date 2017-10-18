@@ -1,4 +1,4 @@
-/*public*/
+
 .lynn_item{height:1rem;background: #eee;}
 .fl{float:left;}
 .fr{float:right;}
@@ -221,6 +221,7 @@ background: #ff473f;color:#fff;font-size:0.65rem;text-align: center;position: re
 
 .pcshop-index{width:640px;margin:0 auto;-webkit-box-shadow:0px 2px 10px rgba(0,0,0,0.1);box-shadow:0px 2px 10px rgba(0,0,0,0.1);
     border-left:1px solid #ddd;border-right:1px solid #ddd;min-height:100%;}
+
 
 
 

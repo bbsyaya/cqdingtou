@@ -33,7 +33,7 @@ class Index_EweiShopV2Page extends WebPage
 			$condition .= ' AND title LIKE :title';
 			$params[':title'] = '%' . trim($_GPC['keyword']) . '%';
 		}
-		$packages = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_package') . "\n" . '                    WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+		$packages = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_package') . "\r\n" . '                    WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		if (!(empty($packages))) 
 		{
 			foreach ($packages as $key => &$value ) 
@@ -43,7 +43,7 @@ class Index_EweiShopV2Page extends WebPage
 			}
 		}
 		$total = pdo_fetchcolumn('SELECT COUNT(1) FROM ' . tablename('ewei_shop_package') . ' WHERE 1 ' . $condition . ' ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 
@@ -81,7 +81,7 @@ class Index_EweiShopV2Page extends WebPage
 			$option = $_GPC['packagegoods'];
 			foreach ($goodsid as $key => $value ) 
 			{
-				$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $value . ' and uniacid = ' . $uniacid . ' ');
+				$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\r\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $value . ' and uniacid = ' . $uniacid . ' ');
 				if (empty($data['thumb'])) 
 				{
 					$data['thumb'] = save_media($good_data['thumb']);
@@ -105,10 +105,10 @@ class Index_EweiShopV2Page extends WebPage
 				}
 				$package_update = pdo_update('ewei_shop_package', $data, array('id' => $id, 'uniacid' => $uniacid));
 				$package_goods_del = pdo_delete('ewei_shop_package_goods', array('pid' => $id, 'uniacid' => $uniacid));
-				$package_goods_option_del = pdo_delete('ewei_shop_package_goods_option', array('pid' => $id, 'goodsid' => $value, 'uniacid' => $uniacid));
+				$package_goods_option_del = pdo_delete('ewei_shop_package_goods_option', array('pid' => $id,  'uniacid' => $uniacid));
 				foreach ($goodsid as $key => $value ) 
 				{
-					$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $value . ' and uniacid = ' . $uniacid . ' ');
+					$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\r\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $value . ' and uniacid = ' . $uniacid . ' ');
 					$good_data['uniacid'] = $uniacid;
 					$good_data['goodsid'] = $value;
 					$good_data['pid'] = $id;
@@ -128,7 +128,7 @@ class Index_EweiShopV2Page extends WebPage
 						$packageGoodsOption = array_filter(explode(',', $good_data['option']));
 						foreach ($packageGoodsOption as $k => $val ) 
 						{
-							$op = pdo_fetch('SELECT id,title,marketprice,goodssn,productsn FROM ' . tablename('ewei_shop_goods_option') . "\n" . '                                WHERE uniacid = ' . $uniacid . ' and id = ' . $val . ' ');
+							$op = pdo_fetch('SELECT id,title,marketprice,goodssn,productsn FROM ' . tablename('ewei_shop_goods_option') . "\r\n" . '                                WHERE uniacid = ' . $uniacid . ' and id = ' . $val . ' ');
 							$optionStr = $_GPC['packagegoodsoption' . $val . ''];
 							$optionArray = explode(',', $optionStr);
 							$optionData = array('uniacid' => $uniacid, 'goodsid' => $value, 'pid' => $id, 'title' => $op['title'], 'optionid' => $val, 'marketprice' => $op['marketprice'], 'packageprice' => $optionArray[0], 'commission1' => $optionArray[1], 'commission2' => $optionArray[2], 'commission3' => $optionArray[3]);
@@ -164,7 +164,7 @@ class Index_EweiShopV2Page extends WebPage
 				$id = pdo_insertid();
 				foreach ($goodsid as $key => $value ) 
 				{
-					$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $value . ' and uniacid = ' . $uniacid . ' ');
+					$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\r\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $value . ' and uniacid = ' . $uniacid . ' ');
 					if (empty($data['thumb'])) 
 					{
 						$data['thumb'] = save_media($good_data['thumb']);
@@ -189,7 +189,7 @@ class Index_EweiShopV2Page extends WebPage
 						$packageGoodsOption = array_filter(explode(',', $good_data['option']));
 						foreach ($packageGoodsOption as $k => $val ) 
 						{
-							$op = pdo_fetch('SELECT id,title,marketprice,goodssn,productsn FROM ' . tablename('ewei_shop_goods_option') . "\n" . '                                WHERE uniacid = ' . $uniacid . ' and id = ' . $val . ' ');
+							$op = pdo_fetch('SELECT id,title,marketprice,goodssn,productsn FROM ' . tablename('ewei_shop_goods_option') . "\r\n" . '                                WHERE uniacid = ' . $uniacid . ' and id = ' . $val . ' ');
 							$optionStr = $_GPC['packagegoodsoption' . $val . ''];
 							$optionArray = explode(',', $optionStr);
 							$optionData = array('uniacid' => $uniacid, 'goodsid' => $value, 'pid' => $id, 'title' => $op['title'], 'optionid' => $val, 'marketprice' => $op['marketprice'], 'packageprice' => $optionArray[0], 'commission1' => $optionArray[1], 'commission2' => $optionArray[2], 'commission3' => $optionArray[3]);
@@ -214,12 +214,12 @@ class Index_EweiShopV2Page extends WebPage
 		{
 			$item = set_medias($item, array('thumb'));
 			$package_goods = array();
-			$package_goods = pdo_fetchall('select id,pid,title,thumb,packageprice,hasoption,goodsid,`option`,commission1,commission2,commission3' . "\n" . '                            from ' . tablename('ewei_shop_package_goods') . ' where pid = ' . $id . ' and uniacid = ' . $uniacid . ' ');
+			$package_goods = pdo_fetchall('select id,pid,title,thumb,packageprice,hasoption,goodsid,`option`,commission1,commission2,commission3' . "\r\n" . '                            from ' . tablename('ewei_shop_package_goods') . ' where pid = ' . $id . ' and uniacid = ' . $uniacid . ' ');
 			foreach ($package_goods as $key => $value ) 
 			{
 				if ($value['hasoption']) 
 				{
-					$package_goods[$key]['optiontitle'] = pdo_fetchall('select id,goodsid,optionid,pid,packageprice,title,marketprice,commission1,commission2,commission3' . "\n" . '                            from ' . tablename('ewei_shop_package_goods_option') . ' where pid = ' . $id . ' and goodsid = ' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
+					$package_goods[$key]['optiontitle'] = pdo_fetchall('select id,goodsid,optionid,pid,packageprice,title,marketprice,commission1,commission2,commission3' . "\r\n" . '                            from ' . tablename('ewei_shop_package_goods_option') . ' where pid = ' . $id . ' and goodsid = ' . $value['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
 				}
 			}
 		}
@@ -334,7 +334,7 @@ class Index_EweiShopV2Page extends WebPage
 			$condition .= ' AND (`title` LIKE :keywords OR `keywords` LIKE :keywords)';
 			$params[':keywords'] = '%' . $kwd . '%';
 		}
-		$ds = pdo_fetchall('SELECT id,title,thumb,marketprice,total,goodssn,productsn,`type`,isdiscount,istime,isverify,share_title,share_icon,description,hasoption,nocommission,groupstype' . "\n" . '            FROM ' . tablename('ewei_shop_goods') . "\n" . '            WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+		$ds = pdo_fetchall('SELECT id,title,thumb,marketprice,total,goodssn,productsn,`type`,isdiscount,istime,isverify,share_title,share_icon,description,hasoption,nocommission,groupstype' . "\r\n" . '            FROM ' . tablename('ewei_shop_goods') . "\r\n" . '            WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT COUNT(1) FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' ', $params);
 		$pager = pagination($total, $pindex, $psize, '', array('before' => 5, 'after' => 4, 'ajaxcallback' => 'select_page', 'callbackfuncname' => 'select_page'));
 		$ds = set_medias($ds, array('thumb'));
@@ -358,7 +358,7 @@ class Index_EweiShopV2Page extends WebPage
 		$goods = pdo_fetch('select id,title,marketprice,hasoption,nocommission from ' . tablename('ewei_shop_goods') . ' where uniacid = :uniacid and id = :goodsid ', $params);
 		if (!(empty($pid))) 
 		{
-			$packgoods = pdo_fetch('select id,title,packageprice,commission1,commission2,commission3,`option`,goodsid from ' . tablename('ewei_shop_package_goods') . "\n" . '                        where pid = ' . $pid . ' and uniacid = :uniacid and goodsid = :goodsid ', $params);
+			$packgoods = pdo_fetch('select id,title,packageprice,commission1,commission2,commission3,`option`,goodsid from ' . tablename('ewei_shop_package_goods') . "\r\n" . '                        where pid = ' . $pid . ' and uniacid = :uniacid and goodsid = :goodsid ', $params);
 		}
 		else 
 		{
@@ -368,8 +368,8 @@ class Index_EweiShopV2Page extends WebPage
 		{
 			$hasoption = 1;
 			$option = array();
-			$option = pdo_fetchall('SELECT id,title,marketprice,specs,displayorder FROM ' . tablename('ewei_shop_goods_option') . "\n" . '            WHERE uniacid = :uniacid and goodsid = :goodsid  ORDER BY displayorder DESC,id DESC ', $params);
-			$package_option = pdo_fetchall('SELECT id,uniacid,goodsid,optionid,pid,title,marketprice,packageprice,commission1,commission2,commission3 FROM ' . tablename('ewei_shop_package_goods_option') . "\n" . '            WHERE uniacid = :uniacid and goodsid = :goodsid  and pid = ' . $pid . ' ', $params);
+			$option = pdo_fetchall('SELECT id,title,marketprice,specs,displayorder FROM ' . tablename('ewei_shop_goods_option') . "\r\n" . '            WHERE uniacid = :uniacid and goodsid = :goodsid  ORDER BY displayorder DESC,id DESC ', $params);
+			$package_option = pdo_fetchall('SELECT id,uniacid,goodsid,optionid,pid,title,marketprice,packageprice,commission1,commission2,commission3 FROM ' . tablename('ewei_shop_package_goods_option') . "\r\n" . '            WHERE uniacid = :uniacid and goodsid = :goodsid  and pid = ' . $pid . ' ', $params);
 			foreach ($option as $key => $value ) 
 			{
 				foreach ($package_option as $k => $val ) 
@@ -402,7 +402,7 @@ class Index_EweiShopV2Page extends WebPage
 		$uniacid = intval($_W['uniacid']);
 		$options = ((is_array($_GPC['option']) ? implode(',', array_filter($_GPC['option'])) : 0));
 		$options = intval($options);
-		$option = pdo_fetch('SELECT id,title FROM ' . tablename('ewei_shop_goods_option') . "\n" . '            WHERE uniacid = ' . $uniacid . ' and id = ' . $options . '  ORDER BY displayorder DESC,id DESC LIMIT 1');
+		$option = pdo_fetch('SELECT id,title FROM ' . tablename('ewei_shop_goods_option') . "\r\n" . '            WHERE uniacid = ' . $uniacid . ' and id = ' . $options . '  ORDER BY displayorder DESC,id DESC LIMIT 1');
 		show_json(1, $option);
 	}
 }

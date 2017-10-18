@@ -538,7 +538,7 @@ input[type=text] { padding:0px 5px;  }
     height: auto;
     padding: 10px 0;
     background: none !important;
-    color: inherit !important; 
+    color: inherit !important;
 }
 
 .order-container { position:relative;
@@ -865,15 +865,15 @@ input[type=text] { padding:0px 5px;  }
 .modal-dialog .embed-responsive-16by9{padding-bottom:0; height:490px; overflow:hidden;}
 
 .switch-version {
-    height: 30px;
-    width: 80px;
-    background: #38a7ff;
+    height: 26px;
+    width: 70px;
+    background: #ff5555;
     color: #fff !important;
     position: absolute;
     top: 10px;
     right: -120px;
-    font-size: 14px;
-    line-height: 30px;
+    font-size: 12px;
+    line-height: 26px;
     text-align: center;
     moz-user-select: -moz-none;
     -moz-user-select: none;
@@ -883,6 +883,7 @@ input[type=text] { padding:0px 5px;  }
     -ms-user-select:none;
     user-select:none;
     cursor: pointer;
+    display: block;
 }
 
 .switch-version:before {
@@ -890,12 +891,33 @@ input[type=text] { padding:0px 5px;  }
     display: inline-block;
     width: 0;
     height: 0;
-    border-right: 6px dashed #38a7ff;
-    border-right: 6px solid #38a7ff;
+    border-right: 6px dashed #ff5555;
+    border-right: 6px solid #ff5555;
     border-top: 6px solid transparent;
     border-bottom: 6px solid transparent;
     position: absolute;
     left: -6px;
     top: 50%;
     margin-top: -6px;
+}
+.switch-version{
+    -webkit-animation: bounce-down 1s steps(4,end) infinite;
+    animation: bounce-down 1s steps(4,end) infinite;
+}
+@keyframes bounce-down {
+    from {
+        transform: translateY(0px);
+    }
+    25%{
+        transform: translateY(-1px);
+    }
+    50%{
+        transform: translateY(-2px);
+    }
+    75% {
+        transform: translateY(1px);
+    }
+    100%{
+        transform: translateY(2px);
+    }
 }

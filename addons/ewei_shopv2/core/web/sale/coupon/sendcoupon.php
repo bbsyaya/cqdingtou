@@ -211,15 +211,12 @@ class Sendcoupon_EweiShopV2Page extends ComWebPage
 		m('common')->updatePluginset(array('coupon' => $data));
 		$time = time();
 		$i = 1;
-		foreach ($openids as $openid ) 
-		{
-		$log = array('uniacid' => $_W['uniacid'], 'merchid' => $coupon['merchid'], 'openid' => $openid, 'logno' => m('common')->createNO('coupon_log', 'logno', 'CC'), 'couponid' => $couponid, 'status' => 1, 'paystatus' => -1, 'creditstatus' => -1, 'createtime' => $time, 'getfrom' => 0);
+		$log = array('uniacid' => $_W['uniacid'], 'merchid' => $coupon['merchid'], 'openid' => $m['openid'], 'logno' => m('common')->createNO('coupon_log', 'logno', 'CC'), 'couponid' => $couponid, 'status' => 1, 'paystatus' => -1, 'creditstatus' => -1, 'createtime' => $time, 'getfrom' => 0);
 		pdo_insert('ewei_shop_coupon_log', $log);
 		$logid = pdo_insertid();
-		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $coupon['merchid'], 'openid' => $openid, 'couponid' => $couponid, 'gettype' => 0, 'gettime' => $time, 'senduid' => $_W['uid']);
+		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $coupon['merchid'], 'openid' => $m['openid'], 'couponid' => $couponid, 'gettype' => 0, 'gettime' => $time, 'senduid' => $_W['uid']);
 		pdo_insert('ewei_shop_coupon_data', $data);
 		++$i;
-		}
 		show_json(1, array('openids' => $openids));
 	}
 	public function sendmessage() 

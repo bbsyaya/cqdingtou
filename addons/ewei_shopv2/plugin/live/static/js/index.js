@@ -6,7 +6,11 @@ define(['core', 'tpl'], function (core, tpl) {
         modal.keywords = params.keywords;
         $('.fui-content').infinite({
             onLoading: function () {
-                modal.getList()
+                if(modal.page==1){
+                    return;
+                }else {
+                    modal.getList();
+                }
             }
         });
         if (modal.page == 1) {

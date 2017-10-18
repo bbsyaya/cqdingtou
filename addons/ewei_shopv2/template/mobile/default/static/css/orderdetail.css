@@ -1,6 +1,6 @@
-/*common*/
+
 .text-danger{
-	color: #f95a59 !important;
+	color: #ff5555 !important;
 }
 .fui-page, .fui-page-group{
 	background: #f3f3f3;
@@ -65,7 +65,6 @@
 }
 .fui-according-header .text{
 	padding: 0;
-	font-size: 0.7rem;
 }
 .fui-according-header .remark:after{
 	content: " ";
@@ -144,10 +143,10 @@ input::-moz-placeholder, textarea::-moz-placeholder {
 input:-ms-input-placeholder, textarea:-ms-input-placeholder { 
 	color: #b2b2b2;
 } 
-.fui-cell-group .fui-cell .fui-cell-remark{
-	color: #000;
-	font-size: 0.7rem;
-}
+/*.fui-cell-group .fui-cell .fui-cell-remark{*/
+	/*color: #000;*/
+	/*font-size: 0.7rem;*/
+/*}*/
 .fui-cell-remark .label{
 	display: inline-block;
 	font-size: 0.55rem;
@@ -188,7 +187,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 .fui-list-icon{
 	width: 0.8rem;
-	margin-right: 0.3rem;
+	margin-right: 0.6rem;
 }
 .fui-list:active {
 	background: #fff;
@@ -216,7 +215,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	white-space: normal;
-	height: 2.1rem;
+	height: auto;
 }
 .fui-list-inner .subtitle{
 	color: #999;
@@ -757,3 +756,4 @@ i{
 .fui-according-content .content-block{
 	padding: 0;
 }
+

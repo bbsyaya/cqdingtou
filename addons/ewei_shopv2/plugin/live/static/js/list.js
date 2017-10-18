@@ -8,7 +8,11 @@ define(['core', 'tpl'], function (core, tpl) {
         modal.subscribe = 0;
         $('.fui-content').infinite({
             onLoading: function () {
-                modal.getList()
+                if(modal.page==1){
+                    return;
+                }else {
+                    modal.getList();
+                }
             }
         });
         if (modal.page == 1) {

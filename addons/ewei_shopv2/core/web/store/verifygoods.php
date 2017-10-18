@@ -108,7 +108,7 @@ class Verifygoods_EweiShopV2Page extends ComWebPage
 			}
 			$data = array('limittype' => $limittype, 'limitdate' => $limitdate, 'limitdays' => $limitdays, 'limitnum' => intval($_GPC['limitnum']), 'invalid' => intval($_GPC['invalid']), 'used' => $used);
 			pdo_update('ewei_shop_verifygoods', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
-			plog('store.edit', '编辑核销商品核销信息 ID: ' . $id);
+			plog('store.edit', '编辑记次时商品核销信息 ID: ' . $id);
 			com('wxcard')->updateusercardbyvarifygoodid($id);
 			show_json(1, array('url' => referer()));
 		}

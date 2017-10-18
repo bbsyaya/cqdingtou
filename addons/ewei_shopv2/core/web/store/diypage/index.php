@@ -31,7 +31,7 @@ class Index_EweiShopV2Page extends ComWebPage
 				$this->message('门店不存在');
 			}
 		}
-		$templist = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_diypage_temp') . 'WHERE (uniacid=:uniacid OR uniacid=0) AND status>0', array(':uniacid' => $_W['uniacid']));
+		$templist = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_diypage_temp') . 'WHERE (uniacid=:uniacid OR uniacid=0) AND status>0 ORDER BY uniacid asc', array(':uniacid' => $_W['uniacid']));
 		$pagelist = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_diypage') . 'WHERE uniacid=:uniacid AND storeid=:storeid AND status=1', array(':uniacid' => $_W['uniacid'], ':storeid' => $storeid));
 		include $this->template();
 	}
@@ -122,8 +122,10 @@ class Index_EweiShopV2Page extends ComWebPage
 	public function goods_group() 
 	{
 		global $_W;
+		global $_GPC;
 		$condition = ' AND uniacid=:uniacid ';
 		$params = array(':uniacid' => $_W['uniacid']);
+		$kwd = trim($_GPC['keyword']);
 		if (!(empty($kwd))) 
 		{
 			$condition .= ' AND `name` LIKE :keyword';
@@ -153,7 +155,7 @@ class Index_EweiShopV2Page extends ComWebPage
 		}
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_diypage_temp') . ' WHERE 1 ' . $condition . '  ORDER BY uniacid ASC limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_newstore_diypage_temp') . ' WHERE 1 ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 

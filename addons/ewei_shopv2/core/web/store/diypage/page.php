@@ -34,7 +34,7 @@ class Page_EweiShopV2Page extends ComWebPage
 		$limit = ' LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_diypage') . 'WHERE ' . $condition . $limit, $params);
 		$total = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_newstore_diypage') . 'WHERE ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 

@@ -16,7 +16,7 @@ class Notice_EweiShopV2Page extends MobilePage
 		global $_GPC;
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 10;
-		$condition = ' and `uniacid` = :uniacid and status=1';
+		$condition = ' and `uniacid` = :uniacid and status=1 and iswxapp=0';
 		$params = array(':uniacid' => $_W['uniacid']);
 		$sql = 'SELECT COUNT(*) FROM ' . tablename('ewei_shop_notice') . ' where 1 ' . $condition;
 		$total = pdo_fetchcolumn($sql, $params);
@@ -43,7 +43,7 @@ class Notice_EweiShopV2Page extends MobilePage
 		}
 		else 
 		{
-			$notice = pdo_fetch('select * from ' . tablename('ewei_shop_notice') . ' where id=:id and uniacid=:uniacid and status=1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+			$notice = pdo_fetch('select * from ' . tablename('ewei_shop_notice') . ' where id=:id and iswxapp=0 and uniacid=:uniacid and status=1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		}
 		$notice['detail'] = m('ui')->lazy($notice['detail']);
 		include $this->template();

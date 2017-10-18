@@ -1,6 +1,6 @@
 <?php
 ini_set('display_errors', 'On');
-error_reporting(30719);
+error_reporting(32767);
 require '../../../../../framework/bootstrap.inc.php';
 require '../../../../../addons/ewei_shopv2/defines.php';
 require '../../../../../addons/ewei_shopv2/core/inc/functions.php';
@@ -21,13 +21,13 @@ foreach ($sets as $set )
 	$days = intval($trade['refunddays']);
 	$daytimes = 86400 * $days;
 	$orders = pdo_fetchall('select id,couponid from ' . tablename('ewei_shop_order') . ' where  uniacid=' . $_W['uniacid'] . ' and status=3 and isparent=0 and couponid<>0 and finishtime + ' . $daytimes . ' <=unix_timestamp() ');
-	if (!empty($orders)) 
+	if (!(empty($orders))) 
 	{
 		if ($p) 
 		{
 			foreach ($orders as $o ) 
 			{
-				if (!empty($o['couponid'])) 
+				if (!(empty($o['couponid']))) 
 				{
 					$p->backConsumeCoupon($o['id']);
 				}

@@ -663,6 +663,11 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			$shoplogo = tomedia($merch_user['logo']);
 		}
 		$activity = com('coupon')->activity($order['price']);
+		if (!(empty($order['virtual'])) && !(empty($order['virtual_str']))) 
+		{
+			$ordervirtual = m('order')->getOrderVirtual($order);
+			$virtualtemp = pdo_fetch('SELECT linktext, linkurl FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE id=:id AND uniacid=:uniacid LIMIT 1', array(':id' => $order['virtual'], ':uniacid' => $_W['uniacid']));
+		}
 		include $this->template();
 	}
 	public function express() 

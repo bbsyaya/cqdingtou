@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -17,7 +17,7 @@ class Notice_EweiShopV2Page extends MobileLoginPage
 		if (p('commission')) 
 		{
 			$cset = p('commission')->getSet();
-			$hascommission = !empty($cset['level']);
+			$hascommission = !(empty($cset['level']));
 		}
 		if ($_W['ispost']) 
 		{

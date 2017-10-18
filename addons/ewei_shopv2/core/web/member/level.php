@@ -9,14 +9,11 @@ class Level_EweiShopV2Page extends WebPage
 	{
 		global $_W;
 		global $_GPC;
+		$set = array();
 		$set = m('common')->getSysset();
+		$shopset = array();
 		$shopset = $set['shop'];
-		if(isset($shopset['leveldiscount'])){
-			$leveldiscount = $shopset['leveldiscount'];
-		}else{
-			$leveldiscount = 0;
-		}
-		$default = array('id' => 'default', 'levelname' => (empty($set['shop']['levelname']) ? '普通等级' : $set['shop']['levelname']), 'discount' => $leveldiscount, 'ordermoney' => 0, 'ordercount' => 0, 'membercount' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_member') . ' where uniacid=:uniacid and level=0 limit 1', array(':uniacid' => $_W['uniacid'])));
+		$default = array('id' => 'default', 'levelname' => (empty($set['shop']['levelname']) ? '普通等级' : $set['shop']['levelname']), 'discount' => $set['shop']['leveldiscount'], 'ordermoney' => 0, 'ordercount' => 0, 'membercount' => pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_member') . ' where uniacid=:uniacid and level=0 limit 1', array(':uniacid' => $_W['uniacid'])));
 		$condition = ' and uniacid=:uniacid';
 		$params = array(':uniacid' => $_W['uniacid']);
 		if ($_GPC['enabled'] != '') 
@@ -35,7 +32,14 @@ class Level_EweiShopV2Page extends WebPage
 			$row['membercount'] = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_member') . ' where uniacid=:uniacid and level=:level limit 1', array(':uniacid' => $_W['uniacid'], ':level' => $row['id']));
 		}
 		unset($row);
-		$list = array_merge(array($default), $others);
+		if (empty($_GPC['keyword'])) 
+		{
+			$list = array_merge(array($default), $others);
+		}
+		else 
+		{
+			$list = $others;
+		}
 		include $this->template();
 	}
 	public function add() 

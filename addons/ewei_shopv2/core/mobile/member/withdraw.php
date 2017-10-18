@@ -21,8 +21,9 @@ class Withdraw_EweiShopV2Page extends MobileLoginPage
 		$withdrawend = floatval($set['withdrawend']);
 		$credit = m('member')->getCredit($_W['openid'], 'credit2');
 		$last_data = $this->getLastApply($openid);
+		$canusewechat = !(strexists($openid, 'wap_user_')) && !(strexists($openid, 'sns_qq_')) && !(strexists($openid, 'sns_wx_')) && !(strexists($openid, 'sns_wa_'));
 		$type_array = array();
-		if ($set['withdrawcashweixin'] == 1) 
+		if (($set['withdrawcashweixin'] == 1) && $canusewechat) 
 		{
 			$type_array[0]['title'] = '提现到微信钱包';
 		}

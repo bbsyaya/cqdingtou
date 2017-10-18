@@ -17,6 +17,7 @@ class Selecturl_EweiShopV2Page extends WebPage
 			$categorys = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_category') . ' WHERE uniacid=:uniacid  ORDER BY parentid ASC, displayorder DESC', array(':uniacid' => $_W['uniacid']));
 		}
 		$goodsgroup = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_goodsgroup') . ' WHERE uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
+		$diypage = p('diypage')->getPageList('allpage');
 		include $this->template();
 	}
 	public function query() 

@@ -313,7 +313,7 @@ class Data_EweiShopV2Page extends ComWebPage
 			$isEmpty = false;
 			foreach ($val as $k => $v ) 
 			{
-				if (empty($v)) 
+				while (empty($v)) 
 				{
 					$isEmpty = true;
 					break;

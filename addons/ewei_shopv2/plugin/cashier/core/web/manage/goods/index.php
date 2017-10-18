@@ -31,7 +31,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 				if ($res['res']['errno'] == -2) 
 				{
 					$message = explode(':', $res['res']['message']);
-					if (($message[0] != 'USERPAYING') && ($message[0] != 'need_query')) 
+					if ($message[0] != 'USERPAYING') 
 					{
 						show_json(-101, $res['res']);
 					}
@@ -188,7 +188,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 	{
 		global $_W;
 		global $_GPC;
-		$mobile = $_GPC['mobile'];
+		$mobile = intval($_GPC['mobile']);
 		if (!($mobile)) 
 		{
 			show_json(0);
@@ -211,7 +211,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 		if ($_W['ispost']) 
 		{
 			$password = trim($_GPC['password']);
-			$mobile = $_GPC['mobile'];
+			$mobile = intval($_GPC['mobile']);
 			$info = m('member')->getMobileMember($mobile);
 			if (md5($password . $info['salt']) == $info['pwd']) 
 			{
@@ -227,7 +227,7 @@ class Index_EweiShopV2Page extends CashierWebPage
 		if ($_W['ispost']) 
 		{
 			$password = trim($_GPC['password']);
-			$mobile = $_GPC['mobile'];
+			$mobile = intval($_GPC['mobile']);
 			$info = m('member')->getMobileMember($mobile);
 			if (empty($info['salt']) && empty($info['pwd'])) 
 			{

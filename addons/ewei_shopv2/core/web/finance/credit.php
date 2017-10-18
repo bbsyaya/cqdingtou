@@ -11,8 +11,8 @@ class Credit_EweiShopV2Page extends WebPage
 		global $_GPC;
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 20;
-		$condition = ' and log.uniacid=:uniacid and log.module=:module and m.uniacid=:uniacid  and log.credittype=:credittype';
-		$params = array(':uniacid' => $_W['uniacid'], ':module' => 'ewei_shopv2', ':credittype' => $type);
+		$condition = ' and log.uniacid=:uniacid and (log.module=:module1  or log.module=:module2)and m.uniacid=:uniacid  and log.credittype=:credittype';
+		$params = array(':uniacid' => $_W['uniacid'], ':module1' => 'ewei_shopv2', ':module2' => 'ewei_shop', ':credittype' => $type);
 		if (!(empty($_GPC['keyword']))) 
 		{
 			$_GPC['keyword'] = trim($_GPC['keyword']);
@@ -45,6 +45,10 @@ class Credit_EweiShopV2Page extends WebPage
 		if (empty($_GPC['export'])) 
 		{
 			$sql .= 'LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+		}
+		else 
+		{
+			ini_set('memory_limit', '-1');
 		}
 		$list = pdo_fetchall($sql, $params);
 		if ($_GPC['export'] == 1) 
@@ -90,7 +94,7 @@ class Credit_EweiShopV2Page extends WebPage
 			m('excel')->export($list, array('title' => (($type == 'credit1' ? '会员积分明细-' : '会员余额明细')) . date('Y-m-d-H-i', time()), 'columns' => $columns));
 		}
 		$total = pdo_fetchcolumn('select count(*) from ' . tablename('mc_credits_record') . ' log ' . ' left join ' . tablename('users') . ' u on log.operator<>0 and log.operator<>log.uid and  log.operator=u.uid' . ' left join ' . tablename('ewei_shop_member') . ' m on m.uid=log.uid' . ' left join ' . tablename('ewei_shop_member_group') . ' g on m.groupid=g.id' . ' left join ' . tablename('ewei_shop_member_level') . ' l on m.level =l.id' . ' where 1 ' . $condition . ' ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		$groups = m('member')->getGroups();
 		$levels = m('member')->getLevels();
 		include $this->template('finance/credit');

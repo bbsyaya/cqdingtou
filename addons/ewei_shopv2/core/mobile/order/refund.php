@@ -74,7 +74,7 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 			{
 				foreach ($goods as $g ) 
 				{
-					if ($g['cannotrefund'] == 1) 
+					while ($g['cannotrefund'] == 1) 
 					{
 						$order['cannotrefund'] = true;
 						break;

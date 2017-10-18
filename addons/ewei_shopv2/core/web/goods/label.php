@@ -24,9 +24,9 @@ class Label_EweiShopV2Page extends WebPage
 			$condition .= ' and label like :keyword';
 			$params[':keyword'] = '%' . $_GPC['keyword'] . '%';
 		}
-		$label = pdo_fetchall('SELECT id,uniacid,label,labelname,status,displayorder FROM ' . tablename('ewei_shop_goods_label') . "\n" . '                WHERE uniacid=:uniacid ' . $condition . ' order by id limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+		$label = pdo_fetchall('SELECT id,uniacid,label,labelname,status,displayorder FROM ' . tablename('ewei_shop_goods_label') . "\r\n" . '                WHERE uniacid=:uniacid ' . $condition . ' order by id limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_goods_label') . ' WHERE uniacid=:uniacid ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 
@@ -45,7 +45,7 @@ class Label_EweiShopV2Page extends WebPage
 		$uniacid = intval($_W['uniacid']);
 		if (!(empty($id))) 
 		{
-			$item = pdo_fetch('SELECT id,uniacid,label,labelname,status,displayorder FROM ' . tablename('ewei_shop_goods_label') . "\n" . '                    WHERE id=:id and uniacid=:uniacid limit 1 ', array(':id' => $id, ':uniacid' => $uniacid));
+			$item = pdo_fetch('SELECT id,uniacid,label,labelname,status,displayorder FROM ' . tablename('ewei_shop_goods_label') . "\r\n" . '                    WHERE id=:id and uniacid=:uniacid limit 1 ', array(':id' => $id, ':uniacid' => $uniacid));
 			if (json_decode($item['labelname'], true)) 
 			{
 				$labelname = json_decode($item['labelname'], true);

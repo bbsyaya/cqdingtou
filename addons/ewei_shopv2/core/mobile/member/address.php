@@ -13,13 +13,17 @@ class Address_EweiShopV2Page extends MobileLoginPage
 		$area_set = m('util')->get_area_config_set();
 		$new_area = intval($area_set['new_area']);
 		$address_street = intval($area_set['address_street']);
-		$pindex = max(1, intval($_GPC['page']));
+		$pindex = intval($_GPC['page']);
 		$psize = 20;
 		$condition = ' and openid=:openid and deleted=0 and  `uniacid` = :uniacid  ';
 		$params = array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']);
 		$sql = 'SELECT COUNT(*) FROM ' . tablename('ewei_shop_member_address') . ' where 1 ' . $condition;
 		$total = pdo_fetchcolumn($sql, $params);
-		$sql = 'SELECT * FROM ' . tablename('ewei_shop_member_address') . ' where 1 ' . $condition . ' ORDER BY `id` DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+		$sql = 'SELECT * FROM ' . tablename('ewei_shop_member_address') . ' where 1 ' . $condition . ' ORDER BY `id` DESC';
+		if ($pindex != 0) 
+		{
+			$sql .= 'LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
+		}
 		$list = pdo_fetchall($sql, $params);
 		include $this->template();
 	}
@@ -67,7 +71,8 @@ class Address_EweiShopV2Page extends MobileLoginPage
 		$data['street'] = trim($data['street']);
 		$data['datavalue'] = trim($data['datavalue']);
 		$data['streetdatavalue'] = trim($data['streetdatavalue']);
-		unset($data['areas']);
+		$isdefault = intval($data['isdefault']);
+		unset($data['isdefault'], $data['areas']);
 		$data['openid'] = $_W['openid'];
 		$data['uniacid'] = $_W['uniacid'];
 		if (empty($id)) 
@@ -83,6 +88,11 @@ class Address_EweiShopV2Page extends MobileLoginPage
 		else 
 		{
 			pdo_update('ewei_shop_member_address', $data, array('id' => $id, 'uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
+		}
+		if (!(empty($isdefault))) 
+		{
+			pdo_update('ewei_shop_member_address', array('isdefault' => 0), array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
+			pdo_update('ewei_shop_member_address', array('isdefault' => 1), array('id' => $id, 'uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
 		}
 		show_json(1, array('addressid' => $id));
 	}

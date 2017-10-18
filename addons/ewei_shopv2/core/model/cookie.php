@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -17,7 +17,7 @@ class Cookie_EweiShopV2Model
 	}
 	public function get($key) 
 	{
-		if (!isset($_COOKIE[$this->prefix . $key])) 
+		if (!(isset($_COOKIE[$this->prefix . $key]))) 
 		{
 			return false;
 		}

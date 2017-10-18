@@ -16,25 +16,18 @@ class Staff_EweiShopV2Page extends ComWebPage
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 20;
 		$id = intval($_GPC['id']);
-		$condition = '  np.uniacid = :uniacid';
+		$condition = '  np.uniacid = :uniacid  and np.deleted = 0 ';
 		$params = array(':uniacid' => $_W['uniacid']);
 		$keyword = trim($_GPC['keyword']);
 		if (!(empty($keyword))) 
 		{
-			$condition .= ' and g.title like :keyword';
+			$condition .= ' and (np.nickname like :keyword or np.realname like :keyword or np.storeid like :keyword or st.storename like :keyword )';
 			$params[':keyword'] = '%' . $keyword . '%';
 		}
-		$sql = 'SELECT np.* FROM ' . tablename('ewei_shop_newstore_people') . '  np' . "\r\n" . '        WHERE   1 and ' . $condition . ' ORDER BY np.id DESC ';
+		$sql = 'SELECT np.*,st.storename FROM ' . tablename('ewei_shop_newstore_people') . ' np' . "\r\n" . '            inner join ' . tablename('ewei_shop_store') . ' st on np.storeid=st.id' . "\r\n" . '            WHERE 1 and' . $condition . 'ORDER BY np.id DESC';
 		$sql .= ' LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall($sql, $params);
-		foreach ($list as &$row ) 
-		{
-			$store = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_store') . ' WHERE uniacid = :uniacid AND id = :id', array(':uniacid' => $_W['uniacid'], ':id' => $row['storeid']));
-			$row['storename'] = $store['storename'];
-		}
-		unset($row);
-		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_newstore_people') . '  np' . "\r\n" . '        WHERE   1 and ' . $condition . ' ORDER BY np.id DESC ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2(count($list), $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 

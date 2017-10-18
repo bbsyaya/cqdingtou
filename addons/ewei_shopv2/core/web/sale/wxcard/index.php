@@ -30,12 +30,12 @@ class Index_EweiShopV2Page extends ComWebPage
 		if ($_GPC['card_type'] != '') 
 		{
 			$condition .= ' AND card_type = :card_type';
-			$data[':card_type'] = intval($_GPC['card_type']);
+			$data[':card_type'] = trim($_GPC['card_type']);
 		}
 		$sql = 'SELECT * FROM ' . tablename('ewei_shop_wxcard') . ' ' . ' where  1 and ' . $condition . ' ORDER BY id DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall($sql, $data);
 		$total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_wxcard') . ' where 1 and ' . $condition, $data);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 

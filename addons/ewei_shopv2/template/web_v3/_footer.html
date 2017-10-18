@@ -79,7 +79,7 @@
         })
         {php $task_mode =intval(m('cache')->getString('task_mode', 'global'))}
         {if $task_mode==0}
-            $.getJSON("{php echo webUrl('util/task')}");
+            $.getJSON("{php echo mobileUrl('util/task')}");
         {/if}
     });
 </script>

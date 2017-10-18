@@ -7,17 +7,7 @@ class Index_EweiShopV2Page extends ComWebPage
 {
 	public function __construct() 
 	{
-		if (!(com('perm')->check_com('sale'))) 
-		{
-			if (cv('sale.coupon')) 
-			{
-				header('location: ' . webUrl('sale/coupon'));
-			}
-			else 
-			{
-				$this->message('你没有相应的权限查看');
-			}
-		}
+		parent::__construct('sale');
 	}
 	public function main() 
 	{

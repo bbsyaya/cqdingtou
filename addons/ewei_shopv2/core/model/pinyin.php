@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -15,7 +15,7 @@ class Pinyin_EweiShopV2Model
 		{
 			$_Code = 'gb2312';
 		}
-		if (!empty($lstring)) 
+		if (!(empty($lstring))) 
 		{
 			$_String = $lstring . $_String;
 		}
@@ -57,11 +57,10 @@ class Pinyin_EweiShopV2Model
 		}
 		foreach ($_Data as $k => $v ) 
 		{
-			if (!($v <= $_Num)) 
+			while ($v <= $_Num) 
 			{
-				continue;
+				break;
 			}
-			break;
 		}
 		return $k;
 	}

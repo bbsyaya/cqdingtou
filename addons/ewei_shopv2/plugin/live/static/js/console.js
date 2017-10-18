@@ -15,13 +15,11 @@ define([], function () {
         modal.wsConfig = params.wsConfig || {};
         modal.initWs();
         modal.initClick();
-
-        // 心跳
         setInterval(function () {
             if (modal.wsConnected) {
                 modal.wsSend('communication', {toUser: 'system'})
             }
-        }, 20000);
+        }, 20000)
     };
     modal.initWs = function () {
         if (!modal.wsConfig || !modal.wsConfig.address) {
@@ -148,6 +146,37 @@ define([], function () {
                     modal.initSetting();
                     modal.initOnline()
                 }
+            } else if (data.type == 'goods') {
+                modal.liveMsg('goods', data);
+                if (data.self == 1) {
+                    tip.msgbox.suc('推送成功')
+                }
+            } else if (data.type == 'redpack') {
+                modal.liveMsg('redpack', data);
+                if (data.self == 1) {
+                    tip.msgbox.suc('推送成功')
+                }
+                modal.liveMsgPush('redpack', data)
+            } else if (data.type == 'redpackdraw') {
+                var elm = $('.panel-push tbody').find('tr[data-pushid="' + data.redpackid + '"]');
+                if (elm.length < 1) {
+                    return
+                }
+                elm.find('.total_remain').text(data.redpack.total_remain);
+                elm.find('.money_remain').text(data.redpack.money_remain)
+            } else if (data.type == 'coupon') {
+                modal.liveMsg('coupon', data);
+                if (data.self == 1) {
+                    tip.msgbox.suc('推送成功')
+                }
+                modal.liveMsgPush('coupon', data)
+            } else if (data.type == 'coupondraw') {
+                var elm = $('.panel-push tbody').find('tr[data-pushid="' + data.couponid + '"]');
+                if (elm.length < 1) {
+                    return
+                }
+                elm.find('.total_remain').text(data.coupon.total_remain);
+                elm.find('.money_remain').text(data.coupon.money_remain)
             }
         };
         wsClient.onclose = function (evt) {
@@ -248,7 +277,6 @@ define([], function () {
             var _this = $(this), elm = $(this).closest('p').find('.nickname');
             var nickname = elm.data('nickname'), uid = elm.data('uid'), banned = _this.data('banned') || 0;
             var text = banned == 1 ? '确定解除禁言用户' : '确定禁言用户';
-            text = 'a:' + uid;
             if (uid) {
                 tip.confirm(text + nickname + '"？', function () {
                     modal.wsSend('banned', {banned: banned == 1 ? 0 : 1, bannedUid: uid, bannedNick: nickname})
@@ -439,13 +467,19 @@ define([], function () {
             })
         });
         $('.btn-push').click(function () {
+            if (!modal.wsConnected) {
+                tip.msgbox.err('与通讯服务器连接失败');
+                return
+            }
             var action = $(this).data('action');
             if (action == 'redpack') {
                 $('#pushRedpackModal').modal({backdrop: 'static', keyboard: false})
             } else if (action == 'coupon') {
                 $('#pushCouponModal').modal({backdrop: 'static', keyboard: false})
             } else if (action == 'link') {
-                $('#pushLinkModal').modal({backdrop: 'static', keyboard: false})
+                var url = biz.url('goods/query', {live: 1});
+                $(this).attr({'id': 'goods_selector', 'data-url': url, 'data-callback': 'callbackGoods'});
+                biz.selector.select({name: 'goods'})
             }
         });
         $('.submit-push').click(function () {
@@ -507,7 +541,50 @@ define([], function () {
                 $('#redpacktotal').val('0');
                 $('#redpacktitle').val('');
                 $('.repacktype[value="0"]').prop('checked', true).siblings().removeAttr('checked');
-                $('#redpackconfirm').removeAttr('checked')
+                $('#redpackconfirm').removeAttr('checked');
+                $('.repacktype').text('单个')
+            } else if (action == 'coupon') {
+                var couponid = $('input[name="couponid"]').val();
+                var name = $('#couponid_text').val();
+                var total = $('#coupontotal').val();
+                var valuetext = $('#coupon_value_text').val();
+                var valuetotal = $('#coupon_value_total').val();
+                var uselimit = $('#coupon_uselimit').val();
+                if (!couponid || couponid == 0) {
+                    tip.msgbox.err('请选择优惠券');
+                    return
+                }
+                if (total == '' || total < 1) {
+                    tip.msgbox.err('最低发送1张优惠券');
+                    return
+                }
+                if (total > 200) {
+                    tip.msgbox.err('最高发送200张优惠券');
+                    return
+                }
+                var confirm = $('#couponconfirm').is(':checked');
+                if (!confirm) {
+                    tip.msgbox.err('请勾选确认按钮');
+                    return
+                }
+                modal.wsSend('coupon', {
+                    toUser: 'all',
+                    couponId: couponid,
+                    couponTotal: total,
+                    couponName: name,
+                    couponValueText: valuetext,
+                    couponValueTotal: valuetotal,
+                    couponUseLimit: uselimit
+                });
+                $('#pushCouponModal').modal('hide');
+                $('#coupontotal').val('0');
+                $('#coupon_value_text').val('');
+                $('#coupon_value_total').val('');
+                $('#coupon_uselimit').val('');
+                $('#couponconfirm').removeAttr('checked');
+                $('#couponid_selector').find('.close').click()
+            } else {
+                tip.msgbox.err('未知类型')
             }
         });
         $('input[name="repacktype"]').click(function () {
@@ -517,6 +594,19 @@ define([], function () {
                 $('.repacktype').text('单个')
             }
         })
+    };
+    modal.callbackGoods = function (data) {
+        modal.wsSend('goods', {
+            toUser: 'all',
+            goodsTitle: data.title,
+            goodsThumb: data.thumb,
+            goodsPrice: data.islive == 1 && data.liveprice < data.minprice ? data.liveprice : data.minprice,
+            goodsId: data.id
+        })
+    };
+    modal.callbackCoupon = function (data) {
+        $('#coupon_value_text').val(data.value_text);
+        $('#coupon_value_total').val(data.value_total)
     };
     modal.initSetting = function () {
         if (modal.settings.nickname) {
@@ -546,10 +636,10 @@ define([], function () {
             $('.btn-play').show().siblings().hide()
         } else if (modal.settings.status == 1) {
             $('.online').removeClass('stop').removeClass('pause').find('.status').text('直播中');
-            $('.btn-play').hide().siblings().show().siblings('.btn-loading').hide();
+            $('.btn-play').hide().siblings().show().siblings('.btn-loading').hide()
         } else if (modal.settings.status == 2) {
             $('.online').removeClass('stop').addClass('pause').find('.status').text('暂停中');
-            $('.btn-pause').hide().siblings().show().siblings('.btn-loading').hide();
+            $('.btn-pause').hide().siblings().show().siblings('.btn-loading').hide()
         }
     };
     modal.initOnline = function () {
@@ -654,7 +744,8 @@ define([], function () {
                         text = text.replace(']', '');
                         var elm = $('.emoji-list .item[title="' + text + '"]');
                         if (elm.length > 0) {
-                            msg.text = msg.text.replace(val, elm.html())
+                            var face = '<img class="face" src="../addons/ewei_shopv2/plugin/live/static/images/face/' + elm.data('index') + '.gif?v=2" />';
+                            msg.text = msg.text.replace(val, face)
                         }
                     })
                 }
@@ -669,19 +760,33 @@ define([], function () {
         if (type != 'notice') {
             var date = modal.time2date(msg.time);
             html += '<span class="time">[' + date + '] </span>';
+            if (type == 'goods') {
+                text = '<a class="goods" href="' + biz.url('goods/edit', {id: msg.goodsId}) + '" target="_blank">';
+                text += '<span class="thumb"><img src="' + modal.tomedia(msg.goodsThumb) + '"/></span>';
+                text += '<span class="info"><span class="title">' + msg.goodsTitle + '</span><span class="price">￥' + msg.goodsPrice + '</span></span>';
+                text += '</span></a>'
+            } else if (type == 'redpack') {
+                text = '[余额红包] ' + msg.redpack.title + '，请到手机端查看'
+            } else if (type == 'coupon') {
+                text = '[优惠券] ' + msg.coupon.title + '，请到手机端查看'
+            }
             if (msg.self) {
                 if (modal.msgAt) {
                     text = modal.handleAtText(text, modal.msgAt)
                 }
                 html += '<span class="nickname self" title="点击修改昵称">' + msg.nickname + '(我)</span>：' + atText + text;
-                html += '<a class="btn-repeal" title="撤回此条消息"> 撤回</a>'
+                if (type != 'goods' && type != 'redpack' && type != 'coupon') {
+                    html += '<a class="btn-repeal" title="撤回此条消息"> 撤回</a>'
+                }
             } else {
                 if (msg.at) {
                     text = modal.handleAtText(text, msg.at)
                 }
                 html += '<span class="nickname" title="点击@Ta" data-nickname="' + msg.nickname + '" data-uid="' + msg.fromUser + '">' + msg.nickname + '</span>：' + atText + text;
-                html += '\n<a class="btn-delete" title="删除此条消息"> 删除</a>';
-                html += '\n<a class="btn-banned" title="禁止此用户发言"> 禁言</a>'
+                if (type != 'goods' && type != 'redpack') {
+                    html += '\n<a class="btn-delete" title="删除此条消息"> 删除</a>';
+                    html += '\n<a class="btn-banned" title="禁止此用户发言"> 禁言</a>'
+                }
             }
         } else {
             html += '<span class="notice">系统提醒：' + text + '</span>'
@@ -691,6 +796,34 @@ define([], function () {
         if (elm[0].scrollHeight > elm.height()) {
             elm.stop(true).animate({scrollTop: elm[0].scrollHeight + "px"}, 1)
         }
+    };
+    modal.liveMsgPush = function (type, data) {
+        if (type == 'coupon') {
+            var typetext = '-'
+        } else {
+            var typetext = data.redpack.type == 1 ? '拼手气红包' : '普通红包'
+        }
+        var pushtype = type == 'coupon' ? '优惠券' : '红包(余额)';
+        var pushid = type == 'coupon' ? data.coupon.id : data.redpack.id;
+        var title = type == 'coupon' ? data.coupon.title : data.redpack.title;
+        var total = type == 'coupon' ? data.coupon.total : data.redpack.total;
+        var total = type == 'coupon' ? data.coupon.total : data.redpack.total;
+        var money = type == 'coupon' ? '-' : data.redpack.money;
+        var label = type == 'coupon' ? 'label-warning' : 'label-danger';
+        var html = '<tr data-pushid="' + pushid + '" data-type="' + type + '"><td><label class="label ' + label + '">' + pushtype + '</label></td>';
+        html += '<td>' + title + '</td><td>' + modal.formatDateTime(pushid) + '</td><td>' + total + '</td>';
+        html += '<td class="total_remain">' + total + '</td><td>' + money + '</td>';
+        html += '<td class="money_remain">' + money + '</td><td>' + typetext + '</td>';
+        var href = biz.url('live/room/console_record', {
+            pushid: pushid,
+            type: type == 'coupon' ? 2 : data.redpack.type,
+            id: modal.wsConfig.roomid
+        });
+        html += '<td><a href="' + href + '" data-toggle="ajaxModal">领取记录</a></td></tr>';
+        $('.panel-push tbody').prepend(html).animate({scrollTop: "0px"}, 100).closest('.panel-body').find('.table').show();
+        $('.panel-body .empty-data').hide();
+        var pushcount = parseInt($('#pushcount').text());
+        $('#pushcount').text(pushcount + 1)
     };
     modal.tomedia = function (src) {
         if (typeof src != 'string') {
@@ -751,6 +884,21 @@ define([], function () {
         }
         ret += date.getSeconds() + '';
         return ret
+    };
+    modal.formatDateTime = function (inputTime) {
+        var date = new Date(inputTime * 1000);
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        m = m < 10 ? ('0' + m) : m;
+        var d = date.getDate();
+        d = d < 10 ? ('0' + d) : d;
+        var h = date.getHours();
+        h = h < 10 ? ('0' + h) : h;
+        var minute = date.getMinutes();
+        var second = date.getSeconds();
+        minute = minute < 10 ? ('0' + minute) : minute;
+        second = second < 10 ? ('0' + second) : second;
+        return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second
     };
     modal.insertAtCaret = function (elm, textFeildValue) {
         var textObj = $(elm).get(0);

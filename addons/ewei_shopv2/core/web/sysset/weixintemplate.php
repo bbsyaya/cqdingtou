@@ -30,7 +30,7 @@ class Weixintemplate_EweiShopV2Page extends WebPage
 		$template = NULL;
 		foreach ($list as $temp ) 
 		{
-			if ($temp['template_id'] == $id) 
+			while ($temp['template_id'] == $id) 
 			{
 				$template = $temp;
 				break;

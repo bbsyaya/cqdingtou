@@ -32,7 +32,7 @@ class Index_EweiShopV2Page extends ComWebPage
 		$sql .= ' LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$sql_count = 'SELECT count(1) FROM ' . tablename('ewei_shop_store') . ' WHERE ' . $condition;
 		$total = pdo_fetchcolumn($sql_count, $paras);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		$list = pdo_fetchall($sql, $paras);
 		foreach ($list as &$row ) 
 		{
@@ -67,6 +67,22 @@ class Index_EweiShopV2Page extends ComWebPage
 			{
 				$perms = '';
 			}
+			if (empty($_GPC['logo'])) 
+			{
+				show_json(0, '门店LOGO不能为空');
+			}
+			if (empty($_GPC['map']['lng']) || empty($_GPC['map']['lat'])) 
+			{
+				show_json(0, '门店位置不能为空');
+			}
+			if (empty($_GPC['address'])) 
+			{
+				show_json(0, '门店地址不能为空');
+			}
+			else if (30 < mb_strlen($_GPC['address'], 'UTF-8')) 
+			{
+				show_json(0, '门店地址不能超过30个字符');
+			}
 			$label = '';
 			if (!(empty($_GPC['lab']))) 
 			{
@@ -79,6 +95,10 @@ class Index_EweiShopV2Page extends ComWebPage
 					if (20 < mb_strlen($lab, 'UTF-8')) 
 					{
 						show_json(0, '标签长度不能超过20个字符');
+					}
+					if (strlen(trim($lab)) <= 0) 
+					{
+						show_json(0, '标签不能为空');
 					}
 				}
 				$label = implode(',', $_GPC['lab']);
@@ -96,10 +116,38 @@ class Index_EweiShopV2Page extends ComWebPage
 					{
 						show_json(0, '角标长度不能超过3个字符');
 					}
+					if (strlen(trim($tg)) <= 0) 
+					{
+						show_json(0, '角标不能为空');
+					}
 				}
 				$tag = implode(',', $_GPC['tag']);
 			}
-			$data = array('uniacid' => $_W['uniacid'], 'storename' => trim($_GPC['storename']), 'address' => trim($_GPC['address']), 'province' => trim($_GPC['province']), 'city' => trim($_GPC['city']), 'area' => trim($_GPC['area']), 'provincecode' => trim($_GPC['chose_province_code']), 'citycode' => trim($_GPC['chose_city_code']), 'areacode' => trim($_GPC['chose_area_code']), 'tel' => trim($_GPC['tel']), 'lng' => $_GPC['map']['lng'], 'lat' => $_GPC['map']['lat'], 'type' => intval($_GPC['type']), 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'label' => $label, 'tag' => $tag, 'fetchtime' => trim($_GPC['fetchtime']), 'saletime' => trim($_GPC['saletime']), 'logo' => save_media($_GPC['logo']), 'desc' => trim($_GPC['desc']), 'opensend' => intval($_GPC['opensend']), 'status' => intval($_GPC['status']), 'perms' => $perms);
+			$cates = '';
+			if (!(empty($_GPC['cates']))) 
+			{
+				if (3 < count($_GPC['cates'])) 
+				{
+					show_json(0, '门店分类不能超过3个');
+				}
+				$cates = implode(',', $_GPC['cates']);
+			}
+			if (empty($_GPC['tel']) || (strlen(trim($_GPC['tel'])) <= 0)) 
+			{
+				show_json(0, '门店电话不能为空');
+			}
+			else if (20 < strlen($_GPC['tel'])) 
+			{
+				show_json(0, '门店电话不能大于20个字符');
+			}
+			if (!(empty($_GPC['saletime']))) 
+			{
+				if (20 < strlen($_GPC['saletime'])) 
+				{
+					show_json(0, '营业时间不能大于20个字符');
+				}
+			}
+			$data = array('uniacid' => $_W['uniacid'], 'storename' => trim($_GPC['storename']), 'address' => trim($_GPC['address']), 'province' => trim($_GPC['province']), 'city' => trim($_GPC['city']), 'area' => trim($_GPC['area']), 'provincecode' => trim($_GPC['chose_province_code']), 'citycode' => trim($_GPC['chose_city_code']), 'areacode' => trim($_GPC['chose_area_code']), 'tel' => trim($_GPC['tel']), 'lng' => $_GPC['map']['lng'], 'lat' => $_GPC['map']['lat'], 'type' => intval($_GPC['type']), 'realname' => trim($_GPC['realname']), 'mobile' => trim($_GPC['mobile']), 'label' => $label, 'tag' => $tag, 'fetchtime' => trim($_GPC['fetchtime']), 'saletime' => trim($_GPC['saletime']), 'logo' => save_media($_GPC['logo']), 'desc' => trim($_GPC['desc']), 'opensend' => intval($_GPC['opensend']), 'status' => intval($_GPC['status']), 'cates' => $cates, 'perms' => $perms);
 			if (P('newstore')) 
 			{
 				$data['storegroupid'] = intval($_GPC['storegroupid']);
@@ -123,6 +171,7 @@ class Index_EweiShopV2Page extends ComWebPage
 		if (p('newstore')) 
 		{
 			$storegroup = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_newstore_storegroup') . ' WHERE  uniacid=:uniacid  ', array(':uniacid' => $_W['uniacid']));
+			$category = pdo_fetchall('SELECT *FROM ' . tablename('ewei_shop_newstore_category') . ' WHERE uniacid = :uniacid', array(':uniacid' => $_W['uniacid']));
 		}
 		$item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_store') . ' WHERE id =:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $id));
 		$perms = explode(',', $item['perms']);
@@ -135,6 +184,7 @@ class Index_EweiShopV2Page extends ComWebPage
 		}
 		$label = explode(',', $item['label']);
 		$tag = explode(',', $item['tag']);
+		$cates = explode(',', $item['cates']);
 		include $this->template();
 	}
 	public function delete() 
@@ -190,9 +240,14 @@ class Index_EweiShopV2Page extends ComWebPage
 		global $_W;
 		global $_GPC;
 		$kwd = trim($_GPC['keyword']);
+		$limittype = ((empty($_GPC['limittype']) ? 0 : intval($_GPC['limittype'])));
 		$params = array();
 		$params[':uniacid'] = $_W['uniacid'];
-		$condition = ' and uniacid=:uniacid and type in (1,2,3) and status=1';
+		$condition = ' and uniacid=:uniacid  and status=1 ';
+		if ($limittype == 0) 
+		{
+			$condition .= '  and type in (1,2,3) ';
+		}
 		if (!(empty($kwd))) 
 		{
 			$condition .= ' AND `storename` LIKE :keyword';

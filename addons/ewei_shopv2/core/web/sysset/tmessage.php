@@ -21,7 +21,7 @@ class Tmessage_EweiShopV2Page extends WebPage
 		}
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_member_message_template') . ' WHERE 1 ' . $condition . '  ORDER BY id asc limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_member_message_template') . ' WHERE 1 ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 

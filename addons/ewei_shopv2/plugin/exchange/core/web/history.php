@@ -75,7 +75,7 @@ class History_EweiShopV2Page extends PluginWebPage
 		$record = pdo_fetchall($sql, array(':uniacid' => $_W['uniacid']));
 		$countsql = 'SELECT COUNT(*) FROM ' . tablename('ewei_shop_exchange_record') . ' WHERE uniacid = :uniacid ' . $keyword_condition . $group_condition . $time_condition;
 		$count = pdo_fetchcolumn($countsql, array(':uniacid' => $_W['uniacid']));
-		$pager = pagination($count, $page, $psize);
+		$pager = pagination2($count, $page, $psize);
 		include $this->template();
 	}
 	public function detail() 

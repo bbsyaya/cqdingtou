@@ -14,6 +14,39 @@
 }
 
 .isliving {
+    height: 1.2rem;
+    width: 3.75rem;
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    bottom: 0;
+
+    color: #fff;
+    line-height: 1.25rem;
+    font-size: 0.6rem;
+    text-align: right;
+    padding: 0 0.5rem;
+
+    background: -moz-linear-gradient(left top, #ffce4a 0%, #fe9402 100%);
+    background: -webkit-linear-gradient(left top, #ffce4a 0%,#fe9402 100%);
+    background: -o-linear-gradient(left top, #ffce4a 0%,#fe9402 100%);
+    background: -ms-linear-gradient(left top, #ffce4a 0%,#fe9402 100%);
+    background: linear-gradient(to right bottom, #ffce4a 0%,#fe9402 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffffce4a, endColorstr=#fffe9402,gradientType=1) ;
+}
+
+.isliving:before {
+    content: '';
+    position: absolute;
+    top: 0.3rem;
+    left: 0.5rem;
+    height: 0.6rem;
+    width: 0.6rem;
+    background: url("../images/note.gif") no-repeat;
+    background-size: 100%;
+}
+
+.isliving2 {
     height: 3.2rem;
     width: 3.55rem;
     position: absolute;

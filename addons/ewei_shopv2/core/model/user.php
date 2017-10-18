@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -59,7 +59,7 @@ class User_EweiShopV2Model
 	public function followed($openid = '') 
 	{
 		global $_W;
-		$followed = !empty($openid);
+		$followed = !(empty($openid));
 		if ($followed) 
 		{
 			$mf = pdo_fetch('select follow from ' . tablename('mc_mapping_fans') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':openid' => $openid, ':uniacid' => $_W['uniacid']));

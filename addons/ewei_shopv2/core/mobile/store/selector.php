@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -13,7 +13,7 @@ class Selector_EweiShopV2Page extends MobilePage
 		$type = intval($_GPC['type']);
 		$merchid = intval($_GPC['merchid']);
 		$condition = '';
-		if (!empty($ids)) 
+		if (!(empty($ids))) 
 		{
 			$condition = ' and id in(' . $ids . ')';
 		}

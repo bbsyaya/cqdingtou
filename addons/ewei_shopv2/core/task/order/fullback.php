@@ -16,7 +16,7 @@ foreach ($sets as $set )
 		continue;
 	}
 	$trade = m('common')->getSysset('trade', $_W['uniacid']);
-	$logs = pdo_fetchall('select * from ' . tablename('ewei_shop_fullback_log') . ' where uniacid = ' . $_W['uniacid'] . ' and isfullback = 0 and (fullbacktime =0 or fullbacktime < ' . strtotime('-1 days') . ') and fullbackday < day ');
+	$logs = pdo_fetchall('select id,`day`,fullbackday,openid,priceevery,price from ' . tablename('ewei_shop_fullback_log') . ' where uniacid = ' . $_W['uniacid'] . ' and isfullback = 0 and (fullbacktime =0 or fullbacktime < ' . strtotime('-1 days') . ') and fullbackday < day ');
 	foreach ($logs as $key => $value ) 
 	{
 		if (1 < ($value['day'] - $value['fullbackday'])) 

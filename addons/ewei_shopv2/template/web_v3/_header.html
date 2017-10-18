@@ -34,11 +34,9 @@
     </div>
     <div class="wb-header-flex"></div>
 
-    {if empty($_W['shopset']['template']['close_v2'])}
-        <div class="switch-version-box">
-            <a class="switch-version" title="返回旧版" href="{php echo webUrl('switchversion', array('route'=>$_GET['r'], 'id'=>$_GET['id']))}">返回旧版</a>
-        </div>
-    {/if}
+    <div class="switch-version-box">
+        <a class="switch-version" title="返回旧版" href="{php echo webUrl('switchversion', array('route'=>$_GET['r'], 'id'=>$_GET['id']))}">返回旧版</a>
+    </div>
 
     <ul>
         {if $system['right_menu']['system']}
@@ -46,7 +44,7 @@
                 <a href="{php echo webUrl('system')}"><i class="icow icow-syssetL"></i></a>
             </li>
         {/if}
-        <li class="dropdown {if $system['merch']}auto{/if} ellipsis">
+        <li class="dropdown {if $system['merch']}auto{/if}">
             <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">{$system['right_menu']['menu_title']}<span></span></a>
             <ul class="dropdown-menu">
                 {loop $system['right_menu']['menu_items'] $right_menu_item}

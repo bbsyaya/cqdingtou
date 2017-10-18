@@ -18,8 +18,7 @@ class Verifygoods_EweiShopV2Model
 			$sql2 = ',o.storeid,o.isnewstore';
 		}
 		$ordergoods = pdo_fetchall('select o.openid,o.uniacid,o.id as orderid , og.id as ordergoodsid,g.verifygoodsdays,g.verifygoodsnum,g.verifygoodslimittype,g.verifygoodslimitdate,og.total ' . $sql2 . ' from ' . tablename('ewei_shop_order_goods') . '   og inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n" . '          inner join ' . tablename('ewei_shop_order') . ' o on og.orderid = o.id' . "\r\n" . '          where   og.orderid =:orderid and g.type = 5', array(':orderid' => $orderid));
-		foreach($ordergoods as  $ordergood)
-		{
+		foreach($ordergoods as  $ordergood){
 		$time = time();
 		$total = intval($ordergood['total']);
 		$i = 0;
@@ -62,6 +61,17 @@ class Verifygoods_EweiShopV2Model
 		}
 		unset($row);
 		return $verifygoods;
+	}
+	public function checkhaveverifygoods($openid) 
+	{
+		global $_W;
+		$sql = 'select  COUNT(1)  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n" . '                 inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n" . '                 left  join ' . tablename('ewei_shop_order') . ' o on vg.orderid = o.id' . "\r\n" . '                 left  join ' . tablename('ewei_shop_order_refund') . ' orf on o.refundid = orf.id' . "\r\n" . '                 inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n" . '                 left  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n" . '                 where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0   order by vg.starttime desc';
+		$verifygoods = pdo_fetchcolumn($sql, array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+		if (!(empty($verifygoods))) 
+		{
+			return 1;
+		}
+		return 0;
 	}
 }
 ?>

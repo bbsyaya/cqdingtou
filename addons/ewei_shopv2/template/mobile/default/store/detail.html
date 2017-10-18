@@ -1,5 +1,6 @@
 {template '_header'}
 
+<div class="fui-page">
 <link rel="stylesheet" type="text/css" href="../addons/ewei_shopv2/template/mobile/default/static/css/storedetail.css?v=2.0.0">
 
 <link rel="stylesheet" href="http://at.alicdn.com/t/font_pn66xvaxw2ymn29.css">
@@ -47,12 +48,12 @@
 	    </div>
 		<div class="fui-cell-group fui-cell-click merchant">
 			 <a class="fui-cell" href="tel:{$item['tel']}">
-				<div class="fui-cell-icon"><i class="iconfont icon-shouji"></i></div>
+				<div class="fui-cell-icon"><i class="icon icon-dianhua"></i></div>
 				<div class="fui-cell-text"><p>{$item['tel']}</p></div>
 				<div class="fui-cell-remark"></div>
 		 	 </a>
-			 <a class="fui-cell"  href="{php echo mobileUrl('store/map',array('id'=>$item['id']))}">
-				<div class="fui-cell-icon"><i class="iconfont icon-dingwei"></i></div>
+			 <a class="fui-cell external"  href="{php echo mobileUrl('store/map',array('id'=>$item['id']))}">
+				<div class="fui-cell-icon"><i class="icon icon-dingwei "></i></div>
 				<div class="fui-cell-text">{$item['address']}</div>
 				<div class="fui-cell-remark"></div>
 			</a>
@@ -69,4 +70,7 @@
         $(e.target).addClass('active');
     })
 </script>
+
+</div>
 {template '_footer'}
+

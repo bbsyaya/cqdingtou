@@ -328,19 +328,6 @@ class Member_EweiShopV2Model
 				return;
 			}
 		}
-		$redis = redis();
-		if (!(is_error($redis))) 
-		{
-			$member = $redis->get($_W['openid']);
-			if (!(empty($member))) 
-			{
-				return array('openid' => $_W['openid']);
-			}
-		}
-		if (!(is_error($redis))) 
-		{
-			$redis->set($_W['openid'], 1, 20);
-		}
 		if (empty($openid) && !(EWEI_SHOPV2_DEBUG)) 
 		{
 			$diemsg = ((is_h5app() ? 'APP正在维护, 请到公众号中访问' : '请在微信客户端打开链接'));

@@ -30,7 +30,7 @@ class Index_EweiShopV2Page extends SystemPage
 		}
 		$styles = array();
 		$dir = IA_ROOT . '/pcsite/template';
-		if ($handle = opendir($dir)) 
+		if ($handle = @opendir($dir)) 
 		{
 			while (($file = readdir($handle)) !== false) 
 			{

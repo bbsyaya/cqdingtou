@@ -865,7 +865,7 @@ class System_EweiShopV2Model
 			array('title' => '应用信息'),
 			array('title' => '组件信息', 'route' => 'coms'),
 			array('title' => '公众号权限', 'route' => 'perm'),
-			array('title' => '应用中心', 'route' => 'apps'),
+			//array('title' => '应用中心', 'route' => 'apps'),
 			array(
 				'title' => '应用授权管理',
 				'items' => array(
@@ -960,13 +960,13 @@ class System_EweiShopV2Model
 			)
 		),
 	'auth'      => array(
-		'title'    => '更新',
+		'title'    => '授权',
 		'subtitle' => '授权管理',
 		'icon'     => 'iconfont-shouquan',
 		'items'    => array(
 			array('title' => '授权管理'),
 			array('title' => '系统更新', 'route' => 'upgrade'),
-			array('title' => '历史日志', 'route' => 'upgrade.log')
+			//array('title' => '历史日志', 'route' => 'upgrade.log')
 			)
 		)
 	);
@@ -1089,9 +1089,10 @@ class System_EweiShopV2Model
 
 				if ($_W['role'] == 'founder') {
 					$return_arr['menu_items'][] = 'line';
-					//$return_arr['menu_items'][] = array('text' => '应用中心', 'href' => webUrl('system/plugin/apps'));
+					/* $return_arr['menu_items'][] = array('text' => '应用中心', 'href' => webUrl('system/plugin/apps')); */
 					$return_arr['menu_items'][] = 'line';
 					$return_arr['menu_items'][] = array('text' => '系统更新', 'href' => './index.php?c=site&a=entry&m=ewei_shopv2&do=web&r=system.auth.upgrade');
+			
 				}
 
 				$return_arr['menu_items'][] = array('text' => '修改密码', 'href' => './index.php?c=user&a=profile&', 'blank' => true);

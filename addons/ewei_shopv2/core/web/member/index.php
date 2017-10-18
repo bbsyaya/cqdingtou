@@ -8,8 +8,7 @@ class Index_EweiShopV2Page extends WebPage
 	public function main() 
 	{
 		global $_W;
-		$set = m('common')->getSysset('template');
-		if (!(empty($set['style_v3']))) 
+		if (!(empty($_W['shopversion']))) 
 		{
 			header('location: ' . webUrl('member/list'));
 			exit();

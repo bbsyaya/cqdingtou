@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -14,9 +14,11 @@ class History_EweiShopV2Page extends MobileLoginPage
 		if ($merch_plugin && $merch_data['is_openmerch']) 
 		{
 			include $this->template('merch/member/history');
-			return NULL;
 		}
-		include $this->template();
+		else 
+		{
+			include $this->template();
+		}
 	}
 	public function get_list() 
 	{
@@ -32,7 +34,7 @@ class History_EweiShopV2Page extends MobileLoginPage
 		$list = pdo_fetchall($sql, $params);
 		$merch_plugin = p('merch');
 		$merch_data = m('common')->getPluginset('merch');
-		if (!empty($list) && $merch_plugin && $merch_data['is_openmerch']) 
+		if (!(empty($list)) && $merch_plugin && $merch_data['is_openmerch']) 
 		{
 			$merch_user = $merch_plugin->getListUser($list, 'merch_user');
 		}
@@ -40,7 +42,7 @@ class History_EweiShopV2Page extends MobileLoginPage
 		{
 			$row['createtime'] = date('Y-m-d H:i:s', $row['createtime']);
 			$row['thumb'] = tomedia($row['thumb']);
-			$row['merchname'] = ($merch_user[$row['merchid']]['merchname'] ? $merch_user[$row['merchid']]['merchname'] : $_W['shopset']['shop']['name']);
+			$row['merchname'] = (($merch_user[$row['merchid']]['merchname'] ? $merch_user[$row['merchid']]['merchname'] : $_W['shopset']['shop']['name']));
 		}
 		unset($row);
 		show_json(1, array('list' => $list, 'total' => $total, 'pagesize' => $psize));
@@ -50,7 +52,7 @@ class History_EweiShopV2Page extends MobileLoginPage
 		global $_W;
 		global $_GPC;
 		$ids = $_GPC['ids'];
-		if (empty($ids) || !is_array($ids)) 
+		if (empty($ids) || !(is_array($ids))) 
 		{
 			show_json(0, '参数错误');
 		}

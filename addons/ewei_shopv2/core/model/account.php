@@ -1,5 +1,5 @@
 <?php
-if (!defined('IN_IA')) 
+if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
 }
@@ -12,7 +12,7 @@ class Account_EweiShopV2Model
 		if (empty($_W['openid'])) 
 		{
 			$openid = $this->checkOpenid();
-			if (!empty($openid)) 
+			if (!(empty($openid))) 
 			{
 				return $openid;
 			}
@@ -50,11 +50,11 @@ class Account_EweiShopV2Model
 	public function setLogin($member) 
 	{
 		global $_W;
-		if (!is_array($member)) 
+		if (!(is_array($member))) 
 		{
 			$member = m('member')->getMember($member);
 		}
-		if (!empty($member)) 
+		if (!(empty($member))) 
 		{
 			$member['ewei_shopv2_member_hash'] = md5($member['pwd'] . $member['salt']);
 			$key = '__ewei_shopv2_member_session_' . $_W['uniacid'];

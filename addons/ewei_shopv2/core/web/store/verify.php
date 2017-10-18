@@ -26,7 +26,7 @@ class Verify_EweiShopV2Page extends ComWebPage
 				$verifygood = pdo_fetch('select *  from ' . tablename('ewei_shop_verifygoods') . ' where uniacid=:uniacid and  verifycode=:verifycode  limit 1 ', array(':uniacid' => $_W['uniacid'], ':verifycode' => $verifycode));
 				if (empty($verifygood)) 
 				{
-					show_json(0, '未查询到核销商品或核销码已过期,请核对核销码');
+					show_json(0, '未查询到记次时商品或核销码已过期,请核对核销码');
 				}
 				if (intval($verifygood['codeinvalidtime']) < time()) 
 				{
@@ -45,12 +45,12 @@ class Verify_EweiShopV2Page extends ComWebPage
 		$verifycode = trim($_GPC['verifycode']);
 		if (empty($verifycode)) 
 		{
-			$this->message('未查询到核销商品或核销码已失效,请核对核销码!', '', 'error');
+			$this->message('未查询到记次时商品或核销码已失效,请核对核销码!', '', 'error');
 		}
 		$verifygood = pdo_fetch('select vg.*,g.id as goodsid ,g.title,g.subtitle,g.thumb  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' where   vg.verifycode=:verifycode and vg.uniacid=:uniacid  limit 1', array(':uniacid' => $_W['uniacid'], ':verifycode' => $verifycode));
 		if (empty($verifygood)) 
 		{
-			$this->message('未查询到核销商品或核销码已失效,请核对核销码!', '', 'error');
+			$this->message('未查询到记次时商品或核销码已失效,请核对核销码!', '', 'error');
 		}
 		if (intval($verifygood['codeinvalidtime']) < time()) 
 		{
@@ -130,7 +130,7 @@ class Verify_EweiShopV2Page extends ComWebPage
 		}
 		unset($rom);
 		$total = pdo_fetchcolumn('select  COUNT(*)   from ' . tablename('ewei_shop_verifygoods_log') . '   vgl' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_verifygoods') . ' vg on vg.id = vgl.verifygoodsid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_store') . ' s  on s.id = vgl.storeid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_saler') . ' sa  on sa.id = vgl.salerid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = og.orderid' . "\r\n\t\t" . ' left join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . '  where  1 and  ' . $condition . ' ORDER BY vgl.verifydate DESC ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 }

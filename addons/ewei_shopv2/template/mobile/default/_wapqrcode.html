@@ -1,4 +1,4 @@
-{if !empty($currenturl)}
+{if !empty($currenturl) && !is_mobile()}
 <div class="wap-qrcode-container">
     <p class="example1">{$shopname}</p>
     <div class="wap-qrcode-image" id="wap-qrcode"></div>

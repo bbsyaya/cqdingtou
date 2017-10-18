@@ -9,13 +9,17 @@ class Index_EweiShopV2Page extends WebPage
 	{
 		global $_W;
 		global $_GPC;
-		if (empty($_W['shopset']['template']['style_v3'])) 
+		if (empty($_W['shopversion'])) 
 		{
 			$goodsfrom = strtolower(trim($_GPC['goodsfrom']));
 			if (empty($goodsfrom)) 
 			{
 				header('location: ' . webUrl('goods', array('goodsfrom' => 'sale')));
 			}
+		}
+		else if (!(empty($_GPC['goodsfrom']))) 
+		{
+			header('location: ' . webUrl('goods/' . $_GPC['goodsfrom']));
 		}
 		$merch_plugin = p('merch');
 		$merch_data = m('common')->getPluginset('merch');
@@ -56,6 +60,7 @@ class Index_EweiShopV2Page extends WebPage
 			$condition .= ' AND FIND_IN_SET(' . $_GPC['cate'] . ',cates)<>0 ';
 		}
 		empty($goodsfrom) && ($_GPC['goodsfrom'] = $goodsfrom = 'sale');
+		$_GPC['goodsfrom'] = $goodsfrom;
 		if ($goodsfrom == 'sale') 
 		{
 			$condition .= ' AND g.`status` > 0 and g.`checked`=0 and g.`total`>0 and g.`deleted`=0';

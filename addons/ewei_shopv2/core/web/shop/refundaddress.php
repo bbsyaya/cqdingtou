@@ -25,7 +25,7 @@ class Refundaddress_EweiShopV2Page extends WebPage
 		}
 		$list = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_refund_address') . ' WHERE 1 ' . $condition . '  ORDER BY id DESC limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_refund_address') . ' WHERE 1 ' . $condition, $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function add() 

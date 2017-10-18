@@ -13,8 +13,8 @@
                 <label class="col-sm-1 control-label"></label>
                 <div class="col-sm-12">
                     <div class="input-group">
-                        <input type="text" class="form-control">
-                        <a class="input-group-addon">搜索</a>
+                        <input type="text" class="form-control" id="title2" value="">
+                        <a class="input-group-addon" onclick="so2()">搜索</a>
                     </div>
                 </div>
             </div>
@@ -56,7 +56,7 @@
 <script>
     $(function () {
         $(".pager-nav").click(function () {
-            getpagecontent($(this).attr('page'),'{$type}');
+            getpagecontent($(this).attr('page'),'{$type}','');
         })
     })
 </script>

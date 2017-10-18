@@ -5,20 +5,20 @@ if (!(defined('IN_IA'))) {
 
 
 if (!(function_exists('getIsSecureConnection'))) {
-	function getIsSecureConnection()
-	{
-		if (isset($_SERVER['HTTPS']) && (('1' == $_SERVER['HTTPS']) || ('on' == strtolower($_SERVER['HTTPS'])))) {
-			return true;
-		}
-
-
-		if (isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'])) {
-			return true;
-		}
-
-
-		return false;
+function getIsSecureConnection()
+{
+	if (isset($_SERVER['HTTPS']) && (('1' == $_SERVER['HTTPS']) || ('on' == strtolower($_SERVER['HTTPS'])))) {
+		return true;
 	}
+
+
+	if (isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'])) {
+		return true;
+	}
+
+
+	return false;
+}
 }
 
 

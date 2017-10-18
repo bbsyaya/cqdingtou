@@ -1,6 +1,6 @@
 <?php
 set_time_limit(0);
-if (!(defined('IN_IA'))) 
+if (!defined('IN_IA')) 
 {
 	exit('Access Denied');
 }
@@ -16,7 +16,7 @@ class TaobaoModel extends PluginModel
 		$url = $this->get_taobao_info_url($itemid);
 		load()->func('communication');
 		$response = ihttp_get($url);
-		if (!(isset($response['content']))) 
+		if (!isset($response['content'])) 
 		{
 			return array('result' => '0', 'error' => '未从淘宝获取到商品信息!');
 		}
@@ -31,7 +31,7 @@ class TaobaoModel extends PluginModel
 		$item = array();
 		$item['id'] = $g['id'];
 		$item['merchid'] = $merchid;
-		if (!(empty($merchid))) 
+		if (!empty($merchid)) 
 		{
 			if (empty($_W['merch_user']['goodschecked'])) 
 			{
@@ -50,7 +50,7 @@ class TaobaoModel extends PluginModel
 		$tcateid = 0;
 		if (is_array($cates)) 
 		{
-			foreach ($cates as $key => $cid ) 
+			foreach ($cates as $key => $cid) 
 			{
 				$c = pdo_fetch('select level from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
 				if ($c['level'] == 1) 
@@ -61,9 +61,12 @@ class TaobaoModel extends PluginModel
 				{
 					$ccates[] = $cid;
 				}
-				else if ($c['level'] == 3) 
+				else 
 				{
-					$tcates[] = $cid;
+					if ($c['level'] == 3) 
+					{
+						$tcates[] = $cid;
+					}
 				}
 				if ($key == 0) 
 				{
@@ -77,13 +80,16 @@ class TaobaoModel extends PluginModel
 						$pcateid = $crow['parentid'];
 						$ccateid = $cid;
 					}
-					else if ($c['level'] == 3) 
+					else 
 					{
-						$tcateid = $cid;
-						$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
-						$ccateid = $tcate['parentid'];
-						$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
-						$pcateid = $ccate['parentid'];
+						if ($c['level'] == 3) 
+						{
+							$tcateid = $cid;
+							$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+							$ccateid = $tcate['parentid'];
+							$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
+							$pcateid = $ccate['parentid'];
+						}
 					}
 				}
 			}
@@ -91,7 +97,7 @@ class TaobaoModel extends PluginModel
 		$item['pcate'] = $pcateid;
 		$item['ccate'] = $ccateid;
 		$item['tcate'] = $tcateid;
-		if (!(empty($cates))) 
+		if (!empty($cates)) 
 		{
 			$item['cates'] = implode(',', $cates);
 		}
@@ -105,7 +111,7 @@ class TaobaoModel extends PluginModel
 		if (isset($data['props'])) 
 		{
 			$props = $data['props'];
-			foreach ($props as $pp ) 
+			foreach ($props as $pp) 
 			{
 				$params[] = array('title' => $pp['name'], 'value' => $pp['value']);
 			}
@@ -119,10 +125,10 @@ class TaobaoModel extends PluginModel
 			if (isset($skuModel['skuProps'])) 
 			{
 				$skuProps = $skuModel['skuProps'];
-				foreach ($skuProps as $prop ) 
+				foreach ($skuProps as $prop) 
 				{
 					$spec_items = array();
-					foreach ($prop['values'] as $spec_item ) 
+					foreach ($prop['values'] as $spec_item) 
 					{
 						$spec_items[] = array('valueId' => $spec_item['valueId'], 'title' => $spec_item['name'], 'thumb' => $spec_item['imgUrl']);
 					}
@@ -133,11 +139,11 @@ class TaobaoModel extends PluginModel
 			if (isset($skuModel['ppathIdmap'])) 
 			{
 				$ppathIdmap = $skuModel['ppathIdmap'];
-				foreach ($ppathIdmap as $key => $skuId ) 
+				foreach ($ppathIdmap as $key => $skuId) 
 				{
 					$option_specs = array();
 					$m = explode(';', $key);
-					foreach ($m as $v ) 
+					foreach ($m as $v) 
 					{
 						$mm = explode(':', $v);
 						$option_specs[] = array('propId' => $mm[0], 'valueId' => $mm[1]);
@@ -160,26 +166,26 @@ class TaobaoModel extends PluginModel
 			if (isset($skuModel1['skus'])) 
 			{
 				$skus = $skuModel1['skus'];
-				foreach ($skus as $key => $val ) 
+				foreach ($skus as $key => $val) 
 				{
 					$sku_id = $key;
-					foreach ($options as &$o ) 
+					foreach ($options as &$o) 
 					{
 						if ($o['skuId'] == $sku_id) 
 						{
 							$o['stock'] = $val['quantity'];
-							foreach ($val['priceUnits'] as $p ) 
+							foreach ($val['priceUnits'] as $p) 
 							{
 								$o['marketprice'] = $p['price'];
 							}
 							$titles = array();
-							foreach ($o['option_specs'] as $osp ) 
+							foreach ($o['option_specs'] as $osp) 
 							{
-								foreach ($specs as $sp ) 
+								foreach ($specs as $sp) 
 								{
 									if ($sp['propId'] == $osp['propId']) 
 									{
-										foreach ($sp['items'] as $spitem ) 
+										foreach ($sp['items'] as $spitem) 
 										{
 											if ($spitem['valueId'] == $osp['valueId']) 
 											{
@@ -198,7 +204,7 @@ class TaobaoModel extends PluginModel
 			else 
 			{
 				$mprice = 0;
-				foreach ($itemInfoModel1['priceUnits'] as $p ) 
+				foreach ($itemInfoModel1['priceUnits'] as $p) 
 				{
 					$mprice = $p['price'];
 				}
@@ -208,7 +214,7 @@ class TaobaoModel extends PluginModel
 		else 
 		{
 			$mprice = 0;
-			foreach ($itemInfoModel1['priceUnits'] as $p ) 
+			foreach ($itemInfoModel1['priceUnits'] as $p) 
 			{
 				$mprice = $p['price'];
 			}
@@ -241,7 +247,7 @@ class TaobaoModel extends PluginModel
 		$dom->loadHTML('<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $content);
 		$xml = simplexml_import_dom($dom);
 		$prodectNameContent = $xml->xpath('//*[@id="goodName"]');
-		$prodectName = strval( $prodectNameContent[0]->attributes()->value);
+		$prodectName = strval($prodectNameContent[0]->attributes()->value);
 		if ($prodectName == NULL) 
 		{
 			return array('result' => '0', 'error' => '宝贝不存在!');
@@ -249,7 +255,7 @@ class TaobaoModel extends PluginModel
 		$item = array();
 		$item['id'] = $g['id'];
 		$item['merchid'] = $merchid;
-		if (!(empty($merchid))) 
+		if (!empty($merchid)) 
 		{
 			if (empty($_W['merch_user']['goodschecked'])) 
 			{
@@ -268,7 +274,7 @@ class TaobaoModel extends PluginModel
 		$tcateid = 0;
 		if (is_array($cates)) 
 		{
-			foreach ($cates as $key => $cid ) 
+			foreach ($cates as $key => $cid) 
 			{
 				$c = pdo_fetch('select level from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
 				if ($c['level'] == 1) 
@@ -279,9 +285,12 @@ class TaobaoModel extends PluginModel
 				{
 					$ccates[] = $cid;
 				}
-				else if ($c['level'] == 3) 
+				else 
 				{
-					$tcates[] = $cid;
+					if ($c['level'] == 3) 
+					{
+						$tcates[] = $cid;
+					}
 				}
 				if ($key == 0) 
 				{
@@ -295,13 +304,16 @@ class TaobaoModel extends PluginModel
 						$pcateid = $crow['parentid'];
 						$ccateid = $cid;
 					}
-					else if ($c['level'] == 3) 
+					else 
 					{
-						$tcateid = $cid;
-						$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
-						$ccateid = $tcate['parentid'];
-						$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
-						$pcateid = $ccate['parentid'];
+						if ($c['level'] == 3) 
+						{
+							$tcateid = $cid;
+							$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+							$ccateid = $tcate['parentid'];
+							$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
+							$pcateid = $ccate['parentid'];
+						}
 					}
 				}
 			}
@@ -309,7 +321,7 @@ class TaobaoModel extends PluginModel
 		$item['pcate'] = $pcateid;
 		$item['ccate'] = $ccateid;
 		$item['tcate'] = $tcateid;
-		if (!(empty($cates))) 
+		if (!empty($cates)) 
 		{
 			$item['cates'] = implode(',', $cates);
 		}
@@ -320,7 +332,7 @@ class TaobaoModel extends PluginModel
 		$item['title'] = $prodectName;
 		$pics = array();
 		$imgurls = $xml->xpath('//*[@id="slide"]/ul');
-		foreach ($imgurls[0]->li as $imgurl ) 
+		foreach ($imgurls[0]->li as $imgurl) 
 		{
 			if (count($pics) < 4) 
 			{
@@ -349,7 +361,7 @@ class TaobaoModel extends PluginModel
 		$item['total'] = 10;
 		$item['sales'] = 0;
 		$prodectPriceContent = $xml->xpath('//*[@id="jdPrice"]');
-		$prodectPrices = strval( $prodectPriceContent[0]->attributes()->value);
+		$prodectPrices = strval($prodectPriceContent[0]->attributes()->value);
 		$item['marketprice'] = $prodectPrices;
 		$url = $this->get_jingdong_detail_url($itemid);
 		$responseDetail = ihttp_get($url);
@@ -380,7 +392,11 @@ class TaobaoModel extends PluginModel
 	public function save_taobao_goods($item = array(), $catch_url = '') 
 	{
 		global $_W;
-		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $item['merchid'], 'checked' => $item['checked'], 'catch_source' => 'taobao', 'catch_id' => $item['itemId'], 'catch_url' => $catch_url, 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => $item['pcate'], 'ccate' => $item['ccate'], 'tcate' => $item['tcate'], 'cates' => $item['cates'], 'sales' => $item['sales'], 'createtime' => time(), 'updatetime' => time(), 'hasoption' => (0 < count($item['options']) ? 1 : 0), 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '');
+		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $item['merchid'], 'checked' => $item['checked'], 'catch_source' => 'taobao', 'catch_id' => $item['itemId'], 'catch_url' => $catch_url, 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => $item['pcate'], 'ccate' => $item['ccate'], 'tcate' => $item['tcate'], 'cates' => $item['cates'], 'sales' => $item['sales'], 'createtime' => time(), 'updatetime' => time(), 'hasoption' => 0 < count($item['options']) ? 1 : 0, 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '', 'merchsale' => 1);
+		if (empty($item['merchid'])) 
+		{
+			$data['discounts'] = '{"type":"0","default":"","default_pay":""}';
+		}
 		$thumb_url = array();
 		$pics = $item['pics'];
 		$piclen = count($pics);
@@ -415,7 +431,7 @@ class TaobaoModel extends PluginModel
 		$params = $item['params'];
 		$paramids = array();
 		$displayorder = 0;
-		foreach ($params as $p ) 
+		foreach ($params as $p) 
 		{
 			$oldp = pdo_fetch('select * from ' . tablename('ewei_shop_goods_param') . ' where goodsid=:goodsid and title=:title limit 1', array(':goodsid' => $goodsid, ':title' => $p['title']));
 			$paramid = 0;
@@ -445,7 +461,7 @@ class TaobaoModel extends PluginModel
 		$specids = array();
 		$displayorder = 0;
 		$newspecs = array();
-		foreach ($specs as $spec ) 
+		foreach ($specs as $spec) 
 		{
 			$oldspec = pdo_fetch('select * from ' . tablename('ewei_shop_goods_spec') . ' where goodsid=:goodsid and propId=:propId limit 1', array(':goodsid' => $goodsid, ':propId' => $spec['propId']));
 			$specid = 0;
@@ -467,7 +483,7 @@ class TaobaoModel extends PluginModel
 			$spec_itemids = array();
 			$displayorder_item = 0;
 			$newspecitems = array();
-			foreach ($spec_items as $spec_item ) 
+			foreach ($spec_items as $spec_item) 
 			{
 				$d = array('uniacid' => $_W['uniacid'], 'specid' => $specid, 'title' => $spec_item['title'], 'thumb' => $this->save_image($spec_item['thumb'], false), 'valueId' => $spec_item['valueId'], 'show' => 1, 'displayorder' => $displayorder_item);
 				$oldspecitem = pdo_fetch('select * from ' . tablename('ewei_shop_goods_spec_item') . ' where specid=:specid and valueId=:valueId limit 1', array(':specid' => $specid, ':valueId' => $spec_item['valueId']));
@@ -515,16 +531,16 @@ class TaobaoModel extends PluginModel
 		}
 		$optionids = array();
 		$displayorder = 0;
-		foreach ($options as $o ) 
+		foreach ($options as $o) 
 		{
 			$option_specs = $o['option_specs'];
 			$ids = array();
 			$valueIds = array();
-			foreach ($option_specs as $os ) 
+			foreach ($option_specs as $os) 
 			{
-				foreach ($newspecs as $nsp ) 
+				foreach ($newspecs as $nsp) 
 				{
-					foreach ($nsp['items'] as $nspitem ) 
+					foreach ($nsp['items'] as $nspitem) 
 					{
 						if ($nspitem['valueId'] == $os['valueId']) 
 						{
@@ -569,7 +585,7 @@ class TaobaoModel extends PluginModel
 		preg_match_all('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg]?))[\\\\\'|\\"].*?[\\/]?>/', $content, $imgs);
 		if (isset($imgs[1])) 
 		{
-			foreach ($imgs[1] as $img ) 
+			foreach ($imgs[1] as $img) 
 			{
 				$catchimg = $img;
 				if (substr($catchimg, 0, 2) == '//') 
@@ -584,7 +600,7 @@ class TaobaoModel extends PluginModel
 		$html = iconv('GBK', 'UTF-8', $html[1]);
 		if (isset($images)) 
 		{
-			foreach ($images as $img ) 
+			foreach ($images as $img) 
 			{
 				$html = str_replace($img['catchimg'], $img['system'], $html);
 			}
@@ -603,7 +619,7 @@ class TaobaoModel extends PluginModel
 		pdo_update('ewei_shop_goods', $d, array('id' => $goodsid));
 		if ($d['hasoption']) 
 		{
-			$sql = 'update ' . tablename('ewei_shop_goods') . ' g set' . "\r\n" . '            g.minprice = (select min(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $goodsid . ' and marketprice > 0),' . "\r\n" . '            g.maxprice = (select max(marketprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $goodsid . ')' . "\r\n" . '            where g.id = ' . $goodsid . ' and g.hasoption=1';
+			$sql = 'update ' . tablename('ewei_shop_goods') . " g set\r\n            g.minprice = (select min(marketprice) from " . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $goodsid . " and marketprice > 0),\r\n            g.maxprice = (select max(marketprice) from " . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $goodsid . ")\r\n            where g.id = " . $goodsid . ' and g.hasoption=1';
 		}
 		else 
 		{
@@ -615,7 +631,11 @@ class TaobaoModel extends PluginModel
 	public function save_jingdong_goods($item = array(), $catch_url = '') 
 	{
 		global $_W;
-		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $item['merchid'], 'checked' => $item['checked'], 'catch_source' => 'jingdong', 'catch_id' => $item['itemId'], 'catch_url' => $catch_url, 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => $item['pcate'], 'ccate' => $item['ccate'], 'tcate' => $item['tcate'], 'cates' => $item['cates'], 'sales' => $item['sales'], 'createtime' => time(), 'updatetime' => time(), 'hasoption' => 0, 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '', 'minprice' => $item['marketprice'], 'maxprice' => $item['marketprice']);
+		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $item['merchid'], 'checked' => $item['checked'], 'catch_source' => 'jingdong', 'catch_id' => $item['itemId'], 'catch_url' => $catch_url, 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => $item['pcate'], 'ccate' => $item['ccate'], 'tcate' => $item['tcate'], 'cates' => $item['cates'], 'sales' => $item['sales'], 'createtime' => time(), 'updatetime' => time(), 'hasoption' => 0, 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '', 'minprice' => $item['marketprice'], 'maxprice' => $item['marketprice'], 'merchsale' => 1);
+		if (empty($item['merchid'])) 
+		{
+			$data['discounts'] = '{"type":"0","default":"","default_pay":""}';
+		}
 		$thumb_url = array();
 		$pics = $item['pics'];
 		$piclen = count($pics);
@@ -650,7 +670,7 @@ class TaobaoModel extends PluginModel
 		$params = $item['params'];
 		$paramids = array();
 		$displayorder = 0;
-		foreach ($params as $p ) 
+		foreach ($params as $p) 
 		{
 			$oldp = pdo_fetch('select * from ' . tablename('ewei_shop_goods_param') . ' where goodsid=:goodsid and title=:title limit 1', array(':goodsid' => $goodsid, ':title' => $p['title']));
 			$paramid = 0;
@@ -680,7 +700,7 @@ class TaobaoModel extends PluginModel
 		preg_match_all('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg]?))[\\\\\'|\\"].*?[\\/]?>/', $content, $imgs);
 		if (isset($imgs[1])) 
 		{
-			foreach ($imgs[1] as $img ) 
+			foreach ($imgs[1] as $img) 
 			{
 				$catchimg = $img;
 				if (substr($catchimg, 0, 2) == '//') 
@@ -694,7 +714,7 @@ class TaobaoModel extends PluginModel
 		$html = $content;
 		if (isset($images)) 
 		{
-			foreach ($images as $img ) 
+			foreach ($images as $img) 
 			{
 				$html = str_replace($img['catchimg'], $img['system'], $html);
 			}
@@ -707,7 +727,11 @@ class TaobaoModel extends PluginModel
 	public function save_1688_goods($item = array(), $catch_url = '') 
 	{
 		global $_W;
-		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $item['merchid'], 'checked' => $item['checked'], 'catch_source' => '1688', 'catch_id' => $item['itemId'], 'catch_url' => $catch_url, 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => $item['pcate'], 'ccate' => $item['ccate'], 'tcate' => $item['tcate'], 'cates' => $item['cates'], 'sales' => $item['sales'], 'createtime' => time(), 'updatetime' => time(), 'hasoption' => 0, 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '', 'minprice' => $item['marketprice'], 'maxprice' => $item['marketprice']);
+		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $item['merchid'], 'checked' => $item['checked'], 'catch_source' => '1688', 'catch_id' => $item['itemId'], 'catch_url' => $catch_url, 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => $item['pcate'], 'ccate' => $item['ccate'], 'tcate' => $item['tcate'], 'cates' => $item['cates'], 'sales' => $item['sales'], 'createtime' => time(), 'updatetime' => time(), 'hasoption' => 0, 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '', 'minprice' => $item['marketprice'], 'maxprice' => $item['marketprice'], 'merchsale' => 1);
+		if (empty($item['merchid'])) 
+		{
+			$data['discounts'] = '{"type":"0","default":"","default_pay":""}';
+		}
 		$thumb_url = array();
 		$pics = $item['pics'];
 		$piclen = count($pics);
@@ -742,7 +766,7 @@ class TaobaoModel extends PluginModel
 		$params = $item['params'];
 		$paramids = array();
 		$displayorder = 0;
-		foreach ($params as $p ) 
+		foreach ($params as $p) 
 		{
 			$oldp = pdo_fetch('select * from ' . tablename('ewei_shop_goods_param') . ' where goodsid=:goodsid and title=:title limit 1', array(':goodsid' => $goodsid, ':title' => $p['title']));
 			$paramid = 0;
@@ -772,7 +796,7 @@ class TaobaoModel extends PluginModel
 		$specids = array();
 		$displayorder = 0;
 		$newspecs = array();
-		foreach ($specs as $spec ) 
+		foreach ($specs as $spec) 
 		{
 			$oldspec = pdo_fetch('select * from ' . tablename('ewei_shop_goods_spec') . ' where goodsid=:goodsid and propId=:propId limit 1', array(':goodsid' => $goodsid, ':propId' => $spec['propId']));
 			$specid = 0;
@@ -794,7 +818,7 @@ class TaobaoModel extends PluginModel
 			$spec_itemids = array();
 			$displayorder_item = 0;
 			$newspecitems = array();
-			foreach ($spec_items as $spec_item ) 
+			foreach ($spec_items as $spec_item) 
 			{
 				$d = array('uniacid' => $_W['uniacid'], 'specid' => $specid, 'title' => $spec_item['title'], 'thumb' => $this->save_image($spec_item['thumb'], false), 'valueId' => $spec_item['valueId'], 'show' => 1, 'displayorder' => $displayorder_item);
 				$oldspecitem = pdo_fetch('select * from ' . tablename('ewei_shop_goods_spec_item') . ' where specid=:specid and valueId=:valueId limit 1', array(':specid' => $specid, ':valueId' => $spec_item['valueId']));
@@ -838,7 +862,7 @@ class TaobaoModel extends PluginModel
 		preg_match_all('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg]?))[\\\\\'|\\"].*?[\\/]?>/', $content, $imgs);
 		if (isset($imgs[1])) 
 		{
-			foreach ($imgs[1] as $img ) 
+			foreach ($imgs[1] as $img) 
 			{
 				$catchimg = $img;
 				if (substr($catchimg, 0, 2) == '//') 
@@ -852,7 +876,7 @@ class TaobaoModel extends PluginModel
 		$html = $content;
 		if (isset($images)) 
 		{
-			foreach ($images as $img ) 
+			foreach ($images as $img) 
 			{
 				$html = str_replace($img['catchimg'], $img['system'], $html);
 			}
@@ -865,8 +889,12 @@ class TaobaoModel extends PluginModel
 	public function save_taobaocsv_goods($item = array(), $merchid = 0) 
 	{
 		global $_W;
-		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $merchid, 'catch_source' => 'taobaocsv', 'catch_id' => '', 'catch_url' => '', 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => '', 'ccate' => '', 'tcate' => '', 'cates' => '', 'sales' => 0, 'createtime' => time(), 'updatetime' => time(), 'hasoption' => 0, 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '', 'minprice' => $item['marketprice'], 'maxprice' => $item['marketprice']);
-		if (!(empty($merchid))) 
+		$data = array('uniacid' => $_W['uniacid'], 'merchid' => $merchid, 'catch_source' => 'taobaocsv', 'catch_id' => '', 'catch_url' => '', 'title' => $item['title'], 'total' => $item['total'], 'marketprice' => $item['marketprice'], 'pcate' => '', 'ccate' => '', 'tcate' => '', 'cates' => '', 'sales' => 0, 'createtime' => time(), 'updatetime' => time(), 'hasoption' => 0, 'status' => 0, 'deleted' => 0, 'buylevels' => '', 'showlevels' => '', 'buygroups' => '', 'showgroups' => '', 'noticeopenid' => '', 'storeids' => '', 'minprice' => $item['marketprice'], 'maxprice' => $item['marketprice'], 'merchsale' => 1);
+		if (empty($item['merchid'])) 
+		{
+			$data['discounts'] = '{"type":"0","default":"","default_pay":""}';
+		}
+		if (!empty($merchid)) 
 		{
 			if (empty($_W['merch_user']['goodschecked'])) 
 			{
@@ -901,7 +929,7 @@ class TaobaoModel extends PluginModel
 		preg_match_all('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg]?))[\\\\\'|\\"].*?[\\/]?>/', $content, $imgs);
 		if (isset($imgs[1])) 
 		{
-			foreach ($imgs[1] as $img ) 
+			foreach ($imgs[1] as $img) 
 			{
 				$catchimg = $img;
 				if (substr($catchimg, 0, 2) == '//') 
@@ -915,7 +943,7 @@ class TaobaoModel extends PluginModel
 		$html = $content;
 		if (isset($images)) 
 		{
-			foreach ($images as $img ) 
+			foreach ($images as $img) 
 			{
 				$html = str_replace($img['catchimg'], $img['system'], $html);
 			}
@@ -968,7 +996,7 @@ class TaobaoModel extends PluginModel
 		}
 		$filename = random(32) . $ext;
 		$save_dir = ATTACHMENT_ROOT . 'images/' . $_W['uniacid'] . '/' . date('Y') . '/' . date('m') . '/';
-		if (!(file_exists($save_dir)) && !(mkdir($save_dir, 511, true))) 
+		if (!file_exists($save_dir) && !mkdir($save_dir, 511, true)) 
 		{
 			return $url;
 		}
@@ -1072,7 +1100,7 @@ class TaobaoModel extends PluginModel
 		$url = $this->get_pageno_url($url, $pageNo);
 		load()->func('communication');
 		$response = ihttp_get($url);
-		if (!(isset($response['content']))) 
+		if (!isset($response['content'])) 
 		{
 			return array('result' => 0);
 		}
@@ -1136,7 +1164,7 @@ class TaobaoModel extends PluginModel
 				$detail = $detail_temp;
 			}
 			$thumb_url = array();
-			foreach ($json1['imageList'] as $k => $v ) 
+			foreach ($json1['imageList'] as $k => $v) 
 			{
 				$thumb_url[] = $this->save_image($v['originalImageURI'], 1);
 			}
@@ -1144,14 +1172,14 @@ class TaobaoModel extends PluginModel
 			unset($thumb_url[0]);
 			$priceRange = explode('-', $json1['priceDisplay']);
 			$minprice = floatval($priceRange[0]);
-			$maxprice = ((empty($priceRange[1]) ? floatval($priceRange[0]) : floatval($priceRange[1])));
-			$hasoption = ((empty($json1['skuProps']) ? 0 : 1));
+			$maxprice = (empty($priceRange[1]) ? floatval($priceRange[0]) : floatval($priceRange[1]));
+			$hasoption = (empty($json1['skuProps']) ? 0 : 1);
 			$param = $json1['productFeatureList'];
 			$detail['content'] = $this->contentpasswh($detail['content']);
 			preg_match_all('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg]?))[\\\\\'|\\"].*?[\\/]?>/', $detail['content'], $imgs);
 			if (isset($imgs[1])) 
 			{
-				foreach ($imgs[1] as $img ) 
+				foreach ($imgs[1] as $img) 
 				{
 					$catchimg = $img;
 					if (substr($catchimg, 0, 2) == '//') 
@@ -1164,13 +1192,13 @@ class TaobaoModel extends PluginModel
 			}
 			if (isset($images)) 
 			{
-				foreach ($images as $img ) 
+				foreach ($images as $img) 
 				{
 					$detail['content'] = str_replace($img['catchimg'], $img['system'], $detail['content']);
 				}
 			}
 			$detail['content'] = m('common')->html_to_images($detail['content']);
-			$data = array('uniacid' => $_W['uniacid'], 'thumb' => $thumb, 'thumb_url' => serialize($thumb_url), 'title' => $json1['subject'], 'status' => 0, 'marketprice' => $maxprice, 'originalprice' => $minprice, 'minprice' => $minprice, 'maxprice' => $maxprice, 'hasoption' => $hasoption, 'createtime' => time(), 'total' => $json1['canBookedAmount'], 'content' => $detail['content'], 'merchid' => $merchid, 'cates' => $cates, 'checked' => (empty($merchid) ? 0 : 1));
+			$data = array('uniacid' => $_W['uniacid'], 'thumb' => $thumb, 'thumb_url' => serialize($thumb_url), 'title' => $json1['subject'], 'status' => 0, 'marketprice' => $maxprice, 'originalprice' => $minprice, 'minprice' => $minprice, 'maxprice' => $maxprice, 'hasoption' => $hasoption, 'createtime' => time(), 'total' => $json1['canBookedAmount'], 'content' => $detail['content'], 'merchid' => $merchid, 'cates' => $cates, 'checked' => empty($merchid) ? 0 : 1);
 			$pcates = array();
 			$ccates = array();
 			$tcates = array();
@@ -1179,7 +1207,7 @@ class TaobaoModel extends PluginModel
 			$tcateid = 0;
 			if (is_array($cates)) 
 			{
-				foreach ($cates as $key => $cid ) 
+				foreach ($cates as $key => $cid) 
 				{
 					$c = pdo_fetch('select level from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
 					if ($c['level'] == 1) 
@@ -1190,9 +1218,12 @@ class TaobaoModel extends PluginModel
 					{
 						$ccates[] = $cid;
 					}
-					else if ($c['level'] == 3) 
+					else 
 					{
-						$tcates[] = $cid;
+						if ($c['level'] == 3) 
+						{
+							$tcates[] = $cid;
+						}
 					}
 					if ($key == 0) 
 					{
@@ -1206,13 +1237,16 @@ class TaobaoModel extends PluginModel
 							$pcateid = $crow['parentid'];
 							$ccateid = $cid;
 						}
-						else if ($c['level'] == 3) 
+						else 
 						{
-							$tcateid = $cid;
-							$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
-							$ccateid = $tcate['parentid'];
-							$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
-							$pcateid = $ccate['parentid'];
+							if ($c['level'] == 3) 
+							{
+								$tcateid = $cid;
+								$tcate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $cid, ':uniacid' => $_W['uniacid']));
+								$ccateid = $tcate['parentid'];
+								$ccate = pdo_fetch('select id,parentid from ' . tablename('ewei_shop_category') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $ccateid, ':uniacid' => $_W['uniacid']));
+								$pcateid = $ccate['parentid'];
+							}
 						}
 					}
 				}
@@ -1220,7 +1254,7 @@ class TaobaoModel extends PluginModel
 			$data['pcate'] = $pcateid;
 			$data['ccate'] = $ccateid;
 			$data['tcate'] = $tcateid;
-			if (!(empty($cates))) 
+			if (!empty($cates)) 
 			{
 				$data['cates'] = implode(',', $cates);
 			}
@@ -1236,29 +1270,29 @@ class TaobaoModel extends PluginModel
 			$param = $this->paramFormat($param, $goodsid);
 			if ($hasoption) 
 			{
-				foreach ($json1['skuProps'] as $k => $v ) 
+				foreach ($json1['skuProps'] as $k => $v) 
 				{
 					$spec = $v['prop'];
 					pdo_insert('ewei_shop_goods_spec', array('uniacid' => $_W['uniacid'], 'goodsid' => $goodsid, 'title' => $spec));
 					$specId = pdo_insertid();
-					foreach ($v['value'] as $key => $val ) 
+					foreach ($v['value'] as $key => $val) 
 					{
 						$thumb = $val['imageUrl'];
 						$title = $val['name'];
-						pdo_insert('ewei_shop_goods_spec_item', array('specid' => $specId, 'title' => $val['name'], 'thumb' => (empty($thumb) ? '' : $thumb), 'show' => 1));
+						pdo_insert('ewei_shop_goods_spec_item', array('specid' => $specId, 'title' => $val['name'], 'thumb' => empty($thumb) ? '' : $thumb, 'show' => 1));
 						$specs = pdo_insertid();
 						$specsid[$k][$key][$title] = $specs;
 					}
 				}
 				$map = $json1['skuMap'];
-				foreach ($map as $k => $v ) 
+				foreach ($map as $k => $v) 
 				{
 					$specArr = explode('&gt;', $k);
-					foreach ($specsid as $key => $item ) 
+					foreach ($specsid as $key => $item) 
 					{
-						foreach ($item as $v1 ) 
+						foreach ($item as $v1) 
 						{
-							if (!(empty($v1[$specArr[$key]]))) 
+							if (!empty($v1[$specArr[$key]])) 
 							{
 								$sss[] = $v1[$specArr[$key]];
 							}
@@ -1267,15 +1301,15 @@ class TaobaoModel extends PluginModel
 					$option['specs'] = implode('_', $sss);
 					unset($sss);
 					$option['title'] = str_replace('&gt;', '+', $k);
-					if (!(empty($v['price']))) 
+					if (!empty($v['price'])) 
 					{
 						$option['marketprice'] = $v['price'];
 					}
-					else if (!(empty($v['discountPrice']))) 
+					else if (!empty($v['discountPrice'])) 
 					{
 						$option['marketprice'] = $v['discountPrice'];
 					}
-					else if (!(empty($json1['discountPriceRanges']))) 
+					else if (!empty($json1['discountPriceRanges'])) 
 					{
 						$option['marketprice'] = $json1['discountPriceRanges'][0]['price'];
 					}
@@ -1285,15 +1319,15 @@ class TaobaoModel extends PluginModel
 					}
 					$option['stock'] = $v['canBookCount'];
 					$option['goodsid'] = $goodsid;
-					if (!(empty($v['price']))) 
+					if (!empty($v['price'])) 
 					{
 						$option['productprice'] = $v['price'];
 					}
-					else if (!(empty($v['discountPrice']))) 
+					else if (!empty($v['discountPrice'])) 
 					{
 						$option['productprice'] = $v['discountPrice'];
 					}
-					else if (!(empty($json1['discountPriceRanges']))) 
+					else if (!empty($json1['discountPriceRanges'])) 
 					{
 						$option['productprice'] = $json1['discountPriceRanges'][0]['price'];
 					}
@@ -1311,15 +1345,15 @@ class TaobaoModel extends PluginModel
 	{
 		global $_W;
 		$value = array();
-		foreach ($param as $k => $v ) 
+		foreach ($param as $k => $v) 
 		{
-			if (!(empty($v['name'])) && !(empty($v['value']))) 
+			if (!empty($v['name']) && !empty($v['value'])) 
 			{
-				$unit = ((empty($v['unit']) ? '' : $v['unit']));
+				$unit = (empty($v['unit']) ? '' : $v['unit']);
 				$value[$v['name']] = $v['value'] . $unit;
 			}
 		}
-		foreach ($value as $key => $val ) 
+		foreach ($value as $key => $val) 
 		{
 			pdo_insert('ewei_shop_goods_param', array('goodsid' => $id, 'uniacid' => $_W['uniacid'], 'title' => $key, 'value' => $val));
 		}

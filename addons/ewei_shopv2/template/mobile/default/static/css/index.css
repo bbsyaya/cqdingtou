@@ -1,4 +1,4 @@
-/*common*/
+
 .fui-page, .fui-page-group{
 	background: #ededed;
 	color: #000;
@@ -371,7 +371,7 @@ i{
     line-height: 2.5rem;
     
 }
-.cav .mask{
+.mask{
 	position: fixed;
 	background:rgba(0,0,0,0.5);
 	width: 100%;
@@ -381,7 +381,7 @@ i{
 	z-index: 100;
 	display: none;
 }
-.cav .mask .codebox{
+.mask .codebox{
 	position: absolute;
 	margin-top:-10rem;
 	top: 50%;
@@ -397,15 +397,15 @@ i{
 	font-weight: bold;
 	padding-top: 1.1rem;
 }
-.cav .mask .codebox img{
+.mask .codebox img{
 	width: 10rem;
 	height: 10rem;
 }
- .cav .mask .codebox .img_box{
+ .mask .codebox .img_box{
 	line-height: 3;
 	height:auto;
 }
- .cav .mask .cav_code{
+ .mask .cav_code{
 	width: 10rem;
 	height: 1.8rem;
 	line-height: 1.8rem;
@@ -414,7 +414,7 @@ i{
 	color: #6f6f6f;
 	 font-size: 0.8rem;
 }
- .cav .mask .error{
+ .mask .error{
 	font-size: 0.65rem;
 	line-height: 1.2rem;
 	font-weight: normal;

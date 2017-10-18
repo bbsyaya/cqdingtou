@@ -18,7 +18,7 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		$merch_data = m('common')->getPluginset('merch');
 		if ($merch_plugin && $merch_data['is_openmerch']) 
 		{
-			$statics = array('order_0' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and status=0 and (isparent=1 or (isparent=0 and parentid=0)) and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'order_1' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and (status=1 or (status=0 and paytype=3)) and isparent=0 and refundid=0 and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'order_2' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and (status=2 or (status=1 and sendtype>0)) and isparent=0 and refundid=0 and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'order_4' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and refundstate=1 and isparent=0 and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'cart' => pdo_fetchcolumn('select ifnull(sum(total),0) from ' . tablename('ewei_shop_member_cart') . ' where uniacid=:uniacid and openid=:openid and deleted=0', $params), 'favorite' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member_favorite') . ' where uniacid=:uniacid and openid=:openid and deleted=0', $params));
+			$statics = array('order_0' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and status=0 and (isparent=1 or (isparent=0 and parentid=0)) and paytype<>3 and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'order_1' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and (status=1 or (status=0 and paytype=3)) and isparent=0 and refundid=0 and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'order_2' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and (status=2 or (status=1 and sendtype>0)) and isparent=0 and refundid=0 and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'order_4' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_order') . ' where openid=:openid and refundstate=1 and isparent=0 and uniacid=:uniacid and istrade=0 and userdeleted=0', $params), 'cart' => pdo_fetchcolumn('select ifnull(sum(total),0) from ' . tablename('ewei_shop_member_cart') . ' where uniacid=:uniacid and openid=:openid and deleted=0', $params), 'favorite' => pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_member_favorite') . ' where uniacid=:uniacid and openid=:openid and deleted=0', $params));
 		}
 		else 
 		{
@@ -51,6 +51,10 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			if (empty($pcset['closecenter'])) 
 			{
 				$hascouponcenter = true;
+			}
+			if ($hascoupon) 
+			{
+				$couponnum = com('coupon')->getCanGetCouponNum($_W['merchid']);
 			}
 		}
 		$hasglobonus = false;
@@ -90,28 +94,11 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		}
 		$card = m('common')->getSysset('membercard');
 		$actionset = m('common')->getSysset('memberCardActivation');
-		$sql = 'select vg.*,g.title,g.subtitle,g.thumb,c.card_id  from ' . tablename('ewei_shop_verifygoods') . '   vg' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_order_goods') . ' og on vg.ordergoodsid = og.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order') . ' o on vg.orderid = o.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_order_refund') . ' orf on o.refundid = orf.id' . "\r\n\t\t" . ' inner join ' . tablename('ewei_shop_goods') . ' g on og.goodsid = g.id' . "\r\n\t\t" . ' left  join ' . tablename('ewei_shop_goods_cards') . ' c on c.id = g.cardid' . "\r\n\t\t" . ' where   vg.uniacid=:uniacid and vg.openid=:openid and vg.invalid =0 and (o.refundid=0 or orf.status<0) and o.status>0' . "\r\n\t\t" . ' and    ((vg.limittype=0   and vg.limitdays * 86400 + vg.starttime >=unix_timestamp() )or ( vg.limittype=1   and vg.limitdate >=unix_timestamp() ))  and  vg.used =0 order by vg.starttime desc';
-		$verifygoods = set_medias(pdo_fetchall($sql, array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid'])), 'thumb');
-		if (empty($verifygoods)) 
+		$haveverifygoods = m('verifygoods')->checkhaveverifygoods($_W['openid']);
+		if (!(empty($haveverifygoods))) 
 		{
-			$verifygoods = array();
+			$verifygoods = m('verifygoods')->getCanUseVerifygoods($_W['openid']);
 		}
-		foreach ($verifygoods as $i => &$row ) 
-		{
-			$row['numlimit'] = 0;
-			if (!(empty($row['limitnum']))) 
-			{
-				$row['numlimit'] = 1;
-			}
-			if (is_weixin()) 
-			{
-				if (!(empty($row['card_id'])) && empty($row['activecard'])) 
-				{
-					$row['cangetcard'] = 1;
-				}
-			}
-		}
-		unset($row);
 		$showcard = 0;
 		if (!(empty($card))) 
 		{

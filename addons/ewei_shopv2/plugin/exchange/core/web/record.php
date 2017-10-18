@@ -7,6 +7,7 @@ class Record_EweiShopV2Page extends PluginWebPage
 {
 	public function __construct() 
 	{
+		parent::__construct();
 	}
 	public function main() 
 	{

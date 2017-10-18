@@ -29,7 +29,7 @@ class Index_EweiShopV2Page extends WebPage
 			$condition .= ' AND titles LIKE :title';
 			$params[':title'] = '%' . trim($_GPC['keyword']) . '%';
 		}
-		$gifts = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_fullback_goods') . "\n" . '                    WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+		$gifts = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_fullback_goods') . "\r\n" . '                    WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT COUNT(1) FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE 1 ' . $condition . ' ', $params);
 		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
@@ -60,7 +60,7 @@ class Index_EweiShopV2Page extends WebPage
 				show_json(0, '全返时间不可以小于0！');
 			}
 			$option = $_GPC['fullbackgoods'];
-			$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $data['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
+			$good_data = pdo_fetch('select title,thumb,marketprice,goodssn,productsn,hasoption' . "\r\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $data['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
 			if (empty($data['thumb'])) 
 			{
 				$data['thumb'] = save_media($good_data['thumb']);
@@ -104,7 +104,7 @@ class Index_EweiShopV2Page extends WebPage
 				$id = pdo_insertid();
 				plog('sale.fullback.add', '添加全返 ID: ' . $id . '  <br/>全返名称: ' . $data['titles']);
 			}
-			$sql = 'update ' . tablename('ewei_shop_fullback_goods') . ' g set' . "\n" . '                g.minallfullbackallprice = (select min(allfullbackprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . '),' . "\n" . '                g.maxallfullbackallprice = (select max(allfullbackprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . '),' . "\n" . '                g.minallfullbackallratio = (select min(allfullbackratio) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . '),' . "\n" . '                g.maxallfullbackallratio = (select max(allfullbackratio) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . ')' . "\n" . '                where g.goodsid = ' . $data['goodsid'] . ' and g.hasoption=1 and g.uniacid = ' . $uniacid . ' and g.id = ' . $id . ' ';
+			$sql = 'update ' . tablename('ewei_shop_fullback_goods') . ' g set' . "\r\n" . '                g.minallfullbackallprice = (select min(allfullbackprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . '),' . "\r\n" . '                g.maxallfullbackallprice = (select max(allfullbackprice) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . '),' . "\r\n" . '                g.minallfullbackallratio = (select min(allfullbackratio) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . '),' . "\r\n" . '                g.maxallfullbackallratio = (select max(allfullbackratio) from ' . tablename('ewei_shop_goods_option') . ' where goodsid = ' . $data['goodsid'] . ')' . "\r\n" . '                where g.goodsid = ' . $data['goodsid'] . ' and g.hasoption=1 and g.uniacid = ' . $uniacid . ' and g.id = ' . $id . ' ';
 			pdo_query($sql);
 			if (0 < $data['status']) 
 			{
@@ -119,7 +119,7 @@ class Index_EweiShopV2Page extends WebPage
 		if (!(empty($id))) 
 		{
 			$item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_fullback_goods') . ' WHERE uniacid = ' . $uniacid . ' and id = ' . $id . ' ');
-			$good_data = pdo_fetch('select title,thumb,hasoption' . "\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $item['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
+			$good_data = pdo_fetch('select title,thumb,hasoption' . "\r\n" . '                            from ' . tablename('ewei_shop_goods') . ' where id = ' . $item['goodsid'] . ' and uniacid = ' . $uniacid . ' ');
 			if (empty($good_data)) 
 			{
 				$this->message('抱歉，商品不存在或是已经删除！', '', 'error');
@@ -127,7 +127,7 @@ class Index_EweiShopV2Page extends WebPage
 			$item['title'] = $good_data['title'];
 			if (0 < $item['hasoption']) 
 			{
-				$item['option'] = pdo_fetchall('SELECT id,title,marketprice,specs,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback,day ' . "\n" . '                FROM ' . tablename('ewei_shop_goods_option') . "\n" . '                WHERE uniacid = :uniacid and goodsid = :goodsid  ORDER BY displayorder DESC,id DESC ', array(':uniacid' => $uniacid, 'goodsid' => $item['goodsid']));
+				$item['option'] = pdo_fetchall('SELECT id,title,marketprice,specs,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback,day ' . "\r\n" . '                FROM ' . tablename('ewei_shop_goods_option') . "\r\n" . '                WHERE uniacid = :uniacid and goodsid = :goodsid  ORDER BY displayorder DESC,id DESC ', array(':uniacid' => $uniacid, 'goodsid' => $item['goodsid']));
 			}
 			if (!(empty($item['thumb']))) 
 			{
@@ -211,7 +211,7 @@ class Index_EweiShopV2Page extends WebPage
 			$condition .= ' AND (`title` LIKE :keywords OR `keywords` LIKE :keywords)';
 			$params[':keywords'] = '%' . $kwd . '%';
 		}
-		$goods = pdo_fetchall('SELECT id,title,thumb,marketprice,total' . "\n" . '            FROM ' . tablename('ewei_shop_goods') . "\n" . '            WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+		$goods = pdo_fetchall('SELECT id,title,thumb,marketprice,total' . "\r\n" . '            FROM ' . tablename('ewei_shop_goods') . "\r\n" . '            WHERE 1 ' . $condition . ' ORDER BY displayorder DESC,id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT COUNT(1) FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' ', $params);
 		$pager = pagination($total, $pindex, $psize, '', array('before' => 5, 'after' => 4, 'ajaxcallback' => 'select_page', 'callbackfuncname' => 'select_page'));
 		$goods = set_medias($goods, array('thumb'));
@@ -229,7 +229,7 @@ class Index_EweiShopV2Page extends WebPage
 		$goods = pdo_fetch('select id,title,marketprice,hasoption,isfullback from ' . tablename('ewei_shop_goods') . ' where uniacid = :uniacid and id = :goodsid ', $params);
 		if (!(empty($id))) 
 		{
-			$fullback = pdo_fetch('select * from ' . tablename('ewei_shop_fullback_goods') . "\n" . '                        where id = ' . $id . ' and uniacid = :uniacid and goodsid = :goodsid ', $params);
+			$fullback = pdo_fetch('select * from ' . tablename('ewei_shop_fullback_goods') . "\r\n" . '                        where id = ' . $id . ' and uniacid = :uniacid and goodsid = :goodsid ', $params);
 			$fullback['isfullback'] = $goods['isfullback'];
 		}
 		else 
@@ -240,7 +240,7 @@ class Index_EweiShopV2Page extends WebPage
 		{
 			$hasoption = 1;
 			$option = array();
-			$option = pdo_fetchall('SELECT id,title,marketprice,specs,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback ' . "\n" . '                FROM ' . tablename('ewei_shop_goods_option') . "\n" . '                WHERE uniacid = :uniacid and goodsid = :goodsid  ORDER BY displayorder DESC,id DESC ', $params);
+			$option = pdo_fetchall('SELECT id,title,marketprice,specs,allfullbackprice,fullbackprice,allfullbackratio,fullbackratio,isfullback ' . "\r\n" . '                FROM ' . tablename('ewei_shop_goods_option') . "\r\n" . '                WHERE uniacid = :uniacid and goodsid = :goodsid  ORDER BY displayorder DESC,id DESC ', $params);
 		}
 		else 
 		{
@@ -255,7 +255,7 @@ class Index_EweiShopV2Page extends WebPage
 		$uniacid = intval($_W['uniacid']);
 		$options = ((is_array($_GPC['option']) ? implode(',', array_filter($_GPC['option'])) : 0));
 		$options = intval($options);
-		$option = pdo_fetch('SELECT id,title FROM ' . tablename('ewei_shop_goods_option') . "\n" . '            WHERE uniacid = ' . $uniacid . ' and id = ' . $options . '  ORDER BY displayorder DESC,id DESC LIMIT 1');
+		$option = pdo_fetch('SELECT id,title FROM ' . tablename('ewei_shop_goods_option') . "\r\n" . '            WHERE uniacid = ' . $uniacid . ' and id = ' . $options . '  ORDER BY displayorder DESC,id DESC LIMIT 1');
 		show_json(1, $option);
 	}
 }

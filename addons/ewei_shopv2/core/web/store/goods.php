@@ -32,11 +32,11 @@ class Goods_EweiShopV2Page extends ComWebPage
 			$condition .= ' and EXISTS(select id from ' . tablename('ewei_shop_newstore_goodsgroup_goods') . ' gg where  gg.goodsgroupid=:goodsgroupid and gg.goodsid = ng.goodsid) ';
 			$params[':goodsgroupid'] = $goodsgroupid;
 		}
-		$sql = 'SELECT ng.*,g.title,g.thumb,g.hasoption FROM ' . tablename('ewei_shop_newstore_goods') . '  ng' . "\r\n" . '        INNER JOIN ' . tablename('ewei_shop_goods') . '  g ON ng.goodsid = g.id' . "\r\n" . '        WHERE   1 and ' . $condition . ' ORDER BY ng.id DESC ';
+		$sql = 'SELECT ng.*,g.title,g.thumb,g.hasoption,g.type  FROM ' . tablename('ewei_shop_newstore_goods') . '  ng' . "\r\n" . '        INNER JOIN ' . tablename('ewei_shop_goods') . '  g ON ng.goodsid = g.id' . "\r\n" . '        WHERE   1 and ' . $condition . ' ORDER BY ng.id DESC ';
 		$sql .= ' LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall($sql, $params);
 		$total = pdo_fetchcolumn('SELECT count(*)  FROM ' . tablename('ewei_shop_newstore_goods') . '  ng' . "\r\n" . '        INNER JOIN ' . tablename('ewei_shop_goods') . '  g ON ng.goodsid = g.id' . "\r\n" . '        WHERE   1 and ' . $condition . ' ORDER BY ng.id DESC ', $params);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		include $this->template();
 	}
 	public function plusgoods() 
@@ -54,17 +54,17 @@ class Goods_EweiShopV2Page extends ComWebPage
 			$params = array();
 			$params[':uniacid'] = $_W['uniacid'];
 			$ids = implode(',', $goodsids);
-			$list = pdo_fetchall('SELECT id,marketprice,total FROM ' . tablename('ewei_shop_goods') . ' WHERE uniacid=:uniacid and deleted = 0 and merchid =0 and `type` in (1,5,30) and id in (' . $ids . ')', $params);
+			$list = pdo_fetchall('SELECT id,marketprice,total,dowpayment FROM ' . tablename('ewei_shop_goods') . ' WHERE uniacid=:uniacid and deleted = 0 and merchid =0 and `type` in (1,5,30) and id in (' . $ids . ')', $params);
 			foreach ($list as $goods ) 
 			{
 				$count = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_newstore_goods') . ' WHERE uniacid=:uniacid and storeid=:storeid   and goodsid =:goodsid', array(':uniacid' => $_W['uniacid'], ':storeid' => $id, ':goodsid' => $goods['id']));
 				if (empty($count)) 
 				{
-					$data = array('uniacid' => $_W['uniacid'], 'storeid' => $id, 'goodsid' => $goods['id'], 'smarketprice' => $goods['marketprice'], 'stotal' => $goods['total'], 'createtime' => time(), 'deleted' => 0);
+					$data = array('uniacid' => $_W['uniacid'], 'storeid' => $id, 'goodsid' => $goods['id'], 'sdowpayment' => $goods['dowpayment'], 'smarketprice' => $goods['marketprice'], 'sminprice' => $goods['marketprice'], 'smaxprice' => $goods['marketprice'], 'stotal' => $goods['total'], 'createtime' => time(), 'deleted' => 0);
 					pdo_insert('ewei_shop_newstore_goods', $data);
 					$ngoods = pdo_insertid();
 					pdo_delete('ewei_shop_newstore_goods_option', array('goodsid' => $goods['id'], 'storeid' => $id), 'AND');
-					$sql = 'insert into ims_ewei_shop_newstore_goods_option(uniacid,storeid,goodsid,ngoodsid,marketprice,stock,deleted,optionid) select  :uniacid,:storeid,goodsid,:ngoods,marketprice,0,0,id from ims_ewei_shop_goods_option where goodsid =:goodsid';
+					$sql = 'insert into ims_ewei_shop_newstore_goods_option(uniacid,storeid,goodsid,ngoodsid,marketprice,stock,deleted,optionid) select  :uniacid,:storeid,goodsid,:ngoods,marketprice,stock,0,id from ims_ewei_shop_goods_option where goodsid =:goodsid';
 					pdo_query($sql, array(':uniacid' => $_W['uniacid'], ':storeid' => $id, ':ngoods' => $ngoods, ':goodsid' => $goods['id']));
 				}
 			}
@@ -89,13 +89,13 @@ class Goods_EweiShopV2Page extends ComWebPage
 			$params = array();
 			$params[':uniacid'] = $_W['uniacid'];
 			$params[':goodsgroupid'] = $goodsgroupid;
-			$list = pdo_fetchall('SELECT g.id,g.marketprice,g.total FROM ' . tablename('ewei_shop_goods') . ' g' . "\r\n" . '            inner join ' . tablename('ewei_shop_newstore_goodsgroup_goods') . ' gg on g.id=gg.goodsid' . "\r\n" . '            WHERE g.uniacid=:uniacid and g.deleted = 0 and g.merchid =0  and g.`type` in (1,5,30)  and gg.goodsgroupid=:goodsgroupid', $params);
+			$list = pdo_fetchall('SELECT g.id,g.marketprice,g.total,g.dowpayment FROM ' . tablename('ewei_shop_goods') . ' g' . "\r\n" . '            inner join ' . tablename('ewei_shop_newstore_goodsgroup_goods') . ' gg on g.id=gg.goodsid' . "\r\n" . '            WHERE g.uniacid=:uniacid and g.deleted = 0 and g.merchid =0  and g.`type` in (1,5,30)  and gg.goodsgroupid=:goodsgroupid', $params);
 			foreach ($list as $goods ) 
 			{
 				$count = pdo_fetchcolumn('SELECT count(1) FROM ' . tablename('ewei_shop_newstore_goods') . ' WHERE uniacid=:uniacid    and storeid=:storeid and goodsid =:goodsid', array(':uniacid' => $_W['uniacid'], ':storeid' => $id, ':goodsid' => $goods['id']));
 				if (empty($count)) 
 				{
-					$data = array('uniacid' => $_W['uniacid'], 'storeid' => $id, 'goodsid' => $goods['id'], 'smarketprice' => $goods['marketprice'], 'stotal' => $goods['total'], 'createtime' => time(), 'deleted' => 0);
+					$data = array('uniacid' => $_W['uniacid'], 'storeid' => $id, 'goodsid' => $goods['id'], 'sdowpayment' => $goods['dowpayment'], 'smarketprice' => $goods['marketprice'], 'sminprice' => $goods['marketprice'], 'smaxprice' => $goods['marketprice'], 'stotal' => $goods['total'], 'createtime' => time(), 'deleted' => 0);
 					pdo_insert('ewei_shop_newstore_goods', $data);
 					$ngoods = pdo_insertid();
 					pdo_delete('ewei_shop_newstore_goods_option', array('goodsid' => $goods['id'], 'storeid' => $id), 'AND');
@@ -160,15 +160,24 @@ class Goods_EweiShopV2Page extends ComWebPage
 			pdo_update('ewei_shop_newstore_goods_option', array('deleted' => 1), array('storeid' => $id, 'uniacid' => $_W['uniacid']));
 			$list = pdo_fetchall('SELECT ng.id  FROM   ' . tablename('ewei_shop_newstore_goods_option') . ' ng inner join' . "\r\n" . '            ' . tablename('ewei_shop_goods_option') . ' g on ng.optionid = g.id   where ng.ngoodsid=:id AND ng.uniacid = :uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 			$stotal = 0;
-			foreach ($list as $v ) 
+			if (is_array($price)) 
 			{
-				$deleted = 1;
-				if (in_array($v['id'], $ids)) 
+				if (is_array($price)) 
 				{
-					$deleted = 0;
-					$stotal += intval($total[$v['id']]);
+					$max = array_search(max($price), $price);
+					$min = array_search(min($price), $price);
+					pdo_update('ewei_shop_newstore_goods', array('smaxprice' => $price[$max], 'sminprice' => $price[$min]), array('id' => $id, 'uniacid' => $_W['uniacid']));
 				}
-				pdo_update('ewei_shop_newstore_goods_option', array('marketprice' => $price[$v['id']], 'deleted' => $deleted, 'stock' => $total[$v['id']]), array('id' => $v['id'], 'uniacid' => $_W['uniacid']));
+				foreach ($list as $v ) 
+				{
+					$deleted = 1;
+					if (in_array($v['id'], $ids)) 
+					{
+						$deleted = 0;
+						$stotal += intval($total[$v['id']]);
+					}
+					pdo_update('ewei_shop_newstore_goods_option', array('marketprice' => $price[$v['id']], 'deleted' => $deleted, 'stock' => $total[$v['id']]), array('id' => $v['id'], 'uniacid' => $_W['uniacid']));
+				}
 			}
 			pdo_update('ewei_shop_newstore_goods', array('stotal' => $stotal), array('id' => $id, 'uniacid' => $_W['uniacid']));
 			show_json(1);

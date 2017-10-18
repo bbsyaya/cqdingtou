@@ -32,7 +32,7 @@ class Store_EweiShopV2Page extends ComWebPage
 		$sql .= ' LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$sql_count = 'SELECT count(1) FROM ' . tablename('ewei_shop_store') . ' WHERE ' . $condition;
 		$total = pdo_fetchcolumn($sql_count, $paras);
-		$pager = pagination($total, $pindex, $psize);
+		$pager = pagination2($total, $pindex, $psize);
 		$list = pdo_fetchall($sql, $paras);
 		foreach ($list as &$row ) 
 		{

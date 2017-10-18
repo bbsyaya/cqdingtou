@@ -61,7 +61,7 @@
         </div>
         <div class="title">{$item['title']}</div>
         <div class="fui-header-right">
-            <a href="{php echo mobileUrl('order')}" class="external">
+            <a href="{php echo mobileUrl('order')}" data-nocache="true">
                 <i class="icon icon-person2"></i>
             </a>
         </div>
@@ -73,29 +73,27 @@
                 <div class="fui-shop style{$data['style']['shopstyle']}">
                     <div class="shop-info">
                         <img class="background" src="{php echo tomedia($data['style']['shopbg'])}" />
-                        {if empty($data['style']['hidelogo'])}
-                            <div class="inner">
-                                <div class="logo {$data['style']['logostyle']}">
-                                    <img src="{$shopset['logo']}">
-                                </div>
-                                <div class="right">
-                                    <div class="name">{$shopset['name']}</div>
-                                    <div class="notice" style="overflow: hidden">
-                                        <span class="text" {if count($data['notices'])>1}id="notice"{/if}>
-                                            {if empty($data['notices'])}
-                                            <i class="icon icon-notification"></i> 暂无公告
-                                            {else}
-                                                <ul>
-                                                    {loop $data['notices'] $notice}
-                                                        <li><i class="icon icon-notification"></i><a href="{php echo mobileUrl('shop/notice/detail', array('id'=>$notice['id']))}" data-nocache="true">{$notice['title']}</a></li>
-                                                    {/loop}
-                                                </ul>
-                                            {/if}
-                                        </span>
-                                    </div>
+                        <div class="inner">
+                            <div class="logo {$data['style']['logostyle']}">
+                                <img src="{php echo tomedia($_W['shopset']['shop']['logo'])}">
+                            </div>
+                            <div class="right">
+                                <div class="name">{$_W['shopset']['shop']['name']}</div>
+                                <div class="notice" style="overflow: hidden">
+                                    <span class="text" id="notice">
+                                        {if empty($data['notices'])}
+                                        <i class="icon icon-notification"></i> 暂无公告
+                                        {else}
+                                            <ul>
+                                                {loop $data['notices'] $notice}
+                                                    <li><i class="icon icon-notification"></i><a href="{php echo $data['style']['notice']==2?$notice['linkurl']:mobileUrl('shop/notice/detail', array('id'=>$notice['id']))}" data-nocache="true">{$notice['title']}</a></li>
+                                                {/loop}
+                                            </ul>
+                                        {/if}
+                                    </span>
                                 </div>
                             </div>
-                        {/if}
+                        </div>
                     </div>
                     {if !empty($data['shopmenu'])}
                         <div class="shop-menu">
@@ -112,7 +110,7 @@
                 <div class="fui-goods-tab style{$data['style']['shopstyle']}">
                     <div class="menu">
                         {loop $data['datas'] $index $item}
-                            <div class="nav {if $index==0}active{/if}" data-index="{$index}">{if !empty($item['icon'])}<i class="icon {$item['icon']}"></i> {/if}{$item['title']}</div>
+                            <div class="nav {if $index==0}active{/if}" data-index="{$index}">{$item['title']}</div>
                         {/loop}
                     </div>
                     <div class="main">
@@ -200,12 +198,12 @@
         <i class="icon icon-cartfill"></i>
     </a>
 
-    {php $this->footerMenus($data['diymenu'])}
+    {php $this->footerMenus()}
 {/if}
 
     <script language="javascript">
         require(['../addons/ewei_shopv2/plugin/quick/static/js/mobile.js'], function(modal){
-            modal.init({datas: {$datas}, cart: {php echo $carts}, fromquick:{$fromquick}, template: {$data['template']}, merchid: {$merchid}});
+            modal.init({datas: {$datas}, cart: {php echo $carts}, fromquick:{$fromquick}, template: {$data['template']}});
         });
     </script>
 

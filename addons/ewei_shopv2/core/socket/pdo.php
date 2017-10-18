@@ -30,7 +30,7 @@ class sw_pdo
 				exit($ex->getMessage());
 			}
 		}
-		return self::$pdo;
+		label91: return self::$pdo;
 	}
 	static public function beginTransaction() 
 	{

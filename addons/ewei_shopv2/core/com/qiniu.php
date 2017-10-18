@@ -113,21 +113,21 @@ class Qiniu_EweiShopV2ComModel extends ComModel
 			$url = $filename;
 		}
 		require_once IA_ROOT . '/framework/library/qiniu/autoload.php';
-		$auth = new Qiniu\Auth($config['access_key'], $config['secret_key']);
+		$auth = new \Qiniu\Auth($config['access_key'], $config['secret_key']);
 		if (is_callable('\\Qiniu\\Zone::zone0')) 
 		{
-			$zone = Qiniu\Zone::zone0();
+			$zone = \Qiniu\Zone::zone0();
 			if ($config['zone'] == 'zone1') 
 			{
-				$zone = Qiniu\Zone::zone1();
+				$zone = \Qiniu\Zone::zone1();
 			}
-			$uploadmgr = new Qiniu\Storage\UploadManager(new Qiniu\Config($zone));
-			$putpolicy = Qiniu\base64_urlSafeEncode(json_encode(array('scope' => $config['bucket'] . ':' . $url)));
+			$uploadmgr = new \Qiniu\Storage\UploadManager(new \Qiniu\Config($zone));
+			$putpolicy = \Qiniu\base64_urlSafeEncode(json_encode(array('scope' => $config['bucket'] . ':' . $url)));
 			$uploadtoken = $auth->uploadToken($config['bucket'], $key, 3600, $putpolicy);
 		}
 		else 
 		{
-			$uploadmgr = new Qiniu\Storage\UploadManager();
+			$uploadmgr = new \Qiniu\Storage\UploadManager();
 			$uploadtoken = $auth->uploadToken($config['bucket'], $key, 3600);
 		}
 		$ret = $uploadmgr->putFile($uploadtoken, $key, $url);

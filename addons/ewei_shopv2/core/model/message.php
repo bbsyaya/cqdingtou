@@ -5,7 +5,7 @@ if (!(defined('IN_IA')))
 }
 class Message_EweiShopV2Model 
 {
-	public function sendTplNotice($touser, $template_id, $postdata, $url = '', $account = NULL) 
+	public function sendTplNotice($touser, $template_id, $postdata, $url = '', $account = NULL, $miniprogram = array()) 
 	{
 		if (!($account)) 
 		{
@@ -15,7 +15,7 @@ class Message_EweiShopV2Model
 		{
 			return;
 		}
-		return $account->sendTplNotice($touser, $template_id, $postdata, $url);
+		return $account->sendTplNotice($touser, $template_id, $postdata, $url, '#FF683F', $miniprogram);
 	}
 	public function sendCustomNotice($openid, $msg, $url = '', $account = NULL) 
 	{

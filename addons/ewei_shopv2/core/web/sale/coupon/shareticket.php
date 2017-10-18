@@ -108,9 +108,9 @@ class Shareticket_EweiShopV2Page extends WebPage
 				$activity = intval($_GPC['activitytype']);
 			}
 			$titlelen = mb_strlen(trim($_GPC['share_title']), 'utf-8');
-			if (12 < $titlelen) 
+			if (6 < $titlelen) 
 			{
-				show_json(0, '分享标题的字数长度最大为12！');
+				show_json(0, '分享标题的字数长度最大为6！');
 			}
 			$data = array('uniacid' => $uniacid, 'order' => intval($_GPC['order']), 'enough' => floatval($_GPC['enough']), 'expiration' => intval($_GPC['expiration']), 'status' => intval($_GPC['status']), 'sharetitle' => trim($_GPC['share_title']), 'shareicon' => trim($_GPC['share_icon']), 'createtime' => TIMESTAMP, 'issync' => intval($_GPC['issync']));
 			if (!(empty($_GPC['share_desc']))) 

@@ -521,7 +521,8 @@
 .we7-modal-dialog .modal-body, .modal-dialog .modal-body {
     padding: 30px;
     overflow-y: auto;
-    overflow-x: hidden
+    overflow-x: hidden;
+    max-height: 600px;
 }
 
 .we7-modal-dialog .modal-footer, .modal-dialog .modal-footer {

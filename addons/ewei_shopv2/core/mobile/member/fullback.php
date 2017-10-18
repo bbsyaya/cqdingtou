@@ -22,8 +22,8 @@ class Fullback_EweiShopV2Page extends MobileLoginPage
 		$condition = ' and fl.openid=:openid and fl.uniacid=:uniacid and fl.isfullback=:isfullback and fl.price>0';
 		$params = array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid'], ':isfullback' => $isfullback);
 		$list = array();
-		$list = pdo_fetchall('select fl.*,g.thumb,g.title,og.optionname from ' . tablename('ewei_shop_fullback_log') . ' as fl' . "\n" . '            left join ' . tablename('ewei_shop_goods') . ' as g on g.id = fl.goodsid' . "\n" . '            left join ' . tablename('ewei_shop_order_goods') . ' as og on og.orderid = fl.orderid and og.goodsid = fl.goodsid ' . "\n" . '            where 1 ' . $condition . ' group by fl.id order by fl.createtime desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
-		$total = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_fullback_log') . ' as fl' . "\n" . '            where 1 ' . $condition . ' order by fl.createtime desc ', $params);
+		$list = pdo_fetchall('select fl.*,g.thumb,g.title,og.optionname from ' . tablename('ewei_shop_fullback_log') . ' as fl' . "\r\n" . '            left join ' . tablename('ewei_shop_goods') . ' as g on g.id = fl.goodsid' . "\r\n" . '            left join ' . tablename('ewei_shop_order_goods') . ' as og on og.orderid = fl.orderid and og.goodsid = fl.goodsid ' . "\r\n" . '            where 1 ' . $condition . ' group by fl.id order by fl.createtime desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+		$total = pdo_fetchcolumn('select count(1) from ' . tablename('ewei_shop_fullback_log') . ' as fl' . "\r\n" . '            where 1 ' . $condition . ' order by fl.createtime desc ', $params);
 		foreach ($list as &$row ) 
 		{
 			$row['createtime'] = date('Y/m/d H:i:s', $row['createtime']);

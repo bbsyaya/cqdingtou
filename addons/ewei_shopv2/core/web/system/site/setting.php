@@ -26,10 +26,12 @@ class Setting_EweiShopV2Page extends SystemPage
 				plog('system.site.setting', '添加基础设置 ID:' . $set['id']);
 			}
 			show_json(1);
-			return;
 		}
-		$item = pdo_fetch('select * from ' . tablename('ewei_shop_system_setting') . ' where uniacid = :uniacid ', array(':uniacid' => $uniacid));
-		include $this->template();
+		else 
+		{
+			$item = pdo_fetch('select * from ' . tablename('ewei_shop_system_setting') . ' where uniacid = :uniacid ', array(':uniacid' => $uniacid));
+			include $this->template();
+		}
 	}
 }
 ?>

@@ -2910,6 +2910,10 @@ class Create_EweiShopV2Page extends MobileLoginPage
 		$order['taskdiscountprice'] = $taskdiscountprice;
 		$order['lotterydiscountprice'] = $lotterydiscountprice;
 		$order['discountprice'] = $discountprice;
+		if (!(empty($goods[0]['bargain_id'])) && p('bargain')) 
+		{
+			$order['discountprice'] = 0;
+		}
 		$order['isdiscountprice'] = $isdiscountprice;
 		$order['merchisdiscountprice'] = $merchisdiscountprice;
 		$order['cash'] = $cash;

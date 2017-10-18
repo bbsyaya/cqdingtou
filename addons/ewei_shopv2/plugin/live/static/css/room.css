@@ -72,12 +72,11 @@
 
 .player-fullscreen .block-video .video {
     object-fit: contain;
-    object-position: 0px 52px;
+    object-position: 0px 50px;
 }
 
 .block-video .live-tips {
     background: rgba(0, 0, 0, 0.5);
-    padding-top: 5rem;
     position: absolute;
     top: 0;
     left: 0;
@@ -91,6 +90,20 @@
 
 .block-video .live-tips.loading {
     display: block;
+}
+
+.block-video .live-tips .inner {
+    height: 2rem;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin-top: -1rem;
+}
+
+.fullscreen .block-video .live-tips .inner {
+    position: relative;
+    height: auto;
 }
 
 .block-video .live-tips .inner .date {
@@ -275,6 +288,7 @@
 .block-online .mycard {
     height: 1.1rem;
     width: auto;
+    display: block;
     background-color: #020202;
     background-image: url("../images/icon-myacard.png");
     background-position: 1px center;
@@ -330,6 +344,7 @@
     -ms-flex: 1;
     flex: 1;
     position: relative;
+    overflow: hidden;
 }
 
 .block-tab a.active {
@@ -339,8 +354,8 @@
 .block-tab a.active:before {
     content: '';
     position: absolute;
-    left: 1rem;
-    right: 1rem;
+    left: 0.5rem;
+    right: 0.5rem;
     bottom: 0;
     border-bottom: 2px solid #118cff;
 }
@@ -354,6 +369,7 @@
     left: 0;
     right: 0;
     z-index: 1;
+    overflow: hidden;
 }
 
 .fullscreen .block-content {
@@ -362,11 +378,56 @@
     background: none;
     margin-left: 0.5rem;
     top: auto;
-    overflow: visible;
 }
 
 .player-fullscreen .block-content {
     /*top: 15.7rem;*/
+}
+
+.block-content .layer-enter {
+    height: 1.5rem;
+    width: 9.5rem;
+    position: absolute;
+    top: 2rem;
+    left: 0;
+    background: url("../images/bg-enter.png") no-repeat;
+    background-size: 100% 100%;
+    color: #fff;
+    z-index: 10;
+    font-size: 0.7rem;
+    line-height: 1.5rem;
+
+    left: 100%;
+    transition: all 0.4s;
+    -moz-transition: all 0.4s;
+    -webkit-transition: all 0.4s;
+    -o-transition: all 0.4s;
+    opacity: 0;
+}
+
+.block-content .layer-enter.in {
+    left: 0;
+    opacity: 1;
+}
+
+.block-content .layer-enter.out {
+    left: -100%;
+    opacity: 0;
+}
+
+.block-content .layer-enter .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    float: left;
+    max-width: 4.5rem;
+    padding-left: 0.3rem;
+}
+
+.block-content .layer-enter .text {
+    width: 5rem;
+    padding-left: 4px;
+    float: left;
 }
 
 .block-content .layer-at {
@@ -445,6 +506,15 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
+.block-content .tab-content[data-tab="interaction"] {
+    padding-right: 2.2rem;
+}
+.fullscreen .block-content .tab-content {
+    background: none;
+}
+.fullscreen .block-content .tab-content[data-tab="interaction"] {
+    padding-right: 0;
+}
 
 .block-content .tab-content[data-tab='chat'] {
     display: block;
@@ -462,6 +532,7 @@
     font-size: 0.75rem;
     word-break:break-all;
     word-wrap:break-word;
+    display: block;
 }
 
 .block-content .tab-content .msg.notice,
@@ -479,6 +550,7 @@
 .fullscreen .block-content .tab-content .msg.nopadding {
     padding: 0;
     background: none;
+    display: block;
 }
 
 .block-content .tab-content .msg a {
@@ -537,25 +609,40 @@
     width: auto;
     max-width: 80%;
     height: 2.5rem;
-    padding: 0 0.4rem 0 2.1rem;
+    padding: 0 0.4rem 0 2.2rem;
     background-color: #f44649;
     background-image: url("../images/icon-redpack.png");
     background-position: 0.2rem center;
     background-size: 2rem;
     background-repeat: no-repeat;
     border-radius: 0.4rem;
-    line-height: 2.5rem;
+    line-height: 1rem;
     color: #fff;
-    display: inline-block;
+    display: table-cell;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    vertical-align: middle;
+}
+
+.block-content .tab-content .msg .content .coupon p.desc,
+.block-content .tab-content .msg .content .redpack p.desc {
+    font-size: 0.65rem;
+    line-height: 0.7rem;
+}
+
+.block-content .tab-content .msg .content .redpack.drew {
+    background-color: #faa1a1;
 }
 
 .fullscreen .block-content .tab-content .msg .content .coupon,
 .fullscreen .block-content .tab-content .msg .content .redpack {
     max-width: 100%;
     background-color: rgba(244, 70, 73, 0.9);
+}
+
+.fullscreen .block-content .tab-content .msg .content .redpack.drew {
+    background-color: rgba(250, 161, 161, 0.9);
 }
 
 .block-content .tab-content .msg .content .conpon:empty,
@@ -568,8 +655,16 @@
     background-image: url("../images/icon-coupon.png");
 }
 
+.block-content .tab-content .msg .content .coupon.drew {
+    background-color: #91caff;
+}
+
 .fullscreen .block-content .tab-content .msg .content .coupon {
     background-color: rgba(78, 154, 254, 0.9);
+}
+
+.fullscreen .block-content .tab-content .msg .content .coupon.drew {
+    background-color: rgba(142, 202, 255, 0.9);
 }
 
 .block-content .tab-content .msg .content .goods {
@@ -656,6 +751,8 @@
 }
 
 .block-content .tab-content .msg .btn-repeal {
+    height: 0.9rem;
+    line-height: 0.9rem;
     color: #999;
     background: #f3f3f3;
     text-align: center;
@@ -664,6 +761,7 @@
     margin-left: 0.2rem;
     padding: 0 0.2rem;
     display: none;
+    vertical-align: middle;
 }
 
 .block-content .tab-content .msg .btn-repeal.show {
@@ -759,6 +857,80 @@
     border-left: 4px solid #3482fe;
 }
 
+/* 浮动图标 */
+.block-icon {
+    width: 2.45rem;
+    height: auto;
+    position: fixed;
+    right: 0.25rem;
+    bottom: 4.5rem;
+    z-index: 11;
+}
+
+.block-icon .btn-gift {
+    height: 2.2rem;
+    width: 2.45rem;
+    background-image: url("../images/icon-gift2.png");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-top: 0.85rem;
+}
+
+.block-icon .btn-like {
+    height: 2.2rem;
+    width: 2.45rem;
+    background-image: url("../images/icon-like2.png");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-top: 0.85rem;
+}
+
+.block-icon .btn-share {
+    height: 2.2rem;
+    width: 2.45rem;
+    background-image: url("../images/icon-share2.png");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-top: 0.85rem;
+    display: block;
+}
+
+/* 公告浮层 */
+.block-notice {
+    height: 1.4rem;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0 0.2rem;
+    line-height: 1.4rem;
+    font-size: 0.7rem;
+    position: absolute;
+    top: 7.45rem;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: none;
+    overflow: hidden;
+}
+
+.block-notice .inner {
+    height: 1.4rem;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    overflow-x: auto;
+    color: #fff;
+    white-space:nowrap;
+}
+
+.fullscreen .block-notice {
+    top: 2.8rem;
+}
+
+.player-fullscreen .block-notice {
+    top: 5rem;
+}
 
 /* 商品列表 */
 .goods-item {
@@ -768,6 +940,10 @@
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
 }
 
 .goods-item:before {
@@ -786,19 +962,22 @@
     height: 3.4rem;
     width: 3.4rem;
     display: block;
+    -webkit-border-radius: 0.2rem;
+    border-radius: 0.2rem;
 }
 
 .goods-item .info {
-    height: 3.4rem;
+    max-height: 3.4rem;
     padding-left: 0.5rem;
     -webkit-box-flex: 1;
     -webkit-flex: 1;
     -ms-flex: 1;
     flex: 1;
+    display: table-cell;
 }
 
 .goods-item .info .title {
-    height: 2rem;
+    max-height: 2rem;
     margin-bottom: 0.2rem;
     line-height: 1rem;
     font-size: 0.7rem;
@@ -829,6 +1008,7 @@
     flex: 1;
     line-height: 1.2rem;
     vertical-align: middle;
+    display: block;
 }
 
 .goods-item .info .price .num span {
@@ -847,6 +1027,8 @@
 }
 
 .goods-item .info .price .num .bigprice {
+    height: 1.2rem;
+    line-height: 1.1rem;
     font-size: 0.8rem;
     padding: 0 0.2rem;
     color: #f4484a;
@@ -864,13 +1046,10 @@
     border-radius: 1rem;
     line-height: 1.15rem;
     display: inline-block;
-}
-
-.goods-item .info .price .btn-buy a {
     color: #e64a4c;
 }
 
-    /* 输入区域 */
+/* 输入区域 */
 .block-input {
     height: 2.8rem;
     background: #f7f7f7;
@@ -893,6 +1072,7 @@
     border-top: 1px solid #d2d2d2;
 }
 
+.block-input.focus .btn-plus,
 .block-input.focus .btn-goods,
 .block-input.focus .btn-like {
     display: none;
@@ -913,6 +1093,7 @@
 
 /* 底部输入框 区域 */
 .block-input .btn-goods,
+.block-input .btn-plus,
 .block-input .btn-like {
     height: 1.8rem;
     width: 1.8rem;
@@ -922,6 +1103,11 @@
 
 .block-input .btn-goods {
     background-image: url("../images/icon-goods.png");
+}
+
+.block-input .btn-plus {
+    background-image: url("../images/icon-plus.png");
+    margin-right: 0.5rem;
 }
 
 .block-input .input {
@@ -952,6 +1138,7 @@
     -webkit-flex: 1;
     -ms-flex: 1;
     flex: 1;
+    width: 100%;
 }
 
 .block-input .input input {
@@ -1039,15 +1226,25 @@
     bottom: 9rem;
 }
 
+.show-plus .block-input {
+    bottom: 5rem;
+}
+
 .show-emoji .block-content {
     bottom: 11.8rem;
 }
 
+.show-plus .block-content {
+    bottom: 7.8rem;
+}
+
+.show-plus .block-plus,
 .show-emoji .block-emoji {
     display: block;
 }
 
 /* 表情列表 */
+.block-plus,
 .block-emoji {
     background: #f7f7f7;
     position: fixed;
@@ -1059,6 +1256,19 @@
     display: none;
 }
 
+.block-emoji {
+    background: #fff;
+    padding: 0.3rem;
+    overflow-y: auto;
+}
+
+.block-plus {
+    height: 5rem;
+    background: #f4f4f4;
+    padding: 0.8rem 0.2rem
+}
+
+.block-plus:before,
 .block-emoji:before {
     content: '';
     position: absolute;
@@ -1068,12 +1278,138 @@
     border-top: 1px solid #d2d2d2;
 }
 
-.block-emoji .item {
-    width: 1.2rem;
-    height: 1.2rem;
-    margin: 2px;
+.block-plus .item {
+    height: 2.5rem;
+    width: 25%;
+    font-size: 0.7rem;
     float: left;
 }
+
+.block-plus .item .item-icon {
+    height: 2.5rem;
+    width: 2.5rem;
+    background: #fafafc;
+    margin: auto;
+    color: #c9c9c8;
+    border: 1px solid #c9c9c8 !important;
+    border-radius: 0.2rem;
+    line-height: 2.5rem;
+    text-align: center;
+}
+
+.block-plus .item .item-icon .icon {
+    font-size: 1.4rem;
+    color: #888;
+}
+
+.block-plus .item .item-text {
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    line-height: 1.2rem;
+    color: #777;
+}
+
+.block-emoji .item {
+    width: 1.6rem;
+    height: 1.6rem;
+    background: url("../images/face/allface.jpg");
+    background-size: 1.6rem auto;
+    margin: 0.1rem 0.2rem;
+    float: left;
+}
+
+
+.block-emoji .item:nth-child(1){background-position: 0 -0rem;}
+.block-emoji .item:nth-child(2){background-position: 0 -1.6rem;}
+.block-emoji .item:nth-child(3){background-position: 0 -3.2rem;}
+.block-emoji .item:nth-child(4){background-position: 0 -4.8rem;}
+.block-emoji .item:nth-child(5){background-position: 0 -6.4rem;}
+.block-emoji .item:nth-child(6){background-position: 0 -8rem;}
+.block-emoji .item:nth-child(7){background-position: 0 -9.6rem;}
+.block-emoji .item:nth-child(8){background-position: 0 -11.2rem;}
+.block-emoji .item:nth-child(9){background-position: 0 -12.8rem;}
+.block-emoji .item:nth-child(10){background-position: 0 -14.4rem;}
+.block-emoji .item:nth-child(11){background-position: 0 -16rem;}
+.block-emoji .item:nth-child(12){background-position: 0 -17.6rem;}
+.block-emoji .item:nth-child(13){background-position: 0 -19.2rem;}
+.block-emoji .item:nth-child(14){background-position: 0 -20.8rem;}
+.block-emoji .item:nth-child(15){background-position: 0 -22.4rem;}
+.block-emoji .item:nth-child(16){background-position: 0 -24rem;}
+.block-emoji .item:nth-child(17){background-position: 0 -25.6rem;}
+.block-emoji .item:nth-child(18){background-position: 0 -27.2rem;}
+.block-emoji .item:nth-child(19){background-position: 0 -28.8rem;}
+.block-emoji .item:nth-child(20){background-position: 0 -30.4rem;}
+.block-emoji .item:nth-child(21){background-position: 0 -32rem;}
+.block-emoji .item:nth-child(22){background-position: 0 -33.6rem;}
+.block-emoji .item:nth-child(23){background-position: 0 -35.2rem;}
+.block-emoji .item:nth-child(24){background-position: 0 -36.8rem;}
+.block-emoji .item:nth-child(25){background-position: 0 -38.4rem;}
+.block-emoji .item:nth-child(26){background-position: 0 -40rem;}
+.block-emoji .item:nth-child(27){background-position: 0 -41.6rem;}
+.block-emoji .item:nth-child(28){background-position: 0 -43.2rem;}
+.block-emoji .item:nth-child(29){background-position: 0 -44.8rem;}
+.block-emoji .item:nth-child(30){background-position: 0 -46.4rem;}
+.block-emoji .item:nth-child(31){background-position: 0 -48rem;}
+.block-emoji .item:nth-child(32){background-position: 0 -49.6rem;}
+.block-emoji .item:nth-child(33){background-position: 0 -51.2rem;}
+.block-emoji .item:nth-child(34){background-position: 0 -52.8rem;}
+.block-emoji .item:nth-child(35){background-position: 0 -54.4rem;}
+.block-emoji .item:nth-child(36){background-position: 0 -56rem;}
+.block-emoji .item:nth-child(37){background-position: 0 -57.6rem;}
+.block-emoji .item:nth-child(38){background-position: 0 -59.2rem;}
+.block-emoji .item:nth-child(39){background-position: 0 -60.8rem;}
+.block-emoji .item:nth-child(40){background-position: 0 -62.4rem;}
+.block-emoji .item:nth-child(41){background-position: 0 -64rem;}
+.block-emoji .item:nth-child(42){background-position: 0 -65.6rem;}
+.block-emoji .item:nth-child(43){background-position: 0 -67.2rem;}
+.block-emoji .item:nth-child(44){background-position: 0 -68.8rem;}
+.block-emoji .item:nth-child(45){background-position: 0 -70.4rem;}
+.block-emoji .item:nth-child(46){background-position: 0 -72rem;}
+.block-emoji .item:nth-child(47){background-position: 0 -73.6rem;}
+.block-emoji .item:nth-child(48){background-position: 0 -75.2rem;}
+.block-emoji .item:nth-child(49){background-position: 0 -76.8rem;}
+.block-emoji .item:nth-child(50){background-position: 0 -78.4rem;}
+.block-emoji .item:nth-child(51){background-position: 0 -80rem;}
+.block-emoji .item:nth-child(52){background-position: 0 -81.6rem;}
+.block-emoji .item:nth-child(53){background-position: 0 -83.2rem;}
+.block-emoji .item:nth-child(54){background-position: 0 -84.8rem;}
+.block-emoji .item:nth-child(55){background-position: 0 -86.4rem;}
+.block-emoji .item:nth-child(56){background-position: 0 -88rem;}
+.block-emoji .item:nth-child(57){background-position: 0 -89.6rem;}
+.block-emoji .item:nth-child(58){background-position: 0 -91.2rem;}
+.block-emoji .item:nth-child(59){background-position: 0 -92.8rem;}
+.block-emoji .item:nth-child(60){background-position: 0 -94.4rem;}
+.block-emoji .item:nth-child(61){background-position: 0 -96rem;}
+.block-emoji .item:nth-child(62){background-position: 0 -97.6rem;}
+.block-emoji .item:nth-child(63){background-position: 0 -99.2rem;}
+.block-emoji .item:nth-child(64){background-position: 0 -100.8rem;}
+.block-emoji .item:nth-child(65){background-position: 0 -102.4rem;}
+.block-emoji .item:nth-child(66){background-position: 0 -104rem;}
+.block-emoji .item:nth-child(67){background-position: 0 -105.6rem;}
+.block-emoji .item:nth-child(68){background-position: 0 -107.2rem;}
+.block-emoji .item:nth-child(69){background-position: 0 -108.8rem;}
+.block-emoji .item:nth-child(70){background-position: 0 -110.4rem;}
+.block-emoji .item:nth-child(71){background-position: 0 -112rem;}
+.block-emoji .item:nth-child(72){background-position: 0 -113.6rem;}
+.block-emoji .item:nth-child(73){background-position: 0 -115.2rem;}
+.block-emoji .item:nth-child(74){background-position: 0 -116.8rem;}
+.block-emoji .item:nth-child(75){background-position: 0 -118.4rem;}
+.block-emoji .item:nth-child(76){background-position: 0 -120rem;}
+.block-emoji .item:nth-child(77){background-position: 0 -121.6rem;}
+.block-emoji .item:nth-child(78){background-position: 0 -123.2rem;}
+.block-emoji .item:nth-child(79){background-position: 0 -124.8rem;}
+.block-emoji .item:nth-child(80){background-position: 0 -126.4rem;}
+.block-emoji .item:nth-child(81){background-position: 0 -128rem;}
+.block-emoji .item:nth-child(82){background-position: 0 -129.6rem;}
+.block-emoji .item:nth-child(83){background-position: 0 -131.2rem;}
+.block-emoji .item:nth-child(84){background-position: 0 -132.8rem;}
+.block-emoji .item:nth-child(85){background-position: 0 -134.4rem;}
+.block-emoji .item:nth-child(86){background-position: 0 -136rem;}
+.block-emoji .item:nth-child(87){background-position: 0 -137.6rem;}
+.block-emoji .item:nth-child(88){background-position: 0 -139.2rem;}
+.block-emoji .item:nth-child(89){background-position: 0 -140.8rem;}
+.block-emoji .item:nth-child(90){background-position: 0 -142.4rem;}
 
 .block-emoji .item img {
     height: 1.2rem;
@@ -1089,7 +1425,7 @@
     right: 0;
     bottom: 0;
     z-index: 95;
-   display: none;
+    display: none;
 }
 
 /* 红包弹窗 */
@@ -1106,7 +1442,7 @@
     display: none;
 }
 
-.layer:not(.layer-goods).in {
+.layer:not(.layer-goods):not(.layer-at).in {
     display: block;
     -webkit-animation: layerIn 0.3s;
     -ms-animation: layerIn 0.3s;
@@ -1350,7 +1686,7 @@
 .layer-gifts {
     width: 14.8rem;
     background: #fff;
-    margin: -5.2rem 0 0 -7.4rem;
+    margin: -5.7rem 0 0 -7.4rem;
     border-radius: 0.5rem;
     position: absolute;
     z-index: 100;
@@ -1374,6 +1710,149 @@
     line-height: 1.5rem;
     height: 1.5rem;
     z-index: 100;
+}
+
+.layer-coupon .coupon-title {
+    height: 3rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    line-height: 3rem;
+    color: #fff;
+    font-size: 0.8rem;
+    z-index: 1;
+}
+
+.layer-coupon.fail .coupon-title {
+    height: 1.8rem;
+    margin-top: 0.7rem;
+    line-height: 1.7rem;
+    color: #000;
+    position: relative;
+}
+
+.layer-coupon .coupon-fail-title {
+    display: none;
+}
+
+.layer-coupon.fail .coupon-fail-title {
+    font-size: 0.7rem;
+    color: #999;
+    text-align: center;
+    display: block;
+}
+
+.layer-coupon .coupon-inner {
+    height: 6.8rem;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius:  0.5rem 0.5rem 0 0;
+}
+
+.layer-coupon.fail .coupon-inner {
+    display: none;
+}
+
+.layer-coupon .coupon-inner .coupon-bg {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    right: 0;
+    height: 6.8rem;
+    width: 20rem;
+    background: #118cff;
+    margin-left: -10rem;
+    border-radius:  0.5rem 0.5rem 50% 50%;
+    overflow: hidden;
+}
+
+.layer-coupon .coupon-inner .coupon-bg .coupon-block {
+    width: 7.4rem;
+    height: 5rem;
+    background: #deefff;
+    margin: 3rem auto 0;
+    text-align: center;
+    position: relative;
+}
+
+.layer-coupon .coupon-inner .coupon-bg .coupon-block .price {
+    height: 2.2rem;
+    line-height: 2.5rem;
+    font-size: 0.8rem;
+}
+
+.layer-coupon .coupon-inner .coupon-bg .coupon-block .price .money {
+    font-size: 1.5rem;
+}
+
+.layer-coupon .coupon-inner .coupon-bg .coupon-block .desc {
+    font-size: 0.65rem;
+    color: #666;
+}
+
+.layer-coupon .coupon-inner .coupon-bg .coupon-block .coupon-gold {
+    height: 2.75rem;
+    width: 2.75rem;
+    background-image: url("../images/icon-gold.png");
+    background-size: 100%;
+    position: absolute;
+    bottom: 0.5rem;
+    left: -1.5rem;
+}
+
+.layer-coupon .coupon-inner .coupon-bg .coupon-block .coupon-gift {
+    height: 2.75rem;
+    width: 2.75rem;
+    background-image: url("../images/icon-gift.png");
+    background-size: 100%;
+    position: absolute;
+    bottom: 1rem;
+    right: -1.3rem;
+}
+
+.layer-coupon .coupon-btn {
+    height: 1.8rem;
+    width: 100%;
+    margin: 1.4rem 0;
+    text-align: center;
+}
+
+.layer-coupon.fail .coupon-btn {
+    display: none;
+}
+
+.layer-coupon .coupon-btn .btn {
+    height: 1.8rem;
+    width: 6rem;
+    background: #81cdff;
+    padding: 0;
+    margin: 0;
+    margin-right: 0.75rem;
+    color: #000;
+    border: 0;
+    border-radius: 1.8rem;
+    line-height: 1.8rem;
+}
+.layer-coupon .coupon-btn .btn.btn-goon{display: none;}
+.layer-coupon.roomcoupon .coupon-btn .btn.btn-goon{display: inline-block;}
+.layer-coupon.roomcoupon .coupon-btn .btn.btn-blue{display: none;}
+
+
+.layer-coupon .coupon-btn .btn-yellow {
+    margin-right: 0;
+    background: #f9ca3e;
+}
+
+.layer-coupon.fail .coupon-fail {
+    height: 5.6rem;
+    width: 5.6rem;
+    background-image: url("../images/coupon-fail.png");
+    background-size: 100%;
+    margin: 0.8rem auto 1.4rem;
 }
 
 .layer-coupon > .title {
@@ -1465,8 +1944,8 @@
     font-size: 0.8rem;
     height:1.5rem;
     overflow:hidden;
-text-overflow:ellipsis;
-white-space:nowrap;
+    text-overflow:ellipsis;
+    white-space:nowrap;
     line-height: 1.5rem;
 }
 
@@ -1498,7 +1977,7 @@ white-space:nowrap;
 
 /* 店铺信息+关注 */
 .layer-roominfo {
-    height: 19rem;
+    max-height: 19rem;
     width: 15.2rem;
     background: #fff;
     padding: 1.5rem 0.9rem 0.9rem;
@@ -1530,24 +2009,51 @@ white-space:nowrap;
 }
 
 .layer-roominfo .room-title {
-    height: 2.6rem;
+    height: 1.75rem;
     color: #118cff;
     font-size: 0.85rem;
     text-align: center;
-    line-height: 3rem;
+    line-height: 2.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .layer-roominfo .room-info {
-    height: 5rem;
+    height: 3.8rem;
     padding: 0.5rem;
     margin-top: 0.5rem;
     border-radius: 0.5rem;
     border: 1px dashed #e3e3e3;
     font-size: 0.7rem;
+    line-height: 1.05rem;
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 .layer-roominfo .room-info p {
+    height: 1.3rem;
+    width: 100%;
     line-height: 1.3rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.layer-roominfo .room-qrcode {
+    height: 5.7rem;
+    width: 5.7rem;
+    margin: 0.7rem auto 0;
+}
+
+.layer-roominfo .room-qrcode img {
+    height: 5.7rem;
+    width: 5.7rem;
+    display: block;
 }
 
 .layer-roominfo .room-btn {
@@ -1568,7 +2074,7 @@ white-space:nowrap;
 
 /* 礼物弹窗 */
 .layer-gifts {
-    padding: 1rem 0;
+    padding: 0.5rem 0;
 }
 
 .layer-gifts .inner {
@@ -1614,7 +2120,8 @@ white-space:nowrap;
 }
 
 .layer-gifts .coupon-item {
-    margin-top: 0.85rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
 }
 
 .layer-gifts .redpack-item .left {
@@ -1670,7 +2177,6 @@ white-space:nowrap;
     height: auto;
     max-height: 70%;
     padding-top: 1.4rem;
-    padding-bottom: 1.4rem;
     background: #fff;
     position: fixed;
     left: 0;
@@ -1712,7 +2218,7 @@ white-space:nowrap;
     width: 1.5rem;
     color: #f90;;
     position: fixed;
-    right: 10px;
+    right: 30px;
     bottom: 2.5rem;
     z-index: 10;
 }

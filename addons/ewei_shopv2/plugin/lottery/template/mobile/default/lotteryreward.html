@@ -29,9 +29,7 @@
 
             {elseif isset($value['reward']['coupon'])}
             {loop $value['reward']['coupon'] $key $val}
-            {if $value['reward']['coupon'][$key]['couponnum']}
             <p class="reward-item"><span class="item-left">{$value['title']}</span><span class="item-center">{$value['reward']['coupon'][$key]['couponname']}</span><span class="item-right">{$value['reward']['coupon'][$key]['couponnum']}张</span></p>
-            {/if}
             {/loop}
             {/if}
             {else}
@@ -46,4 +44,5 @@
 </div>
 
 {template '_footer'}
+
 

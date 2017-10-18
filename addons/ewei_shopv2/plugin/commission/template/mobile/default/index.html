@@ -26,7 +26,7 @@
 			    {$up['nickname']}
 			    {/if}
 				<br>
-				{php echo $this->set['texts']['icode']}:{$member['id']}
+				{php echo $this->set['texts']['icode']}:{if p('offic')}{$member['mobile']}{else}{$member['id']}{/if}
 			</div>
 		    </div>
 		</div>
@@ -74,6 +74,18 @@
                 <div class="title">{php echo $this->set['texts']['mydown']}</div>
                 <div class="text"><span>{php echo number_format($member['downcount'],0)}</span>人</div>
             </a>
+		{if p("offic")}
+		<a class="fui-block-child external" href="{php echo mobileUrl('commission/branch')}">
+			<div class="icon text-orange"><i class="icon icon-store"></i></div>
+			<div class="title">我的分店</div>
+			<div class="text"><span></span></div>
+		</a>
+		<a class="fui-block-child external" href="{php echo mobileUrl('commission/branch/fans')}">
+			<div class="icon text-orange"><i class="icon icon-person2"></i></div>
+			<div class="title">我的粉丝</div>
+			<div class="text"><span></span></div>
+		</a>
+		{/if}
 
 		{if $hasglobonus}
 		<a class="fui-block-child external" href="{php echo mobileUrl('globonus')}">
