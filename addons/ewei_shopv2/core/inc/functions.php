@@ -1807,6 +1807,39 @@ if (!function_exists('tpl_form_field_position')) {
 		return $s;
 	}
 }
+
+if (!(function_exists('tpl_goods_selector'))) {
+	/**
+     * @param $name 名字
+     * @param string $data 数据
+     * @param string $option 设置选项
+     * @param string $where 商品表where条件
+     */
+	function tpl_goods_selector($name, $data_gs = '', $option = array())
+	{
+		global $_W;
+		$condition = base64_encode($option['condition']);
+
+		if (is_array($data_gs)) {
+			$data_gs = json_encode($data_gs);
+		}
+		 else {
+			json_decode($data_gs);
+			if ((json_last_error() != JSON_ERROR_NONE) || empty($data_gs)) {
+				$data_gs = '{}';
+			}
+
+		}
+
+		$name_id = 'goods_selector_' . $name;
+		$data_arr = json_decode($data_gs, 1);
+		$path = IA_ROOT . '/addons/ewei_shopv2/template/web_v3/util/tpl_goods_selector.html';
+		include $path;
+		$_W['goods_selector_js'] = 1;
+	}
+}
+
+
 function auth_user($siteid, $domain) {
 
     $ret = cloud_upgrade('user', array('website' => $siteid,'domain'=> $domain));

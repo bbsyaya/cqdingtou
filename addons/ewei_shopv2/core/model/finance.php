@@ -804,7 +804,7 @@ class Finance_EweiShopV2Model
 		}
 		else 
 		{
-			$days = (double) $endtime - $starttime / 86400;
+			$days = (double) ($endtime - $starttime)/ 86400;
 			$d = 0;
 			while ($d < $days) 
 			{
@@ -843,6 +843,23 @@ class Finance_EweiShopV2Model
 			break;
 			case '4': return error(1, '暂不支持全付通的账单下载');
 		}
+		$content = '';
+
+		foreach ($dates as $date) {
+			$dc = $this->downloadday($date, $wechat, $type);
+
+			if (is_error($dc) || strexists($dc, 'CDATA[FAIL]')) {
+				continue;
+			}
+
+			if ($datatype && !strexists($dc, 'ewei_shopv2')) {
+				continue;
+			}
+
+			$content .= $date . ' 账单' . "\r\n\r\n";
+			$content .= $dc . "\r\n\r\n";
+		}
+		
 		if (empty($content)) 
 		{
 			return error(-1, '账单为空');

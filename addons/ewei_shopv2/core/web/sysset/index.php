@@ -148,11 +148,14 @@ class Index_EweiShopV2Page extends WebPage
 		{
 			show_json(1, array('status' => 0, 'messages' => '默认模板信息错误', 'tag' => $tag));
 		}
-		$content = str_replace(array("\r\n", "\r", "\n"), '', $templatetype['content']);
+		$content = str_replace(array("\r\n", "\r", "\n", ' '), '', $templatetype['content']);
+		$content = str_replace(array('：'), ':', $content);
 		$issnoet = true;
 		foreach ($result['template_list'] as $key => $value ) 
 		{
-			if (str_replace(array("\r\n", "\r", "\n"), '', $value['content']) == $content) 
+			$valuecontent = str_replace(array("\r\n", "\r", "\n", ' '), '', $value['content']);
+			$valuecontent = str_replace(array('：'), ':', $valuecontent);
+			if ($valuecontent == $content) 
 			{
 				$issnoet = false;
 				$defaulttemp = pdo_fetch('select 1  from ' . tablename('ewei_shop_member_message_template_default') . ' where typecode=:typecode and uniacid=:uniacid  limit 1', array(':typecode' => $tag, ':uniacid' => $_W['uniacid']));
@@ -484,6 +487,7 @@ class Index_EweiShopV2Page extends WebPage
 			$data['weixin_jie'] = intval($inputdata['weixin_jie']);
 			$data['weixin_jie_sub'] = intval($inputdata['weixin_jie_sub']);
 			$data['alipay'] = intval($inputdata['alipay']);
+			$data['alipay_id'] = intval($inputdata['alipay_id']);
 			$data['credit'] = intval($inputdata['credit']);
 			$data['cash'] = intval($inputdata['cash']);
 			$data['app_wechat'] = intval($inputdata['app_wechat']);
@@ -494,7 +498,8 @@ class Index_EweiShopV2Page extends WebPage
 			show_json(1);
 		}
 		$data = m('common')->getSysset('pay');
-		$payments = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
+		$payments = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid and paytype = 0 ', array(':uniacid' => $_W['uniacid']));
+		$paymentalis = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_payment') . ' WHERE uniacid=:uniacid and paytype = 1 ', array(':uniacid' => $_W['uniacid']));
 		if (empty($payments)) 
 		{
 			$payments = array();

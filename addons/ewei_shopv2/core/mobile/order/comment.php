@@ -77,6 +77,10 @@ class Comment_EweiShopV2Page extends MobileLoginPage
 				{
 					p('task')->checkTaskReward('cost_comment', 1);
 				}
+				if (p('task')) 
+				{
+					p('task')->checkTaskProgress(1, 'comment');
+				}
 			}
 			else 
 			{

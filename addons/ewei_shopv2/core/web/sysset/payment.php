@@ -6,6 +6,7 @@ if (!(defined('IN_IA')))
 class Payment_EweiShopV2Page extends WebPage 
 {
 	public $paytype = array('微信支付', '微信支付子商户', '借用微信支付', '借用微信支付子商户');
+	public $paytypeali = array('支付宝2.0');
 	public function main() 
 	{
 		global $_W;
@@ -24,6 +25,7 @@ class Payment_EweiShopV2Page extends WebPage
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_payment') . ' WHERE 1 ' . $condition, $params);
 		$pager = pagination($total, $pindex, $psize);
 		$payment = $this->paytype;
+		$paytypeali = $this->paytypeali;
 		if (p('qpay')) 
 		{
 			$payment[4] = '中信银行全付通';
@@ -45,7 +47,11 @@ class Payment_EweiShopV2Page extends WebPage
 		$id = intval($_GPC['id']);
 		if ($_W['ispost']) 
 		{
-			$data = array('uniacid' => $_W['uniacid'], 'type' => intval($_GPC['type']), 'title' => trim($_GPC['title']), 'appid' => trim($_GPC['appid']), 'mch_id' => trim($_GPC['mch_id']), 'apikey' => trim($_GPC['apikey']), 'sub_appid' => trim($_GPC['sub_appid']), 'sub_appsecret' => trim($_GPC['sub_appsecret']), 'sub_mch_id' => trim($_GPC['sub_mch_id']), 'is_raw' => intval($_GPC['is_raw']));
+			$data = array('uniacid' => $_W['uniacid'], 'paytype' => intval($_GPC['paytype']), 'type' => intval($_GPC['type']), 'title' => trim($_GPC['title']), 'appid' => trim($_GPC['appid']), 'mch_id' => trim($_GPC['mch_id']), 'apikey' => trim($_GPC['apikey']), 'sub_appid' => trim($_GPC['sub_appid']), 'sub_appsecret' => trim($_GPC['sub_appsecret']), 'sub_mch_id' => trim($_GPC['sub_mch_id']), 'is_raw' => intval($_GPC['is_raw']));
+			$data['alipay_sec']['public_key'] = trim($_GPC['data']['app_alipay_public_key']);
+			$data['alipay_sec']['private_key'] = trim($_GPC['data']['app_alipay_private_key']);
+			$data['alipay_sec']['appid'] = trim($_GPC['data']['app_alipay_appid']);
+			$data['alipay_sec'] = iserializer($data['alipay_sec']);
 			if ($_FILES['cert_file']['name']) 
 			{
 				$data['cert_file'] = $this->upload_cert('cert_file');
@@ -76,7 +82,9 @@ class Payment_EweiShopV2Page extends WebPage
 		{
 			$data = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_payment') . ' WHERE id=:id and uniacid=:uniacid ', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 		}
+		$sec['alipay_sec'] = iunserializer($data['alipay_sec']);
 		$payment = $this->paytype;
+		$paytypeali = $this->paytypeali;
 		if (p('qpay')) 
 		{
 			$payment[4] = '中信银行全付通';

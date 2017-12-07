@@ -344,6 +344,10 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			exit();
 		}
 		$isonlyverifygood = m('order')->checkisonlyverifygoods($order['id']);
+		if ($order['refundid'] != 0) 
+		{
+			$refund = pdo_fetch('SELECT *  FROM ' . tablename('ewei_shop_order_refund') . ' WHERE orderid = :orderid and uniacid=:uniacid order by id desc', array(':orderid' => $order['id'], ':uniacid' => $_W['uniacid']));
+		}
 		$area_set = m('util')->get_area_config_set();
 		$new_area = intval($area_set['new_area']);
 		$address_street = intval($area_set['address_street']);

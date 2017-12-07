@@ -74,6 +74,10 @@ class aliApy
 		{
 			$this->threen();
 		}
+		else if ($this->type == '20') 
+		{
+			$this->creditShop();
+		}
 		exit('success');
 	}
 	public function order() 
@@ -93,7 +97,14 @@ class aliApy
 		$params[':tid'] = $tid;
 		$params[':module'] = 'ewei_shopv2';
 		$log = pdo_fetch($sql, $params);
-		if ($this->post['total_fee'] != $log['fee']) 
+		if (!($this->isapp) && ($this->post['sign_type'] == 'RSA')) 
+		{
+			if ($this->post['total_amount'] != $log['fee']) 
+			{
+				exit('fail');
+			}
+		}
+		else if ($this->post['total_fee'] != $log['fee']) 
 		{
 			exit('fail');
 		}
@@ -149,7 +160,14 @@ class aliApy
 			exit();
 		}
 		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_threen_log') . ' WHERE `uniacid`=:uniacid and id=:id limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $logno));
-		if ($this->post['total_fee'] != $log['moneychange']) 
+		if (!($this->isapp) && ($this->post['sign_type'] == 'RSA')) 
+		{
+			if ($this->post['total_amount'] != $log['moneychange']) 
+			{
+				exit('fail');
+			}
+		}
+		else if ($this->post['total_fee'] != $log['moneychange']) 
 		{
 			exit('fail');
 		}
@@ -171,7 +189,14 @@ class aliApy
 			exit();
 		}
 		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_member_log') . ' WHERE `uniacid`=:uniacid and `logno`=:logno limit 1', array(':uniacid' => $_W['uniacid'], ':logno' => $logno));
-		if ($this->post['total_fee'] != $log['money']) 
+		if (!($this->isapp) && ($this->post['sign_type'] == 'RSA')) 
+		{
+			if ($this->post['total_amount'] != $log['money']) 
+			{
+				exit('fail');
+			}
+		}
+		else if ($this->post['total_fee'] != $log['money']) 
 		{
 			exit('fail');
 		}
@@ -196,6 +221,29 @@ class aliApy
 		}
 		if (p('cashier')) 
 		{
+		}
+	}
+	public function creditShop() 
+	{
+		global $_W;
+		if (!($this->publicMethod())) 
+		{
+			exit('creditShop');
+		}
+		$logno = trim($this->post['out_trade_no']);
+		if (empty($logno)) 
+		{
+			exit();
+		}
+		$logno = str_replace('_borrow', '', $logno);
+		$total_fee = $this->total_fee;
+		if (!($this->isapp) && ($this->post['sign_type'] == 'RSA')) 
+		{
+			$total_fee = $this->post['total_amount'];
+		}
+		if (p('creditshop')) 
+		{
+			p('creditshop')->payResult($logno, 'alipay', $total_fee, ($this->isapp ? true : false));
 		}
 	}
 	public function batch_trans_notify() 
@@ -378,7 +426,7 @@ class aliApy
 		$mcommission = $totalpay;
 		if (!(empty($deductionmoney))) 
 		{
-			$mcommission .= ',实际到账金额:' . $realmoney . ',个人所得税金额:' . $deductionmoney;
+			$mcommission .= ',实际到账金额:' . $realmoney . ',提现手续费金额:' . $deductionmoney;
 		}
 		p('commission')->sendMessage($member['openid'], array('commission' => $mcommission, 'type' => $apply_type[$apply['type']]), TM_COMMISSION_PAY);
 		p('commission')->upgradeLevelByCommissionOK($member['openid']);
@@ -386,7 +434,7 @@ class aliApy
 		{
 			p('globous')->upgradeLevelByCommissionOK($member['openid']);
 		}
-		plog('commission.apply.pay', '佣金打款 ID: ' . $id . ' 申请编号: ' . $apply['applyno'] . ' 打款方式: ' . $apply_type[$apply['type']] . ' 总佣金: ' . $totalcommission . ' 审核通过佣金: ' . $totalpay . ' 实际到账金额: ' . $realmoney . ' 个人所得税金额: ' . $deductionmoney . ' 个人所得税税率: ' . $set_array['charge'] . '%');
+		plog('commission.apply.pay', '佣金打款 ID: ' . $id . ' 申请编号: ' . $apply['applyno'] . ' 打款方式: ' . $apply_type[$apply['type']] . ' 总佣金: ' . $totalcommission . ' 审核通过佣金: ' . $totalpay . ' 实际到账金额: ' . $realmoney . ' 提现手续费金额: ' . $deductionmoney . ' 提现手续费税率: ' . $set_array['charge'] . '%');
 	}
 	public function batch_trans_notify_rw($id, $money) 
 	{
@@ -523,25 +571,28 @@ class aliApy
 					$this->isapp = true;
 					return m('finance')->RSAVerify($this->post, $public_key, true);
 				}
+				$public_key = $this->sec['alipay_pay']['public_key'];
+				if (empty($public_key)) 
+				{
+					exit();
+				}
+				return m('finance')->RSAVerify($this->post, $public_key, true);
 			}
-			else 
+			$prepares = array();
+			foreach ($this->post as $key => $value ) 
 			{
-				$prepares = array();
-				foreach ($this->post as $key => $value ) 
+				if (($key != 'sign') && ($key != 'sign_type')) 
 				{
-					if (($key != 'sign') && ($key != 'sign_type')) 
-					{
-						$prepares[] = $key . '=' . $value;
-					}
+					$prepares[] = $key . '=' . $value;
 				}
-				sort($prepares);
-				$string = implode($prepares, '&');
-				$string .= $this->setting['payment']['alipay']['secret'];
-				$sign = md5($string);
-				if ($sign == $this->post['sign']) 
-				{
-					return true;
-				}
+			}
+			sort($prepares);
+			$string = implode($prepares, '&');
+			$string .= $this->setting['payment']['alipay']['secret'];
+			$sign = md5($string);
+			if ($sign == $this->post['sign']) 
+			{
+				return true;
 			}
 		}
 		return false;

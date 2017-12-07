@@ -752,7 +752,7 @@ class System_EweiShopV2Model
 					array(
 						'title'   => '微信会员卡',
 						'route'   => 'card',
-						'iscom'   => 'card',
+						//'iscom'   => 'card',
 						'extends' => array('member.card.post', 'member.card.activationset')
 						)
 					)

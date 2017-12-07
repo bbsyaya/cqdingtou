@@ -50,6 +50,10 @@ class Bind_EweiShopV2Page extends MobileLoginPage
 				{
 					p('task')->checkTaskReward('member_info', 1, $_W['openid']);
 				}
+				if (p('task')) 
+				{
+					p('task')->checkTaskProgress(1, 'info_phone');
+				}
 				show_json(1, 'bind success (0)');
 			}
 			if ($member['id'] == $member2['id']) 
@@ -68,6 +72,10 @@ class Bind_EweiShopV2Page extends MobileLoginPage
 					if (p('task')) 
 					{
 						p('task')->checkTaskReward('member_info', 1, $_W['openid']);
+					}
+					if (p('task')) 
+					{
+						p('task')->checkTaskProgress(1, 'info_phone');
 					}
 					show_json(1, 'bind success (1)');
 				}
@@ -93,6 +101,10 @@ class Bind_EweiShopV2Page extends MobileLoginPage
 					{
 						p('task')->checkTaskReward('member_info', 1, $_W['openid']);
 					}
+					if (p('task')) 
+					{
+						p('task')->checkTaskProgress(1, 'info_phone');
+					}
 					show_json(1, 'bind success (2)');
 				}
 				else 
@@ -116,6 +128,10 @@ class Bind_EweiShopV2Page extends MobileLoginPage
 					if (p('task')) 
 					{
 						p('task')->checkTaskReward('member_info', 1, $_W['openid']);
+					}
+					if (p('task')) 
+					{
+						p('task')->checkTaskProgress(1, 'info_phone');
 					}
 					show_json(1, 'bind success (3)');
 				}

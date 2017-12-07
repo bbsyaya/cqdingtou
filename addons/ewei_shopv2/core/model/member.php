@@ -283,6 +283,11 @@ class Member_EweiShopV2Model
 				p('task')->checkTaskReward('cost_rechargetotal', $credits, $openid);
 			}
 		}
+		if (p('task')) 
+		{
+			p('task')->checkTaskProgress($credits, 'recharge_full', 0, $openid);
+			p('task')->checkTaskProgress($credits, 'recharge_count', 0, $openid);
+		}
 		com_run('wxcard::updateMemberCardByOpenid', $openid);
 	}
 	public function getCredit($openid = '', $credittype = 'credit1') 

@@ -55,6 +55,9 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_message_mass_template` (
   `createtime` int(11) DEFAULT '0',
   `sendtimes` int(11) DEFAULT '0',
   `sendcount` int(11) DEFAULT '0',
+  `miniprogram` tinyint(1) DEFAULT '0',
+  `appid` varchar(255) DEFAULT '',
+  `pagepath` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -1861,6 +1864,37 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_exchange_setting` (
   PRIMARY KEY (`id`,`uniacid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_exhelper_esheet`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_exhelper_esheet` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `express` varchar(50) DEFAULT '',
+  `code` varchar(20) NOT NULL DEFAULT '',
+  `datas` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=21 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_exhelper_esheet_temp`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_exhelper_esheet_temp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT '0',
+  `esheetid` int(11) NOT NULL DEFAULT '0',
+  `esheetname` varchar(255) NOT NULL DEFAULT '',
+  `customername` varchar(50) NOT NULL DEFAULT '',
+  `customerpwd` varchar(50) NOT NULL DEFAULT '',
+  `monthcode` varchar(50) NOT NULL DEFAULT '',
+  `sendsite` varchar(50) NOT NULL DEFAULT '',
+  `paytype` tinyint(3) NOT NULL DEFAULT '1',
+  `templatesize` varchar(10) NOT NULL DEFAULT '',
+  `isnotice` tinyint(3) NOT NULL DEFAULT '0',
+  `merchid` int(11) NOT NULL DEFAULT '0',
+  `issend` tinyint(3) NOT NULL DEFAULT '1',
+  `isdefault` tinyint(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_isdefault` (`isdefault`) USING BTREE,
+  KEY `idx_uniacid` (`uniacid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_exhelper_express`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_exhelper_express` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1892,6 +1926,9 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_exhelper_senduser` (
   `sendercity` varchar(255) DEFAULT NULL,
   `isdefault` tinyint(3) DEFAULT '0',
   `merchid` int(11) DEFAULT '0',
+  `province` varchar(30) NOT NULL DEFAULT '',
+  `city` varchar(30) NOT NULL DEFAULT '',
+  `area` varchar(30) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_isdefault` (`isdefault`)
@@ -1907,6 +1944,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_exhelper_sys` (
   `port_cloud` int(11) NOT NULL DEFAULT '8000',
   `is_cloud` int(1) NOT NULL DEFAULT '0',
   `merchid` int(11) DEFAULT '0',
+  `ebusiness` varchar(20) NOT NULL DEFAULT '',
+  `apikey` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -4124,6 +4163,8 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_order_goods` (
   `tdate_time` int(11) NOT NULL DEFAULT '0',
   `dowpayment` decimal(10,2) NOT NULL DEFAULT '0.00',
   `peopleid` int(11) NOT NULL DEFAULT '0',
+  `esheetprintnum` int(11) NOT NULL DEFAULT '0',
+  `ordercode` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`),
   KEY `idx_orderid` (`orderid`),
@@ -4308,6 +4349,9 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_payment` (
   `root_file` text,
   `is_raw` tinyint(1) DEFAULT '0',
   `createtime` int(10) unsigned DEFAULT '0',
+  `paytype` tinyint(3) NOT NULL DEFAULT '0',
+  `alitype` tinyint(3) NOT NULL DEFAULT '0',
+  `alipay_sec` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_uniacid` (`uniacid`) USING BTREE,
   KEY `idx_type` (`type`) USING BTREE
@@ -5822,6 +5866,45 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_joiner` (
   PRIMARY KEY (`complete_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
 
+DROP TABLE IF EXISTS `ims_ewei_shop_task_list`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_list` (
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `displayorder` int(11) NOT NULL DEFAULT '0',
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `title` char(50) NOT NULL DEFAULT '',
+  `image` varchar(255) NOT NULL DEFAULT '',
+  `type` varchar(50) NOT NULL DEFAULT '',
+  `starttime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `endtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `demand` int(11) NOT NULL DEFAULT '0',
+  `requiregoods` text NOT NULL,
+  `picktype` tinyint(1) NOT NULL DEFAULT '0',
+  `stop_type` tinyint(1) NOT NULL DEFAULT '0',
+  `stop_limit` int(11) NOT NULL DEFAULT '0',
+  `stop_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `stop_cycle` tinyint(1) NOT NULL DEFAULT '0',
+  `repeat_type` tinyint(1) NOT NULL DEFAULT '0',
+  `repeat_interval` int(11) NOT NULL DEFAULT '0',
+  `repeat_cycle` tinyint(1) NOT NULL DEFAULT '0',
+  `reward` text NOT NULL,
+  `followreward` text NOT NULL,
+  `goods_limit` int(11) NOT NULL DEFAULT '0',
+  `notice` text NOT NULL,
+  `design_data` text NOT NULL,
+  `design_bg` varchar(255) NOT NULL DEFAULT '',
+  `native_data` text NOT NULL,
+  `native_data2` text,
+  `native_data3` text,
+  `reward2` text,
+  `reward3` text,
+  `level2` int(11) NOT NULL DEFAULT '0',
+  `level3` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_uniacid` (`uniacid`) USING BTREE,
+  KEY `idx_passive` (`picktype`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
 DROP TABLE IF EXISTS `ims_ewei_shop_task_log`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -5894,6 +5977,110 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_poster_qr` (
   `endtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_task_qr`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_qr` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `openid` varchar(100) NOT NULL DEFAULT '',
+  `recordid` int(11) NOT NULL DEFAULT '0',
+  `sceneid` varchar(255) NOT NULL DEFAULT '',
+  `mediaid` varchar(255) NOT NULL DEFAULT '',
+  `ticket` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `uniacid` (`uniacid`) USING BTREE,
+  KEY `recordid` (`recordid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_task_record`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_record` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `taskid` int(11) NOT NULL DEFAULT '0',
+  `tasktitle` varchar(255) NOT NULL,
+  `taskimage` varchar(255) NOT NULL DEFAULT '',
+  `tasktype` varchar(50) NOT NULL DEFAULT '',
+  `task_progress` int(11) NOT NULL DEFAULT '0',
+  `task_demand` int(11) NOT NULL DEFAULT '0',
+  `openid` char(50) NOT NULL DEFAULT '',
+  `nickname` varchar(255) NOT NULL DEFAULT '',
+  `picktime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `stoptime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `finishtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `reward_data` text NOT NULL,
+  `followreward_data` text NOT NULL,
+  `design_data` text NOT NULL,
+  `design_bg` varchar(255) NOT NULL DEFAULT '',
+  `require_goods` varchar(255) NOT NULL DEFAULT '',
+  `level1` int(11) NOT NULL DEFAULT '0',
+  `reward_data1` text NOT NULL,
+  `level2` int(11) NOT NULL DEFAULT '0',
+  `reward_data2` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `uniacid` (`uniacid`) USING BTREE,
+  KEY `taskid` (`taskid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_task_reward`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_reward` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `taskid` int(11) NOT NULL DEFAULT '0',
+  `tasktitle` char(50) NOT NULL DEFAULT '',
+  `tasktype` varchar(50) NOT NULL DEFAULT '',
+  `taskowner` char(50) NOT NULL DEFAULT '',
+  `ownernickname` char(50) NOT NULL DEFAULT '',
+  `recordid` int(11) NOT NULL DEFAULT '0',
+  `nickname` char(50) NOT NULL DEFAULT '',
+  `headimg` varchar(255) NOT NULL DEFAULT '',
+  `openid` char(50) NOT NULL DEFAULT '',
+  `reward_type` char(10) NOT NULL DEFAULT '',
+  `reward_title` char(50) NOT NULL DEFAULT '',
+  `reward_data` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `get` tinyint(1) NOT NULL DEFAULT '0',
+  `sent` tinyint(1) NOT NULL DEFAULT '0',
+  `gettime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `senttime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `isjoiner` tinyint(1) NOT NULL DEFAULT '0',
+  `price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `level` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `uniacid` (`uniacid`) USING BTREE,
+  KEY `recordid` (`recordid`) USING BTREE,
+  KEY `taskid` (`taskid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_task_set`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_set` (
+  `uniacid` int(11) NOT NULL DEFAULT '0',
+  `entrance` tinyint(1) NOT NULL DEFAULT '0',
+  `keyword` varchar(10) NOT NULL DEFAULT '',
+  `cover_title` varchar(20) NOT NULL DEFAULT '',
+  `cover_img` varchar(255) NOT NULL DEFAULT '',
+  `cover_desc` varchar(255) NOT NULL DEFAULT '',
+  `msg_pick` text NOT NULL,
+  `msg_progress` text NOT NULL,
+  `msg_finish` text NOT NULL,
+  `msg_follow` text NOT NULL,
+  `isnew` tinyint(1) NOT NULL DEFAULT '0',
+  `bg_img` varchar(255) NOT NULL DEFAULT '../addons/ewei_shopv2/plugin/task/static/images/sky.png',
+  PRIMARY KEY (`uniacid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+DROP TABLE IF EXISTS `ims_ewei_shop_task_type`;
+CREATE TABLE IF NOT EXISTS `ims_ewei_shop_task_type` (
+  `id` int(11) NOT NULL,
+  `type_key` char(20) NOT NULL DEFAULT '',
+  `type_name` char(10) NOT NULL DEFAULT '',
+  `description` char(30) NOT NULL DEFAULT '',
+  `verb` char(11) NOT NULL DEFAULT '',
+  `numeric` tinyint(1) NOT NULL DEFAULT '0',
+  `unit` char(10) NOT NULL DEFAULT '',
+  `goods` tinyint(1) NOT NULL DEFAULT '0',
+  `theme` char(10) NOT NULL DEFAULT '',
+  `once` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
 DROP TABLE IF EXISTS `ims_ewei_shop_verifygoods`;
 CREATE TABLE IF NOT EXISTS `ims_ewei_shop_verifygoods` (
@@ -6077,6 +6264,28 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_wxcard` (
   `use_condition` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('1', '顺丰', '', 'SF', 'a:2:{i:0;a:4:{s:5:\"style\";s:9:\"二联150\";s:4:\"spec\";s:33:\"（宽100mm高150mm切点90/60）\";s:4:\"size\";s:3:\"150\";s:9:\"isdefault\";i:1;}i:1;a:4:{s:5:\"style\";s:9:\"三联210\";s:4:\"spec\";s:38:\"（宽100mm 高210mm 切点90/60/60）\";s:4:\"size\";s:3:\"210\";s:9:\"isdefault\";i:0;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('2', '百世快递', '', 'HTKY', 'a:2:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:0;}i:1;a:4:{s:5:\"style\";s:9:\"二联183\";s:4:\"spec\";s:37:\"（宽100mm 高183mm 切点87/5/91）\";s:4:\"size\";s:3:\"183\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('3', '韵达', '', 'YD', 'a:2:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:0;}i:1;a:4:{s:5:\"style\";s:9:\"二联203\";s:4:\"spec\";s:36:\"（宽100mm 高203mm 切点152/51）\";s:4:\"size\";s:3:\"203\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('4', '申通', '', 'STO', 'a:2:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}i:1;a:4:{s:5:\"style\";s:9:\"二联150\";s:4:\"spec\";s:35:\"（宽100mm 高150mm 切点90/60）\";s:4:\"size\";s:3:\"150\";s:9:\"isdefault\";i:0;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('5', '圆通', '', 'YTO', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('6', 'EMS', '', 'EMS', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联150\";s:4:\"spec\";s:33:\"（宽100mm高150mm切点90/60）\";s:4:\"size\";s:3:\"150\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('7', '中通', '', 'ZTO', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('8', '德邦', '', 'DBL', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联177\";s:4:\"spec\";s:34:\"（宽100mm高177mm切点107/70）\";s:4:\"size\";s:3:\"177\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('9', '优速', '', 'UC', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('10', '宅急送', '', 'ZJS', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联120\";s:4:\"spec\";s:33:\"（宽100mm高116mm切点98/10）\";s:4:\"size\";s:3:\"120\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('11', '京东', '', 'JD', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联110\";s:4:\"spec\";s:33:\"（宽100mm高110mm切点60/50）\";s:4:\"size\";s:3:\"110\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('12', '信丰', '', 'XFEX', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联150\";s:4:\"spec\";s:33:\"（宽100mm高150mm切点90/60）\";s:4:\"size\";s:3:\"150\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('13', '全峰', '', 'QFKD', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('14', '跨越速运', '', 'KYSY', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联137\";s:4:\"spec\";s:34:\"（宽100mm高137mm切点101/36）\";s:4:\"size\";s:3:\"137\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('15', '安能', '', 'ANE', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"三联180\";s:4:\"spec\";s:37:\"（宽100mm高180mm切点110/30/40）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('16', '快捷', '', 'FAST', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('17', '国通', '', 'GTO', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('18', '天天', '', 'HHTT', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('19', '中铁快运', '', 'ZTKY', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联150\";s:4:\"spec\";s:33:\"（宽100mm高150mm切点90/60）\";s:4:\"size\";s:3:\"150\";s:9:\"isdefault\";i:1;}}');
+INSERT INTO `ims_ewei_shop_exhelper_esheet` VALUES ('20', '邮政快递包裹', '', 'YZPY', 'a:1:{i:0;a:4:{s:5:\"style\";s:9:\"二联180\";s:4:\"spec\";s:34:\"（宽100mm高180mm切点110/70）\";s:4:\"size\";s:3:\"180\";s:9:\"isdefault\";i:1;}}');
+
 
 INSERT INTO `ims_ewei_shop_member_message_template_type` (`id`, `name`, `typecode`, `templatecode`, `templateid`, `templatename`, `content`, `typegroup`, `groupname`, `showtotaladd`) VALUES
 (1, '订单付款通知', 'saler_pay', 'OPENTM405584202', '', '订单付款通知', '{{first.DATA}}订单编号：{{keyword1.DATA}}商品名称：{{keyword2.DATA}}商品数量：{{keyword3.DATA}}支付金额：{{keyword4.DATA}}{{remark.DATA}}', 'sys', '系统消息通知', 0),

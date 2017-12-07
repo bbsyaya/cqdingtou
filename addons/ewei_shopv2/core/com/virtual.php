@@ -45,7 +45,7 @@ class Virtual_EweiShopV2ComModel extends ComModel
 	{
 		global $_W;
 		$goodsids = array();
-		$goods = pdo_fetchall('select id from ' . tablename('ewei_shop_goods') . ' where type=3 and `virtual`=:virtual and uniacid=:uniacid limit 1', array(':virtual' => $typeid, ':uniacid' => $_W['uniacid']));
+		$goods = pdo_fetchall('select id from ' . tablename('ewei_shop_goods') . ' where `type`=3 and `virtual`=:virtual and uniacid=:uniacid', array(':virtual' => $typeid, ':uniacid' => $_W['uniacid']));
 		foreach ($goods as $g ) 
 		{
 			$goodsids[] = $g['id'];
@@ -63,7 +63,7 @@ class Virtual_EweiShopV2ComModel extends ComModel
 			$this->updateGoodsStock($gid);
 		}
 	}
-	public function pay($order) 
+	public function pay_befo($order) 
 	{
 		global $_W;
 		global $_GPC;
@@ -78,7 +78,7 @@ class Virtual_EweiShopV2ComModel extends ComModel
 		}
 		$goods = pdo_fetch('select id,goodsid,total,realprice from ' . tablename('ewei_shop_order_goods') . ' where  orderid=:orderid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':orderid' => $order['id']));
 		$g = pdo_fetch('select id,credit,sales,salesreal from ' . tablename('ewei_shop_goods') . ' where  id=:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $goods['goodsid']));
-		$virtual_data = pdo_fetchall('SELECT id,typeid,fields FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE typeid=:typeid and openid=:openid and uniacid=:uniacid and merchid = :merchid order by rand() limit ' . $goods['total'], array(':openid' => '', ':typeid' => $order['virtual'], ':uniacid' => $_W['uniacid'], ':merchid' => $order['merchid']));
+		$virtual_data = pdo_fetchall('SELECT id,typeid,fields FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE typeid=:typeid and openid=:openid and uniacid=:uniacid and merchid = :merchid order by id asc limit ' . $goods['total'], array(':openid' => '', ':typeid' => $order['virtual'], ':uniacid' => $_W['uniacid'], ':merchid' => $order['merchid']));
 		$type = pdo_fetch('select fields from ' . tablename('ewei_shop_virtual_type') . ' where id=:id and uniacid=:uniacid and merchid = :merchid limit 1 ', array(':id' => $order['virtual'], ':uniacid' => $_W['uniacid'], ':merchid' => $order['merchid']));
 		$fields = iunserializer($type['fields'], true);
 		$virtual_info = array();
@@ -100,7 +100,19 @@ class Virtual_EweiShopV2ComModel extends ComModel
 		$virtual_str = implode("\n", $virtual_str);
 		$virtual_info = '[' . implode(',', $virtual_info) . ']';
 		$time = time();
-		pdo_update('ewei_shop_order', array('virtual_info' => $virtual_info, 'virtual_str' => $virtual_str, 'status' => '3', 'paytime' => $time, 'sendtime' => $time, 'finishtime' => $time), array('id' => $order['id']));
+		pdo_update('ewei_shop_order', array('virtual_info' => $virtual_info, 'virtual_str' => $virtual_str, 'sendtime' => $time), array('id' => $order['id']));
+		return true;
+	}
+	public function pay($order) 
+	{
+		global $_W;
+		global $_GPC;
+		$goods = pdo_fetch('select id,goodsid,total,realprice from ' . tablename('ewei_shop_order_goods') . ' where  orderid=:orderid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':orderid' => $order['id']));
+		$g = pdo_fetch('select id,credit,sales,salesreal from ' . tablename('ewei_shop_goods') . ' where  id=:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $goods['goodsid']));
+		$virtual_data = pdo_fetchall('SELECT id,typeid,fields FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE typeid=:typeid and openid=:openid and uniacid=:uniacid and merchid = :merchid order by id asc limit ' . $goods['total'], array(':openid' => '', ':typeid' => $order['virtual'], ':uniacid' => $_W['uniacid'], ':merchid' => $order['merchid']));
+		$type = pdo_fetch('select fields from ' . tablename('ewei_shop_virtual_type') . ' where id=:id and uniacid=:uniacid and merchid = :merchid limit 1 ', array(':id' => $order['virtual'], ':uniacid' => $_W['uniacid'], ':merchid' => $order['merchid']));
+		$time = time();
+		pdo_update('ewei_shop_order', array('status' => '3', 'paytime' => $time, 'sendtime' => $time, 'finishtime' => $time), array('id' => $order['id']));
 		$credits = 0;
 		$gcredit = trim($g['credit']);
 		if (!(empty($gcredit))) 
