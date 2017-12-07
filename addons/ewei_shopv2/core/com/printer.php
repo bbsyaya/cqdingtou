@@ -324,7 +324,7 @@ class Printer_EweiShopV2ComModel extends ComModel
 	public function setSpacing($str, $length = 32) 
 	{
 		$str_old = $str;
-		$str = ((is_utf8($str) ? iconv('utf-8', 'gb2312', $str) : $str));
+		$str = ((is_utf8($str) ? iconv('utf-8', 'GBK//IGNORE', $str) : $str));
 		$num = strlen($str);
 		if ($length < $num) 
 		{
@@ -455,7 +455,7 @@ class Printer_EweiShopV2ComModel extends ComModel
 		{
 			case 1: $datas = array('[收银台名称]' => (isset($params['title']) ? $params['title'] : ''), '[收银金额]' => (isset($params['price']) ? $params['price'] : ''), '[收银时间]' => (isset($params['paytime']) ? $params['paytime'] : ''), '[支付类型]' => (isset($params['paytype']) ? $params['paytype'] : ''), '[订单编号]' => (isset($params['logno']) ? $params['logno'] : ''), '[随机减金额]' => (isset($params['randommoney']) ? $params['randommoney'] : 0), '[满立减金额]' => (isset($params['enough']) ? $params['enough'] : 0), '[余额抵扣金额]' => (isset($params['deduction']) ? $params['deduction'] : 0), '[操作员]' => (isset($params['operator']) ? $params['operator'] : '管理员'), '[商品名称]' => (isset($params['goodstitle']) ? $params['goodstitle'] : ''), '[商品价格]' => (isset($params['goodsprice']) ? $params['goodsprice'] : ''), '[商品数量]' => (isset($params['goodstotal']) ? $params['goodstotal'] : ''), '[单商品合计]' => (isset($params['goodstotalprice']) ? $params['goodstotalprice'] : ''));
 			break;
-			default: $datas = array('[商品名称]' => (isset($params['shorttitle']) ? $params['shorttitle'] : ''), '[商品价格]' => (isset($params['goodsprice']) ? $params['goodsprice'] : ''), '[商品数量]' => (isset($params['goodstotal']) ? $params['goodstotal'] : ''), '[单商品合计]' => (isset($params['goodstotalprice']) ? $params['goodstotalprice'] : ''), '[商品规格]' => (isset($params['optiontitle']) ? $params['optiontitle'] : ''), '[订单编号]' => (isset($params['ordersn']) ? $params['ordersn'] : ''), '[订单金额]' => (isset($params['price']) ? $params['price'] : ''), '[优惠金额]' => (isset($params['discount']) ? $params['discount'] : ''), '[收货人]' => (isset($params['realname']) ? $params['realname'] : ''), '[收货地址]' => (isset($params['address']) ? $params['address'] : ''), '[收货电话]' => (isset($params['mobile']) ? $params['mobile'] : ''), '[备注]' => (isset($params['remark']) ? $params['remark'] : ''), '[运费]' => (isset($params['dispatchprice']) ? $params['dispatchprice'] : ''), '[订单时间标题]' => (isset($params['order_time_title']) ? $params['order_time_title'] : ''), '[订单时间]' => (isset($params['order_time']) ? $params['order_time'] : ''), '[订单状态]' => (isset($params['order_status']) ? $params['order_status'] : ''), '[门店名称]' => (isset($params['storename']) ? $params['storename'] : ''), '[门店地址]' => (isset($params['storeaddress']) ? $params['storeaddress'] : ''), '[门店联系方式]' => (isset($params['storemobile']) ? $params['storemobile'] : ''), '[门店联系人]' => (isset($params['storerealname']) ? $params['storerealname'] : ''), '[付款地址]' => (isset($params['id']) ? $this->getUrl('order/pay', array('id' => $params['id'])) : ''), '[订单详情地址]' => (isset($params['id']) ? $this->getUrl('order/detail', array('id' => $params['id'])) : ''));
+			default: $datas = array('[商品名称]' => (isset($params['shorttitle']) ? $params['shorttitle'] : ''), '[商品价格]' => (isset($params['goodsprice']) ? $params['goodsprice'] : ''), '[商品数量]' => (isset($params['goodstotal']) ? $params['goodstotal'] : ''), '[单商品合计]' => (isset($params['goodstotalprice']) ? $params['goodstotalprice'] : ''), '[商品规格]' => (isset($params['optiontitle']) ? $params['optiontitle'] : ''), '[订单编号]' => (isset($params['ordersn']) ? $params['ordersn'] : ''), '[订单金额]' => (isset($params['price']) ? $params['price'] : ''), '[优惠金额]' => (isset($params['discount']) ? $params['discount'] : ''), '[收货人]' => (isset($params['realname']) ? $params['realname'] : ''), '[收货地址]' => (isset($params['address']) ? $params['address'] : ''), '[收货电话]' => (isset($params['mobile']) ? $params['mobile'] : ''), '[备注]' => (isset($params['remark']) ? $params['remark'] : ''), '[运费]' => (isset($params['dispatchprice']) ? $params['dispatchprice'] : ''), '[订单时间标题]' => (isset($params['order_time_title']) ? $params['order_time_title'] : ''), '[订单时间]' => (isset($params['order_time']) ? $params['order_time'] : ''), '[订单状态]' => (isset($params['order_status']) ? $params['order_status'] : ''), '[门店名称]' => (isset($params['storename']) ? $params['storename'] : ''), '[门店地址]' => (isset($params['storeaddress']) ? $params['storeaddress'] : ''), '[门店联系方式]' => (isset($params['storemobile']) ? $params['storemobile'] : ''), '[门店联系人]' => (isset($params['storerealname']) ? $params['storerealname'] : ''), '[付款地址]' => (isset($params['id']) ? $this->getUrl('order/pay', array('id' => $params['id'])) : ''), '[付款类型]' => (isset($params['paytype']) ? $params['paytype'] : ''), '[订单详情地址]' => (isset($params['id']) ? $this->getUrl('order/detail', array('id' => $params['id'])) : ''));
 			break;
 		}
 		$template = $this->replaceArray($datas, $template);
@@ -579,7 +579,7 @@ class Printer_EweiShopV2ComModel extends ComModel
 		if (!(empty($order['address']))) 
 		{
 			$address = iunserializer($order['address_send']);
-			if (!(is_array($address))) 
+			if ((is_array($address) && empty($address)) || !(is_array($address))) 
 			{
 				$address = iunserializer($order['address']);
 				if (!(is_array($address))) 
@@ -625,7 +625,22 @@ class Printer_EweiShopV2ComModel extends ComModel
 				$StorePrinterSet = $this->getStorePrinterSet($store);
 			}
 		}
-		$params = array('id' => $order['id'], 'goodsprice' => (double) $order['goodsprice'], 'dispatchprice' => (double) $order['dispatchprice'], 'discountprice' => (double) $order['discountprice'], 'deductprice' => (double) $order['deductprice'], 'deductcredit2' => (double) $order['deductcredit2'], 'deductenough' => (double) $order['deductenough'], 'merchdeductenough' => (double) $order['merchdeductenough'], 'couponprice' => (double) $order['couponprice'], 'isdiscountprice' => (double) $order['isdiscountprice'], 'changeprice' => (double) $order['changeprice'], 'changedispatchprice' => (double) $order['changedispatchprice'], 'price' => (double) $order['price'], 'data' => $goods, 'discount' => (double) $order['goodsprice'] - $order['price'], 'ordersn' => $order['ordersn'], 'remark' => $order['remark'], 'address' => $addressinfo, 'realname' => $buyerinfo_name, 'mobile' => $buyerinfo_mobile, 'expresscom' => $order['expresscom'], 'expresssn' => $order['expresssn'], 'createtime' => date('Y-m-d H:i', $order['createtime']), 'paytime' => date('Y-m-d H:i', $order['paytime']), 'sendtime' => date('Y-m-d H:i', $order['sendtime']), 'finishtime' => date('Y-m-d H:i', $order['finishtime']), 'storename' => (!(empty($store)) ? $store['storename'] : ''), 'storeaddress' => (!(empty($store)) ? $store['address'] : ''), 'storemobile' => (!(empty($store)) ? $store['mobile'] : ''), 'storerealname' => (!(empty($store)) ? $store['realname'] : ''), 'order_time_title' => $order_time_title, 'order_time' => $order_time, 'order_status' => $order_status);
+		switch ($order['paytype']) 
+		{
+			case 1: $paytype = '余额支付';
+			break;
+			case 11: $paytype = '后台付款';
+			break;
+			case 21: $paytype = '微信支付';
+			break;
+			case 22: $paytype = '支付宝支付';
+			break;
+			case 23: $paytype = '银联支付';
+			break;
+			case 3: $paytype = '货到付款';
+			break;
+		}
+		$params = array('id' => $order['id'], 'goodsprice' => (double) $order['goodsprice'], 'dispatchprice' => (double) $order['dispatchprice'], 'discountprice' => (double) $order['discountprice'], 'deductprice' => (double) $order['deductprice'], 'deductcredit2' => (double) $order['deductcredit2'], 'deductenough' => (double) $order['deductenough'], 'merchdeductenough' => (double) $order['merchdeductenough'], 'couponprice' => (double) $order['couponprice'], 'isdiscountprice' => (double) $order['isdiscountprice'], 'changeprice' => (double) $order['changeprice'], 'changedispatchprice' => (double) $order['changedispatchprice'], 'price' => (double) $order['price'], 'data' => $goods, 'discount' => (double) $order['goodsprice'] - $order['price'], 'ordersn' => $order['ordersn'], 'remark' => $order['remark'], 'address' => $addressinfo, 'realname' => $buyerinfo_name, 'mobile' => $buyerinfo_mobile, 'expresscom' => $order['expresscom'], 'expresssn' => $order['expresssn'], 'createtime' => date('Y-m-d H:i', $order['createtime']), 'paytime' => date('Y-m-d H:i', $order['paytime']), 'paytype' => $paytype, 'sendtime' => date('Y-m-d H:i', $order['sendtime']), 'finishtime' => date('Y-m-d H:i', $order['finishtime']), 'storename' => (!(empty($store)) ? $store['storename'] : ''), 'storeaddress' => (!(empty($store)) ? $store['address'] : ''), 'storemobile' => (!(empty($store)) ? $store['mobile'] : ''), 'storerealname' => (!(empty($store)) ? $store['realname'] : ''), 'order_time_title' => $order_time_title, 'order_time' => $order_time, 'order_status' => $order_status);
 		$PrinterSet = $this->getPrinterSet();
 		$res = array();
 		if (!(empty($PrinterSet['printer_merch'])) || (empty($PrinterSet['printer_merch']) && ($order['merchid'] == 0))) 

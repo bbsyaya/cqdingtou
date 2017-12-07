@@ -13,9 +13,16 @@ class Category_EweiShopV2Page extends ComWebPage
 	{
 		global $_W;
 		global $_GPC;
-		if (!(empty($_GPC['catname']))) 
+		if (!(empty($_W['ispost']))) 
 		{
 			ca('goods.virtual.category.edit');
+			if (!(empty($_GPC['catname']['new']))) 
+			{
+				foreach ($_GPC['catname']['new'] as $k => $v ) 
+				{
+					$_GPC['catname']['new_' . $k] = $v;
+				}
+			}
 			foreach ($_GPC['catname'] as $id => $catname ) 
 			{
 				$catname = trim($catname);
@@ -23,7 +30,7 @@ class Category_EweiShopV2Page extends ComWebPage
 				{
 					continue;
 				}
-				if ($id == 'new') 
+				if (strpos($id, 'new_') !== false) 
 				{
 					pdo_insert('ewei_shop_virtual_category', array('name' => $catname, 'uniacid' => $_W['uniacid'], 'merchid' => 0));
 					$insert_id = pdo_insertid();

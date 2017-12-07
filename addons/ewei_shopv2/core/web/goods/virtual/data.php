@@ -22,7 +22,7 @@ class Data_EweiShopV2Page extends ComWebPage
 		$kw = $_GPC['keyword'];
 		$page = ((empty($_GPC['page']) ? '' : $_GPC['page']));
 		$pindex = max(1, intval($page));
-		$psize = 100;
+		$psize = 60;
 		$type = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE id=:id and uniacid=:uniacid and merchid=0', array(':id' => $typeid, ':uniacid' => $_W['uniacid']));
 		$type['fields'] = iunserializer($type['fields']);
 		$condition = ' and d.typeid=:typeid and d.uniacid=:uniacid';
@@ -35,13 +35,25 @@ class Data_EweiShopV2Page extends ComWebPage
 		{
 			$condition .= ' and d.openid<>\'\'';
 		}
+		if ($_GPC['status'] == '1') 
+		{
+			$order = ' id DESC ';
+		}
+		else 
+		{
+			$order = ' id ASC ';
+		}
 		if (!(empty($_GPC['keyword']))) 
 		{
 			$_GPC['keyword'] = trim($_GPC['keyword']);
 			$condition .= ' and d.pvalue like :pvalue';
 			$params[':pvalue'] = '%' . $_GPC['keyword'] . '%';
 		}
-		$items = pdo_fetchall('SELECT d.*,o.carrier,m.avatar,m.nickname FROM ' . tablename('ewei_shop_virtual_data') . ' d ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid = d.openid and m.uniacid= d.uniacid and d.merchid=0' . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = d.orderid ' . ' where  1 ' . $condition . ' order by id desc limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
+		if (($_GPC['time']['start'] != '') && ($_GPC['time']['start'] != '')) 
+		{
+			$condition .= ' and d.createtime >= ' . strtotime($_GPC['time']['start']) . ' and d.createtime <= ' . strtotime($_GPC['time']['end']);
+		}
+		$items = pdo_fetchall('SELECT d.*,o.carrier,m.avatar,m.nickname,o.status FROM ' . tablename('ewei_shop_virtual_data') . ' d ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid = d.openid and m.uniacid= d.uniacid and d.merchid=0' . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = d.orderid ' . ' where  1 ' . $condition . ' order by ' . $order . ' limit ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		foreach ($items as &$row ) 
 		{
 			$carrier = iunserializer($row['carrier']);
@@ -102,7 +114,7 @@ class Data_EweiShopV2Page extends ComWebPage
 						{
 							$values[$key] = $_GPC['tp_value_' . $key][$index];
 						}
-						$insert = array('typeid' => $_GPC['typeid'], 'pvalue' => $values['key'], 'fields' => iserializer($values), 'uniacid' => $_W['uniacid']);
+						$insert = array('typeid' => $_GPC['typeid'], 'pvalue' => $values['key'], 'fields' => iserializer($values), 'uniacid' => $_W['uniacid'], 'createtime' => TIMESTAMP);
 						$datas = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE id=:id and typeid=:typeid and uniacid=:uniacid and merchid=0', array(':id' => $id, ':typeid' => $typeid, ':uniacid' => $_W['uniacid']));
 						if (empty($datas)) 
 						{
@@ -181,17 +193,33 @@ class Data_EweiShopV2Page extends ComWebPage
 			$this->message('未找到虚拟物品模板!', '', 'error');
 		}
 		$type['fields'] = iunserializer($type['fields']);
-		$fieldstr = '';
-		foreach ($type['fields'] as $key => $name ) 
-		{
-			$fieldstr .= $name . '(' . $key . ')/';
-		}
-		$condition = ' and d.typeid=:typeid and d.uniacid=:uniacid and d.openid<>\'\'';
+		$condition = ' and d.typeid=:typeid and d.uniacid=:uniacid';
 		$params = array(':typeid' => $typeid, ':uniacid' => $_W['uniacid']);
+		if (($_GPC['time'] != '导入时间') && !(empty($_GPC['time']))) 
+		{
+			$time = explode('至', $_GPC['time']);
+			$condition .= ' and d.createtime >= :start and d.createtime <= :end';
+			$params[':start'] = 1504249376;
+			$params[':end'] = strtotime($time[1]);
+		}
+		if ($_GPC['status'] == '0') 
+		{
+			$condition .= ' and d.openid = \'\' ';
+		}
+		else if ($_GPC['status'] == '1') 
+		{
+			$condition .= ' and d.openid<>\'\' ';
+		}
+		if (!(empty($_GPC['keyword']))) 
+		{
+			$_GPC['keyword'] = trim($_GPC['keyword']);
+			$condition .= ' and d.pvalue like :keyword ';
+			$params[':keyword'] = '%' . $_GPC['keyword'] . '%';
+		}
 		$list = pdo_fetchall('SELECT d.*,o.carrier,m.avatar,m.nickname FROM ' . tablename('ewei_shop_virtual_data') . ' d ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid = d.openid and m.uniacid = d.uniacid and d.merchid=0' . ' left join ' . tablename('ewei_shop_order') . ' o on o.id = d.orderid ' . ' where  1 ' . $condition . ' order by usetime desc', $params);
 		if (empty($list)) 
 		{
-			$this->message('没有已使用的数据!', '', 'info');
+			$this->message('没有可导出的数据!', '', 'info');
 		}
 		foreach ($list as &$row ) 
 		{
@@ -199,20 +227,37 @@ class Data_EweiShopV2Page extends ComWebPage
 			$valuestr = '';
 			foreach ($type['fields'] as $k => $v ) 
 			{
-				$valuestr .= $datas[$k] . '/';
+				$row[$k] = $datas[$k] . ' ';
 			}
-			$row['values'] = $valuestr;
 			$carrier = iunserializer($row['carrier']);
 			if (is_array($carrier)) 
 			{
 				$row['realname'] = $carrier['carrier_realname'];
 				$row['mobile'] = $carrier['carrier_mobile'];
 			}
-			$row['usetime'] = date('Y-m-d H:i', $row['usetime']);
+			if (empty($row['usetime']) || ($row['usetime'] == 0)) 
+			{
+				$row['usetime'] = '';
+			}
+			else 
+			{
+				$row['usetime'] = date('Y-m-d H:i', $row['usetime']);
+			}
 		}
 		unset($row);
-		$columns = array( array('title' => $fieldstr, 'field' => 'values', 'width' => 24), array('title' => '粉丝昵称', 'field' => 'nickname', 'width' => 12), array('title' => '姓名', 'field' => 'realname', 'width' => 12), array('title' => '手机号', 'field' => 'mobile', 'width' => 12), array('title' => '使用时间', 'field' => 'usetime', 'width' => 12), array('title' => '订单号', 'field' => 'ordersn', 'width' => 24), array('title' => '购买价格', 'field' => 'price', 'width' => 12) );
-		m('excel')->export($list, array('title' => $type['title'] . '已使用数据', 'columns' => $columns));
+		$columns = array();
+		foreach ($type['fields'] as $key => $name ) 
+		{
+			$columns[] = array('title' => $name . '(' . $key . ')', 'field' => $key, 'width' => 24);
+		}
+		$columns[] = array('title' => '粉丝昵称', 'field' => 'nickname', 'width' => 12);
+		$columns[] = array('title' => '姓名', 'field' => 'realname', 'width' => 12);
+		$columns[] = array('title' => '手机号', 'field' => 'mobile', 'width' => 12);
+		$columns[] = array('title' => '使用时间', 'field' => 'usetime', 'width' => 12);
+		$columns[] = array('title' => '订单号', 'field' => 'ordersn', 'width' => 24);
+		$columns[] = array('title' => '购买价格', 'field' => 'price', 'width' => 12);
+		$columns[] = array('title' => '状态:此列值为del时表示删除(status)', 'field' => 'status', 'width' => 34);
+		m('excel')->export($list, array('title' => $type['title'] . '数据', 'columns' => $columns));
 		exit();
 	}
 	public function temp() 
@@ -231,6 +276,7 @@ class Data_EweiShopV2Page extends ComWebPage
 		{
 			$columns[] = array('title' => $name . '(' . $key . ')', 'field' => '', 'width' => 24);
 		}
+		$columns[] = array('title' => '状态:此列值为del时表示删除' . '(status)', 'field' => '', 'width' => 34);
 		m('excel')->temp('数据模板', $columns);
 	}
 	public function import() 
@@ -244,51 +290,130 @@ class Data_EweiShopV2Page extends ComWebPage
 			$this->message('虚拟物品模板不存在', referer(), 'error');
 		}
 		$rows = m('excel')->import('excelfile');
+		var_dump($rows);
 		$item['fields'] = iunserializer($item['fields']);
-		$rows = $this->filterEmpty($rows);
 		if (empty($rows)) 
 		{
 			$this->message('导入数据为空', referer(), 'error');
 		}
-		foreach ($rows as $rownum => $col ) 
+		$new_name = array();
+		foreach ($rows[0] as $key => $value ) 
 		{
-			$data = array( 'typeid' => $id, 'pvalue' => $col[0], 'fields' => array(), 'uniacid' => $_W['uniacid'] );
-			$index = 0;
-			foreach ($item['fields'] as $k => $f ) 
+			$new_name[$key] = $this->getNeedBetween($value, '(', ')');
+		}
+		$new_names = array_slice($new_name, 0, count($item['fields']));
+		$new_names[count($new_names)] = $new_name[count($new_name) - 1];
+		$newRow = array();
+		foreach ($rows as $rk => $rv ) 
+		{
+			$rvs = array_slice($rv, 0, count($item['fields']));
+			$rvs[count($rvs)] = $rv[count($rv) - 1];
+			$newRow[$rk] = array_combine($new_names, $rvs);
+		}
+		unset($new_names[count($new_names) - 1]);
+		
+		$newkey = implode('.', $new_names);
+		$authkey = implode('.', array_keys($item['fields']));
+		var_dump($newkey);
+		echo '------';
+		var_dump($authkey);
+		exit();
+		if ($newkey != $authkey) 
+		{
+			$this->message('键名key不对应', referer(), 'error');
+		}
+		unset($newRow[0]);
+		foreach ($newRow as $rownum => $col ) 
+		{
+			$nkeys = array_keys($col);
+			if (2 < count($nkeys)) 
 			{
-				$data['fields'][$k] = $col[$index];
-				++$index;
+				if ($col[$nkeys[1]] == '') 
+				{
+					continue;
+				}
 			}
-			$data['fields'] = iserializer($data['fields']);
+			$data = array( 'typeid' => $id, 'pvalue' => $col['key'], 'fields' => array(), 'uniacid' => $_W['uniacid'], 'status' => $col['status'] );
+			unset($col['status']);
+			$data['fields'] = iserializer($col);
 			$datas[] = $data;
 		}
+		$noinsert = '';
+		$status = array();
+		$null = '';
 		foreach ($datas as $d ) 
 		{
-			$olddata = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE pvalue=:pvalue and typeid=:typeid and uniacid=:uniacid and merchid=0', array(':pvalue' => $d['pvalue'], ':typeid' => $_GPC['typeid'], ':uniacid' => $_W['uniacid']));
-			if (empty($olddata)) 
+			if ($d['pvalue'] != '') 
 			{
-				pdo_insert('ewei_shop_virtual_data', $d);
-				pdo_update('ewei_shop_virtual_type', 'alldata=alldata+1', array('id' => $item['id']));
+				if (!(empty($d['status'])) && ($d['status'] == 'del')) 
+				{
+					$olddata = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE pvalue=:pvalue and typeid=:typeid and uniacid=:uniacid and merchid=0', array(':pvalue' => $d['pvalue'], ':typeid' => $_GPC['typeid'], ':uniacid' => $_W['uniacid']));
+					$d['createtime'] = TIMESTAMP;
+					if (!(empty($olddata))) 
+					{
+						if (empty($olddata['openid'])) 
+						{
+							pdo_delete('ewei_shop_virtual_data', array('id' => $olddata['id']));
+							pdo_update('ewei_shop_virtual_type', 'alldata=alldata-1', array('id' => $item['id']));
+						}
+						else 
+						{
+							$noinsert .= $d['pvalue'] . ',';
+						}
+					}
+					else 
+					{
+						$null .= 1;
+					}
+					$status[] = 1;
+				}
+				else 
+				{
+					unset($d['status']);
+					$olddata = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_virtual_data') . ' WHERE pvalue=:pvalue and typeid=:typeid and uniacid=:uniacid and merchid=0', array(':pvalue' => $d['pvalue'], ':typeid' => $_GPC['typeid'], ':uniacid' => $_W['uniacid']));
+					$d['createtime'] = TIMESTAMP;
+					if (empty($olddata)) 
+					{
+						pdo_insert('ewei_shop_virtual_data', $d);
+						pdo_update('ewei_shop_virtual_type', 'alldata=alldata+1', array('id' => $item['id']));
+					}
+					else if (empty($olddata['openid'])) 
+					{
+						pdo_update('ewei_shop_virtual_data', $d, array('id' => $olddata['id']));
+					}
+					else 
+					{
+						$noinsert .= $d['pvalue'] . ',';
+					}
+					$status[] = 2;
+				}
 			}
-			else if (empty($olddata['openid'])) 
+		}
+		if ($status[0] == 1) 
+		{
+			com('virtual')->updateStock($id);
+			if (!(empty($noinsert))) 
 			{
-				pdo_update('ewei_shop_virtual_data', $d, array('id' => $olddata['id']));
+				$tip = '<br>未删除成功的数据：主键=' . $noinsert . '<br>失败原因：已经使用无法删除';
+				$this->message('部分数据删除成功！' . $tip, '', 'warning');
 			}
 			else 
 			{
-				$noinsert .= $d['pvalue'] . ',';
+				$this->message('删除成功！', webUrl('goods/virtual/data', array('typeid' => $_GPC['typeid'])));
 			}
-			$noinsert = '';
 		}
-		com('virtual')->updateStock($id);
-		if (!(empty($noinsert))) 
+		else if ($status[0] == 2) 
 		{
-			$tip = '<br>未保存成功的数据：主键=' . $noinsert . '<br>失败原因：已经使用无法更改';
-			$this->message('部分数据保存成功！' . $tip, '', 'warning');
-		}
-		else 
-		{
-			$this->message('导入成功！', webUrl('goods/virtual/data', array('typeid' => $_GPC['typeid'])));
+			com('virtual')->updateStock($id);
+			if (!(empty($noinsert))) 
+			{
+				$tip = '<br>未保存成功的数据：主键=' . $noinsert . '<br>失败原因：已经使用无法更改';
+				$this->message('部分数据保存成功！' . $tip, '', 'warning');
+			}
+			else 
+			{
+				$this->message('导入成功！', webUrl('goods/virtual/data', array('typeid' => $_GPC['typeid'])));
+			}
 		}
 	}
 	public function tpl() 
@@ -325,6 +450,19 @@ class Data_EweiShopV2Page extends ComWebPage
 			}
 		}
 		return $newArr;
+	}
+	public function getNeedBetween($kw1, $mark1, $mark2) 
+	{
+		$kw = $kw1;
+		$kw = '123' . $kw . '123';
+		$st = stripos($kw, $mark1);
+		$ed = stripos($kw, $mark2);
+		if (($st == false) || ($ed == false) || ($ed <= $st)) 
+		{
+			return 0;
+		}
+		$kw = substr($kw, $st + 1, $ed - $st - 1);
+		return $kw;
 	}
 }
 ?>

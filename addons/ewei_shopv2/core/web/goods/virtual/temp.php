@@ -17,8 +17,8 @@ class Temp_EweiShopV2Page extends ComWebPage
 		$pindex = max(1, intval($page));
 		$psize = 12;
 		$kw = ((empty($_GPC['keyword']) ? '' : $_GPC['keyword']));
-		$items = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE uniacid=:uniacid and merchid=0 and title like :name order by id desc limit ' . (($pindex - 1) * $psize) . ',' . $psize, array(':name' => '%' . $kw . '%', ':uniacid' => $_W['uniacid']));
-		$total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE uniacid=:uniacid and merchid=0 and title like :name order by id desc ', array(':uniacid' => $_W['uniacid'], ':name' => '%' . $kw . '%'));
+		$items = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE uniacid=:uniacid and merchid=0 and title like :name and recycled = 0 order by id desc limit ' . (($pindex - 1) * $psize) . ',' . $psize, array(':name' => '%' . $kw . '%', ':uniacid' => $_W['uniacid']));
+		$total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE uniacid=:uniacid and merchid=0 and title like :name and recycled = 0 order by id desc ', array(':uniacid' => $_W['uniacid'], ':name' => '%' . $kw . '%'));
 		$pager = pagination2($total, $pindex, $psize);
 		$category = pdo_fetchall('select * from ' . tablename('ewei_shop_virtual_category') . ' where uniacid=:uniacid and merchid=0 order by id desc', array(':uniacid' => $_W['uniacid']), 'id');
 		include $this->template();
@@ -41,7 +41,7 @@ class Temp_EweiShopV2Page extends ComWebPage
 		{
 			$item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE id=:id and uniacid=:uniacid and merchid=0', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 			$item['fields'] = iunserializer($item['fields']);
-			$datacount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_virtual_data') . ' where typeid=:typeid and uniacid=:uniacid and merchid=0 and openid=\'\' limit 1', array(':typeid' => $id, ':uniacid' => $_W['uniacid']));
+			$datacount = pdo_fetchcolumn('select count(*) from ' . tablename('ewei_shop_virtual_data') . ' where typeid=:typeid and uniacid=:uniacid and merchid=0 limit 1', array(':typeid' => $id, ':uniacid' => $_W['uniacid']));
 		}
 		if ($_W['ispost']) 
 		{
@@ -80,7 +80,7 @@ class Temp_EweiShopV2Page extends ComWebPage
 		include $this->template('goods/virtual/temp/tpl');
 		exit();
 	}
-	public function delete() 
+	public function recycled() 
 	{
 		global $_W;
 		global $_GPC;
@@ -92,9 +92,8 @@ class Temp_EweiShopV2Page extends ComWebPage
 		$types = pdo_fetchall('SELECT * FROM ' . tablename('ewei_shop_virtual_type') . ' WHERE id in( ' . $id . ' ) and merchid=0 AND uniacid=' . $_W['uniacid']);
 		foreach ($types as $type ) 
 		{
-			pdo_delete('ewei_shop_virtual_type', array('id' => $type['id']));
-			pdo_delete('ewei_shop_virtual_data', array('typeid' => $type['id']));
-			plog('virtual.temp.delete', '删除模板 ID: ' . $type['id']);
+			pdo_update('ewei_shop_virtual_type', array('recycled' => 1), array('id' => $type['id']));
+			plog('virtual.temp.recycled', '模板放入回收站 ID: ' . $type['id']);
 		}
 		show_json(1, array('url' => webUrl('goods/virtual')));
 	}

@@ -5,6 +5,10 @@ if (!(defined('IN_IA')))
 }
 class Verifyorder_EweiShopV2Page extends ComWebPage 
 {
+	public function __construct($_com = 'verify') 
+	{
+		parent::__construct($_com);
+	}
 	protected function orderData() 
 	{
 		global $_W;
@@ -14,6 +18,11 @@ class Verifyorder_EweiShopV2Page extends ComWebPage
 		$condition = ' o.uniacid = :uniacid and o.ismr=0 and o.deleted=0 and o.isparent=0';
 		$uniacid = $_W['uniacid'];
 		$paras = array(':uniacid' => $uniacid);
+		if (empty($starttime) || empty($endtime)) 
+		{
+			$starttime = strtotime('-1 month');
+			$endtime = time();
+		}
 		$searchtime = trim($_GPC['searchtime']);
 		if (!(empty($searchtime)) && is_array($_GPC['time']) && in_array($searchtime, array('create', 'pay', 'send', 'finish'))) 
 		{
@@ -31,7 +40,7 @@ class Verifyorder_EweiShopV2Page extends ComWebPage
 			}
 			else if ($_GPC['searchtype'] == 'mall') 
 			{
-				$condition .= ' AND ( o.storeid =0  and   o.isnewstore=0 ) ';
+				$condition .= ' AND ((o.storeid =0  and   o.isnewstore=0 and  o.isverify=1)||(o.storeid =0  and   o.isnewstore=0 and addressid=0)) ';
 			}
 			else if ($_GPC['searchtype'] == 'trade') 
 			{

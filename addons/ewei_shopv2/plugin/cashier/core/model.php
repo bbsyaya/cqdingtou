@@ -1,5 +1,4 @@
 <?php
-
 function sort_cashier($a, $b)
 {
 	$enough1 = floatval($a['enough']);
@@ -531,6 +530,58 @@ class CashierModel extends PluginModel
      * @param $log
      * @return bool|int
      */
+	 
+	public function refund($id) 
+	{
+		global $_W;
+		$id = (int) $id;
+		$pay_log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_cashier_pay_log') . ' WHERE uniacid=:uniacid AND id=:id', array(':uniacid' => $_W['uniacid'], ':id' => $id));
+		if ($pay_log['status'] != 1) 
+		{
+			return error(-1, '未支付或者已退款!');
+		}
+		$out_trade_no = 'CST' . date('YmdHis') . mt_rand(1000, 9999);
+		$res = array();
+		switch ($pay_log['paytype']) 
+		{
+			case '0': $res = $this->refundWechat($pay_log['openid'], $pay_log['logno'], $out_trade_no, $pay_log['money'] * 100, $pay_log['money'] * 100, false);
+			break;
+			case '1': $res = m('finance')->newAlipayRefund(array('out_trade_no' => $pay_log['logno'], 'refund_amount' => $pay_log['money'], 'refund_reason' => $_W['cashieruser']['title'] . ' 收银台退款! 退款订单号: ' . $out_trade_no), json_decode($_W['cashieruser']['alipay'], true));
+			break;
+			case '2': m('member')->setCredit($pay_log['openid'], 'credit2', $pay_log['money'] + $pay_log['deduction'], $_W['cashieruser']['title'] . ' 收银台退款! 退款订单号' . $out_trade_no);
+			break;
+			case '3': $res = true;
+			break;
+			case '101': $res = m('finance')->refund($pay_log['openid'], $pay_log['logno'], $out_trade_no, $pay_log['money'] * 100, $pay_log['money'] * 100, false);
+			break;
+			case '102': $res = m('finance')->refund($pay_log['openid'], $pay_log['logno'], $out_trade_no, $pay_log['money'] * 100, $pay_log['money'] * 100, false);
+			break;
+		}
+		if (is_error($res)) 
+		{
+			return $res;
+		}
+		$refunduser = 0;
+		if (isset($_W['cashieruser']['operator'])) 
+		{
+			$refunduser = $_W['cashieruser']['operator']['id'];
+		}
+		pdo_update('ewei_shop_cashier_pay_log', array('status' => -1, 'refundsn' => $out_trade_no, 'refunduser' => $refunduser), array('uniacid' => $_W['uniacid'], 'id' => $id));
+		if (com('coupon') && !(empty($pay_log['usecoupon']))) 
+		{
+			com('coupon')->returnConsumeCoupon($pay_log['usecoupon']);
+		}
+		if (!(empty($pay_log['present_credit1']))) 
+		{
+			m('member')->setCredit($pay_log['openid'], 'credit1', -$pay_log['present_credit1'], $_W['cashieruser']['title'] . ' 收银台退款收回赠送的积分! 退款订单号' . $out_trade_no);
+		}
+		if (!(empty($pay_log['orderid']))) 
+		{
+			pdo_update('ewei_shop_order', array('status' => -1), array('uniacid' => $_W['uniacid'], 'id' => $pay_log['orderid']));
+		}
+		return $res;
+	}
+	
 	public function updateOrder($log)
 	{
 		global $_W;

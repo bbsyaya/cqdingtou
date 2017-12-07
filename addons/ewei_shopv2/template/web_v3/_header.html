@@ -43,8 +43,10 @@
 
     <ul>
         {if $system['right_menu']['system']}
-            <li data-toggle="tooltip" data-placement="bottom" title="系统管理">
-                <a href="{php echo webUrl('system')}"><i class="icow icow-syssetL"></i></a>
+            <li data-toggle="tooltip" data-placement="bottom" title="">
+                <a href="{php echo webUrl('system')}">
+                    <!--<i class="icow icow-syssetL"></i>-->
+                    系统管理</a>
             </li>
         {/if}
         <li class="dropdown {if $system['merch']}auto{/if} ellipsis">
@@ -113,7 +115,6 @@
         <p class="wb-nav-fold"><i class="icow icow-zhedie"></i></p>
         <ul>
             {loop $sysmenus['menu'] $sysmenu}
-			
                 <li {if $sysmenu['active']}class="active"{/if}>
                     <a href="{php echo empty($sysmenu['index'])? webUrl($sysmenu['route']): webUrl($sysmenu['route']. '.'. $sysmenu['index'])}">
                         {if $sysmenu['route']=='plugins'}

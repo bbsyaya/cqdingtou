@@ -64,10 +64,18 @@ class System_EweiShopV2Model
 						if (!p($key)) {
 							continue;
 						}
+
+						if (!com('perm')->check_plugin($key)) {
+							continue;
+						}
 					}
 					else {
 						if ($val['plugincom'] == 2) {
 							if (!com($key)) {
+								continue;
+							}
+
+							if (!com('perm')->check_com($key)) {
 								continue;
 							}
 						}
@@ -156,7 +164,7 @@ class System_EweiShopV2Model
 						}
 						else {
 							if (!empty($child['iscom'])) {
-								if (!com('sms') || !com('perm')->check_com($child['iscom'])) {
+								if (!com($child['iscom']) || !com('perm')->check_com($child['iscom'])) {
 									continue;
 								}
 
@@ -196,6 +204,10 @@ class System_EweiShopV2Model
 
 							if (!empty($child['perm'])) {
 								$return_menu_child['perm'] = $child['perm'];
+							}
+
+							if (!empty($child['permmust'])) {
+								$return_menu_child['permmust'] = $child['permmust'];
 							}
 
 							if ($routes[0] == 'system') {
@@ -238,6 +250,10 @@ class System_EweiShopV2Model
 
 							if ($full) {
 								$return_menu_child['url'] = webUrl($return_menu_child['route'], !empty($return_menu_child['param']) && is_array($return_menu_child['param']) ? $return_menu_child['param'] : array());
+							}
+
+							if (!empty($return_menu_child['permmust']) && !$this->cv($return_menu_child['permmust'])) {
+								continue;
 							}
 
 							if (!$this->cv($return_menu_child['route'])) {
@@ -328,6 +344,10 @@ class System_EweiShopV2Model
 									$return_submenu_three['perm'] = $three['perm'];
 								}
 
+								if (!empty($three['permmust'])) {
+									$return_submenu_three['permmust'] = $three['permmust'];
+								}
+
 								if ($routes[0] == 'system') {
 									$return_submenu_three['route'] = 'system.' . $return_submenu_three['route'];
 								}
@@ -383,6 +403,10 @@ class System_EweiShopV2Model
 
 								if ($full) {
 									$return_submenu_three['url'] = webUrl($return_submenu_three['route'], !empty($return_submenu_three['param']) && is_array($return_submenu_three['param']) ? $return_submenu_three['param'] : array());
+								}
+
+								if (!empty($return_submenu_three['permmust']) && !$this->cv($return_submenu_three['permmust'])) {
+									continue;
 								}
 
 								if (!$this->cv($return_submenu_three['route'])) {
@@ -580,7 +604,7 @@ class System_EweiShopV2Model
 				}
 				else {
 					if (!empty($child['iscom'])) {
-						if (!com('sms') || !com('perm')->check_com($child['iscom'])) {
+						if (!com($child['iscom']) || !com('perm')->check_com($child['iscom'])) {
 							continue;
 						}
 
@@ -707,6 +731,7 @@ class System_EweiShopV2Model
 					array(
 						'title' => '虚拟卡密',
 						'route' => 'virtual',
+						'iscom' => 'virtual',
 						'items' => array(
 							array('title' => '虚拟卡密', 'route' => 'temp', 'extend' => 'goods.virtual.data'),
 							array('title' => '卡密分类', 'route' => 'category'),
@@ -727,6 +752,7 @@ class System_EweiShopV2Model
 					array(
 						'title'   => '微信会员卡',
 						'route'   => 'card',
+						'iscom'   => 'card',
 						'extends' => array('member.card.post', 'member.card.activationset')
 						)
 					)
@@ -741,7 +767,7 @@ class System_EweiShopV2Model
 					array('title' => '待付款', 'route' => 'list.status0', 'desc' => '待付款订单管理'),
 					array('title' => '已完成', 'route' => 'list.status3', 'desc' => '已完成订单管理'),
 					array('title' => '已关闭', 'route' => 'list.status_1', 'desc' => '已关闭订单管理'),
-					array('title' => '全部订单', 'route' => 'list', 'desc' => '全部订单列表'),
+					array('title' => '全部订单', 'route' => 'list', 'desc' => '全部订单列表', 'permmust' => 'order.list.main'),
 					array(
 						'title' => '维权',
 						'route' => 'list',
@@ -850,10 +876,10 @@ class System_EweiShopV2Model
 							)
 						),
 					array(
-						'title'     => '优惠券',
-						'route'     => 'coupon',
-						'plugincom' => 2,
-						'items'     => array(
+						'title' => '优惠券',
+						'route' => 'coupon',
+						'iscom' => 'coupon',
+						'items' => array(
 							array('title' => '全部优惠券'),
 							array('title' => '手动发送', 'route' => 'sendcoupon', 'desc' => '手动发送优惠券'),
 							array(
@@ -867,9 +893,9 @@ class System_EweiShopV2Model
 							)
 						),
 					array(
-						'title'     => '微信卡券',
-						'plugincom' => 2,
-						'items'     => array(
+						'title' => '微信卡券',
+						'iscom' => 'wxcard',
+						'items' => array(
 							array('title' => '卡券管理', 'route' => 'wxcard')
 							)
 						),
@@ -985,6 +1011,7 @@ class System_EweiShopV2Model
 					array(
 						'title' => '小票打印机',
 						'route' => 'printer',
+						'iscom' => 'printer',
 						'items' => array(
 							array(
 								'title'   => '打印机管理',
@@ -1008,7 +1035,7 @@ class System_EweiShopV2Model
 					array(
 						'title' => '工具',
 						'items' => array(
-							array('title' => '七牛存储', 'route' => 'qiniu'),
+							array('title' => '七牛存储', 'route' => 'qiniu', 'iscom' => 'qiniu'),
 							array('title' => '商品价格修复', 'route' => 'goodsprice'),
 							array('title' => '快捷导航管理', 'route' => 'funbar')
 							)
@@ -1050,6 +1077,8 @@ class System_EweiShopV2Model
 			array('title' => '应用信息'),
 			array('title' => '组件信息', 'route' => 'coms'),
 			array('title' => '公众号权限', 'route' => 'perm'),
+			array('title' => '站点小程序', 'route' => 'wxapp', 'route' => 'wxapp', 'isplugin' => 'app'),
+			array('title' => '商家管理程序', 'route' => 'release1', 'route' => 'release1', 'isplugin' => 'app'),
 			//array('title' => '应用中心', 'route' => 'apps'),
 			array(
 				'title'    => '应用授权管理',
@@ -1087,7 +1116,6 @@ class System_EweiShopV2Model
 		'items'    => array(
 			array('title' => '数据清理'),
 			array('title' => '数据转移', 'route' => 'transfer'),
-			array('title' => '数据下载', 'route' => 'backup'),
 			array(
 				'title' => '计划任务',
 				'items' => array(
