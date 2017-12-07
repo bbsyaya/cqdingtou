@@ -697,6 +697,27 @@
     transform: translate(-50%, -50%)
 }
 
+.material-content .material-body .del {
+    position: absolute;
+    width: 34px;
+    line-height: 34px;
+    text-align: center;
+    background-color: #428bca;
+    cursor: pointer;
+    bottom: 0;
+    right: 0;
+    z-index: 6;
+    display: none
+}
+
+.material-content .material-body .item:hover .del {
+    display: block
+}
+
+.material-content .material-body .del .wi, .material-content .material-body .del .ext-apply-list .ext-apply-item.apply-show:before, .ext-apply-list .material-content .material-body .del .ext-apply-item.apply-show:before, .material-content .material-body .del .cut-list .item.apply-show:before, .cut-list .material-content .material-body .del .item.apply-show:before {
+    color: #fff
+}
+
 .material-content .material-pager {
     padding: 20px;
     height: 79px
@@ -774,6 +795,10 @@ select.we7-select[multiple=multiple], select[multiple=multiple] {
 }
 .wi-right:before {
     content: "\e955"
+}
+
+.wi-delete2:before {
+    content: "\e913"
 }
 
 .modal.uploader-modal {

@@ -1,4 +1,13 @@
 <div class="form-group">
+	<label class="col-sm-2 control-label">开启商品送积分</label>
+	<div class="col-sm-9 col-xs-12">
+		<label class="checkbox-inline"><input type="radio" name="isgoodspoint" value="0" {if empty($credit1['isgoodspoint']) || $credit1['isgoodspoint'] == 0}checked="true"{/if}   /> 否</label>
+		<label class="checkbox-inline"><input type="radio" name="isgoodspoint" value="1" {if !empty($credit1['isgoodspoint']) && $credit1['isgoodspoint'] == 1}checked="true"{/if}   /> 是</label>
+		<span class="help-block">开启后会以商品赠送积分为准</span>
+	</div>
+</div>
+
+<div class="form-group">
 	<label class="col-sm-2 control-label">购物送积分</label>
 	<div class="col-sm-9">
 		<div class='recharge-items'>

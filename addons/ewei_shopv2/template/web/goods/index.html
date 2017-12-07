@@ -1,4 +1,17 @@
 {template '_header'}
+<style>
+    .newgoodsflag{
+        width: 18px;height: 16px;
+        background-color: #ff0000;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        bottom: 40px;
+        left: 22px;
+        z-index:99;
+        font-size: 12px;
+    }
+</style>
 <div class="page-heading"> 
     <span class='pull-right'>
         {ifp 'goods.add'}
@@ -99,7 +112,11 @@
                 {/if}
             </td>
             <td>
-                <img src="{php echo tomedia($item['thumb'])}" style="width:40px;height:40px;padding:1px;border:1px solid #ccc;"  />
+                <img src="{php echo tomedia($item['thumb'])}" class="imgg" style="width:40px;height:40px;padding:1px;border:1px solid #ccc;"  />
+                {if !empty($item['newgoods'])}
+                <!--新-->
+                <div class="newgoodsflag">新</div>
+                {/if}
             </td>
             <td class='full' style="overflow-x: hidden">
                 {if !empty($category[$item['pcate']])}

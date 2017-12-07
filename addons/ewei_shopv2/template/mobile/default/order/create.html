@@ -81,13 +81,12 @@
                     </div>
                     <div class="fui-list-inner">
                         <div class="no-address"><i class="icon icon-icon02"></i> 请选择自提门店</div>
-                        <div class="title has-address" style="display: none"><span class='storename'>请选择itinerary门店</span></div>
-                        <!--<div class="subtitle">-->
-                            <!--<span style="overflow: hidden;    display: inline-block;">收货人：</span>-->
-                            <!--<span class='realname'>{$carrier_list[0]['realname']}</span>-->
-                            <!--<span class='mobile' id="carrierInfo_mobile">{$carrier_list[0]['mobile']}</span>-->
-                        <!--</div>-->
-                        <div class="text" style="display: none"><span class='address'><span class="pickstore">[门店自提]</span>{$carrier_list[0]['address']}</span></div>
+                        <div class="subtitle" style="display: none">
+                            <span style="overflow: hidden;display: inline-block;">联系人：</span>
+                            <span class='realname'></span>
+                            <span class='mobile' id="carrierInfo_mobile"></span>
+                        </div>
+                        <div class="text" style="display: none"><span class='address'>地址：</span></div>
                     </div>
                     <div class="fui-list-angle">
                         <div class="angle"></div>
@@ -271,7 +270,7 @@
 {/if}
 {if !empty($order_formInfo)}
 {template 'diyform/formfields'}
-{else}
+{/if}
 <div class="fui-cell-group">
     <div class="fui-cell fui-cell-textarea">
         <div class="fui-cell-label" style="margin:.15rem 0 0 0">
@@ -282,7 +281,7 @@
         </div>
     </div>
 </div>
-{/if}
+
 {if empty($exchangeOrder) && empty($taskgoodsprice) && empty($packageid) && empty($if_bargain['bargain'])}
 <div class="fui-cell-group">
 
@@ -306,7 +305,8 @@
 {/if}
 {if $deductcredit2>0}
 <div class="fui-cell">
-    <div class="fui-cell-label" style="width: auto;">{$_W['shopset']['trade']['moneytext']}可抵扣 <span id='deductcredit2_money' class="text-danger">{php echo number_format($deductcredit2,2)}</span>元</div>
+    <div class="fui-cell-label" style="width: auto;">{$_W['shopset']['trade']['moneytext']}可抵扣 <span id='deductcredit2_money' class="text-danger">{php echo number_format($deductcredit2,2)}</span>元
+        {if $include_dispath}<span id="include_dispath">（含运费）</span>{/if}</div>
     <div class="fui-cell-info"></div>
     <div class="fui-cell-remark noremark info"><input id="deductcredit2" data-credit2="{$deductcredit2}" type="checkbox"  class="fui-switch fui-switch-small fui-switch-danger pull-right"></div>
 </div>

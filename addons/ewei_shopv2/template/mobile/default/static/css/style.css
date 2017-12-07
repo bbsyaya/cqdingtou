@@ -11,7 +11,7 @@ a {
 }
 
 .text-orange {
-    color: #ff741d;
+    color: #ff8000;
 }
 
 .text-blue {
@@ -244,7 +244,8 @@ a {
     bottom: 0;
     z-index: 1;
     background-repeat: no-repeat;
-    background-position: bottom right;
+    background-position: 50% 20%;
+    background-size: 70% ;
 }
 
 .fui-swipe .salez {
@@ -335,10 +336,6 @@ a {
     float: none;
 }
 
-.fui-images .image .image-remove {
-    top: -.2rem;
-    right: -.3rem;
-}
 
 /* 商品列表页*/
 .page-goods-list .fui-header {
@@ -644,7 +641,8 @@ a {
 }
 
 .page-goods-detail .fui-detail-group {
-    margin-top: 0
+    margin-top: 0;
+    padding-bottom: 0.3rem;
 }
 
 .page-goods-detail .fui-detail-group .fui-cell {
@@ -698,7 +696,6 @@ a {
     text-align: center;
     color:#ff5555;
 }
-
 /*.page-goods-detail .fui-detail-group .fui-cell .share:before {*/
     /*content: " ";*/
     /*border-left: 1px solid #EBEBEB;*/
@@ -911,12 +908,12 @@ a {
 }
 
 .page-goods-detail .fui-shop-group .btn-default-o,.page-goods-detail .fui-comment-group .btn-default-o {
-    height: 1.5rem;
+    height: 1.4rem;
     border-color: #ff5555;
     color: #ff5555;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     padding: 0;
-    line-height: 1.4rem;
+    line-height: 1.3rem;
     display: inline-block;
     margin: 0;
     border-radius: 1.5rem;
@@ -1189,6 +1186,9 @@ a {
 .store-container a.fui-cell:nth-child(1),
 .store-container a.fui-cell:nth-child(2),
 .store-container a.fui-cell:nth-child(3){
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
 }
 .store-container.open .show-allshop {
@@ -1496,7 +1496,9 @@ a {
     color: #ef4f4f;
     font-size: 0.6rem;
 }
-
+.fui-content.hidden{
+    overflow-y: hidden;
+}
 /**规格弹出*/
 .option-picker {
     height: auto;
@@ -1504,7 +1506,13 @@ a {
     padding-bottom: 2.5rem;
     z-index: 1001;
 }
-
+.option-picker.android{
+    padding-bottom:0;
+}
+/*.option-picker.android .option-picker-inner{*/
+    /*position: absolute;*/
+    /*bottom: 0;*/
+/*}*/
 .option-picker .option-picker-cell {
     padding: .2rem .5rem .5rem .5rem;
 }
@@ -2083,8 +2091,10 @@ a {
 .order-create-page  .fui-list.goods-item .fui-list-inner{
     height: 4.2rem;
     display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
     flex-direction: column;
-    justify-content: space-between;
+    -webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;
 }
 .order-create-page  .fui-list-angle.al{
     align-self: flex-start;
@@ -2658,7 +2668,7 @@ a {
 }
 
 .text-warning {
-    color: #ff9326
+    color: #ff8000
 }
 
 .text-danger {
@@ -2786,6 +2796,7 @@ a {
 .order-success-page .col-50 .btn {
     padding: 0;
     width: 80%;
+    border-radius: 1rem;
 }
 .order-success-page  .fui-list {
     padding: .55rem .6rem
@@ -2928,12 +2939,12 @@ a {
 }
 .store-container .show-allshop-btn{
     display: inline-block;
-    height: 1.5rem;
-    line-height: 1.5rem;
+    height: 1.4rem;
+    line-height: 1.4rem;
     padding:0  0.6rem;
     border:1px solid #ff5555;
     border-radius: 1rem;
-    font-size:0.7rem;
+    font-size:0.65rem;
     margin: 0 auto;
     color: #ff5555;
 }
@@ -2972,9 +2983,9 @@ a {
     display: none;
 }
 
-.goods-list {
-    background: #f8f8f8
-}
+/*.goods-list {*/
+    /*background: #f8f8f8*/
+/*}*/
 
 .goods-list .fui-list-angle {
     width: 7rem;
@@ -3121,9 +3132,82 @@ a {
 
 .order-comment-page .goods-comment-btn {
     border-radius: 0.1rem;
-    height: 1rem;
-    line-height: 1rem;
-    padding: 0 0.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+    border-radius: 1rem;
+    padding: 0 .5rem;
+    margin: 0;
+}
+.order-comment-page .goods-list  .towline{
+    color: #000;
+    font-size: 0.7rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    height: auto;
+}
+.order-comment-page .goods-list  .subtitle{
+    margin-top: .2rem;
+    color: #999;
+}
+.order-comment-page .goods-list  .fui-list-media img{
+    width:4rem;
+    height: 4rem;
+}
+.order-comment-page .fui-list-inner{
+    height: 4rem;
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;
+}
+.order-comment-page .goods-list .fui-list-angle {
+    width: auto;
+    font-size: 0.65rem;
+    text-align: right;
+    margin-left: .5rem;
+    margin-right: 0;
+    color: #000;
+    height: 4rem;
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;
+}
+.order-comment-page .fui-cell-label{
+    align-self: flex-start;
+    line-height: normal;
+}
+.order-comment-page .fui-label{
+    background: transparent;
+    font-size: .7rem;
+}
+.order-comment-page .fui-stars{
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+}
+.order-comment-page .icon-roundclose{
+    align-self:flex-start;
+    -webkit-align-self:flex-start;
+}
+.order-comment-page .fui-navbar{
+    height: 2.25rem;
 }
 
 .order-express-page .info-list .fui-list .fui-list-inner .state {
@@ -3320,7 +3404,9 @@ a {
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
-    justify-content: flex-end;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    -webkit-justify-content: flex-end;justify-content: flex-end;
     height: 100%;
 }
 .order-list-page .fui-list-media img{
@@ -3429,7 +3515,9 @@ a {
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
-    justify-content: flex-end;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    -webkit-justify-content: flex-end; justify-content: flex-end;
     height: 100%;
 }
 .order2.order-list-page  .fui-list-media img{
@@ -3591,7 +3679,15 @@ a {
 .member-cart-page .fui-list.goods-item .fui-list-inner {
     min-height: 4.6rem;
     display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    -webkit-justify-content: space-between;
     justify-content: space-between;
 }
 .member-cart-page .fui-list.goods-item .subtitle {
@@ -3625,6 +3721,8 @@ a {
 }
 .member-cart-page .btn.btn-danger:active, .btn.btn-danger.disabled{
     background: #ccc;
+    border:1px solid #ccc;
+    color: #fff;
 }
 .member-cart-page .btn.btn-default.disabled {
     background: #ccc;
@@ -3636,16 +3734,26 @@ a {
     text-align: right;
     height: 100%;
     display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
     justify-content: center;
     padding-right: .5rem;
 }
 .member-cart-page  .fui-list.noclick .fui-list-inner .subtitle{
-    justify-content: flex-end;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    -webkit-justify-content: flex-end;justify-content: flex-end;
 }
 .member-cart-page .fui-list.noclick{
     padding:0 0 0  .6rem;
     height: 2.45rem;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    -webkit-justify-content: space-between;
     justify-content: space-between;
 }
 .member-cart-page .fui-list.noclick .btn{
@@ -3770,6 +3878,12 @@ a {
     border: 0;
     background: #efefef;
 }
+.fui-icon-group .fui-icon-col .text {
+    font-size: 0.55rem;
+    line-height: 1.05rem;
+    padding-top: .5rem;
+}
+
 
 .fui-fullHigh-group {
     position: absolute;
@@ -3790,20 +3904,21 @@ a {
 }
 
 .fui-fullHigh-item.menu {
-    width: 6rem;
+    width: 5.25rem;
     background: #f8f8f8;
 }
 
 .fui-fullHigh-item.menu nav {
-    line-height: 1.8rem;
-    font-size: 0.7rem;
+    line-height: 2.5rem;
+    font-size: 0.65rem;
     text-align: center;
-    color: #666;
+    color: #000;
     padding: 0rem 0.2rem;
-    height: 1.8rem;
+    height: 2.5rem;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    position: relative;
 }
 
 .fui-fullHigh-item.menu nav:active {
@@ -3813,7 +3928,8 @@ a {
 .fui-fullHigh-item.menu nav.on {
     background: #fff;
     position: relative;
-    color: #fd5454;
+    color: #ff5555;
+    font-size: .65rem;
 }
 
 .fui-fullHigh-item.menu nav.on:before {
@@ -3823,11 +3939,11 @@ a {
     position: absolute;
     top: 0;
     left: 0;
-    border-left: 0.1rem solid #fd5454;
+    border-left: 0.2rem solid #ff5555;
+    z-index: 2;
 }
-
 .fui-fullHigh-item.container {
-    padding: 0.3rem;
+    padding: 0.8rem;
     -webkit-box-flex: 1;
     -webkit-flex: 1;
     -ms-flex: 1;
@@ -3838,6 +3954,8 @@ a {
     height: auto;
     width: 100%;
     background: #eee;
+    /*margin-bottom: .7rem;*/
+    display: block;
 }
 
 .page-shop-goods_category .fui-fullHigh-item.container .swipe img {
@@ -3856,16 +3974,37 @@ a {
 }
 
 .page-shop-goods_category .fui-icon-group {
-    display: block;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
 .page-shop-goods_category .fui-icon-group .fui-icon-col {
-    float: left;
-    width: 33.333%;
+    /*float: left;*/
+    width: 30%;
+    margin-right: .5rem;
+    padding:0;
+    padding-top: .7rem;
 }
-
-.page-shop-goods_category .fui-icon-group .fui-icon-col .radius img {
-    border-radius: 2.2rem;
+.page-shop-goods_category .fui-icon-group .fui-icon-col:nth-of-type(3n){
+    margin-right: 0;
+}
+.page-shop-goods_category .fui-icon-group .fui-icon-col  .icon{
+    height: 3.55rem;
+    width:100%;
+    line-height: 3.55rem;
+}
+.page-shop-goods_category .fui-icon-group .fui-icon-col  img {
+    width:100% ;
+    height: 100%;
+}
+.page-shop-goods_category .fui-icon-group  .fui-icon-col .icon i{
+    font-size: 2rem;
+    margin-top: 0;
+    color: #ccc;
 }
 
 /* notice 样式 */
@@ -4742,6 +4881,7 @@ color:#fd5555;}
     display: -ms-flexbox;
     display: flex;
     justify-content: flex-start;
+    -webkit-justify-content: flex-start;
 }
 
 .fui-chat-item .face {
@@ -4778,6 +4918,7 @@ color:#fd5555;}
     -ms-flex-align: center;
     align-items: center;
     justify-content: flex-start;
+    -webkit-justify-content: flex-start;
     min-width: 4rem;
 }
 
@@ -4830,7 +4971,9 @@ color:#fd5555;}
 }
 
 .fui-chat-item.right {
-    justify-content: flex-end;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    -webkit-justify-content: flex-end; justify-content: flex-end;
 }
 
 .fui-chat-item.right .msg {
@@ -5508,12 +5651,12 @@ font-size:0.6rem;line-height: 0.8rem;}
 .diyform-container .fui-uploader.fui-uploader-sm{
     top: .15rem;
 }
-.diyform-container .fui-uploader.fui-uploader-sm:after{
-    width: .6rem;
-}
-.diyform-container .fui-uploader.fui-uploader-sm:before{
-    height: .6rem;
-}
+/*.diyform-container .fui-uploader.fui-uploader-sm:after{*/
+    /*width: .6rem;*/
+/*}*/
+/*.diyform-container .fui-uploader.fui-uploader-sm:before{*/
+    /*height: .6rem;*/
+/*}*/
 .diyform-container .fui-images .image{
     margin-right: .5rem;
 }
@@ -5571,6 +5714,234 @@ font-size:0.6rem;line-height: 0.8rem;}
     margin-left: -3.5rem;
     overflow: hidden;
     transform: scale(10,10);
+    ms-transform: scale(10,10);
+    -moz-transform: scale(10,10);
+    -webkit-transform: scale(10,10);
+    -o-transform: scale(10,10);
     transform-origin: center bottom;
+    -ms-transform-origin:center bottom;
+    -webkit-transform-origin: center bottom;
+    -moz-transform-origin: center bottom;
+    -o-transform-origin: center bottom;
     border: 2px solid #ff5555;
 }
+
+/* 快速登录、注册弹窗 */
+#account-layer {
+    display: none;
+ }
+
+.account-layer {
+    width: 15.5rem;
+    height: 17.2rem;
+    background: #fff;
+    margin: -8.6rem 0 0 -7.75rem;
+    border-radius: 0.25rem;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+}
+
+.account-layer.login .input-mobile,
+.account-layer.bind .input-mobile,
+.account-layer.reg .input-mobile,
+.account-layer.bind-next .input-password,
+.account-layer.reg-next .input-password {
+    margin-top: 1.7rem;
+    display: block;
+}
+
+.account-layer.bind.imgcode .input-mobile,
+.account-layer.reg.imgcode .input-mobile {
+    margin-top: 0.6rem;
+    display: block;
+}
+
+.account-layer.login .account-tip,
+.account-layer.login .account-btn,
+.account-layer.login .input-password {
+    display: block;
+}
+
+.account-layer.bind .account-next,
+.account-layer.bind .account-verify,
+.account-layer.bind.imgcode .account-image,
+
+.account-layer.reg .account-next,
+.account-layer.reg .account-verify,
+.account-layer.reg .account-back,
+.account-layer.reg.imgcode .account-image {
+    display: block;
+}
+
+.account-layer.bind-next .input-password2,
+.account-layer.bind-next .account-btn,
+.account-layer.bind-next .account-back,
+
+.account-layer.reg-next .account-back,
+.account-layer.reg-next .input-password2,
+.account-layer.reg-next .account-btn {
+    display: block;
+}
+
+.account-layer .account-logo {
+    width: 4rem;
+    height: 4rem;
+    background: #eee;
+    margin-left: -2rem;
+    border-radius: 4rem;
+    position: absolute;
+    top: -2rem;
+    left: 50%;
+}
+
+.account-layer .account-logo img {
+    height: 4rem;
+    width: 4rem;
+    border-radius: 4rem;
+    display: block
+}
+
+.account-layer .account-main {
+    height: 14.3rem;
+    padding: 2rem 0.9rem 0 0.9rem;
+}
+
+.account-layer .account-back {
+    height: 2rem;
+    width: 2rem;
+    line-height: 2rem;
+    text-align: center;
+    position: absolute;
+    top: 0.3rem;
+    left: 0.3rem;
+    display: none;
+}
+
+.account-layer .account-back {
+    font-size: 0.65rem;
+    color: #b2b2b2;
+}
+
+.account-layer .account-title {
+    height: 2.7rem;
+    padding-top: 0.5rem;
+    text-align: center;
+    font-size: 0.7rem;
+    line-height: 1.1rem;
+}
+
+.account-layer.login .account-title,
+.account-layer.reg-next .account-title {
+    line-height: 2.7rem;
+    font-size: 0.8rem;
+}
+.account-layer.reg .account-title {
+    line-height: 2rem;
+    font-size: 0.8rem;
+}
+
+.account-layer .account-input {
+    height: 2.2rem;
+    width: 100%;
+    padding: 0 0.6rem;
+    background: #fff;
+    font-size: 0.7rem;
+    margin: 0.5rem 0 0 0;
+    border: 1px solid #ececec;
+    border-radius: 0.2rem;
+    box-shadow: 0;
+    -webkit-appearance: none;
+}
+
+.account-layer .account-input:disabled {
+    background: #ededed;
+    border-color: #dfdfdf;
+    opacity: 1;
+    color: #000;
+}
+
+.account-layer .input-mobile {
+    display: none;
+}
+
+.account-layer .input-password,
+.account-layer .input-password2 {
+    display: none;
+}
+
+.account-layer .account-image,
+.account-layer .account-verify {
+    display: none;
+    position: relative;
+}
+
+.account-layer .account-verify .btn-send {
+    height: 1.2rem;
+    width: auto;
+    padding: 0 0.4rem;
+    line-height: 1.2rem;
+    font-size: 0.5rem;
+    border: 1px solid #ff5555;
+    border-radius: 0.2rem;
+    color: #ff5555;
+    position: absolute;
+    right: 0.6rem;
+    top: 0.95rem;
+}
+
+.account-layer .account-verify .btn-send.disabled {
+    border-color: #ccc;
+    color: #ccc;
+}
+
+.account-layer .account-image .btn-image {
+    height: 1.5rem;
+    width: auto;
+    position: absolute;
+    right: 0.6rem;
+    top: 0.85rem;
+}
+
+.account-layer .account-tip {
+    height: 3rem;
+    line-height: 3rem;
+    text-align: center;
+    font-size: 0.65rem;
+    display: none;
+}
+
+.account-layer .account-tip span {
+    border-bottom: 1px solid #666;
+}
+
+.account-layer .account-next,
+.account-layer .account-btn {
+    height: 2.1rem;
+    background: #ff5555;
+    margin: 0 0.9rem 0.85rem 0.9rem;
+    font-size: 0.7rem;
+    text-align: center;
+    color: #fff;
+    border-radius: 0.25rem;
+    line-height: 2.1rem;
+    display: none;
+}
+
+.account-layer .account-close {
+    height: 2rem;
+    width: 2rem;
+    margin-left: -1rem;
+    line-height: 2rem;
+    text-align: center;
+    position: absolute;
+    bottom: -3rem;
+    left: 50%;
+}
+
+.account-layer .account-close .icon {
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: lighter;
+}
+/*青岛易联互动网络科技有限公司*/

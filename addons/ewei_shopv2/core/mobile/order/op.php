@@ -63,6 +63,7 @@ class Op_EweiShopV2Page extends MobileLoginPage
 			pdo_update('ewei_shop_order_refund', $change_refund, array('id' => $order['refundid'], 'uniacid' => $_W['uniacid']));
 		}
 		pdo_update('ewei_shop_order', array('status' => 3, 'finishtime' => time(), 'refundstate' => 0), array('id' => $order['id'], 'uniacid' => $_W['uniacid']));
+		m('order')->setStocksAndCredits($orderid, 1);
 		m('order')->fullback($orderid);
 		m('member')->upgradeLevel($order['openid'], $orderid);
 		m('order')->setGiveBalance($orderid, 1);
@@ -92,7 +93,7 @@ class Op_EweiShopV2Page extends MobileLoginPage
 				p('lottery')->getLotteryList($_W['openid'], array('lottery_id' => $res));
 			}
 		}
-		show_json(1);
+		show_json(1, array('url' => mobileUrl('order', array('status' => 3))));
 	}
 	public function delete() 
 	{

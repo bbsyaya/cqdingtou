@@ -23,7 +23,7 @@ class Log_EweiShopV2Page extends WebPage
 			}
 			else if ($_GPC['searchfield'] == 'member') 
 			{
-				$condition1 .= ' and (realname like :keyword or nickname like :keyword or mobile like :keyword)';
+				$condition1 .= ' and (m.realname like :keyword or m.nickname like :keyword or m.mobile like :keyword)';
 			}
 			$params[':keyword'] = '%' . $_GPC['keyword'] . '%';
 		}
@@ -42,11 +42,11 @@ class Log_EweiShopV2Page extends WebPage
 		}
 		if (!(empty($_GPC['level']))) 
 		{
-			$condition1 .= ' and level=' . intval($_GPC['level']);
+			$condition1 .= ' and m.level=' . intval($_GPC['level']);
 		}
 		if (!(empty($_GPC['groupid']))) 
 		{
-			$condition1 .= ' and groupid=' . intval($_GPC['groupid']);
+			$condition1 .= ' and m.groupid=' . intval($_GPC['groupid']);
 		}
 		$member_sql = '';
 		if ($condition1 != '') 
@@ -70,7 +70,7 @@ class Log_EweiShopV2Page extends WebPage
 		{
 			$condition .= ' and log.status=' . intval($_GPC['status']);
 		}
-		$sql = 'select log.id,log.openid,log.logno,log.type,log.status,log.rechargetype,log.sendmoney,log.money,log.createtime,log.realmoney,log.deductionmoney,log.charge,log.remark,log.alipay,log.bankname,log.bankcard,log.realname as applyrealname,log.applytype,m.nickname,m.id as mid,m.avatar,m.level,m.groupid,m.realname,m.mobile,g.groupname,l.levelname from ' . tablename('ewei_shop_member_log') . ' log ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid = log.openid ' . ' left join ' . tablename('ewei_shop_member_group') . ' g on g.id = m.groupid ' . ' left join ' . tablename('ewei_shop_member_level') . ' l on l.id = m.level ' . ' where 1 ' . $condition . ' ORDER BY log.createtime DESC ';
+		$sql = 'select log.id,log.openid,log.logno,log.type,log.status,log.rechargetype,log.sendmoney,log.money,log.createtime,log.realmoney,log.deductionmoney,log.charge,log.remark,log.alipay,log.bankname,log.bankcard,log.realname as applyrealname,log.applytype,m.nickname,m.id as mid,m.avatar,m.level,m.groupid,m.realname,m.mobile,g.groupname,l.levelname from ' . tablename('ewei_shop_member_log') . ' log ' . ' left join ' . tablename('ewei_shop_member') . ' m on m.openid = log.openid ' . ' left join ' . tablename('ewei_shop_member_group') . ' g on g.id = m.groupid ' . ' left join ' . tablename('ewei_shop_member_level') . ' l on l.id = m.level ' . ' where 1 ' . $condition . ' ' . $condition1 . ' GROUP BY log.id ORDER BY log.createtime DESC ';
 		if (empty($_GPC['export'])) 
 		{
 			$sql .= 'LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;

@@ -81,19 +81,6 @@
             {/if}
 
 
-            {if $bestpay['success'] || (is_h5app() &&$bestpay['wechat'])}
-                <div class='fui-list pay-btn' data-type='bestpay'>
-                    <div class='fui-list-media'>
-                        <i class='icon icon-money credit'></i>
-                    </div>
-                    <div class='fui-list-inner'>
-                        <div class="title">翼支付</div>
-                        <div class="subtitle c999 f24">使用翼支付进行支付</div>
-                    </div>
-                    <div class='fui-list-angle'><span class="angle"></span></div>
-                </div>
-            {/if}
-
         {if $credit['success']}
             <div class='fui-list pay-btn' data-type='credit'>
                 <div class='fui-list-media'>
@@ -127,7 +114,7 @@
             </div>
             {/if}
 
-            {if empty($ispeerpay) && !empty($peerPaySwi)}
+            {if !empty($peerPaySwi)}
             <div class='fui-list pay-btn' data-type='peerpay'>
                 <div class='fui-list-media'>
                     <!--<i class='icon icon-natice peerpay' style="background: #ff9326;color: #fff"></i>-->

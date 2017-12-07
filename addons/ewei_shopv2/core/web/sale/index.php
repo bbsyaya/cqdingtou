@@ -27,9 +27,37 @@ class Index_EweiShopV2Page extends ComWebPage
 		{
 			header('location: ' . webUrl('sale/recharge'));
 		}
+		else if (cv('sale.credit1')) 
+		{
+			header('location: ' . webUrl('sale/credit1'));
+		}
+		else if (cv('sale.package')) 
+		{
+			header('location: ' . webUrl('sale/package'));
+		}
+		else if (cv('sale.gift')) 
+		{
+			header('location: ' . webUrl('sale/gift'));
+		}
+		else if (cv('sale.fullback')) 
+		{
+			header('location: ' . webUrl('sale/fullback'));
+		}
+		else if (cv('sale.peerpay')) 
+		{
+			header('location: ' . webUrl('sale/peerpay'));
+		}
 		else if (cv('sale.coupon')) 
 		{
 			header('location: ' . webUrl('sale/coupon'));
+		}
+		else if (cv('sale.wxcard')) 
+		{
+			header('location: ' . webUrl('sale/wxcard'));
+		}
+		else if (cv('sale.virtual')) 
+		{
+			header('location: ' . webUrl('sale/virtual'));
 		}
 		else 
 		{
@@ -155,6 +183,7 @@ class Index_EweiShopV2Page extends ComWebPage
 					$enough1[] = array('enough1_1' => floatval($_GPC['enough1_1'][$key]), 'enough1_2' => floatval($_GPC['enough1_2'][$key]), 'give1' => floatval($_GPC['give1'][$key]));
 				}
 			}
+			$data['isgoodspoint'] = intval($_GPC['isgoodspoint']);
 			$data['enough1'] = $enough1;
 			$enough2 = array();
 			$postenough2 = ((is_array($_GPC['enough2_1']) ? $_GPC['enough2_1'] : array()));

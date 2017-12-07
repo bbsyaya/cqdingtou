@@ -20,7 +20,7 @@
         border:none;
     }
 </style>
-<div class="page-header"> 当前位置：<span class="text-primary"></span></div>
+<div class="page-header"> 当前位置：<span class="text-primary">订单统计</span></div>
 
 <div class="page-content">
     <form action="./index.php" method="get" class="form-horizontal"  id="form1">
@@ -90,7 +90,7 @@
         </tr>
         {loop $row['goods'] $g}
         <tr class="trbody" style="border: 1px solid #efefef;">
-            <td><img src="{php echo tomedia($row['thumb'])}" style="width: 50px; height: 50px;border:1px solid #ccc;padding:1px;"  onerror="this.src='../addons/ewei_shopv2/static/images/nopic.png'" ></td>
+            <td><img src="{php echo tomedia($g['thumb'])}" style="width: 50px; height: 50px;border:1px solid #ccc;padding:1px;"  onerror="this.src='../addons/ewei_shopv2/static/images/nopic.png'" ></td>
             <td style="text-align: left;border-left:none;">{$g['title']}</td>
             <td style='text-align:right;border-left:none;'>{php echo $g['realprice']}<br/>x {$g['total']}</td>
             <td>{$row['realname']}</td>
