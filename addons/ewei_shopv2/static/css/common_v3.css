@@ -119,6 +119,10 @@ select, input:focus, input {
 .ibox-title .icow, .wb-nav .icow {
     margin-right: 10px;
 }
+.ibox-title .icow, .wb-nav .icow.icow-xiaochengxu {
+    margin-left: 6px;
+    margin-right: 4px;
+}
 
 .expandMode .icow {
     font-size: 16px;

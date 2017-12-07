@@ -11,6 +11,9 @@ class Index_EweiShopV2Page extends MobilePage
 		global $_GPC;
 		$id = intval($_GPC['id']);
 		$item = pdo_fetch('select * from ' . tablename('ewei_shop_store') . ' where id =:id and uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		if(empty($item)){
+			$item = pdo_fetch('select * from ' . tablename('ewei_shop_merch_store') . ' where id =:id and uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+		}
 		$item['logo'] = tomedia($item['logo']);
 		if (!(empty($item['tag']))) 
 		{

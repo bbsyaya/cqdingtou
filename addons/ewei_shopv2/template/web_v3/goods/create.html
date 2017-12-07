@@ -55,9 +55,9 @@
                                         <label class="radio-inline"><input type="radio" name="type" value="1" checked="true" /> 实体商品</label>
 
                                         {if com('virtual') && com('perm')->check_com('virtual')}
-                                        <label class="radio-inline"><input type="radio" name="type" value="2" /> 虚拟商品</label>
+                                        <label class="radio-inline"><input type="radio" name="type" value="2" onclick="type_change(2);" /> 虚拟商品</label>
 
-                                        <label class="radio-inline"><input type="radio" name="type" value="3" /> 虚拟物品(卡密)</label>
+                                        <label class="radio-inline"><input type="radio" name="type" value="3" onclick="type_change(3);" /> 虚拟物品(卡密)</label>
                                         {/if}
 
                                         <label class="radio-inline"><input type="radio" name="type" value="4" /> 批发商品</label>
@@ -94,6 +94,15 @@
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
+                                {if p('app')}
+                                <div class="form-group">
+                                    <label class="col-sm control-label">首图视频</label>
+                                    <div class="col-md-9">
+                                        {php echo tpl_form_field_video2('video', $item['video'], array('disabled'=>!cv('goods.edit')))}
+                                        <div class='form-control-static'>设置后商品详情首图默认显示视频，目前仅支持小程序</div>
+                                    </div>
+                                </div>
+                                {/if}
                                 <div class="form-group row">
                                     <label class="col-sm control-label">商品属性</label>
                                     <div class="col-md-10">
@@ -389,6 +398,10 @@
                         <input type="submit" value="保存商品" class="btn btn-primary btn-lg" style="display: none;"/>
                     </div>
                 </div>
+<input type="hidden" name="optionArray" value=''>
+<input type="hidden" name="isdiscountDiscountsArray" value=''>
+<input type="hidden" name="discountArray" value=''>
+<input type="hidden" name="commissionArray" value=''>
             </form>
         </div>
     </div>
@@ -396,6 +409,133 @@
 </div>
 <script type="text/javascript">
     $(function () {
+        $('form').submit(function(){
+            var check = true;
+
+            window.type = $("input[name='type']:checked").val();
+            window.virtual = $("#virtual").val();
+
+
+            full = checkoption();
+            if (!full) {
+                $('form').attr('stop',1),tip.msgbox.err('请输入规格名称!');
+                return false;
+            }
+            var spec_item_title = 1;
+            $(".spec_item").each(function (i) {
+                var _this = this;
+                if($(_this).find(".spec_item_title").length == 0){
+                    spec_item_title = 0;
+                }
+            });
+            if(spec_item_title == 0){
+                $('form').attr('stop',1),tip.msgbox.err('详细规格没有填写,请填写详细规格!');
+                return false;
+            }
+            $('form').attr('stop',1);
+            //处理规格
+            optionArray();
+            $('form').removeAttr('stop');
+            return true;
+        });
+
+        function checkoption() {
+
+            var full = true;
+            var $spec_title = $(".spec_title");
+            var $spec_item_title = $(".spec_item_title");
+            if ($("#hasoption").get(0).checked) {
+                if($spec_title.length==0){
+                    $('#myTab a[href="#tab_option"]').tab('show');
+                    full = false;
+                }
+                if($spec_item_title.length==0){
+                    $('#myTab a[href="#tab_option"]').tab('show');
+                    full = false;
+                }
+            }
+            if (!full) {
+                return false;
+            }
+            return full;
+        }
+        function optionArray() {
+            var option_stock = new Array();
+            $('.option_stock').each(function (index,item) {
+                option_stock.push($(item).val());
+            });
+
+            var option_id = new Array();
+            $('.option_id').each(function (index,item) {
+                option_id.push($(item).val());
+            });
+
+            var option_ids = new Array();
+            $('.option_ids').each(function (index,item) {
+                option_ids.push($(item).val());
+            });
+
+            var option_title = new Array();
+            $('.option_title').each(function (index,item) {
+                option_title.push($(item).val());
+            });
+
+            var option_virtual = new Array();
+            $('.option_virtual').each(function (index,item) {
+                option_virtual.push($(item).val());
+            });
+
+            var option_marketprice = new Array();
+            $('.option_marketprice').each(function (index,item) {
+                option_marketprice.push($(item).val());
+            });
+            var option_presellprice = new Array();
+            $('.option_presell').each(function (index,item) {
+                option_presellprice.push($(item).val());
+            });
+
+            var option_productprice = new Array();
+            $('.option_productprice').each(function (index,item) {
+                option_productprice.push($(item).val());
+            });
+
+            var option_costprice = new Array();
+            $('.option_costprice').each(function (index,item) {
+                option_costprice.push($(item).val());
+            });
+
+            var option_goodssn = new Array();
+            $('.option_goodssn').each(function (index,item) {
+                option_goodssn.push($(item).val());
+            });
+
+            var option_productsn = new Array();
+            $('.option_productsn').each(function (index,item) {
+                option_productsn.push($(item).val());
+            });
+
+            var option_weight = new Array();
+            $('.option_weight').each(function (index,item) {
+                option_weight.push($(item).val());
+            });
+
+            var options = {
+                option_stock : option_stock,
+                option_id : option_id,
+                option_ids : option_ids,
+                option_title : option_title,
+                option_presellprice : option_presellprice,
+                option_marketprice : option_marketprice,
+                option_productprice : option_productprice,
+                option_costprice : option_costprice,
+                option_goodssn : option_goodssn,
+                option_productsn : option_productsn,
+                option_weight : option_weight,
+                option_virtual : option_virtual
+            };
+            console.log(options);
+            $("input[name='optionArray']").val(JSON.stringify(options));
+        }
         /*
         * 商品类型选择
         * */
@@ -551,7 +691,7 @@
                 $("#next").show();
             }
         });
-        /**/
+        
         $(".spec_item_thumb").find('i').click(function(){
             var group  =$(this).parent();
             group.find('img').attr('src',"{EWEI_SHOPV2_LOCAL}static/images/nopic100.jpg");
@@ -578,7 +718,6 @@
         $("#hasoption").click(function(){
             var obj = $(this);
             if (obj.get(0).checked){
-                refreshOptions();
                 $('.hasoption').attr('readonly',true);
                 $("#tboption").show();
                 $("#tbdiscount").show();
@@ -587,6 +726,7 @@
                 $("#commission").show();
                 $("#commission_default").hide();
                 $("#discounts_type1").show().parent().show();
+                refreshOptions();
             }else{
                 $("#tboption").hide();
                 refreshOptions();
@@ -697,6 +837,9 @@
             $("#discount").html('');
             $("#isdiscount_discounts").html('');
             $("#commission").html('');
+            {if p('commission') && !empty($com_set['level'])}
+            commission_change();
+            {/if}
             isdiscount_change();
             return;
         }
@@ -753,7 +896,7 @@
         }
 
         html += '<th><div class=""><div style="padding-bottom:10px;text-align:center;">库存</div><div class="input-group"><input type="text" class="form-control  input-sm option_stock_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_stock\');"></a></span></div></div></th>';
-        /*html += '<th><div class=""><div style="padding-bottom:10px;text-align:center;">预售价</div><div class="input-group"><input type="text" class="form-control  input-sm option_presell_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_presell\');"></a></span></div></div></th>';*/
+        html += '<th><div class=""><div style="padding-bottom:10px;text-align:center;">预售价</div><div class="input-group"><input type="text" class="form-control  input-sm option_presell_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_presell\');"></a></span></div></div></th>';
         html += '<th><div class=""><div style="padding-bottom:10px;text-align:center;">现价</div><div class="input-group"><input type="text" class="form-control  input-sm option_marketprice_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_marketprice\');"></a></span></div></div></th>';
         html+='<th><div class=""><div style="padding-bottom:10px;text-align:center;">原价</div><div class="input-group"><input type="text" class="form-control  input-sm option_productprice_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_productprice\');"></a></span></div></div></th>';
         html+='<th><div class=""><div style="padding-bottom:10px;text-align:center;">成本价</div><div class="input-group"><input type="text" class="form-control  input-sm option_costprice_all"VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_costprice\');"></a></span></div></div></th>';
@@ -795,13 +938,13 @@
             ids =ids.join('_');
             titles= titles.join('+');
 
-            var val ={ id : "",title:titles, stock : ""/*,presell : ""*/,costprice : "",productprice : "",marketprice : "",weight:"",productsn:"",goodssn:"",virtual:virtuals };
+            var val ={ id : "",title:titles, stock : "",presell : "",costprice : "",productprice : "",marketprice : "",weight:"",productsn:"",goodssn:"",virtual:virtuals };
             if( $(".option_id_" + ids).length>0){
                 val ={
                     id : $(".option_id_" + ids+":eq(0)").val(),
                     title: titles,
                     stock : $(".option_stock_" + ids+":eq(0)").val(),
-                    /*presell : $(".option_presell_" + ids+":eq(0)").val(),*/
+                    presell : $(".option_presell_" + ids+":eq(0)").val(),
                     costprice : $(".option_costprice_" + ids+":eq(0)").val(),
                     productprice : $(".option_productprice_" + ids+":eq(0)").val(),
                     marketprice : $(".option_marketprice_" + ids +":eq(0)").val(),
@@ -819,7 +962,7 @@
             hh += '<input data-name="option_title_' + ids +'" type="hidden" class="form-control option_title option_title_' + ids +'" value="' +(val.title=='undefined'?'':val.title )+'"/></td>';
             hh += '<input data-name="option_virtual_' + ids +'" type="hidden" class="form-control option_virtual option_virtual_' + ids +'" value="' +(val.virtual=='undefined'?'':val.virtual )+'"/></td>';
             hh += '</td>';
-            /*hh += '<td><input data-name="option_presell_' + ids+'" type="text" class="form-control option_presell option_presell_' + ids +'" value="' +(val.presell=='undefined'?'':val.presell )+'"/></td>';*/
+            hh += '<td><input data-name="option_presell_' + ids+'" type="text" class="form-control option_presell option_presell_' + ids +'" value="' +(val.presell=='undefined'?'':val.presell )+'"/></td>';
             hh += '<td><input data-name="option_marketprice_' + ids+'" type="text" class="form-control option_marketprice option_marketprice_' + ids +'" value="' +(val.marketprice=='undefined'?'':val.marketprice )+'"/></td>';
             hh += '<td><input data-name="option_productprice_' + ids+'" type="text" class="form-control option_productprice option_productprice_' + ids +'" " value="' +(val.productprice=='undefined'?'':val.productprice )+'"/></td>';
             hh += '<td><input data-name="option_costprice_' +ids+'" type="text" class="form-control option_costprice option_costprice_' + ids +'" " value="' +(val.costprice=='undefined'?'':val.costprice )+'"/></td>';
@@ -833,6 +976,10 @@
         $("#options").html(html);
         refreshDiscount();
         refreshIsDiscount();
+        {if p('commission') && !empty($com_set['level'])}
+        refreshCommission();
+        commission_change();
+        {/if}
         isdiscount_change();
     }
 
@@ -955,18 +1102,18 @@
             {loop $levels $level}
             {if $level['key']=='default'}
             level{$level['key']}: '',
-                {else}
+            {else}
             level{$level['id']}: '',
             {/if}
             {/loop}
             costprice: "",
-                /*presell: "",*/
-                productprice: "",
-                marketprice: "",
-                weight: "",
-                productsn: "",
-                goodssn: "",
-                virtual: virtuals
+                    presell: "",
+                    productprice: "",
+                    marketprice: "",
+                    weight: "",
+                    productsn: "",
+                    goodssn: "",
+                    virtual: virtuals
         };
 
             var val ={ id : "",title:titles,{loop $levels $level}{if $level['key']=='default'} level{$level['key']}: '',{else} level{$level['id']}: '',{/if}{/loop}costprice : "",productprice : "",marketprice : "",weight:"",productsn:"",goodssn:"",virtual:virtuals };
@@ -977,19 +1124,19 @@
                 {loop $levels $level}
                 {if $level['key']=='default'}
                 level{$level['key']}: $(".discount_{$level['key']}_" + ids + ":eq(0)").val(),
-                    {else}
+                {else}
                 level{$level['id']}: $(".discount_level{$level['id']}_" + ids + ":eq(0)").val(),
                 {/if}
                 {/loop}
                 costprice: $(".discount_costprice_" + ids + ":eq(0)").val(),
-                    /*presell: $(".discount_presell_" + ids + ":eq(0)").val(),*/
-                    productprice: $(".discount_productprice_" + ids + ":eq(0)").val(),
-                    marketprice: $(".discount_marketprice_" + ids + ":eq(0)").val(),
-                    /*presell: $(".discount_presell_" + ids + ":eq(0)").val(),*/
-                    goodssn: $(".discount_goodssn_" + ids + ":eq(0)").val(),
-                    productsn: $(".discount_productsn_" + ids + ":eq(0)").val(),
-                    weight: $(".discount_weight_" + ids + ":eq(0)").val(),
-                    virtual: virtuals
+                        presell: $(".discount_presell_" + ids + ":eq(0)").val(),
+                        productprice: $(".discount_productprice_" + ids + ":eq(0)").val(),
+                        marketprice: $(".discount_marketprice_" + ids + ":eq(0)").val(),
+                        presell: $(".discount_presell_" + ids + ":eq(0)").val(),
+                        goodssn: $(".discount_goodssn_" + ids + ":eq(0)").val(),
+                        productsn: $(".discount_productsn_" + ids + ":eq(0)").val(),
+                        weight: $(".discount_weight_" + ids + ":eq(0)").val(),
+                        virtual: virtuals
             }
             }
 
@@ -1132,18 +1279,18 @@
             {loop $levels $level}
             {if $level['key']=='default'}
             level{$level['key']}: '',
-                {else}
+            {else}
             level{$level['if']}: '',
             {/if}
             {/loop}
             costprice: "",
-                /*presell: "",*/
-                productprice: "",
-                marketprice: "",
-                weight: "",
-                productsn: "",
-                goodssn: "",
-                virtual: virtuals
+                    presell: "",
+                    productprice: "",
+                    marketprice: "",
+                    weight: "",
+                    productsn: "",
+                    goodssn: "",
+                    virtual: virtuals
         };
 
             var val ={ id : "",title:titles,{loop $levels $level}{if $level['key']=='default'} level{$level['key']}: '',{else} level{$level['id']}: '',{/if}{/loop}costprice : "",productprice : "",marketprice : "",weight:"",productsn:"",goodssn:"",virtual:virtuals };
@@ -1154,18 +1301,18 @@
                 {loop $levels $level}
                 {if $level['key']=='default'}
                 level{$level['key']}: $(".isdiscount_discounts_{$level['key']}_" + ids + ":eq(0)").val(),
-                    {else}
+                {else}
                 level{$level['id']}: $(".isdiscount_discounts_level{$level['id']}_" + ids + ":eq(0)").val(),
                 {/if}
                 {/loop}
                 costprice: $(".isdiscount_discounts_costprice_" + ids + ":eq(0)").val(),
-                    productprice: $(".isdiscount_discounts_productprice_" + ids + ":eq(0)").val(),
-                    marketprice: $(".isdiscount_discounts_marketprice_" + ids + ":eq(0)").val(),
-                    /*presell: $(".isdiscount_discounts_presell_" + ids + ":eq(0)").val(),*/
-                    goodssn: $(".isdiscount_discounts_goodssn_" + ids + ":eq(0)").val(),
-                    productsn: $(".isdiscount_discounts_productsn_" + ids + ":eq(0)").val(),
-                    weight: $(".isdiscount_discounts_weight_" + ids + ":eq(0)").val(),
-                    virtual: virtuals
+                        productprice: $(".isdiscount_discounts_productprice_" + ids + ":eq(0)").val(),
+                        marketprice: $(".isdiscount_discounts_marketprice_" + ids + ":eq(0)").val(),
+                        presell: $(".isdiscount_discounts_presell_" + ids + ":eq(0)").val(),
+                        goodssn: $(".isdiscount_discounts_goodssn_" + ids + ":eq(0)").val(),
+                        productsn: $(".isdiscount_discounts_productsn_" + ids + ":eq(0)").val(),
+                        weight: $(".isdiscount_discounts_weight_" + ids + ":eq(0)").val(),
+                        virtual: virtuals
             }
             }
 
@@ -1305,18 +1452,18 @@
             {loop $commission_level $level}
             {if $level["key"] == "default"}
             level{$level['key']}: '',
-                {else}
+            {else}
             level{$level['id']}: '',
             {/if}
             {/loop}
             costprice: "",
-                /*presell: "",*/
-                productprice: "",
-                marketprice: "",
-                weight: "",
-                productsn: "",
-                goodssn: "",
-                virtual: virtuals
+                    presell: "",
+                    productprice: "",
+                    marketprice: "",
+                    weight: "",
+                    productsn: "",
+                    goodssn: "",
+                    virtual: virtuals
         };
 
             var val ={ id : "",title:titles,{loop $commission_level $level} {if $level["key"] == "default"}level{$level['key']}: '',{else}level{$level['id']}: '',{/if}{/loop}costprice : "",productprice : "",marketprice : "",weight:"",productsn:"",goodssn:"",virtual:virtuals };
@@ -1338,7 +1485,7 @@
                     id: $(".commission_id_" + ids + ":eq(0)").val(),
                     title: titles,
                     costprice: $(".commission_costprice_" + ids + ":eq(0)").val(),
-                    /*presell: $(".commission_presell_" + ids + ":eq(0)").val(),*/
+                    presell: $(".commission_presell_" + ids + ":eq(0)").val(),
                     productprice: $(".commission_productprice_" + ids + ":eq(0)").val(),
                     marketprice: $(".commission_marketprice_" + ids + ":eq(0)").val(),
                     goodssn: $(".commission_goodssn_" + ids + ":eq(0)").val(),
@@ -1453,8 +1600,7 @@
         refreshOptions()
     }
 
-    function setinterval(type)
-    {
+    function setinterval(type) {
         var intervalfloor =$('#intervalfloor').val();
         if(intervalfloor=="")
         {
@@ -1522,6 +1668,7 @@
 
     }
 
+
     /*$(document).ready(function() {
         var Discount = document.getElementById("isdiscount");
         showDiscount(Discount);
@@ -1561,6 +1708,13 @@
             $("#isdiscount_discounts_default").html('');
         }
     }
+
+                function type_change(type) {
+
+                   if(type == 3) {
+                        $(".dispatch_info").hide();
+                    }
+                }
 
     isdiscount_change();
 

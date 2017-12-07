@@ -2,6 +2,7 @@
 
 {php $system=m('system')->init()}
 {php $sysmenus = m('system')->getMenu(true)}
+{php unset($sysmenus['menu'][8])}
 <div class="wb-header" style="position: fixed;">
     <div class="logo {if !empty($system['foldnav'])}small{/if}">
         {if !empty($copyright) && !empty($copyright['logo'])}
@@ -112,6 +113,7 @@
         <p class="wb-nav-fold"><i class="icow icow-zhedie"></i></p>
         <ul>
             {loop $sysmenus['menu'] $sysmenu}
+			
                 <li {if $sysmenu['active']}class="active"{/if}>
                     <a href="{php echo empty($sysmenu['index'])? webUrl($sysmenu['route']): webUrl($sysmenu['route']. '.'. $sysmenu['index'])}">
                         {if $sysmenu['route']=='plugins'}
@@ -120,7 +122,7 @@
                         </svg>
                         {else}
                             {if !empty($sysmenu['icon'])}
-                                <i class="icow icow-{$sysmenu['icon']}"></i>
+                                <i class="icow icow-{$sysmenu['icon']}" {if !empty($sysmenu['iconcolor'])} style="color: {$sysmenu['iconcolor']}"{/if}></i>
                             {/if}
                         {/if}
                         <span class="wb-nav-title">{$sysmenu['text']}</span>

@@ -73,7 +73,7 @@
 
             function preview_html(txt)
             {
-                var win = window.open("", "win", "width=300,height=600"); // a window object
+                var win = window.open("", "win", "width=300,height=600");  
                 win.document.open("text/html", "replace");
                 win.document.write($(txt).val());
                 win.document.close();

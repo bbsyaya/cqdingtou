@@ -52,22 +52,22 @@ class ExchangeModel extends PluginModel
 			$credittext = ((empty($_W['shopset']['trade']['credittext']) ? '积分' : $_W['shopset']['trade']['credittext']));
 			$tag = 'exchange_score';
 			$remark = "\n" . '感谢您的支持 <a href=\'' . $url . '\'>点击查看详情</a>';
-			$text = '恭喜您' . $credittext . '兑换成功！' . "\n\n" . $credittext . '兑换：' . $num . '积分' . "\n" . '兑换时间：' . $time . "\n" . '充值方式：积分兑换' . "\n" . $credittext . '余额：' . (int) $member['credit1'] . $credittext . ' ' . "\n" . $remark;
+			$text = '恭喜您' . $credittext . '兑换成功！' . "\n" . $credittext . '兑换：' . $num . '积分' . "\n" . '兑换时间：' . $time . "\n" . '充值方式：积分兑换' . "\n" . $credittext . '余额：' . (int) $member['credit1'] . $credittext . ' ' . "\n" . $remark;
 			$message = array( 'first' => array('value' => '亲爱的' . $member['nickname'] . '，恭喜您' . $credittext . '兑换成功，具体如下:', 'color' => '#ff0000'), 'keyword1' => array('title' => '获得时间', 'value' => $time, 'color' => '#000000'), 'keyword2' => array('title' => '获得积分', 'value' => $num . $credittext, 'color' => '#000000'), 'keyword3' => array('title' => '获得原因', 'value' => $credittext . '兑换', 'color' => '#000000'), 'keyword4' => array('title' => '当前' . $credittext, 'value' => (double) $member['credit1'] . $credittext, 'color' => '#ff0000'), 'remark' => array('value' => "\n" . $_W['shopset']['shop']['name'] . '感谢您的支持，如有疑问请联系在线客服。', 'color' => '#000000') );
 		}
 		else if ($type == 1) 
 		{
 			$tag = 'exchange_balance';
 			$remark = "\n" . '感谢您的支持 <a href=\'' . $url . '\'>点击查看详情</a>';
-			$text = '恭喜您余额兑换成功！' . "\n\n" . '余额兑换：' . $num . '元' . "\n" . '兑换时间：' . $time . "\n" . '充值方式：余额兑换' . "\n" . '当前余额：' . (int) $member['credit2'] . '元 ' . "\n" . $remark;
-			$message = array( 'first' => array('value' => '亲爱的' . $member['nickname'] . '，恭喜您余额兑换成功，具体如下:', 'color' => '#ff0000'), 'keyword1' => array('title' => '充值金额', 'value' => $num . '元', 'color' => '#000000'), 'keyword2' => array('title' => '充值时间', 'value' => $time, 'color' => '#000000'), 'keyword3' => array('title' => '账户余额', 'value' => (double) $member['credit2'] . '元', 'color' => '#ff0000'), 'remark' => array('value' => '获得原因：余额兑换' . "\n\n" . $_W['shopset']['shop']['name'] . '感谢您的支持，如有疑问请联系在线客服。', 'color' => '#000000') );
+			$text = '恭喜您余额兑换成功！' . "\n" . '余额兑换：' . $num . '元' . "\n" . '兑换时间：' . $time . "\n" . '充值方式：余额兑换' . "\n" . '当前余额：' . (int) $member['credit2'] . '元 ' . "\n" . $remark;
+			$message = array( 'first' => array('value' => '亲爱的' . $member['nickname'] . '，恭喜您余额兑换成功，具体如下:', 'color' => '#ff0000'), 'keyword1' => array('title' => '充值金额', 'value' => $num . '元', 'color' => '#000000'), 'keyword2' => array('title' => '充值时间', 'value' => $time, 'color' => '#000000'), 'keyword3' => array('title' => '账户余额', 'value' => (double) $member['credit2'] . '元', 'color' => '#ff0000'), 'remark' => array('value' => '获得原因：余额兑换' . "\n" . $_W['shopset']['shop']['name'] . '感谢您的支持，如有疑问请联系在线客服。', 'color' => '#000000') );
 		}
 		else 
 		{
 			$tag = 'exchange_recharge';
 			$remark = "\n" . '感谢您的支持 <a href=\'' . $url . '\'>点击查看详情</a>';
-			$text = '恭喜您充值成功！' . "\n\n" . '余额充值：' . $num . '元' . "\n" . '兑换时间：' . $time . "\n" . '充值方式：余额充值' . "\n" . '当前余额：' . (int) $member['credit2'] . '元 ' . "\n" . $remark;
-			$message = array( 'first' => array('value' => '亲爱的' . $member['nickname'] . '，恭喜您余额充值成功，具体如下:', 'color' => '#ff0000'), 'keyword1' => array('title' => '充值金额', 'value' => $num . '元', 'color' => '#000000'), 'keyword2' => array('title' => '充值时间', 'value' => $time, 'color' => '#000000'), 'keyword4' => array('title' => '账户余额', 'value' => (double) $member['credit2'] . '元', 'color' => '#ff0000'), 'remark' => array('value' => '充值方式：卡密充值' . "\n\n" . $_W['shopset']['shop']['name'] . '感谢您的支持，如有疑问请联系在线客服。', 'color' => '#000000') );
+			$text = '恭喜您充值成功！' . "\n" . '余额充值：' . $num . '元' . "\n" . '兑换时间：' . $time . "\n" . '充值方式：余额充值' . "\n" . '当前余额：' . (int) $member['credit2'] . '元 ' . "\n" . $remark;
+			$message = array( 'first' => array('value' => '亲爱的' . $member['nickname'] . '，恭喜您余额充值成功，具体如下:', 'color' => '#ff0000'), 'keyword1' => array('title' => '充值金额', 'value' => $num . '元', 'color' => '#000000'), 'keyword2' => array('title' => '充值时间', 'value' => $time, 'color' => '#000000'), 'keyword4' => array('title' => '账户余额', 'value' => (double) $member['credit2'] . '元', 'color' => '#ff0000'), 'remark' => array('value' => '充值方式：卡密充值' . "\n" . $_W['shopset']['shop']['name'] . '感谢您的支持，如有疑问请联系在线客服。', 'color' => '#000000') );
 		}
 		m('notice')->sendNotice(array('openid' => $openid, 'tag' => $tag, 'default' => $message, 'cusdefault' => $text, 'url' => $url, 'datas' => $datas));
 	}
@@ -323,6 +323,16 @@ class ExchangeModel extends PluginModel
 		{
 			show_json(0, '您已兑换过此兑换码');
 		}
+	}
+	public function noQrImg() 
+	{
+		global $_W;
+		$no_qrimg = pdo_fetchcolumn('select no_qrimg from ' . tablename('ewei_shop_exchange_setting') . ' where uniacid = :uniacid', array(':uniacid' => $_W['uniacid']));
+		if ($no_qrimg) 
+		{
+			return true;
+		}
+		return false;
 	}
 }
 ?>

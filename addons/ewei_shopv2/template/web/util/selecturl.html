@@ -35,9 +35,11 @@
         <div class="modal-body">
         	<ul class="nav nav-tabs" id="selectUrlTab">
 				<li class="active"><a href="#sut_shop">商城</a></li>
-				<li class=""><a href="#sut_good">商品</a></li>
-				{if $syscate['level']!=-1 && !empty($categorys)}
-					<li class=""><a href="#sut_cate">商品分类</a></li>
+				{if $platform!='wxapp_tabbar'}
+					<li class=""><a href="#sut_good">商品</a></li>
+					{if $syscate['level']!=-1 && !empty($categorys)}
+						<li class=""><a href="#sut_cate">商品分类</a></li>
+					{/if}
 				{/if}
 				{if p('article') && !$platform}
 					<li class=""><a href="#sut_article">{php echo m('plugin')->getName('article')}</a></li>
@@ -64,10 +66,19 @@
 			<div class="tab-content ">
 				
 				<div class="tab-pane active" id="sut_shop">
+					{if $platform}
+					<div class="alert alert-primary" style="margin-bottom: 0;">
+						<p>如果底部菜单中已经选择该链接，页面中选择后点击无效</p>
+						{if $platform=='wxapp_tabbar'}
+							<p>底部菜单只可选择部分页面地址</p>
+						{/if}
+					</div>
+					{/if}
+
 					{loop $allUrls $item}
 						<div class="page-head"><h4><i class="fa fa-folder-open-o"></i> {$item['name']}</h4></div>
 						{loop $item['list'] $child}
-							<nav data-href="{php echo $platform=='wxapp'?$child['url_wxapp']:$child['url']}" class="btn btn-default btn-sm" title="商城首页">{$child['name']}</nav>
+							<nav data-href="{php echo $platform?$child['url_wxapp']:$child['url']}" class="btn btn-default btn-sm" title="商城首页">{$child['name']}</nav>
 						{/loop}
 					{/loop}
 				</div>
@@ -85,21 +96,21 @@
 						 {if empty($category['parentid'])}
 							<div class="line">
 								<div class="icon icon-1"></div>
-								<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform=='wxapp'}/pages/goods/index/index?cate={$category['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category['id']), $full)}{/if}">选择</nav>
+								<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform}/pages/goods/index/index?cate={$category['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category['id']), $full)}{/if}">选择</nav>
 								<div class="text">{$category['name']}</div>
 							</div>
 							 {loop $categorys $category2}
 							 	{if $category2['parentid']==$category['id']}
 								 	<div class="line">
 										<div class="icon icon-2"></div>
-										<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform=='wxapp'}/pages/goods/index/index?cate={$category2['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category2['id']), $full)}{/if}">选择</nav>
+										<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform}/pages/goods/index/index?cate={$category2['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category2['id']), $full)}{/if}">选择</nav>
 										<div class="text">{$category2['name']}</div>
 									</div>
 									{loop $categorys $category3}
 										 {if $category3['parentid']==$category2['id']}
 											 <div class="line">
 												<div class="icon icon-3"></div>
-												<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform=='wxapp'}/pages/goods/index/index?cate={$category3['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category3['id']), $full)}{/if}">选择</nav>
+												<nav title="选择" class="btn btn-default btn-sm" data-href="{if $platform}/pages/goods/index/index?cate={$category3['id']}{else}{php echo mobileUrl('goods',array('cate'=>$category3['id']), $full)}{/if}">选择</nav>
 												<div class="text">{$category3['name']}</div>
 											</div>
 										 {/if}

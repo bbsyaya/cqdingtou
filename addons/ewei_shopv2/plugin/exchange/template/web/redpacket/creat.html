@@ -125,7 +125,7 @@
                 loop++;
                 if (loop > num){
                     htmlobj=$.ajax({url:"{php echo webUrl('exchange/goods/code_type',array('id'=>$id),1);}",async:false});
-                    if (htmlobj.responseText == '3'){
+                    if (htmlobj.responseText == '3' || {if p('exchange')->noQrImg()}true{else}false{/if}){
                         var downloadname = md5+'.xls';
                         var href = '../addons/ewei_shopv2/data/qrcode/{$_W["uniacid"]}/exchange/'+md5+'.xls';
                         $("#down").html('<a class="btn btn-success btn-sm" download="'+downloadname+'" href="'+href+'">下载生成的兑换码</a>');

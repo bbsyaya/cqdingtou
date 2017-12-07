@@ -159,6 +159,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 
 			if (empty($ewei_detail)) {
 				unset($goods[$i]);
+				++$i;
 				continue;
 			}
 
@@ -223,6 +224,7 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 
 			if (empty($ewei_detail)) {
 				unset($goods[$i]);
+				++$i;
 				continue;
 			}
 

@@ -1,5 +1,10 @@
 {template '_header'}
 <script>document.title = "选择兑换商品"; </script>
+<style>
+    .option-picker .fui-navbar {
+        height: 2.5rem;
+    }
+</style>
 <form action="{php echo mobileUrl('exchange/calculate',array(),1);}" method="post" class="form-horizontal form-validate" novalidate="novalidate" data-status="0">
 <div id="status">
 <div class='fui-page fui-page-current'>
@@ -19,7 +24,7 @@
                 {if $groupResult['showcount'] == 0}已查询{$codeResult['count']} 次 <br>{/if}
                 您可以凭兑换码兑换 {if $groupResult['type'] == 1}{if $groupResult['max']>0}{$groupResult['max']}{else}任意{/if} 件{else}价值 <span style="color: #ff445f;">{$groupResult['value']}</span> 元的{/if}商品 <br>
                 已选 <span style="color: #ff445f;" class="total">0</span> 件{if $groupResult['type']==1}还可以再选 <span style="color: #ff445f;" class="again"> {if $groupResult['max']>0} {$groupResult['max']} {else}任意{/if}</span> 件 {/if}<br>
-                已选<span class="total">0</span>件商品，需付<span class="value">0</span>元
+                已选<span class="total">0</span>件商品，需付<span class="value" style="color: #ff445f;">0</span>元
             </div>
 
         </div>
@@ -31,10 +36,10 @@
                 <div class="detail">
                     <div class="name">{$value['title']}</div>
                     <div class="price">
-                        <span class="text">￥<span class="g{$value['id']}">{$value['marketprice']}</span></span>
+                        <span class="text" style="font-size: smaller">原价 ￥<span class="g{$value['id']}">{$value['marketprice']}</span></span>
                     </div>
                 </div>
-                    <div class="btn btn-default btn-sm block x" type="default" data="{$value['id']}" value="{$value['marketprice']}" onclick="initialize();">选择</div>
+                    <div class="btn btn-info btn-sm block x" type="default" data="{$value['id']}" value="{$value['marketprice']}" onclick="initialize();">选择</div>
             </div>
 {/loop}
 {loop $optionList $key $value}
@@ -44,10 +49,10 @@
                 <div class="detail">
                     <div class="name">{$value['title']}</div>
                     <div class="price">
-                        <span class="text">￥{$value['marketprice']}</span>
+                        <span class="text" style="font-size: smaller">原价 ￥{$value['marketprice']}</span>
                     </div>
                 </div>
-                <a class="btn btn-default btn-sm block order-verify {php $o = explode('-',$value['optionstr']);}{loop $o $k $v} inoption{$v}{/loop}" value="{php echo mobileUrl('exchange/modal',array('goods'=>$value['id'],'option'=>$value['optionstr']),1);}" data="{$value['id']}" onclick="initialize();">选择</a>
+                <a class="btn btn-info btn-sm block order-verify {php $o = explode('-',$value['optionstr']);}{loop $o $k $v} inoption{$v}{/loop}" value="{php echo mobileUrl('exchange/modal',array('goods'=>$value['id'],'option'=>$value['optionstr']),1);}" data="{$value['id']}" onclick="initialize();">选择</a>
             </div>
 {/loop}
         </div>

@@ -153,7 +153,7 @@
                     {if $value['type']<2}
                     <a class="btn btn-default btn-sm" href="{php echo webUrl('exchange/goods/down',array('key'=>$value['key']));}"><i class="fa fa fa-download"></i> 下载</a>
                     {/if}
-                    {if $value['type'] == 2}<a class="btn btn-default btn-sm" href="{$value['qrcode_url']}&id={$id}" download="{$value['serial']}.png"><i class="fa fa fa-download"></i> 下载</a>
+                    {if $value['type'] == 2}<a class="btn btn-default btn-sm" href="{$value['qrcode_url']}&id={$id}" download="{$value['serial']}.jpg"><i class="fa fa fa-download"></i> 下载</a>
                     {/if}
                     {ifp 'exchange.redpacket.destroy'}
                     <a class="btn btn-default btn-sm" data-toggle="ajaxRemove"

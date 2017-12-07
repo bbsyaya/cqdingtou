@@ -2263,6 +2263,7 @@ CREATE TABLE IF NOT EXISTS `ims_ewei_shop_goods` (
   `subtitle` varchar(255) DEFAULT '',
   `minpriceupdated` tinyint(1) DEFAULT '0',
   `newgoods` tinyint(3) NOT NULL DEFAULT '0',
+  `video` varchar(521) NOT NULL DEFAULT '',
   `sharebtn` tinyint(1) NOT NULL DEFAULT '0',
   `catesinit3` text,
   `showtotaladd` tinyint(1) DEFAULT '0',

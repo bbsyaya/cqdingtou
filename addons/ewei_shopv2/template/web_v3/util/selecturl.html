@@ -36,9 +36,11 @@
         <div class="modal-body">
         	<ul class="nav nav-tabs" id="selectUrlTab">
 				<li class="active"><a href="#sut_shop">商城</a></li>
-				<li class=""><a href="#sut_good">商品</a></li>
-				{if $syscate['level']!=-1 && !empty($categorys)}
-					<li class=""><a href="#sut_cate">商品分类</a></li>
+				{if $platform!='wxapp_tabbar'}
+					<li class=""><a href="#sut_good">商品</a></li>
+					{if $syscate['level']!=-1 && !empty($categorys)}
+						<li class=""><a href="#sut_cate">商品分类</a></li>
+					{/if}
 				{/if}
 				{if p('article') && !$platform}
 					<li class=""><a href="#sut_article">{php echo m('plugin')->getName('article')}</a></li>
@@ -63,8 +65,17 @@
 				{/if}
 			</ul>
 			<div class="tab-content ">
-				
+
 				<div class="tab-pane active" id="sut_shop">
+					{if $platform}
+					<div class="alert alert-primary" style="margin-bottom: 0;">
+						<p>如果底部菜单中已经选择该链接，页面中选择后点击无效</p>
+						{if $platform=='wxapp_tabbar'}
+							<p>底部菜单只可选择部分页面地址</p>
+						{/if}
+					</div>
+					{/if}
+
 					{loop $allUrls $item}
 						<div class="page-head"><h4><i class="fa fa-folder-open-o"></i> {$item['name']}</h4></div>
 						{loop $item['list'] $child}
@@ -72,7 +83,7 @@
 						{/loop}
 					{/loop}
 				</div>
-				
+
 				<div class="tab-pane" id="sut_good">
 					<div class="input-group">
 						<input type="text" placeholder="请输入商品名称进行搜索" id="select-good-kw" value="" class="form-control">
@@ -80,7 +91,7 @@
 					</div>
 					<div id="select-good-list"></div>
 				</div>
-				
+
 				<div class="tab-pane" id="sut_cate">
 					{loop $categorys $category}
 						 {if empty($category['parentid'])}
@@ -110,7 +121,7 @@
 						{/if}
 					{/loop}
 				</div>
-			
+
 			{if p('article')}
 				<div class="tab-pane" id="sut_article">
 					<div class="input-group">
@@ -120,12 +131,12 @@
 					<div id="select-article-list"></div>
 				</div>
 			{/if}
-			
+
 				<div class="tab-pane" id="sut_coupon">
 					<div class="input-group">
 						<input type="text" placeholder="请输入优惠券名称进行搜索" id="select-coupon-kw" value="" class="form-control">
 							<span class="input-group-addon btn btn-default select-btn" data-type="coupon">搜索</span>
-					</div> 
+					</div>
 					<div id="select-coupon-list"></div>
 				</div>
 
@@ -224,4 +235,4 @@
         </script>
     </div>
 
- 
+
