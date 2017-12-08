@@ -104,7 +104,7 @@ $('#btn-wechat').click(function(e){
 		FoxUI.confirm('余额不足！马上去充值？','提醒',function(){
 			location.href='http://www.cqdingtou.com/app/index.php?i=2&c=entry&m=ewei_shopv2&do=mobile&r=member&wxref=mp.weixin.qq.com#wechat_redirect';
 		},function(){
-			location.href='http://www.cqdingtou.com/app/index.php?i=2&c=entry&m=ewei_shopv2&do=mobile&r=cashier.pay&cashierid=2&t='+Date.parse(new Date());
+			location.href=location.href+'&t='+Date.parse(new Date());
 		});
 	}
 });
