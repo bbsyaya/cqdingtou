@@ -91,3 +91,22 @@
 </div>
 <iframe id="ali" style="display: none;"></iframe>
 {template '_footer'}
+<!-- 改造 只能余额资费 start -->
+<!-- 
+有bug当出现多个人同时付款时当前显示余额不会减少
+ -->
+<script>
+$('#btn-wechat').click(function(e){
+	var ye={$member['credit2']};
+	var sr=$('#money').val();
+	if(sr>ye){
+		$(this).attr('id','');
+		FoxUI.confirm('余额不足！马上去充值？','提醒',function(){
+			location.href='http://www.cqdingtou.com/app/index.php?i=2&c=entry&m=ewei_shopv2&do=mobile&r=member&wxref=mp.weixin.qq.com#wechat_redirect';
+		},function(){
+			location.href='http://www.cqdingtou.com/app/index.php?i=2&c=entry&m=ewei_shopv2&do=mobile&r=cashier.pay&cashierid=2&t='+Date.parse(new Date());
+		});
+	}
+});
+</script>
+<!-- 改造 只能余额资费 end -->
